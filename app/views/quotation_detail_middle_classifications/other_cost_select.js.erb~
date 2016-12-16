@@ -1,0 +1,1 @@
+$("#material_cost_total").html("<%= @material_cost_total %>");

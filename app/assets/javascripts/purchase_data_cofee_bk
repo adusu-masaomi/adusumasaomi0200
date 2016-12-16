@@ -1,0 +1,31 @@
+$(document).on 'change', '#purchase_data_material_id', ->
+  $.ajax(
+    type: 'GET'
+    url: '/purchase_data/materials_select'
+    data: {
+      material_id: $(this).val()
+    }
+  ).done (data) ->
+    $('#materials_select').html(data)
+	
+
+
+
+jQuery ->
+  $('#purchase_data_purchase_order_datum_id').select2({
+   theme: "bootstrap"
+ });
+ 
+$('.select').select2({         
+             ajax:
+              url: '/purchase_data/source.json'
+              dataType: 'json'
+              delay: 250
+              data: (params) ->
+                q: params.term
+              processResults: (data, params) ->
+                results: $.map data, (obj)->
+                  id: obj.id
+                  text: obj.title
+				  });
+				  

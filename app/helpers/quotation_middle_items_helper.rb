@@ -1,0 +1,2 @@
+module QuotationMiddleItemsHelper
+end

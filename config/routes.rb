@@ -1,0 +1,269 @@
+Rails.application.routes.draw do
+  #resources :purchase_order_histories
+  resources :purchase_order_histories do
+    collection do
+      get :get_data
+    end
+  #   collection do
+  #    get :send_email
+  end
+  
+  
+  
+  resources :orders
+  resources :working_safety_matters
+  resources :quotation_items_divisions
+  resources :items_divisions
+  resources :quotation_detail_middle_classifications
+  resources :quotation_middle_items
+  resources :quotation_units
+  resources :quotation_large_items
+  resources :quotation_detail_large_classifications
+  resources :quotation_detail_large_classifications
+  resources :quotation_detail_large_classifications
+  resources :quotation_detail_large_classifications
+  resources :quotation_large_classification_details
+  resources :quotation_large_classification_details
+  resources :quotation_headers
+  get '/adusu/session/index'
+  
+  #get 'purchase_order_data' => 'purchase_order_data#index'
+  #get 'purchase_order_data2'
+  resources :purchase_order_data2, :controller=>"purchase_order_data2"
+  
+  resources :users
+  resources :construction_costs
+  resources :affiliations
+  resources :construction_daily_reports
+  resources :staffs
+  resources :purchase_unit_prices
+  resources :purchase_order_data
+  #resources :purchase_order_data do
+  #  member do
+  #    get :send_email
+  #  end
+  #   collection do
+  #    get :send_email
+  #end
+  #end
+  
+  resources :purchase_division_masters
+  #resources :construction_data
+  resources :purchase_divisions
+  resources :unit_masters
+  resources :maker_masters
+  resources :material_masters
+  resources :material_masters
+  resources :customer_masters
+  #resources :supplier_masters
+  #resources :construction_data
+  resources :construction_data do
+    #collection do
+    member do
+      get :edit2
+      patch :update_and_pdf
+	end
+  end
+  
+  resources :purchase_data
+  
+  resources :supplier_masters do
+    get :autocomplete_supplier_master_supplier_name, :on => :collection
+  end
+
+  resources :session, path: "login", only: [:index, :create] do
+    collection do
+      delete  '/', to: "session#delete"
+    end
+  end
+   
+  #get "construction_data/edit2" => 'construction_data#edit2'
+  #
+  #get 'construction_data' => 'construction_data#index'
+  #get 'construction_data/:id' => 'construction_data#show'
+  #get 'construction_data/new' => 'construction_data#new'
+  #get 'construction_data/:id/edit' => 'construction_data#edit'
+  #get 'construction_data/:id/edit2' => 'construction_data#edit2'
+  #post 'construction_data' => 'construction_data#create'
+  #patch 'construction_data/:id' => 'construction_data#update'
+  #delete 'construction_data/:id' => 'construction_data#destroy'
+  #
+
+  #
+
+ 
+  # The priority is based upon order of creation: first created -> highest priority.
+  # See how all your routes lay out with "rake routes".
+
+  # You can have the root of your site routed with "root"
+  # root 'welcome#index'
+
+  # Example of regular route:
+  #   get 'products/:id' => 'catalog#view'
+
+  # Example of named route that can be invoked with purchase_url(id: product.id)
+  #   get 'products/:id/purchase' => 'catalog#purchase', as: :purchase
+  # get "main_menu/menu0"
+  
+  get "system/index"
+  
+  # root :to => 'main_menu'
+  
+  get '/purchase_datum' => "purchase_data#index"
+  # ajax
+  get '/purchase_datum/unit_price_select' => 'purchase_data#unit_price_select'
+  get '/purchase_datum/list_price_select' => 'purchase_data#list_price_select'
+  get '/purchase_datum/maker_select' => 'purchase_data#maker_select'
+  get '/purchase_datum/unit_select' => 'purchase_data#unit_select'
+  
+  get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
+  #161212
+  #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
+  
+  get '/purchase_order_histories_list' => "purchase_order_histories#index2"
+  #add161128
+  get "/purchase_order_historiez/email_select" => 'purchase_order_histories#email_select'
+  get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
+  get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
+  get '/purchase_order_datum/get_last_number_select' => 'purchase_order_data#get_last_number_select'
+  #add161207
+  get '/purchase_order_datum/get_alias_name' => 'purchase_order_data#get_alias_name'
+  get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
+  
+  get '/construction_daily_reportz' => 'construction_daily_reports#index'
+  get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
+  get '/construction_daily_reportz/end_day_select' => 'construction_daily_reports#end_day_select'
+  
+  get '/construction_costz/construction_name_select' => 'construction_costs#construction_name_select'
+  get '/construction_costz/construction_labor_cost_select' => 'construction_costs#construction_labor_cost_select'
+  get '/construction_costz/purchase_order_amount_select' => 'construction_costs#purchase_order_amount_select'
+
+  #get '/quotation_headerz/customer_name_select' => 'quotation_headers#customer_name_select'
+  #upd161028
+  #見積書一覧D顧客情報
+  get '/quotation_headerz/customer_info_select' => 'quotation_headers#customer_info_select'
+
+  #  add161003
+  get '/quotation_detail_large_classificationz/quotation_large_item_select' => 'quotation_detail_large_classifications#quotation_large_item_select'
+  get '/quotation_detail_large_classificationz/quotation_large_specification_select' => 'quotation_detail_large_classifications#quotation_large_specification_select'
+  #見積書内訳D単位名
+  get '/quotation_detail_large_classificationz/quotation_unit_name_select' => 'quotation_detail_large_classifications#quotation_unit_name_select'
+  
+  #見積明細D,見積内訳M連動用
+  get '/quotation_detail_middle_classificationz/quotation_middle_item_select' => 'quotation_detail_middle_classifications#quotation_middle_item_select'
+  get '/quotation_detail_middle_classificationz/quotation_middle_specification_select' => 'quotation_detail_middle_classifications#quotation_middle_specification_select'
+  get '/quotation_detail_middle_classificationz/quotation_unit_price_select' => 'quotation_detail_middle_classifications#quotation_unit_price_select'
+  get '/quotation_detail_middle_classificationz/execution_unit_price_select' => 'quotation_detail_middle_classifications#execution_unit_price_select'
+  get '/quotation_detail_middle_classificationz/material_id_select' => 'quotation_detail_middle_classifications#material_id_select'
+  get '/quotation_detail_middle_classificationz/quotation_material_name_select' => 'quotation_detail_middle_classifications#quotation_material_name_select'
+  get '/quotation_detail_middle_classificationz/material_unit_price_select' => 'quotation_detail_middle_classifications#material_unit_price_select'
+
+  #見積書明細D単位名
+  get '/quotation_detail_middle_classificationz/quotation_unit_name_select' => 'quotation_detail_middle_classifications#quotation_unit_name_select'
+  
+ #労務単価 
+get '/quotation_detail_middle_classificationz/labor_unit_price_select' => 'quotation_detail_middle_classifications#labor_unit_price_select'
+ #歩掛
+get '/quotation_detail_middle_classificationz/labor_productivity_unit_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_select'
+ #使用材料数
+ get '/quotation_detail_middle_classificationz/material_quantity_select' => 'quotation_detail_middle_classifications#material_quantity_select'
+ #付属品等
+ get '/quotation_detail_middle_classificationz/accessory_cost_select' => 'quotation_detail_middle_classifications#accessory_cost_select'
+ #材料費等
+ get '/quotation_detail_middle_classificationz/material_cost_total_select' => 'quotation_detail_middle_classifications#material_cost_total_select'
+ #労務費等
+ get '/quotation_detail_middle_classificationz/labor_cost_total_select' => 'quotation_detail_middle_classifications#labor_cost_total_select'
+ #その他計
+ get '/quotation_detail_middle_classificationz/other_cost_select' => 'quotation_detail_middle_classifications#other_cost_select'
+ #材料名(材料Mから)
+get '/quotation_detail_middle_classificationz/m_quotation_material_name_select' => 'quotation_detail_middle_classifications#m_quotation_material_name_select'
+ #材料単価(材料Mから)
+ get '/quotation_detail_middle_classificationz/m_material_unit_price_select' => 'quotation_detail_middle_classifications#m_material_unit_price_select'
+ #見出し→品目プルダウン絞り込み用
+ get '/quotation_detail_middle_classificationz/quotation_detail_large_classification_id_select' => 'quotation_detail_middle_classifications#quotation_detail_large_classification_id_select'
+
+  #見積内訳M,資材M連動用
+  get '/quotation_middle_itemz/quotation_material_name_select' => 'quotation_middle_items#quotation_material_name_select'
+  get '/quotation_middle_itemz/material_unit_price_select' => 'quotation_middle_items#material_unit_price_select'
+  
+  # うまくいかない・・・
+  get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
+  
+  # Example resource route (maps HTTP verbs to controller actions automatically):
+  #   resources :products
+
+  # Example resource route with options:
+  #   resources :products do
+  #     member do
+  #       get 'short'
+  #       post 'toggle'
+  #     end
+  #
+  #     collection do
+  #       get 'sold'
+  #     end
+  #   end
+  
+  # 保留
+  # ExcelReport::Application.routes.draw do
+  resources :purchase_order_histories
+  resources :purchase_order_histories
+  resources :orders
+  resources :working_safety_matters
+  resources :quotation_items_divisions
+  resources :quotation_detail_middle_classifications
+  resources :quotation_middle_items
+  resources :quotation_units
+  resources :quotation_large_items
+  resources :quotation_detail_large_classifications
+  resources :quotation_headers
+  get 'session/index'
+
+  resources :users
+  resources :construction_costs
+  resources :affiliations
+  #   resources :purchase_data
+  #   # resources :products
+ 
+  #   controller :report do
+  #     get 'report' => 'report#index', as: :report
+  #     get 'report/output', as: :output_report
+  #   end
+  # end
+
+  #?? forget 
+  #resources :purchase_datum do
+  #  collection do
+  #    get :materials_select
+  #  end
+  #end
+
+
+  # Example resource route with sub-resources:
+  #   resources :products do
+  #     resources :comments, :sales
+  #     resource :seller
+  #   end
+
+  # Example resource route with more complex sub-resources:
+  #   resources :products do
+  #     resources :comments
+  #     resources :sales do
+  #       get 'recent', on: :collection
+  #     end
+  #   end
+
+  # Example resource route with concerns:
+  #   concern :toggleable do
+  #     post 'toggle'
+  #   end
+  #   resources :posts, concerns: :toggleable
+  #   resources :photos, concerns: :toggleable
+
+  # Example resource route within a namespace:
+  #   namespace :admin do
+  #     # Directs /admin/products/* to Admin::ProductsController
+  #     # (app/controllers/admin/products_controller.rb)
+  #     resources :products
+  #   end
+end

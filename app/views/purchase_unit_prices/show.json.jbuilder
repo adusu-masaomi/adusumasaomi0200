@@ -1,0 +1,1 @@
+json.partial! "purchase_unit_prices/purchase_unit_price", purchase_unit_price: @purchase_unit_price

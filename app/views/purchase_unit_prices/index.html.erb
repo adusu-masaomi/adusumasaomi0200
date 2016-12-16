@@ -1,0 +1,86 @@
+<%- model_class = PurchaseUnitPrice -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @purchase_unit_prices %>
+  <!-- 追加箇所終了 --> 
+  <%= search_form_for @q do |f| %>
+     <%= f.label :material_id, '品番：：' %>
+     <%= f.select :material_id_eq, options_from_collection_for_select(PurchaseUnitPrice.all, "material_id", "supplier_material_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
+     <br>
+	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+</div>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_purchase_unit_price_path,
+            :class => 'btn btn-primary' %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
+	  <th><%= model_class.human_attribute_name(:supplier_name) %></th>
+      <th><%= model_class.human_attribute_name(:material_id) %></th>
+      <th><%= model_class.human_attribute_name(:supplier_material_code) %></th>
+      <th><%= model_class.human_attribute_name(:unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:unit_id) %></th>
+      <th><%= sort_link(@q, :created_at, model_class.human_attribute_name(:created_at), default_order: :desc ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_unit_prices.each do |purchase_unit_price| %>
+      <tr>
+        <td><%= link_to purchase_unit_price.id, purchase_unit_price_path(purchase_unit_price) %></td>
+        <% if purchase_unit_price.SupplierMaster.present? %>
+          <td><%= purchase_unit_price.SupplierMaster.supplier_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <!--<td><%= purchase_unit_price.material_id %></td>-->
+	<% if purchase_unit_price.MaterialMaster.present? %>
+          <td><%= purchase_unit_price.MaterialMaster.material_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <td><%= purchase_unit_price.supplier_material_code %></td>
+        <td><%= number_to_currency(purchase_unit_price.unit_price, precision: 2) %></td>
+        <% if purchase_unit_price.UnitMaster.present? %>
+          <td><%= purchase_unit_price.UnitMaster.unit_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <td><%=l purchase_unit_price.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_purchase_unit_price_path(purchase_unit_price), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      purchase_unit_price_path(purchase_unit_price),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @purchase_unit_prices %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+	//検索可能なリストボックス
+	$(".searchableMaterialCode").select2({ theme: "classic" });
+  });
+  
+  
+
+</script>

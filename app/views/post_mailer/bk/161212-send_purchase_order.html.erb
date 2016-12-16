@@ -1,0 +1,38 @@
+<h1></h1>
+
+<p>
+  <p>注文依頼</p>
+  <p></p>
+  <p><%= @supplier_name %></p>
+  <p><%= @purchase_order_code %></p>
+  <p><%= @construction_name %></p>
+  </p>
+  </p>
+  
+  <% $order_parameters.values.each_with_index do |item, index| %>
+    <% if item[:_destroy] != "1" then %>     
+      <%= "#{h(index + 1)}." %>
+      品番:
+      <%= item[:material_code] %>
+      品名:
+      <%= item[:material_name] %>
+      メーカー:
+      <%= item[:maker_name] %>
+      定価:
+	  <% if item[:list_price].present? && item[:list_price].to_i > 0 then %>
+        <%= "￥" + item[:list_price].to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,') %>
+      <% else %>
+        -
+      <% end %>
+      数量:
+      <%= item[:quantity]  %></p>
+	<% end %>
+  <% end %>
+  
+  <p>以上、宜しくお願い致します。</p>
+  </p>
+  </p>
+  ※このメールアドレスは配信専用です。このメッセージに返信しないようお願いいたします。
+</p>
+
+ 

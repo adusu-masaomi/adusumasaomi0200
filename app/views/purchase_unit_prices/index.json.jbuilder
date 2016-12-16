@@ -1,0 +1,1 @@
+json.array! @purchase_unit_prices, partial: 'purchase_unit_prices/purchase_unit_price', as: :purchase_unit_price

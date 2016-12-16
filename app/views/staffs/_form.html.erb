@@ -1,0 +1,12 @@
+<%= simple_form_for @staff, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :staff_name %>
+  <%= f.input :furigana %>
+  <%= f.label :所属, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :affiliation_id, Affiliation.all, :id, :affiliation_name, {:prompt => "どれか一つを選択して下さい"} , {id:"affiliation_id", class: "my-custom-class" } %>
+  <%= f.input :hourly_wage %>
+  <%= f.input :daily_pay %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                staffs_path, :class => 'btn btn-default' %>
+<% end %>

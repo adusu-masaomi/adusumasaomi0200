@@ -1,0 +1,1 @@
+$(document).ready(function(){$(".datepicker").datetimepicker({format:"YYYY/MM/DD",icons:{date:"fa fa-calendar"}}),$(".datetimepicker").datetimepicker({format:"YYYY/MM/DD HH:mm"})});

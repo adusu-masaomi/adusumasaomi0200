@@ -1,0 +1,1 @@
+json.array! @working_safety_matters, partial: 'working_safety_matters/working_safety_matter', as: :working_safety_matter

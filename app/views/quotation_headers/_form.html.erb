@@ -1,0 +1,110 @@
+<%= simple_form_for @quotation_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :quotation_code, input_html:{:tabindex=>"0"} %>
+  <%= f.input :quotation_date, input_html:{:tabindex=>"1"} %>
+  <%= f.label :"件名Ｎｏ(＊該当無は”-”のままにする)" , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.input :construction_datum_id %>-->
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:selected => @quotation_header.construction_datum_id || 1, :include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"2",  style: 'width:220px' } %></br>
+  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3"} %>
+  <%= f.label :"得意先(＊該当無は”-”のままにする)", {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.input :customer_id %>-->
+  <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:selected => @quotation_header.customer_id || 1 } , {id:'customer_id', :class => "searchableCustomerName",  style: 'width:220px' , :tabindex=>"4"} %></br>
+  <%= f.input :customer_name , input_html:{id:"customer_name", :tabindex=>"5"} %>
+  <%= f.input :post, input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"6"} %>
+  <%= f.input :address, input_html:{id:"address", name:"address", :tabindex=>"7"} %>
+  <%= f.input :tel, input_html:{id:"tel", :tabindex=>"8"} %>
+  <%= f.input :fax, input_html:{id:"fax", :tabindex=>"9"} %>
+  <%= f.input :construction_period, input_html:{:tabindex=>"10"}  %>
+  <%= f.input :construction_place, input_html:{:tabindex=>"11"}  %>
+  <%= f.input :trading_method, input_html:{:tabindex=>"12"}  %>
+  <%= f.input :effective_period, input_html:{:tabindex=>"13"}  %>
+  <%= f.input :net_amount, input_html:{:tabindex=>"14"}  %>
+  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{:tabindex=>"15"} %>
+  <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{:tabindex=>"16"}  %>
+  
+  <!--<%= f.button :submit, :class => 'btn-primary' %>-->
+  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_headers_path, :class => 'btn btn-default' %>
+<% end %>
+
+<script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+<script type="text/javascript">
+
+   $(document).on('ready page:load', function(){
+   
+   　   //検索可能なリストボックス(注文Noの場合)
+     $(".searchableConstructionCode").select2({ theme: "bootstrap" });
+
+     $( ".searchableConstructionCode" ).change(function(e) {
+	  　  setConstructionDateDefault();
+	 });
+	 
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	 //工事コードの場合
+	 $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+	   $('[tabindex=3]').focus(); 
+	 });
+	 
+	 	 
+	 //検索可能なリストボックス(顧客名の場合)
+     $(".searchableCustomerName").select2({ theme: "bootstrap" });
+	 $( ".searchableCustomerName" ).change(function(e) {
+	  　  setCustomerInfoDefault();
+     });
+	 
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 //顧客名の場合
+	 $( ".searchableCustomerName" ).on("select2:close", function (e) {
+	  　 $('[tabindex=5]').focus(); 
+	 });
+	 //
+   });
+   
+   //工事情報のセット
+  function setConstructionDateDefault()
+  {  
+    //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
+    obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     $.get("<%= construction_costz_construction_name_select_path %>",
+	   {id: construction_id },
+        function(data){
+          obj = document.getElementById("construction_name").textContent;
+          document.getElementById("construction_name").value = obj;
+	      }
+	  );
+	  
+   };
+   //顧客情報のセット
+  function setCustomerInfoDefault()
+  {  
+    obj = document.getElementById("customer_id");
+     customer_id = parseInt(obj.value);
+     $.get("<%= quotation_headerz_customer_info_select_path %>",
+       {id: customer_id },
+        function(data){
+          //顧客名
+		  obj = document.getElementById("customer_name").textContent;
+          document.getElementById("customer_name").value = obj;
+		  
+		  //郵便番号
+	      obj = document.getElementById("post").textContent;
+          document.getElementById("post").value = obj;
+		  //住所
+		  obj = document.getElementById("address").textContent;
+          document.getElementById("address").value = obj;
+		  //tel
+	      obj = document.getElementById("tel").textContent;
+          document.getElementById("tel").value = obj;
+          //fax
+	      obj = document.getElementById("fax").textContent;
+          document.getElementById("fax").value = obj;
+		  }
+      );
+   };
+  
+  
+  
+ 
+ 
+</script>

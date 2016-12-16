@@ -1,0 +1,2 @@
+module QuotationDetailMiddleClassificationsHelper
+end

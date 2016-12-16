@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_large_item_name: MyString
+  quotation_large_specification: MyString
+
+two:
+  quotation_large_item_name: MyString
+  quotation_large_specification: MyString

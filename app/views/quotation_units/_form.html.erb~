@@ -1,0 +1,8 @@
+<%= simple_form_for @quotation_unit, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :quotation_unit_name %>
+  <%= error_span(@quotation_unit[:quotation_unit_name]) %>
+
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_units_path, :class => 'btn btn-default' %>
+<% end %>

@@ -1,0 +1,85 @@
+<%- model_class = ConstructionDatum -%>
+<div class="page-header">
+  <b>
+  </br>
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @construction_data %>
+  <!-- 追加箇所終了 -->
+
+    <%= search_form_for @q do |f| %>
+    <%= f.label :construction_name, '工事名：' %>
+    <%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %>
+     <%= f.label :customer_name, '得意先名：' %>
+    <%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" } %>
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+</div>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_datum_path,
+            :class => 'btn btn-primary' %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th><%= model_class.human_attribute_name(:construction_code) %></th>-->
+      <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code) ) %></th>
+      <th><%= model_class.human_attribute_name(:construction_name) %></th>
+      <th><%= model_class.human_attribute_name(:reception_date) %></th>
+      <th><%= model_class.human_attribute_name(:customer_id) %></th>
+      <th><%= model_class.human_attribute_name(:construction_start_date) %></th>
+      <th><%= model_class.human_attribute_name(:construction_end_date) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @construction_data.order("id desc").each do |construction_datum| %>
+      <tr>
+        <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
+        <td><%= construction_datum.construction_code %></td>
+        <td><%= construction_datum.construction_name %></td>
+        <td><%= construction_datum.reception_date %></td>
+        <td><%= @customer_masters[(construction_datum.customer_id)-1].customer_name %></td>
+        <td><%= construction_datum.construction_start_date %></td>
+        <td><%= construction_datum.construction_end_date %></td>
+        <td><%=l construction_datum.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_construction_datum_path(construction_datum), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      construction_datum_path(construction_datum),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @construction_data %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+  
+<!-- 追加箇所開始 -->
+<%= paginate @construction_data %>
+<!-- 追加箇所終了 -->
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableCustomerName").select2({ theme: "classic" });
+	
+  });
+  
+  
+
+</script>

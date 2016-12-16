@@ -1,0 +1,272 @@
+<%= simple_form_for @purchase_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @purchase_datum.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @purchase_datum.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_datum.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+
+  <!--スマホ対応,datepicker使う場合のみ。 --> 
+  <!--</br></br></br></br>-->  
+
+  <!--<%= f.input :purchase_date, label: "仕入日" , input_html:{ style: 'width:220px;'}, as: :date_picker %>-->
+  <%= f.input :purchase_date, label: "仕入日" , input_html:{ id:"purchase_date", style: 'width:220px;'} %>
+  <%= f.input :slip_code, label: "伝票番号", input_html: { style: 'width:220px;' }  %>
+  <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
+  <!--<%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい",class: "searchable"} , {id:'purchase_order_datum_id', :class => "my-custom-class",:onchange => "setKenmei(this.form, this.fields)"} %>-->
+  <!--<%= f.select_tag :"purchase_datum",  options_from_collection_for_select(PurchaseOrderDatum.all, :id, :p_num_cd), {:prompt => 'どれか一つを選択して下さい' , class: "searchableSubject" , style: 'width:220px;' } %>-->
+  <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", class: "searchableSubject" , style: 'width:220px !important; margin-left: -15px;'} %>
+  
+  <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
+  <%= f.simple_fields_for :@purchase_order_datum do |m| %>
+  <%= m.label :件名Ｎｏ参照用, {:class => "my-custom-class-lr"} %>
+  <%= m.collection_select :lstConstruction_datumid, ConstructionDatum.all, :id, :construction_code, {:include_blank => true,:selected => @purchase_datum.construction_datum_id} , {id:'lstConstruction_datumid',name:'lstConstruction_datumid', :class => "my-custom-class-r2"} %></br>
+  <% end %>
+  <!-- -->
+  <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:include_blank => true} , {id:'construction_datum_id', :class => "my-custom-class-l" } %></br>-->
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode",  style: 'width:220px' } %></br>
+  <!--<%= f.input :construction_datum_id, label: "件名No（変更可）", input_html: { :class => "my-custom-class-t" }  %>-->
+  <%= f.label :品番 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , style: 'width:220px',:onchange => "setListPriceAndMakerAndUnit(this.form)"} %>
+  <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
+  <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2"}  %></br>
+  
+  <%= f.input :material_code, label: "品番（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' }  %>
+  
+  <!--<%= f.hidden_field :material_masters, :value => @material_masters, id:"material_list_price" %>-->
+  
+  <%= f.label :品名 , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :material_name, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {name: 'lstMaterialName' ,:class => "my-custom-class-r"}  %></br>-->
+  <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l"}  %></br>
+  
+  <%= f.input :material_name, label: "品名（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_name' }  %>
+  <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>-->
+  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , style: 'width:220px'} %></br> 
+  <%= f.input :maker_name, label: "メーカー名（手入力可）", input_html: { id:'maker_name', :class => "my-custom-class-t"}  %>
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:selected => 2},{id:"supplier_id", :class => "my-custom-class",:onchange => "setUnitPrice(this.form)"}  %>-->
+  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},{id:"supplier_id", :class => "my-custom-class",:onchange => "setUnitPrice(this.form)"}  %>
+  
+  <!--仕入先単価-->
+  <%= f.simple_fields_for :PurchaseUnitPrice, :remote => true do |k| %>
+  <%= k.input :unit_price , input_html:{ id:"unit_price"} , as: :hidden%>
+  <% end %>
+  
+  <!--資材M単価-->
+  <%= f.simple_fields_for :MaterialMaster, :remote => true do |m| %>
+    <%= m.input :last_unit_price , input_html:{ id:"last_unit_price"}, as: :hidden %>
+    <%= m.input :last_unit_price_update_at , input_html:{ id:"last_unit_price_update_at"} ,as: :date_picker, as: :hidden %>
+  <% end %>
+
+  <%= f.input :quantity , label: "数量" , hint: "＊(PCのみ)入力後必ずtabキーを押す!" , input_html:{ style: 'width:220px;' , :onchange => "calcMoney(this.form)" } %>
+  <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :class => "my-custom-class"} %>
+  <%= f.input :purchase_unit_price, label: "仕入単価", hint: "＊(PCのみ)変更した場合必ずtabキーを押す!" , input_html:{id:"purchase_unit_price",  style: 'width:220px;' , :onchange => "calcMoney(this.form)" } %>
+  <%= f.check_box :check_unit, {}, "true", "false" %>
+  <%= f.label_tag :check_unit, '単価マスタを更新しない場合はチェック' %> 
+  <%= f.input :purchase_amount ,label: "金額"  %>
+  <%= f.input :list_price,label: "定価", input_html:{id:"list_price"} %>
+  <%= f.label :仕入区分 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"} %></br>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_data_path, :class => 'btn btn-default' %>
+				
+<% end %>
+
+<script type="text/javascript">
+
+   //$(document).ready(function(){
+   $(document).on('ready page:load', function(){
+   //$(document).on('turbolinks:load', function(){
+     
+     //連動しなくなるので保留・・・
+     $(".searchableConstructionCode").select2({ theme: "bootstrap" });
+
+     //検索可能なリストボックス(品名の場合)
+     $(".searchableItem").select2({ theme: "bootstrap" });
+
+     $( ".searchableItem" ).change(function(e) {
+       obj = document.getElementById("material_id");
+       index = obj.selectedIndex;
+       //品番のセット
+	   obj4 = document.getElementById("material_code");
+       obj4.value = obj.options[index].innerText;
+	     
+	   //品名のセット（リスト）
+       obj2 = document.getElementById("lstMaterialName");
+       obj2.selectedIndex = index;
+       //品名のセット（テキスト）
+       if (index !== 0){
+          obj3 = document.getElementById("material_name");
+          obj3.value = obj2.options[index].innerText;
+        }
+      });
+
+
+      $(".searchableMaker").select2({ theme: "bootstrap" });
+
+      $( ".searchableMaker" ).change(function(e) {
+           //メーカー名のセット
+          obj = document.getElementById("maker_id");
+          index = obj.selectedIndex;
+          if (index !== 0){
+             obj2 = document.getElementById("maker_name");
+             obj2.value = obj.options[index].innerText;
+          }
+      });
+
+     
+      //検索可能なリストボックス(注文Noの場合)
+      $(".searchableSubject").select2({ theme: "bootstrap" });
+
+       $( ".searchableSubject" ).change(function(e) {
+      
+        //obj = f.purchase_datum_purchase_order_datum_id;
+        obj = document.getElementById("purchase_datum");
+        index = obj.selectedIndex;
+    
+        var str = obj.options[index].innerText;
+        //var searchIndex = obj.options[index].innerText.search("/");
+        //指定文字を抜き出す。区切り文字はモデル内に記述
+        var searchIndex = obj.options[index].innerText.search("<");
+        //数字だけ抜き出す。引数の10は10進数の意。
+        var KenId = parseInt(str.substr(searchIndex + 1,8),10);
+        
+        obj2 = document.getElementById("lstConstruction_datumid");
+        obj2.selectedIndex = KenId;
+        $(".searchableConstructionCode").val(KenId).change(); 
+        
+        //obj3 = document.getElementById("construction_datum_id");
+        //obj3.selectedIndex = KenId;
+     });
+     //
+     $('#supplier_id').change(function(){
+        var supplier_id = $("#supplier_id").val();
+        var material_id = $("#material_id").val();
+	   $.get("<%= purchase_datum_unit_price_select_path %>",
+          { supplier_id: supplier_id, material_id: material_id },
+          function(data){ }
+        );
+      });
+	  
+	
+   });
+
+  //仕入先単価のセット
+   function setUnitPrice(f)
+   {
+     //仕入単価のセット
+     //f.unit_price.selectedIndex = 1;
+     //f.unit_price.value = 1;     
+
+     var supplier_id = f.supplier_id.value;
+      var material_id = f.material_id.value;
+      $.get("<%= purchase_datum_unit_price_select_path %>",
+          { supplier_id: supplier_id, material_id: material_id },
+          function(data){
+            　　//obj = document.getElementById("unit_price");
+                //index = obj.selectedIndex;
+                //f.purchase_unit_price.value = obj.options[index].innerText;     
+          　
+		obj = document.getElementById("unit_price").textContent;
+	        document.getElementById("unit_price").value = obj;
+		document.getElementById("purchase_unit_price").value = obj;
+               
+　　　　　　　　 var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
+   　　　　　　　if (f.last_unit_price_update_at.value <= purchase_date_set){
+　　　　　　　　　　　document.getElementById("last_unit_price").value = obj;  
+	　　    }
+            }
+        );
+      
+      //単位のセット
+      // var material_id = f.material_id.value;
+	  $.get("<%= purchase_datum_unit_select_path %>",
+          { supplier_id: supplier_id, material_id: material_id },
+          function(data){
+          }
+        );
+        
+       }
+
+   //定価・メーカー・単位のセット
+   function setListPriceAndMakerAndUnit(f)
+   {  
+      //定価のセット
+          //初期値をセット
+          f.material_list_price.selectedIndex = 1;
+     //
+     //obj = f.material_list_price;
+          
+          var material_id = f.material_id.value;
+     $.get("<%= purchase_datum_list_price_select_path %>",
+          {material_id: material_id },
+          function(data){
+            //
+              obj = document.getElementById("material_list_price");
+                index = obj.selectedIndex;
+                //index = 0;
+                f.list_price.value = obj.options[index].innerText;
+     }
+        );
+     //メーカーのセット
+       //var material_id = f.material_id.value;
+     $.get("<%= purchase_datum_maker_select_path %>",
+          {material_id: material_id },
+          function(data){
+          //メーカー名もセット
+   	      obj = f.maker_id;
+   	      index = obj.selectedIndex;
+            //f.maker_id.value = obj.options[index].innerHTML;
+            //debugger;
+            //上記でピンポイントしているので0とする
+            index = 0;
+  	     //f.purchase_datum_maker_name.value = obj.options[index].innerText;
+             f.maker_name.value = obj.options[index].innerText;
+          }
+        );
+     
+       //単位も再セット
+       setUnitPrice(f);
+  
+       //単位のセット
+      //var material_id = f.material_id.value;
+      //$.get("<%= purchase_datum_unit_select_path %>",
+      //    {id: material_id },
+      //    function(data){
+      //    }
+      //  );
+     
+    }
+  
+  //金額計算
+  function calcMoney(f)
+  {
+    var num = f.purchase_datum_quantity.value * f.purchase_unit_price.value ;
+    //小数点以下を切り捨て
+    f.purchase_datum_purchase_amount.value = Math.floor(num);
+
+    // 仕入単価をセット
+    f.unit_price.value = f.purchase_unit_price.value;
+  
+    //　単価Mの直近単価も更新
+    var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
+   
+    if (f.last_unit_price_update_at.value <= purchase_date_set){
+     f.last_unit_price.value = f.purchase_unit_price.value;
+    }
+  }
+    
+  
+</script>

@@ -1,0 +1,115 @@
+<%= simple_form_for @purchase_order_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+  <% if @purchase_order_datum.errors.any? %>
+   <div id="error_explanation">
+    <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_order_datum.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+   </div>
+  <% end %>
+
+  <!--<%= f.select :last_header_number,PurchaseOrderDatum.header_numbers, {}, {class: "searchableHeader" , style: 'width:100px' } %>-->
+  <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
+  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1" } %>
+  <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+  <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_order_datum.supplier_master_id || 2}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
+  
+  <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
+     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"4"}  %>
+  <% end %>
+  
+  <%= f.simple_fields_for :construction_datum, :remote => true do |m| %>
+     <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>
+  <% end %>
+  <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
+  
+  <div>
+  <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？" } %>
+  <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_order_data_path, :class => 'btn btn-default' %>
+   </div>
+<% end %>
+<script type="text/javascript">
+
+　　$(document).ready(function(){
+	   //検索可能なリストボックス(注文Noの場合)
+       $(".searchableConstructionName").select2({ theme: "bootstrap" });
+	   $(".searchableConstructionName").change(function(e) {
+         setAliasName();
+       });  
+	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	   $( ".searchableConstructionName" ).on("select2:close", function (e) {
+	     $('[tabindex=3]').focus(); 
+	   });
+	   
+	   $(".searchableSupplier").select2({ theme: "bootstrap" }); 
+       $(".searchableSupplier").change(function(e) {
+         setEmail();
+       });  
+	   $( ".searchableSupplier" ).on("select2:close", function (e) {
+	     $('[tabindex=5]').focus(); 
+	   });
+	   
+        //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+       var flag = document.getElementById("mail_sent_flag").value;
+       if (flag == 1) {
+	     document.getElementById("mail_sent_button").disabled = true;
+	   } 
+	 });
+  
+  //
+  
+  //ajax
+  function setAliasName()
+  {
+       obj = document.getElementById("construction_datum_id");
+       construction_id = parseInt(obj.value);
+       $.get("<%= purchase_order_datum_get_alias_name_path %>",
+         {id: construction_id },
+          function(data){
+               obj = document.getElementById("alias_name").textContent;
+			   // ハイフンの場合は空白としてセット(バリデーションのため)
+			   if (obj == "-") {
+			     obj = "";
+			   }
+               document.getElementById("alias_name").value = obj;
+          }
+        );
+  };
+  //ajax
+  function setEmail()
+  {
+       obj = document.getElementById("supplier_master_id");
+       supplier_master_id = parseInt(obj.value);
+       $.get("<%= purchase_order_datum_get_email1_path %>",
+         {id: supplier_master_id },
+          function(data){
+               obj = document.getElementById("email1").textContent;
+			   document.getElementById("email1").value = obj;
+          }
+        );
+  };
+
+  
+  //最終番号のセット
+  function getLastCode()
+  {  
+    obj = document.getElementById("last_header_number");
+     //quotation_unit_id = parseInt(obj.value);
+	 header = obj.value;
+     $.get("<%= purchase_order_datum_get_last_number_select_path %>",
+       {header: header },
+        function(data){
+		  obj = document.getElementById("purchase_order_code").textContent;
+		  document.getElementById("purchase_order_code").value = obj;
+		  }
+      );
+   };  
+
+</script>

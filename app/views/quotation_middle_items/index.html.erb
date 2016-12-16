@@ -1,0 +1,106 @@
+<%- model_class = QuotationMiddleItem -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @quotation_middle_items %>
+  <!-- 追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+  <%= f.label :quotation_middle_item_name, '内訳名：' %>
+  <%= f.select :id_eq, options_from_collection_for_select(QuotationMiddleItem.all, "id", "quotation_middle_item_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+   
+</div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_quotation_middle_item_path,
+            :class => 'btn btn-primary' %>
+			
+			
+<div class="span11 table-scrollable">
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th><%= sort_link(@q, :quotation_middle_item_name, model_class.human_attribute_name(:quotation_middle_item_name) ) %></th>
+      <th><%= sort_link(@q, :quotation_middle_item_short_name, model_class.human_attribute_name(:quotation_middle_item_short_name) ) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_middle_specification) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_material_name) %></th>
+      <th><%= model_class.human_attribute_name(:material_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
+      <th><%= model_class.human_attribute_name(:material_quantity) %></th>
+      <th><%= model_class.human_attribute_name(:accessory_cost) %></th>
+      <th><%= model_class.human_attribute_name(:material_cost_total) %></th>
+      <th><%= model_class.human_attribute_name(:labor_cost_total) %></th>
+      <th><%= model_class.human_attribute_name(:other_cost) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quotation_middle_items.each do |quotation_middle_item| %>
+      <tr>
+        <td><%= link_to quotation_middle_item.id, quotation_middle_item_path(quotation_middle_item) %></td>
+        <td><%= quotation_middle_item.quotation_middle_item_name %></td>
+        <td><%= quotation_middle_item.quotation_middle_item_short_name %></td>
+        <td><%= quotation_middle_item.quotation_middle_specification %></td>
+        <% if quotation_middle_item.QuotationUnit.present? %>
+           <td><%= quotation_middle_item.QuotationUnit.quotation_unit_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <td><%= quotation_middle_item.quotation_unit_price %></td>
+        <td><%= quotation_middle_item.execution_unit_price %></td>
+        <td><%= quotation_middle_item.quotation_material_name %></td>
+        <td><%= quotation_middle_item.material_unit_price %></td>
+        <td><%= quotation_middle_item.labor_unit_price %></td>
+        <td><%= quotation_middle_item.labor_productivity_unit %></td>
+        <td><%= quotation_middle_item.material_quantity %></td>
+        <td><%= quotation_middle_item.accessory_cost %></td>
+        <td><%= quotation_middle_item.material_cost_total %></td>
+        <td><%= quotation_middle_item.labor_cost_total %></td>
+        <td><%= quotation_middle_item.other_cost %></td>
+        <td><%=l quotation_middle_item.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_quotation_middle_item_path(quotation_middle_item), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      quotation_middle_item_path(quotation_middle_item),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+	<!-- 追加箇所開始 -->
+    <%= paginate @quotation_middle_items %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+  </table>
+</div>
+
+
+<!-- 追加箇所開始 -->
+<%= paginate @quotation_middle_items %>
+<!-- 追加箇所終了 -->
+			
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableLargeItem").select2({ theme: "classic" });
+  });
+</script>
+

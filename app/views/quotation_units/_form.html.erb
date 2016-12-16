@@ -1,0 +1,19 @@
+<%= simple_form_for @quotation_unit, :html => { :class => 'well form-horizontal' } do |f| %>
+  <% if @quotation_unit.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @quotation_unit.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @quotation_unit.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
+  <%= f.input :quotation_unit_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_units_path, :class => 'btn btn-default' %>
+<% end %>

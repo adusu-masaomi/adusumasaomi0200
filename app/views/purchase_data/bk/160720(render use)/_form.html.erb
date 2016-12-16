@@ -1,0 +1,43 @@
+<% @material_masters = MaterialMaster.new unless @material_masters %>
+<%= simple_form_for @purchase_datum, :name => "sfm" , :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :purchase_date, label: "仕入日" , input_html:{ style: 'width:220px;'}, as: :date_picker %>
+  <%= f.label :注文番号 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {:prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"} %></br>
+  <%= f.label :品番 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code,  {:prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"}  %></br>
+  <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  {name: 'lstMakerId' , :class => "my-custom-class" ,:onchange => "alert_me_test(this.form)" } %></br>
+  <%= f.input :maker_name, label: "メーカー名", input_html: { name: 'txtMakerName' , :class => "my-custom-class-t"}  %>
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_datum.supplier_id || 2},{:class => "my-custom-class"}  %></br>
+  <%= f.input :quantity , label: "数量" , input_html:{ style: 'width:220px;'} %>
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_id, UnitMaster.all, :id, :unit_name, {:selected => @purchase_datum.unit_id || 2} , {:class => "my-custom-class"} %>
+  <%= f.input :purchase_unit_price, label: "仕入単価" %>
+  <%= f.input :purchase_amount ,label: "金額"  %>
+  <%= f.input :list_price,label: "定価" %>
+  <%= f.label :仕入区分 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :division_id, PurchaseDivisionMaster.all, :id, :purchase_division_name , {:prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"} %></br>
+  
+  <%= f.label :品名 , {:class => "my-custom-class-l"} %></br>
+  <%= render partial: 'materials', locals: {:material_id =>  @purchase_datum.material_id} %>
+  
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_data_path, :class => 'btn btn-default' %>
+
+<% end %>
+
+<script type="text/javascript">
+  function alert_me_test(f)
+  {
+    obj = f.lstMakerId;
+    index = obj.selectedIndex;
+  	if (index != 0){
+      f.txtMakerName.value = obj.options[index].innerText;
+    }
+  }
+  
+  
+</script>

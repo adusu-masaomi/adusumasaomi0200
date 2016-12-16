@@ -1,0 +1,107 @@
+<%- model_class = QuotationHeader -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @quotation_headers %>
+  <!-- 追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+  <%= f.label :construction_code, '見積Ｎｏ：' %>
+  <%= f.select :id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %></br>
+  <%= f.label :construction_code, '件名：' %>
+  <%= f.select :with_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+
+</div>
+<%= link_to t('.new',:default => t("新規作成")),
+            new_quotation_header_path,
+            :class => 'btn btn-primary' %>
+<div class="span11 table-scrollable">
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th><%= sort_link(@q, :quotation_code, model_class.human_attribute_name(:quotation_code) ) %></th>
+      <th><%= sort_link(@q, :quotation_date, model_class.human_attribute_name(:quotation_date) ) %></th>
+      <th><%= sort_link(@q, :customer_name, model_class.human_attribute_name(:customer_name) ) %></th>
+      <th><%= sort_link(@q, :construction_name, model_class.human_attribute_name(:construction_name) ) %></th>
+      <th><%= model_class.human_attribute_name(:post) %></th>
+      <th><%= model_class.human_attribute_name(:address) %></th>
+      <th><%= model_class.human_attribute_name(:tel) %></th>
+      <th><%= model_class.human_attribute_name(:fax) %></th>
+      <th><%= model_class.human_attribute_name(:construction_period) %></th>
+      <th><%= model_class.human_attribute_name(:construction_place) %></th>
+      <th><%= model_class.human_attribute_name(:trading_method) %></th>
+      <th><%= model_class.human_attribute_name(:effective_period) %></th>
+      <th><%= model_class.human_attribute_name(:quote_price) %></th>
+      <th><%= model_class.human_attribute_name(:net_amount) %></th>
+	  <th><%= model_class.human_attribute_name(:execution_amount) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quotation_headers.order("id desc").each do |quotation_header| %>
+      <tr>
+        <td><%= link_to "内訳へ",
+            quotation_detail_large_classifications_path(quotation_header_id: quotation_header.id, new_flag: "1"),
+            :class => 'btn btn-info' %>
+        </td>
+		<td><%= link_to quotation_header.id, quotation_header_path(quotation_header) %></td>
+        <td><%= quotation_header.quotation_code %></td>
+        <td><%= quotation_header.quotation_date %></td>
+        <td><%= quotation_header.customer_name %></td>
+        <td><%= quotation_header.construction_name %></td>
+        <td><%= quotation_header.post %></td>
+        <td><%= quotation_header.address %></td>
+        <td><%= quotation_header.tel %></td>
+        <td><%= quotation_header.fax %></td>
+        <td><%= quotation_header.construction_period %></td>
+        <td><%= quotation_header.construction_place %></td>
+        <td><%= quotation_header.trading_method %></td>
+        <td><%= quotation_header.effective_period %></td>
+        <td align="right"><%= number_to_currency(quotation_header.quote_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_header.net_amount,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_header.execution_amount,  precision: 0) %></td>
+        <td><%=l quotation_header.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+		  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_quotation_header_path(quotation_header), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      quotation_header_path(quotation_header),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+	<!-- 追加箇所開始 -->
+    <%= paginate @quotation_headers %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+  </table>
+</div>
+
+<!-- 追加箇所開始 -->
+<%= paginate @quotation_headers %>
+<!-- 追加箇所終了 -->
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableQuotationCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+  });
+</script>
+

@@ -1,0 +1,72 @@
+<%- model_class = PurchaseOrderDatum -%>  
+<%= javascript_include_tag 'cocoon' %>
+
+
+<%= simple_nested_form_for @purchase_order_datum, :url => {:controller => 'purchase_order_data2', :action => :update, :id => @purchase_order_datum.id} , 
+                                                           :html => { :class => 'well form-inline', :style => "width: 1200px;" } do |f| %>
+   
+   <%= f.label :注文ＮＯ：, {style: 'color:blue'} %>
+   <%= f.collection_select :id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , { class: "searchableId" , style: 'width:200px', :disabled => true} %>
+   <%= f.label :工事名：, {style: 'color:blue'} %>
+   <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %></br></br>
+   <%= f.label :注文先：, {style: 'color:blue'} %>
+   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {} , { class: "searchableId" , style: 'width:200px'} %>
+   <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:
+   { :value => f.object.purchase_order_date || Date.today , style: 'width:220px'} , as: :date_picker %>
+   
+  　<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
+  
+    
+  
+  <!--<%= f.label :品番コード（手入力可）, {style: 'width:220px'}  %>-->
+  <!--<%= f.label :品名（手入力可）, {style: 'width:400px'}  %>-->
+  <!--<%= f.label :数量, {style: 'width:90px'}  %>-->
+  <!--<%= f.label :単位, {style: 'width:185px'}  %>-->
+  
+  <!-- <div class="dash_actions">-->
+  <%= f.simple_fields_for :orders   do |orders| %>
+    <div class="nested-fields form-inline">
+      <%= render 'order_fields', f: orders %>
+    </div>
+  <% end %>
+  
+    <%= link_to_add_association 'アイテム追加' ,  f, :orders  , :class => 'btn btn-success' %> 
+  <!--</div>-->
+   
+   <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info",  data: {confirm: "メール送信&更新します。よろしいですか？" } %>
+   <%= f.submit '登録のみ', name: "upd", class: "btn btn-primary" %>
+  
+    <!--<%= f.button :submit,   :class => 'btn-primary' %>-->
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_order_data2_index_path, :class => 'btn btn-default' %>
+  
+<% end %>
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+      //検索可能なリストボックス(品名の場合)
+       $(".searchableId").select2({ theme: "classic" });
+       $(".searchableMaterial").select2({ theme: "classic" });
+	   
+       //$(".searchableConstructionCode").change(function(e) {
+       //  setConstructionDateDefault();
+   
+   
+    //$("#owner a.add_fields").
+    //  data("association-insertion-method", 'before').
+    //  data("association-insertion-node", 'this');
+	 
+
+ 
+ });  
+  
+ 
+  
+  
+</script>
+
+  

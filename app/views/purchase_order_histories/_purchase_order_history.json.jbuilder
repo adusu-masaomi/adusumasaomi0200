@@ -1,0 +1,2 @@
+json.extract! purchase_order_history, :id, :purchase_order_date, :supplier_master_id, :purchase_order_datum_id, :created_at, :updated_at
+json.url purchase_order_history_url(purchase_order_history, format: :json)

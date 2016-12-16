@@ -1,0 +1,1 @@
+json.array! @purchase_order_histories, partial: 'purchase_order_histories/purchase_order_history', as: :purchase_order_history

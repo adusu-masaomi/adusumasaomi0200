@@ -1,0 +1,7 @@
+<%= simple_form_for @working_safety_matter, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :working_safety_matter_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_safety_matters_path, :class => 'btn btn-default' %>
+<% end %>

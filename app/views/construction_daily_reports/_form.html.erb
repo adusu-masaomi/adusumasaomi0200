@@ -1,0 +1,271 @@
+<%= simple_form_for @construction_daily_report, :html => {id: "report-form" ,  :class => 'well form-horizontal'}  do |f| %>
+  
+  <% if @construction_daily_report.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @construction_daily_report.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @construction_daily_report.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
+  <!--スマホ対応 datepicker使う場合--> 
+  </br></br></br></br>
+  
+  <%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'} , as: :date_picker %>
+  <!--下記だと工事日がうまく更新されないので保留・・・-->
+  <!--<%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'}  %>-->
+  <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px',} %></br>
+  <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , :onchange=> "getDailyPay(this.form)" }  %>
+  <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :disabled => true } %>
+  <!--<%= f.hidden_field_tag 'staff_pay', @staff_pay, input_html:{id: "daily_pay"} %>-->
+  <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :end_time_2, default: Time.parse('00:00') , input_html:{id: "end_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :working_times, input_html:{id:"working_times"} , hint: "*自動計算されるので入力不要です。" %>
+  <%= f.input :man_month, input_html:{id:"man_month"} , hint: "*自動計算されるので入力不要です。"  %>
+  <%= f.input :labor_cost, input_html:{id:"labor_cost"} , hint: "*自動計算されるので入力不要です。"  %>
+  
+  <%= f.fields_for :construction_datum, :remote => true do |p| %>
+  <%= p.input :construction_start_date , input_html:{id:"construction_start_date"}, as: :date_picker, as: :hidden   %>
+  <%= p.input :construction_end_date , input_html:{id:"construction_end_date"}, as: :date_picker, as: :hidden    %>
+  <% end %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                construction_daily_reports_path, :class => 'btn btn-default' %>
+
+<% end %>
+
+ 
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+      //検索可能なリストボックス(品名の場合)
+       $(".searchableConstructionCode").select2({ theme: "classic" });
+
+       $(".searchableConstructionCode").change(function(e) {
+         setConstructionDateDefault();
+       });  
+
+   //工事日のセット(デフォルト)
+   function setConstructionDateDefault()
+   {  
+      obj = document.getElementById("construction_datum_id");
+       construction_id = parseInt(obj.value);
+       $.get("<%= construction_daily_reportz_start_day_select_path %>",
+         {id: construction_id },
+          function(data){
+               obj = document.getElementById("construction_start_date").textContent;
+               document.getElementById("construction_start_date").value = obj;
+            //   obj = document.getElementById("construction_end_date");
+            //   debugger;
+          }
+        );
+        $.get("<%= construction_daily_reportz_end_day_select_path %>",
+         {id: construction_id },
+          function(data){
+               obj = document.getElementById("construction_end_date").textContent;
+               document.getElementById("construction_end_date").value = obj;
+               //obj = document.getElementById("construction_end_date");
+               //debugger;
+          }
+        );
+    };
+
+  });
+  
+  
+     // 登録前処理(工事日のセット)
+     $('#report-form').submit(function(){
+    //$(document).on('click', 'btn-submit', function(){
+     
+     // 作業日を常に最新の作業開始日・終了日へ更新させる!!
+     var working_date = document.getElementById("working_date").value;
+     var start_date = document.getElementById("construction_start_date").value;
+     var end_date = document.getElementById("construction_end_date").value;
+　　　　
+　　　working_date = new Date(working_date);
+     start_date = new Date(start_date);
+     end_date = new Date(end_date);　          
+
+     // 工事開始日の判定
+     if (working_date <= start_date) {
+       document.getElementById("construction_start_date").value = working_date;
+     }
+     
+     // 工事終了日の判定
+     if (working_date >= end_date) {
+       document.getElementById("construction_end_date").value = working_date;
+     }
+     
+	 //obj = document.getElementById("construction_start_date").value;
+     //debugger;
+    
+   });
+
+  //勤務時間計算
+  var kinmu_time = 0;
+  var kinmu_time_2 = 0;
+  var start_time = 0;
+  var end_time = 0;
+  
+   function calcTimeVarious(f)
+   { 
+     
+     // 勤務時間を計算
+     kinmu_time = 0;
+     
+     //開始時間1
+     obj = document.getElementById("start_time_1");
+     start_time = obj.value; 
+     if (start_time >= 0) {
+         start_time = ( parseInt(start_time) * 3600 ) + ( parseInt(obj.nextElementSibling.value) * 60 );
+     }
+     //終了時間1
+     obj = document.getElementById("end_time_1");
+     end_time = obj.value;
+     
+     if (end_time != 0) {
+         end_time = ( parseInt(end_time) * 3600 ) + (parseInt(obj.nextElementSibling.value) * 60 );
+     }else{
+        //終了時間24時の場合
+        if (start_time > 0) {
+           end_time = ( 24 * 3600 ) + (parseInt(obj.nextElementSibling.value) * 60 );
+        }
+     }
+
+        //calcWorkTime.call(); 
+        var tmp_kinmu_time = 0;
+        kinmu_time = calcWorkTime(tmp_kinmu_time); 
+       //テキストへセット
+        document.getElementById("working_times").value = kinmu_time + kinmu_time_2 ;  
+     
+     
+        // 工数を算出
+        if (kinmu_time >= 0) {
+            var temp_kinmu_time = 0 ;
+            temp_kinmu_time = (kinmu_time + kinmu_time_2) /27000 ;
+            temp_kinmu_time =  floatFormat(temp_kinmu_time, 3) ; 
+            document.getElementById("man_month").value = temp_kinmu_time;
+            
+            //日給を取得
+            getDailyPay.call({}, f);
+           // test
+           //document.getElementById("labor_cost").value = document.getElementById("daily_pay").value ; 
+        }
+      
+   }
+ 
+ 
+
+
+ function calcTimeVarious_2(f)
+   { 
+     //calcTimeVariousとほぼ同じ
+   
+     // 勤務時間を計算
+     kinmu_time_2 = 0;
+     //開始時間1
+     obj = document.getElementById("start_time_2");
+     start_time = obj.value 
+     if (start_time >= 0) {
+       start_time = ( parseInt(start_time) * 3600 ) + ( parseInt(obj.nextElementSibling.value) * 60 );
+    }
+    //終了時間1
+     obj = document.getElementById("end_time_2");
+     end_time = obj.value 
+     
+     if (end_time != 0) {
+       end_time = ( parseInt(end_time) * 3600 ) + (parseInt(obj.nextElementSibling.value) * 60 );
+     }else{
+        //終了時間24時の場合
+        if (start_time > 0) {
+           end_time = ( 24 * 3600 ) + (parseInt(obj.nextElementSibling.value) * 60 );
+        }
+     }
+       
+        var tmp_kinmu_time = 0;
+        kinmu_time_2 = calcWorkTime(tmp_kinmu_time); 
+       
+       //再編集時の場合の処理追加. 勤務時間1を再セットする。 161214
+       if (kinmu_time == 0 && document.getElementById("start_time_1").value > 0 && document.getElementById("end_time_1").value > 0 ) {
+           calcTimeVarious(f);
+         }
+       //
+	   
+	   //テキストへセット
+       document.getElementById("working_times").value = kinmu_time + kinmu_time_2;  
+   
+        // 工数を算出
+       if (kinmu_time_2 >= 0) {
+            var temp_kinmu_time = 0 ;
+            temp_kinmu_time = (kinmu_time + kinmu_time_2) / 27000 ;
+            temp_kinmu_time =  floatFormat(temp_kinmu_time, 3) ; 
+            document.getElementById("man_month").value = temp_kinmu_time;
+       }
+          
+         //日給を取得
+        getDailyPay.call({}, f)
+     //}
+   
+   };
+ 
+  // 日給をajaxで取得
+   function getDailyPay(f){
+     var staff_id = f.staff_id.value;
+      $.get("<%= construction_daily_reportz_staff_pay_select_path %>",
+          { id: staff_id },
+          function(data){
+            //労務費をセット
+            index = daily_pay.selectedIndex;
+            var tmp_daily_pay  = daily_pay.options[index].innerText;     
+            var num =  tmp_daily_pay * document.getElementById("man_month").value;
+            if (num >= 0) {
+               document.getElementById("labor_cost").value = num;
+            }
+          }
+        );
+   }
+
+  function calcWorkTime(tmp_kinmu_time){
+   	   // 勤務時間の計算
+      if (start_time >= 18000 & start_time <= 32400 & end_time >= 61200 & end_time <= 86400){
+         // フルタイム勤務に近ければ、休憩時間を単純にマイナスする。
+         tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 7200; 
+      //} else if (start_time >= 18000 & start_time <= 32400 & end_time > 57600 & end_time < 61200){
+      } else if (start_time >= 18000 & start_time <= 32400 & end_time > 50400 & end_time < 61200){
+         // フルタイム勤務に近ければ、休憩時間をマイナスする(但し小休憩は引かない) 161207 end=16:00以降→14:00以降に変更
+		 tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
+       } else if (start_time >= 55800 & start_time <= 86400 & end_time >= 0 & end_time <= 28800){
+         tmp_kinmu_time = tmp_kinmu_time + 86400 - end_time + start_time;   
+      } else {
+         tmp_kinmu_time = tmp_kinmu_time + end_time - start_time;   
+  }
+      
+     return tmp_kinmu_time;
+  
+   }
+   // 小数点n位までを残す関数
+   // number=対象の数値
+   // n=残したい小数点以下の桁数
+   function floatFormat( number, n ) {
+       var _pow = Math.pow( 10 , n ) ;
+       return Math.round( number * _pow ) / _pow ;
+   }
+
+  function fnGetValue() {
+    return $.get(
+      "/get_value"
+    );
+  }
+
+</script>

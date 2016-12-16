@@ -1,0 +1,7 @@
+<%= simple_form_for @maker_master, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :maker_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                maker_masters_path, :class => 'btn btn-default' %>
+<% end %>

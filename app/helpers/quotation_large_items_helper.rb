@@ -1,0 +1,2 @@
+module QuotationLargeItemsHelper
+end

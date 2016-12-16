@@ -1,0 +1,104 @@
+<%- model_class = PurchaseOrderDatum -%>
+<div class="page-header">
+  <b>
+  </br>
+  <h1><%= "注文データ" %></h1>
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @purchase_order_data %>
+  <!-- 追加箇所終了 -->
+   <%= search_form_for @q , :url => purchase_order_histories_path(@q)  do |f| %>
+      <%= f.label :purchase_order_code, '注文コード：' %>
+      <%= f.select :id_eq, options_from_collection_for_select(PurchaseOrderDatum.all, "id", "purchase_order_code") , {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseOrderCode" } %>
+  	  </br>
+      <%= f.label :construction_datum_id, '工事名：：' %>
+      <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br
+      <div>
+         <%= f.submit '検索する' %>
+  	  </div>
+   <% end %>
+</div>
+
+
+<div class="span11 table-scrollable" style="margin-left : 10px">
+ 
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:purchase_order_code) %></th>
+      <th><%= model_class.human_attribute_name(:construction_name) %></th>
+	  <th><%= model_class.human_attribute_name(:alias_name) %></th>
+	  <th><%= model_class.human_attribute_name(:supplier_name) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_order_data.order("id desc").each do |purchase_order_datum| %>
+      <tr>
+        <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum) %></td>
+        <td><%= purchase_order_datum.purchase_order_code %></td>
+		<% @purchase_order_code = purchase_order_datum.purchase_order_code %>
+		<% if purchase_order_datum.construction_datum.nil? %>
+           <td>-</td>
+           <% @construction_name = "-" %>
+        <% else %>
+		  <td><%= purchase_order_datum.construction_datum.construction_name %></td>
+		  <% @construction_name = purchase_order_datum.construction_datum.construction_name %>
+        <% end %>
+		<% if purchase_order_datum.construction_datum.nil? || purchase_order_datum.construction_datum.alias_name.nil? %>
+           <td>-</td>
+        <% else %>
+		  <td><%= purchase_order_datum.construction_datum.alias_name %></td>
+        <% end %>
+		<% if purchase_order_datum.supplier_master.nil? %>
+           <td>-</td>
+		   <% @supplier_name = "-" %>
+		<% else %>
+		  <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
+		  <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
+        <% end %>
+		
+		<td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("作成")),
+                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_history, :id => purchase_order_datum.id), :class => 'btn btn-info btn-xs' %>
+          
+		  <%= link_to "一覧",
+            purchase_order_histories_list_path(purchase_order_datum_id: purchase_order_datum.id, purchase_order_code: @purchase_order_code, 
+            construction_name: @construction_name, supplier_name: @supplier_name ),
+            :class => 'btn btn-xs btn-warning' %>
+		  
+		  <!--<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      purchase_order_history_path(purchase_order_datum.purchase_order_history),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>-->
+        </td>
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @purchase_order_data %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+
+        $(".searchablePurchaseOrderCode").select2({ theme: "classic" });
+		$(".searchableConstructionCode").select2({ theme: "classic" });
+	
+  });
+  
+  
+
+</script>

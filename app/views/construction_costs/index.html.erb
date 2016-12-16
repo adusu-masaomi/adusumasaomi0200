@@ -1,0 +1,74 @@
+<%- model_class = ConstructionCost -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <%= search_form_for @q do |f| %>
+     <%= f.label :construction_code, '工事コード：' %>
+     <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCode" } %>
+     <%= f.label :construction_name, '工事名：' %>
+     <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") ,  {include_blank: true}, {style: 'width:220px',  class: "searchableConstructionName" } %>  
+     <%= f.label :construction_name, '*いずれかで検索可' %>  
+     <br>
+	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:construction_code) %></th>
+	  <th><%= model_class.human_attribute_name(:construction_name) %></th>
+      <th><%= model_class.human_attribute_name(:supplies_expense) %></th>
+      <th><%= model_class.human_attribute_name(:labor_cost) %></th>
+      <th><%= model_class.human_attribute_name(:misellaneous_expense) %></th>
+      <th><%= model_class.human_attribute_name(:constructing_amount) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @construction_costs.each do |construction_cost| %>
+      <tr>
+        <td><%= link_to construction_cost.id, construction_cost_path(construction_cost) %></td>
+        <!--<td><%= construction_cost.construction_datum_id %></td>-->
+        <td><%= construction_cost.construction_datum.construction_code %></td>
+		<td><%= construction_cost.construction_datum.construction_name %></td>
+		<td><%= construction_cost.supplies_expense %></td>
+        <td><%= construction_cost.labor_cost %></td>
+        <td><%= construction_cost.misellaneous_expense %></td>
+        <td><%= construction_cost.constructing_amount %></td>
+        <td><%=l construction_cost.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_construction_cost_path(construction_cost), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      construction_cost_path(construction_cost),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_cost_path,
+            :class => 'btn btn-primary' %>
+<%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+	//検索可能なリストボックス(工事CDの場合)
+	$(".searchableConstructionCode").select2({ theme: "classic" });
+	
+	//検索可能なリストボックス(工事名の場合)
+	$(".searchableConstructionName").select2({ theme: "classic" });
+  });
+  
+  
+
+</script>
+

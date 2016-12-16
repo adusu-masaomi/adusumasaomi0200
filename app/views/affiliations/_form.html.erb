@@ -1,0 +1,7 @@
+<%= simple_form_for @affiliation, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :affiliation_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                affiliations_path, :class => 'btn btn-default' %>
+<% end %>

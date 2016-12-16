@@ -1,0 +1,1 @@
+json.array! @quotation_items_divisions, partial: 'quotation_items_divisions/quotation_items_division', as: :quotation_items_division

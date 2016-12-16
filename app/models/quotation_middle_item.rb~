@@ -1,0 +1,11 @@
+class QuotationMiddleItem < ActiveRecord::Base
+   belongs_to :QuotationUnit, :foreign_key => "quotation_unit_id"
+   belongs_to :MaterialMaster, :foreign_key => "material_id"
+
+   scope :with_material, -> {joins(:MaterialMaster)}
+   
+    def self.serial_number
+      [[("<行選択>").to_s , (1..100).to_a ]]
+    end 
+
+end

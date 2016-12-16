@@ -1,0 +1,97 @@
+<%= form_for @supplier_master, :html => { :class => "form-horizontal supplier_master" } do |f| %>
+
+  <% if @supplier_master.errors.any? %>
+    <div id="error_expl" class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title"><%= pluralize(@supplier_master.errors.count, "error") %> prohibited this supplier_master from being saved:</h3>
+      </div>
+      <div class="panel-body">
+        <ul>
+        <% @supplier_master.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-group">
+    <%= f.label :supplier_name, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :supplier_name, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:supplier_name) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :tel_main, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :tel_main, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:tel_main) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :fax_main, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :fax_main, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:fax_main) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email_main, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :email_main, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:email_main) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :responsible1, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :responsible1, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:responsible1) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email1, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :email1, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:email1) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :responsible2, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :responsible2, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:responsible2) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email2, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :email2, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:email2) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :responsible3, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :responsible3, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:responsible3) %>
+  </div>
+  <div class="form-group">
+    <%= f.label :email3, :class => 'control-label col-lg-2' %>
+    <div class="col-lg-10">
+      <%= f.text_field :email3, :class => 'form-control' %>
+    </div>
+    <%=f.error_span(:email3) %>
+  </div>
+
+  <div class="form-group">
+    <div class="col-lg-offset-2 col-lg-10">
+      <%= f.submit nil, :class => 'btn btn-primary' %>
+      <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                supplier_masters_path, :class => 'btn btn-default' %>
+    </div>
+  </div>
+
+<% end %>

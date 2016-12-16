@@ -1,0 +1,8 @@
+<%= simple_form_for @purchase_division, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :purchase_division_name %>
+  <%= f.input :purchase_division_long_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_divisions_path, :class => 'btn btn-default' %>
+<% end %>

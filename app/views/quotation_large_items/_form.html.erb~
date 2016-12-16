@@ -1,0 +1,10 @@
+<%= simple_form_for @quotation_large_item, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :quotation_large_item_name %>
+  <%= error_span(@quotation_large_item[:quotation_large_item_name]) %>
+  <%= f.input :quotation_large_specification %>
+  <%= error_span(@quotation_large_item[:quotation_large_specification]) %>
+
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_large_items_path, :class => 'btn btn-default' %>
+<% end %>

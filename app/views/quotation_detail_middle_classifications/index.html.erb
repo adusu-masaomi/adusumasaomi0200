@@ -1,0 +1,101 @@
+<%- model_class = QuotationDetailMiddleClassification -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <%= search_form_for @q do |f| %>
+  <%= f.label :construction_code, '見積Ｎｏ：' %>
+  <%= f.select :quotation_header_id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
+  <%= f.label :construction_code, '件名：' %>
+  <%= f.select :with_header_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
+  
+  <%= f.label :quotation_large_item, '品目名：' %>
+  <%= f.select :with_large_item, options_from_collection_for_select(QuotationDetailLargeClassification.group(:quotation_large_item_name), "quotation_large_item_name","quotation_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  
+  <%= f.label :quotation_middle_item, '内訳名：' %>
+  <%= f.select :quotation_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.group(:quotation_middle_item_name), "quotation_middle_item_name","quotation_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
+  
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+
+</div>
+
+
+
+<%= link_to t('.new', :default => t("新規作成")),
+            new_quotation_detail_middle_classification_path(quotation_header_id: params[:quotation_header_id], quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1"), remote: true,
+            :class => 'btn btn-primary' %>
+<td><%= link_to "内訳へ",
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id]),
+            :class => 'btn btn-warning' %>
+<%= link_to "内訳書(縦)PDF",
+            quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], 
+            default_page_number: params[:default_page_number], print_type: "1", format: "pdf") ,
+            :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
+<%= link_to "内訳書(横)PDF",
+            quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2", format: "pdf"),
+            :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
+  <%= label :label_page_number, '開始頁：' %>
+  <%= text_field :number,:default_page_number,  :value => 1  , :size=>"2", :id=>'default_page_number'  %></br>
+
+<td>見積金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
+
+<div id="quotation_detail_middle_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+<div class="span11 table-scrollable">
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th>件名</th>
+      <th>見積書品目</th>
+      <th><%= model_class.human_attribute_name(:line_number) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_middle_item_name) %></th>
+      <th><%= model_class.human_attribute_name(:quantity) %></th>
+      <th>実数</th>
+      <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:quote_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody class="quotation_detail_middle_classification-index">
+     <%= render "index" %>
+  </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableQuotationCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableLargeItem").select2({ theme: "classic" });
+        $(".searchableMiddleItem").select2({ theme: "classic" });
+  });
+  
+  function addParam(link){
+    var default_page_number = $('default_page_number');
+    if(document.getElementById("default_page_number").value > 0){
+        var num = document.getElementById("default_page_number").value;
+        //ここでコントローラにパラメータが送られる。
+        link.href += "&default_page_number=" + escape(num);
+        return true;
+    } else {
+        alert('Input string for search');
+        return false;
+    }
+  }
+  
+</script>
+
+

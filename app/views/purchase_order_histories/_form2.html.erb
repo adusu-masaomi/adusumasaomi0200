@@ -1,0 +1,197 @@
+<style>
+ body{margin:10px;padding:10px;}
+</style>
+
+<%- model_class = PurchaseOrderHistory -%>  
+<!--<%= javascript_include_tag 'cocoon' %>-->
+
+
+<%= simple_form_for @purchase_order_history, :html => { :class => 'well form-inline', :style => "width: 1200px;"} do |f| %>
+   
+<% if @purchase_order_history.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @purchase_order_history.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_order_history.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+	
+	
+   <div class = "form-inputs">
+    <%= f.label :注文ＮＯ：, {style: 'color:blue'} %>
+   <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , {id:"purchase_order_datum_id", class: "searchableId" , style: 'width:200px'} %>
+   
+   <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
+     <%= m.label :工事名：, {style: 'color:blue'} %>
+     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %></br></br>
+   <% end %>
+   
+   <%= f.label :注文先：, {style: 'color:blue'} %>
+   <!--<%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>-->
+   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>
+   
+   
+   <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Date.today , style: 'width:220px'},as: :date_picker %>
+  
+   <!--<%= f.hidden_field :mail_sent_flag, input_html:{id: "mail_sent_flag"} %>-->
+   <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
+   <!--<%= f.label :eメール：, {style: 'color:blue', class: 'my-custom-class-l2'} %>-->
+   
+   <%= link_to '新規／データ呼出', { id: params[:id] }, :onclick=> "dispDiv()", :class => 'btn btn-warning'  %>
+   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
+  
+   </br>
+   <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
+	
+   <!--<%= link_to '新規／データ呼出', { id: params[:id] }, :onclick=> "dispDiv()" , :class => 'btn btn-warning'  %>-->
+   <!--<%= link_to t('.cancel', :default => t("戻る")),
+                purchase_order_histories_path, :class => 'btn btn-default' %>-->
+      
+  　<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
+   
+       <!-- <div class = "row">-->
+       <div id="subForms" >
+	   
+	   
+        <%= f.simple_fields_for :orders   do |orders| %>
+		
+            <%= render 'order_fields', f: orders %>
+       <!--</div>-->
+       <% end %>
+
+       </div>
+
+	   <!--<div class="links" id="filter" class="hideMe" style="display: none">-->
+	   <!--<div id="filter" class="hide"  >-->
+       <div id="filter" class="hide"  >    
+		   
+		   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success' %> 
+           <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button",  data: {confirm: "メール送信&更新します。よろしいですか？" } %>-->
+           <%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
+               id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
+                
+		   <!--<%= f.submit '登録のみ', name: "upd", class: "btn btn-primary"  %>-->
+           <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" %>
+			   
+			
+		   
+		  
+      </div>
+<% end %>
+
+  </div>  
+
+<script type="text/javascript">
+
+  var disp_flag = 0;
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+      
+      //検索可能なリストボックス(品名の場合)
+       $(".searchableId").select2({ theme: "classic" });
+       $(".searchableMaterial").select2({ theme: "classic" });
+	   
+       //$(".searchableConstructionCode").change(function(e) {
+       //  setConstructionDateDefault();
+	   
+	   //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+       var flag = document.getElementById("mail_sent_flag").value;
+       if (flag == 1) {
+	     document.getElementById("mail_sent_button").disabled = true;
+	   }
+	   
+	   //
+	   var visibled = sessionStorage.getItem('onvisible');
+	   if (visibled == "true") {
+	     $('#filter').removeClass('hide');
+	   }
+	   
+	   //デフォルトのメアド取得
+	   setEmail();
+	   
+ });  
+
+ //入力チェック(eメール用）
+ function submitAfterValidationEmail(){
+   document.getElementById("sent_flag").value = 1;
+   submitAfterValidation();
+ }
+ 
+ //入力チェック後の、更新処理
+ function submitAfterValidation() {
+ 	var ok_flag = true;
+	var after_check = checkQuantity(ok_flag);
+	
+	
+	 if (after_check == true){
+       if (window.confirm('実行しますか？')) {
+         document.forms[0].submit();
+       }
+	 }
+ }
+
+
+//仕入先別メアドのセット
+//ひとまず取得できるメアドは１つ(email1)とする。
+function setEmail()
+ {
+   var supplier_id = document.getElementById("supplier_master_id").value;
+   $.get("<%= purchase_order_historiez_email_select_path %>",
+      { id: supplier_id },
+   function(data){ 
+       obj = document.getElementById("email_responsible").textContent;
+       document.getElementById("email_responsible").value = obj;
+       }
+    );
+		
+ }
+
+
+function reset_value() {
+//セッション用のパラメータをリセットする
+  //debugger;
+  sessionStorage.setItem('onvisible', 'false');
+}
+
+function dispDiv() {
+  
+  //隠れていたボタンをここで表示させる
+  $('#filter').removeClass('hide');
+  //セッション用のパラメータへセットする
+  sessionStorage.setItem('onvisible', 'true');
+  
+  
+  //下記必須（ボタンが消えてしまう）
+  //event.preventDefault();
+  //debugger;
+  
+  //ajax
+  //controllerのイベントを呼び出すため。
+  purchase_order_datum_id = document.getElementById("purchase_order_datum_id").value;
+  purchase_order_date = document.getElementById("purchase_order_date").value;
+  supplier_master_id = document.getElementById("supplier_master_id").value;
+  
+  $.get("<%= purchase_order_historiez_get_data_path %>",
+    {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, supplier_master_id: supplier_master_id},
+     function(data){
+     }
+   );
+  
+  
+  //画面再ロードする
+  window.location.reload();
+  event.preventDefault();
+
+};
+  
+</script>
+
+  

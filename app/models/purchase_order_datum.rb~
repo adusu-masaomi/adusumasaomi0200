@@ -1,0 +1,14 @@
+class PurchaseOrderDatum < ActiveRecord::Base
+    paginates_per 50  # 1ページあたり項目表示
+
+    #has_many :construction_datum , :foreign_key => "construction_datum_id"
+    belongs_to :construction_datum , :foreign_key => "construction_datum_id"
+    has_many :purchase_datum
+	
+	scope :with_id,  -> { joins(:construction_datum) }
+	
+    def p_num_cd
+      #self.purchase_order_code + '/' + self.construction_datum.id.to_s
+	  self.purchase_order_code + '<' + self.construction_datum.id.to_s + '>'
+    end
+end

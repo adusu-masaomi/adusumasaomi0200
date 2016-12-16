@@ -1,0 +1,21 @@
+<%= simple_form_for @construction_daily_report, :html => {  :class => 'form-horizontal' } do |f| %>
+  <%= f.input :working_date %>
+  <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {:prompt => "どれか一つを選択して下さい"} , {id:"construction_datum_id", class: "searchableConstruction" , style: 'width:220px;'} %>
+  <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい"} , {id:"staff_id", class: "my-custom-class" , :onchange=> "getDaylyPay(this.form)"} %>
+  <!--<%= f.collection_select :dayly_pay, Staff.all, :id, :dayly_pay, {:selected => @construction_daily_report.staff_id} , { id:"dayly_pay" } %>-->
+  <!--<%= f.hidden_field_tag 'staff_pay', @staff_pay, input_html:{id: "dayly_pay"} %>-->
+  <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :end_time_2, default: Time.parse('00:00') , input_html:{id: "end_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :working_times, input_html:{id:"working_times"} %>
+  <%= f.input :man_month, input_html:{id:"man_month"} %>
+  <%= f.input :labor_cost, input_html:{id:"labor_cost"} %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                construction_daily_reports_path, :class => 'btn btn-default' %>
+
+<% end %>

@@ -1,0 +1,1 @@
+json.partial! "quotation_items_divisions/quotation_items_division", quotation_items_division: @quotation_items_division

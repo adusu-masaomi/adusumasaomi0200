@@ -1,0 +1,53 @@
+<%= simple_form_for @material_master, label_errors: true, inline_errors: true, :html => { :class => 'well form-horizontal' ,:id => 'material_master'},  :validate => true do |f| %>
+  <!--<%= f.error_notification errors:true %>-->
+  
+  <% if @material_master.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @material_master.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @material_master.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+
+
+  <!--<% if @material_master.errors.any? %>
+  <div class="field_with_errors">
+  <h2><%= pluralize(@material_master.errors.count, "error") %></h2>
+    <ul>
+      <% @material_master.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end -%>
+    </ul>
+  </div>
+  <% end -%>-->
+
+  <%= f.input :material_code %>
+  <%= f.input :material_name %>
+  <%= f.label :メーカー, {:class => "my-custom-class-l", :id => 'MakerMaster'} %></br>
+  <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , {:id => 'maker_id', class: "searchableMaker",  style: 'width:220px'} %></br>
+  <!--<%= f.label :単位, {:class => "my-custom-class-l"} %></br>-->
+  <!--<%= f.collection_select :unit_id,  UnitMaster.all, :id, :unit_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , { :class => "my-custom-class" } %>-->
+  <%= f.input :list_price %>
+  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので入力不要です。" %>
+  <%= f.input :last_unit_price_update_at, default: Date.strptime("2000/01/01", "%Y/%m/%d"), hint: "*仕入データ登録後に自動反映されるので入力不要です。" %>
+
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                material_masters_path, :class => 'btn btn-default' %>
+    
+<% end %>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+      //検索可能なリストボックス
+       $(".searchableMaker").select2({ theme: "classic" });
+
+  });
+
+</script>
+

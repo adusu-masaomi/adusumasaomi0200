@@ -1,0 +1,2 @@
+module PurchaseDivisionsHelper
+end

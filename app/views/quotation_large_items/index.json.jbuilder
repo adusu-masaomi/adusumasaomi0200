@@ -1,0 +1,1 @@
+json.array! @quotation_large_items, partial: 'quotation_large_items/quotation_large_item', as: :quotation_large_item

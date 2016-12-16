@@ -1,0 +1,2 @@
+json.extract! construction_cost, :id, :construction_id, :supplies_expense, :labor_cost, :misellaneous_expense, :constructing_amount, :created_at, :updated_at
+json.url construction_cost_url(construction_cost, format: :json)

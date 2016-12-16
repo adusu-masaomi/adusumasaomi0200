@@ -1,0 +1,1 @@
+json.array! @construction_costs, partial: 'construction_costs/construction_cost', as: :construction_cost

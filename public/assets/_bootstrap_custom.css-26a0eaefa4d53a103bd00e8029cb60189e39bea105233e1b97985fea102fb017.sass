@@ -1,0 +1,12 @@
+// bootstrapに適用する変数を設定
+$grid-float-breakpoint: 320px
+$screen-sm:320px;
+
+@import "bootstrap"
+
+// bootstrapで設定された変数を利用
+.font-size-large
+  font-size: $font-size-large
+// bootstrapで定義されているmixinを利用
+.opacity-half
+  @include opacity(0.5)

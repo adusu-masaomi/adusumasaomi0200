@@ -1,0 +1,17 @@
+# Place all the behaviors and hooks related to the matching controller here.
+# All this logic will automatically be available in application.js.
+# You can use CoffeeScript in this file: http://coffeescript.org/
+
+$ ->
+$("purchase_data#purchase_order_search").select2({
+  placeholder: "Select a state",
+  width:      200,  # 横幅
+  allowClear: true
+  theme: "bootstrap"
+});
+
+#$(document).on 'ready page:load', -> $(".my-custom-class-d datepicker").datetimepicker({
+#    format: 'YYYY年MM月DD日',
+#    locale: 'ja',
+#  })
+

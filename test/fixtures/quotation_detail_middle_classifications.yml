@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_header_id: 1
+  quotation_large_classification_detail_id: 1
+  quotation_middle_item_id: 1
+  quotation_middle_item_name: MyString
+  quantity: 1
+  quotation_unit_id: 1
+  quote_price: 1
+  execution_price: 1
+  labor_productivity_unit: 1.5
+
+two:
+  quotation_header_id: 1
+  quotation_large_classification_detail_id: 1
+  quotation_middle_item_id: 1
+  quotation_middle_item_name: MyString
+  quantity: 1
+  quotation_unit_id: 1
+  quote_price: 1
+  execution_price: 1
+  labor_productivity_unit: 1.5

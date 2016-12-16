@@ -1,0 +1,2 @@
+json.extract! purchase_unit_price, :id, :supplier_id, :material_id, :supplier_material_code, :unit_price, :list_price, :unit_id, :created_at, :updated_at
+json.url purchase_unit_price_url(purchase_unit_price, format: :json)

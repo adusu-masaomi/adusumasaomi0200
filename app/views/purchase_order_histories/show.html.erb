@@ -1,0 +1,24 @@
+<%- model_class = PurchaseOrderHistory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:purchase_order_date) %>:</strong></dt>
+  <dd><%= @purchase_order_history.purchase_order_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:supplier_master_id) %>:</strong></dt>
+  <dd><%= @purchase_order_history.supplier_master_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:purchase_order_datum_id) %>:</strong></dt>
+  <dd><%= @purchase_order_history.purchase_order_datum_id %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              purchase_order_histories_path, :class => 'btn btn-default'  %>
+<!--正常動作しないのでカット<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_purchase_order_history_path(@purchase_order_history), :class => 'btn btn-default' %>-->
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              purchase_order_histories_path(@purchase_order_history),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>
+

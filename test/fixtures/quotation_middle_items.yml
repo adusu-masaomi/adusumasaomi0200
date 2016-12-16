@@ -1,0 +1,33 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_middle_item_name: MyString
+  quotation_middle_item_short_name: MyString
+  quotation_middle_specification: MyString
+  quotation_unit_id: 1
+  unit_price: 1
+  quotation_material_id: 1
+  material_unit_price: 1
+  labor_unit_price: 1.5
+  labor_productivity_unit: 1.5
+  quantity: 1
+  accessory_cost: MyString
+  material_cost_total: 1
+  labor_cost_total: 1
+  other_cost: 1
+
+two:
+  quotation_middle_item_name: MyString
+  quotation_middle_item_short_name: MyString
+  quotation_middle_specification: MyString
+  quotation_unit_id: 1
+  unit_price: 1
+  quotation_material_id: 1
+  material_unit_price: 1
+  labor_unit_price: 1.5
+  labor_productivity_unit: 1.5
+  quantity: 1
+  accessory_cost: MyString
+  material_cost_total: 1
+  labor_cost_total: 1
+  other_cost: 1

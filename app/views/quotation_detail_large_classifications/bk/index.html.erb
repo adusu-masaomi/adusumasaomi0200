@@ -1,0 +1,102 @@
+<%- model_class = QuotationDetailLargeClassification -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+   <%= search_form_for @q do |f| %>
+  <%= f.label :construction_code, '見積Ｎｏ：' %>
+  <%= f.select :quotation_header_id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
+  <%= f.label :construction_code, '件名：' %>
+  <%= f.select :with_header_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
+  <%= f.label :quotation_large_item, '品目名：' %>
+  <%= f.select :quotation_large_item_name_eq, options_from_collection_for_select(QuotationDetailLargeClassification.group(:quotation_large_item_name), "quotation_large_item_name","quotation_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
+
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+</div>
+<%= link_to t('.new', :default => t("新規内訳")),
+            new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], new_flag: "1"),
+            :class => 'btn btn-primary' %>
+<%= link_to "一覧へ",
+            quotation_headers_path(),
+            :class => 'btn btn-info' %>
+<%= link_to "見積書(縦)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
+            :class => 'btn btn-success' %>
+<%= link_to "見積書(横)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2", format: "pdf"),
+            :class => 'btn btn-success' %></br>
+<td>見積金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_large_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
+<div class="span11 table-scrollable">
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  
+  <table class="table table-striped">
+  <thead>
+    <tr>
+      <th></th>
+	  <th><%= model_class.human_attribute_name(:id) %></th>
+      <th>見積書件名</th>
+      <th><%= model_class.human_attribute_name(:quotation_items_division_id) %></th>
+      <th><%= model_class.human_attribute_name(:line_number) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_large_item_name) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_large_specification) %></th>
+      <th><%= model_class.human_attribute_name(:quantity) %></th>
+      <th>実数</th>
+      <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:quote_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quotation_detail_large_classifications.order("quotation_header_id desc, line_number asc").each do |quotation_detail_large_classification| %>
+      <tr>
+	    <td><%= link_to "明細へ",
+            quotation_detail_middle_classifications_path(quotation_header_id: quotation_detail_large_classification.quotation_header_id, quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name, quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
+            :class => 'btn btn-warning' %>
+        </td>
+        <td><%= link_to quotation_detail_large_classification.id, quotation_detail_large_classification_path(quotation_detail_large_classification) %></td>
+        <td><%= quotation_detail_large_classification.QuotationHeader.construction_name %></td>
+        <td><%= quotation_detail_large_classification.quotation_items_division_id %></td>
+        <td><%= quotation_detail_large_classification.line_number %></td>
+        <td><%= quotation_detail_large_classification.quotation_large_item_name %></td>
+        <td><%= quotation_detail_large_classification.quotation_large_specification %></td>
+        <td align="right"><%= quotation_detail_large_classification.quantity %></td>
+        <td align="right"><%= quotation_detail_large_classification.execution_quantity %></td>
+        <td><%= quotation_detail_large_classification.QuotationUnit.quotation_unit_name %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_large_classification.quote_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_large_classification.execution_price,  precision: 0) %></td>
+        <td align="right"><%= number_with_precision(quotation_detail_large_classification.labor_productivity_unit, precision: 3) %></td>
+        <td><%=l quotation_detail_large_classification.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  </table>
+  </div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableQuotationCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableLargeItem").select2({ theme: "classic" });
+  });
+</script>
+

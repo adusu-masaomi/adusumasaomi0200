@@ -1,0 +1,2 @@
+json.extract! quotation_detail_large_classification, :id, :quotation_header_id, :quotation_large_item_id, :quotation_large_item_name, :quantity, :quotation_unit_id, :quote_price, :execution_price, :labor_productivity_unit, :created_at, :updated_at
+json.url quotation_detail_large_classification_url(quotation_detail_large_classification, format: :json)

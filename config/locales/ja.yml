@@ -1,0 +1,343 @@
+---
+ja:
+  attributes:
+    tel_main: 代表Tel
+    fax_main: 代表fax
+    email_main: 代表Email
+    responsible1: 担当者1
+    responsible2: 担当者2
+    responsible3: 担当者3
+    email1: 担当1Email
+    email2: 担当2Email
+    email3: 担当3Email
+    supplier_name: 仕入先名
+    supplier_material_code: 仕入先品番
+    material_id: 品番
+    supplier_id: 仕入業者
+    material_code: 品番
+    material_name: 品名
+    maker_id: メーカー
+    quantity: 数量
+    unit_price: 仕入単価
+    list_price: 定価
+    notes: 備考
+    last_unit_price: 直近単価
+    last_unit_price_update_at: 直近単価更新日
+    unit_id: 単位
+    purchase_order_date: 注文日
+    purchase_order_code: 注文No
+    construction_datum_id: 工事ID
+    construction_code: 工事コード
+    created_at: 登録日
+    customer_name: 得意先名
+    post: 郵便番号
+    address: 住所
+    closing_date: 締日
+    due_date: 支払日
+    maker_name: メーカー名
+    unit_name: 単位名
+    purchase_division_name: 仕入区分名
+    construction_code: 工事コード
+    construction_name: 工事名
+    alias_name: 通称
+    reception_date: 受付日
+    customer_id: 得意先ID
+    construction_start_date: 工事開始日
+    construction_end_date: 工事終了日
+    construction_period_start: 工期着工
+    construction_period_end: 工期完了
+    construction_detail: 工事内容
+    attention_matter: 留意事項
+    billed_flag: 請求済
+    working_safety_matter_name: 安全事項名
+    staff_name: 社員名
+    furigana: ふりがな
+    affiliation_id: 所属
+    hourly_wage: 時給
+    daily_pay: 日給
+    working_date: 作業日
+    staff_id: 社員
+    start_time_1: 開始時間1
+    end_time_1: 終了時間1
+    start_time_2: 開始時間2
+    end_time_2: 終了時間2
+    working_times: 勤務時間
+    man_month: 工数
+    labor_cost: 労務費
+    affiliation_name: 所属名
+    supplies_expense: 消耗品費
+    misellaneous_expense: 諸経費
+    constructing_amount: 請負金額
+    purchase_division_long_name: 仕入区分名(長)
+    name: ユーザー名
+    password: パスワード
+    password_confirmation: パスワード確認用
+    quotation_code: 見積書コード
+    quotation_date: 見積書日付
+    construction_name: 工事名
+    construction_period: 工事期間
+    construction_place: 工事場所
+    trading_method: 取引方法
+    effective_period: 有効期間
+    quote_price: 見積金額
+    execution_amount: 実行金額
+    net_amount: NET金額
+    quotation_items_division_id: 区分
+    quotation_header_id: 見積書見出ID
+    quotation_detail_large_classification_id: 見積書品目ID
+    quotation_large_item_id: 項目ID
+    quotation_middle_item_id: 品名ID
+    quotation_large_item_name: 項目名
+    quotation_middle_item_name: 品名
+    quotation_middle_item_short_name: 品目名(短縮)
+    execution_quantity: 実行数量
+    execution_price: 実行金額
+    quotation_unit_id: 見積単位
+    labor_productivity_unit: 歩掛
+    quotation_large_specification: 仕様
+    quotation_middle_specification: 仕様
+    quotation_material_name: 使用材料名
+    quotation_unit_price: 見積単価
+    execution_unit_price: 実行単価
+    material_unit_price: 材料単価
+    material_cost_total: 材料費計
+    material_quantity: 使用材料数
+    labor_unit_price: 労務単価
+    labor_cost_total: 労務費計
+    accessory_cost: 付属品等
+    other_cost: その他費用
+    quotation_unit_name: 見積単位名
+    line_number: 行    
+
+  datepicker:
+    dformat: '%Y/%m/%d'             # display format of the date (this is the default, can be ommited)
+    pformat: 'YYYY/MM/DD'           # picking format of the date (this is the default, can be ommited)
+  timepicker:
+    dformat: '%R'                   # display format of the time (this is the default, can be ommited)
+    pformat: 'HH:mm'                # picking format of the time (this is the default, can be ommited)
+  dayViewHeaderFormat: 'MMMM YYYY'  # picking format of the time (this is the default, can be ommited)
+  
+  activerecord:
+    models:
+       material_master: 資材マスター
+       purchase_datum: 仕入データ
+       purchase_order_datum: 注文Ｎｏデータ
+       purchase_order_history: 注文データ
+       supplier_master: 仕入先マスター
+       purchase_unit_price: 資材単価マスター
+       customer_master: 得意先マスター
+       maker_master: メーカーマスター
+       unit_master: 単位マスター
+       purchase_division: 仕入区分マスター
+       construction_datum: 工事データ
+       staff: 社員マスター
+       construction_daily_report: 工事日報データ
+       affiliation: 所属マスター
+       construction_cost: 工事費集計
+       working_safety_matter: 作業安全事項マスター
+       quotation_header: 見積書一覧データ
+       quotation_detail_large_classification: 見積書内訳データ
+       quotation_detail_middle_classification: 見積書明細データ
+       quotation_large_item: 見積書内訳マスター
+       quotation_middle_item: 見積書明細マスター 
+       quotation_unit: 見積単位マスター
+       order: 注文データ
+    errors:
+      messages:
+        record_invalid: "バリデーションに失敗しました: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "%{record}が存在しているので削除できません"
+          has_many: "%{record}が存在しているので削除できません"
+  date:
+    abbr_day_names:
+    - 日
+    - 月
+    - 火
+    - 水
+    - 木
+    - 金
+    - 土
+    abbr_month_names:
+    -
+    - 1月
+    - 2月
+    - 3月
+    - 4月
+    - 5月
+    - 6月
+    - 7月
+    - 8月
+    - 9月
+    - 10月
+    - 11月
+    - 12月
+    day_names:
+    - 日曜日
+    - 月曜日
+    - 火曜日
+    - 水曜日
+    - 木曜日
+    - 金曜日
+    - 土曜日
+    formats:
+      default: "%Y/%m/%d"
+      long: "%Y年%m月%d日(%a)"
+      short: "%m/%d"
+    month_names:
+    -
+    - 1月
+    - 2月
+    - 3月
+    - 4月
+    - 5月
+    - 6月
+    - 7月
+    - 8月
+    - 9月
+    - 10月
+    - 11月
+    - 12月
+    order:
+    - :year
+    - :month
+    - :day
+  datetime:
+    distance_in_words:
+      about_x_hours:
+        one: 約1時間
+        other: 約%{count}時間
+      about_x_months:
+        one: 約1ヶ月
+        other: 約%{count}ヶ月
+      about_x_years:
+        one: 約1年
+        other: 約%{count}年
+      almost_x_years:
+        one: 1年弱
+        other: "%{count}年弱"
+      half_a_minute: 30秒前後
+      less_than_x_minutes:
+        one: 1分以内
+        other: "%{count}分未満"
+      less_than_x_seconds:
+        one: 1秒以内
+        other: "%{count}秒未満"
+      over_x_years:
+        one: 1年以上
+        other: "%{count}年以上"
+      x_days:
+        one: 1日
+        other: "%{count}日"
+      x_minutes:
+        one: 1分
+        other: "%{count}分"
+      x_months:
+        one: 1ヶ月
+        other: "%{count}ヶ月"
+      x_seconds:
+        one: 1秒
+        other: "%{count}秒"
+    prompts:
+      day: 日
+      hour: 時
+      minute: 分
+      month: 月
+      second: 秒
+      year: 年
+  errors:
+    format: "%{attribute}%{message}"
+    messages:
+      accepted: を受諾してください
+      blank: を入力してください
+      present: は入力しないでください
+      confirmation: と%{attribute}の入力が一致しません
+      empty: を入力してください
+      equal_to: は%{count}にしてください
+      even: は偶数にしてください
+      exclusion: は予約されています
+      greater_than: は%{count}より大きい値にしてください
+      greater_than_or_equal_to: は%{count}以上の値にしてください
+      inclusion: は一覧にありません
+      invalid: は不正な値です
+      less_than: は%{count}より小さい値にしてください
+      less_than_or_equal_to: は%{count}以下の値にしてください
+      model_invalid: "バリデーションに失敗しました: %{errors}"
+      not_a_number: は数値で入力してください
+      not_an_integer: は整数で入力してください
+      odd: は奇数にしてください
+      required: を入力してください
+      taken: はすでに存在します
+      too_long: は%{count}文字以内で入力してください
+      too_short: は%{count}文字以上で入力してください
+      wrong_length: は%{count}文字で入力してください
+      other_than: は%{count}以外の値にしてください
+    template:
+      body: 次の項目を確認してください
+      header:
+        one: "%{model}にエラーが発生しました"
+        other: "%{model}に%{count}個のエラーが発生しました"
+  helpers:
+    select:
+      prompt: 選択してください
+    submit:
+      create: 登録する
+      submit: 保存する
+      update: 更新する
+  number:
+    currency:
+      format:
+        delimiter: ","
+        format: "%n%u"
+        precision: 0
+        separator: "."
+        significant: false
+        strip_insignificant_zeros: false
+        unit: 円
+    format:
+      delimiter: ","
+      precision: 3
+      separator: "."
+      significant: false
+      strip_insignificant_zeros: false
+    human:
+      decimal_units:
+        format: "%n %u"
+        units:
+          billion: 十億
+          million: 百万
+          quadrillion: 千兆
+          thousand: 千
+          trillion: 兆
+          unit: ''
+      format:
+        delimiter: ''
+        precision: 3
+        significant: true
+        strip_insignificant_zeros: true
+      storage_units:
+        format: "%n%u"
+        units:
+          byte: バイト
+          gb: GB
+          kb: KB
+          mb: MB
+          tb: TB
+    percentage:
+      format:
+        delimiter: ''
+        format: "%n%"
+    precision:
+      format:
+        delimiter: ''
+  support:
+    array:
+      last_word_connector: と
+      two_words_connector: と
+      words_connector: と
+  time:
+    am: 午前
+    formats:
+      default: "%Y/%m/%d %H:%M:%S"
+      long: "%Y年%m月%d日(%a) %H時%M分%S秒 %z"
+      short: "%y/%m/%d %H:%M"
+    pm: 午後

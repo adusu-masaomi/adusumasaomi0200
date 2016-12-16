@@ -1,0 +1,83 @@
+<div class="nested-fields form-inline">
+  
+  <%= f.label :品番選択, {style: 'width:650px'}  %>
+  <%= f.label :数量, {style: 'width:100px'}  %>
+  <%= f.label :単位, {style: 'width:50px'}  %>
+  </br>
+  <%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:prompt => "どれか一つを選択して下さい"} , 
+  {id:"material_id",  class: "searchableMaterial" , style: 'width:650px'  } %>
+  <%= f.text_area :quantity, {:size => "20x1.5", :maxlength => "5",  style: 'width:100px', :tabindex=>"2"} %>
+  <td>&nbsp;&nbsp;</td>
+  <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px',} %>
+  <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%></br>
+  
+  <!--<%= f.index %>-->
+  <!--<%= f.options[:child_index] %>-->
+  
+  <%= f.label :（手入力用） %>
+  <%= f.label :品番： %>
+  <%= f.text_area :material_code, {id:"material_code", :size => "25x1.5",  :maxlength => "25", :tabindex=>"0" } %>
+  <%= f.label :品名： %>
+  <%= f.text_area :material_name, {id:"material_name",:size => "50x1.5", style: 'width:400px', :tabindex=>"1"} %>
+  
+  <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %></br>
+  
+  <!--<% f.label :線を入れる %>-->
+  <hr style="border-top:2px outset #c0c0c0;width: 100%;height:2;">
+  
+ </div> 
+ 
+ <script type="text/javascript">
+
+  cIndex = 0;
+  //var i = 0;
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+      //検索可能なリストボックス(品名の場合)
+       //$(".searchableId").select2({ theme: "classic" });
+	   $(".searchableMaterial").select2({ theme: "classic" });
+	   
+	   $( ".searchableMaterial" ).change(function(e) {
+	     //うまくいかないため一旦保留 
+		 //setItem(e);
+	   
+	   });
+	   
+	   
+	   $( ".searchableMaterial" ).on("select2:open",(function(e) {
+      　 //i = 0;
+	    cIndex = 0;
+	   }));
+	   
+	   $(".searchableUnit").select2({ theme: "classic" });
+	   
+   
+ });  
+  
+  
+    // this refers to the select that its value has changed
+    // and next('input') finds the input right after it
+	//debugger;
+    //$(this).next('input[data-field=material_id]').val(data.item.default_price);
+  
+  //各値の自動セット-ajax
+  function setItem(e)
+  {  
+     objId = document.getElementsByName("material_id");
+	 material_id[cIndex] = parseInt(objId[cIndex].value);
+     id = material_id[cIndex].value;
+     cIndex += 1;     
+     
+     //項目名
+      $.get("<%= purchase_order_datum_material_select_path %>",
+       {id: id },
+        function(data){
+          document.getElementsByName("material_code")[cIndex -1].value = document.getElementsByName("material_code_hide")[0].textContent;
+		  
+		  }
+      );
+  }  
+   
+   
+ </script>

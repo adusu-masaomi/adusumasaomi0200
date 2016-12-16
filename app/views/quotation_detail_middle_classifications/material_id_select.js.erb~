@@ -1,0 +1,1 @@
+$("#material_id").html("<%= escape_javascript options_from_collection_select(@material_id, :id, :material_name) %>");

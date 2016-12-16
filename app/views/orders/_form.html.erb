@@ -1,0 +1,17 @@
+<%= simple_nested_form_for @purchase_order_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :id %>
+  <table id='tasks'>
+  <%= f.simple_fields_for :orders do |p| %>
+    <%= p.text_area :material_id, label: "品番ID" %>
+    <%= p.text_area :material_code %>
+    <%= p.text_area :material_name %>
+    <%= p.text_area :quantity %>
+  <% end %>
+  </table>
+  
+  <%= f.link_to_add "Add task", :orders, data: { target: '#tasks'}  %>
+	
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                orders_path, :class => 'btn btn-default' %>
+<% end %>

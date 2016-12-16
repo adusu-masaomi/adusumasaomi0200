@@ -1,0 +1,2 @@
+module MaterialMastersHelper
+end

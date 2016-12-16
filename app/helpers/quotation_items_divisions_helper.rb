@@ -1,0 +1,2 @@
+module QuotationItemsDivisionsHelper
+end

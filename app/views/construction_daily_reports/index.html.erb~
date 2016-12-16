@@ -1,0 +1,95 @@
+<%- model_class = ConstructionDailyReport -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @construction_daily_reports %>
+  <!-- 追加箇所終了 -->
+
+  <%= search_form_for @q do |f| %>
+  <%= f.label :construction_code, '工事コード：' %>
+  <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCode" } %></br>
+  <%= f.label :construction_code, '工事名：' %>
+  <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
+  <%= f.label :staff_id, '社員' %>
+  <%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {style: 'width:220px' } %>
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+</div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_daily_report_path(:new_flag => "0"),
+            :class => 'btn btn-primary' %>
+<%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default btn-xs'%>
+<td>合計金額:<%=number_to_currency(@construction_daily_reports.sumprice,  precision: 0 ) %></td>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th><%= model_class.human_attribute_name(:working_date) %></th>-->
+      <th><%= sort_link(@q, :working_date, model_class.human_attribute_name(:working_date)) %></th>
+      <th><%= model_class.human_attribute_name(:construction_code) %></th>
+      <th><%= model_class.human_attribute_name(:construction_name) %></th>
+      <th><%= model_class.human_attribute_name(:staff_id) %></th>
+      <th><%= model_class.human_attribute_name(:start_time_1) %></th>
+      <th><%= model_class.human_attribute_name(:end_time_1) %></th>
+      <th><%= model_class.human_attribute_name(:start_time_2) %></th>
+      <th><%= model_class.human_attribute_name(:end_time_2) %></th>
+      <th><%= model_class.human_attribute_name(:working_times) %></th>
+      <th><%= model_class.human_attribute_name(:man_month) %></th>
+      <th><%= model_class.human_attribute_name(:labor_cost) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @construction_daily_reports.order("id desc").each do |construction_daily_report| %>
+      <tr>
+        <td><%= link_to construction_daily_report.id, construction_daily_report_path(construction_daily_report) %></td>
+        <td><%= construction_daily_report.working_date %></td>
+        <td><%= construction_daily_report.construction_datum.construction_code %></td>
+        <td><%= construction_daily_report.construction_datum.construction_name %></td>
+	<td><%= @staff[(construction_daily_report.staff_id)-1].staff_name %></td>
+        <td><%= construction_daily_report.start_time_1.to_s(:start_time_1) %></td>
+        <td><%= construction_daily_report.end_time_1.to_s(:end_time_1) %></td>
+        <td><%= construction_daily_report.start_time_2.to_s(:start_time_2) %></td>
+        <td><%= construction_daily_report.end_time_2.to_s(:end_time_2) %></td>
+        <td><%= construction_daily_report.working_times %></td>
+        <td><%= construction_daily_report.man_month %></td>
+        <td><%= construction_daily_report.labor_cost %></td>
+        <td><%=l construction_daily_report.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_construction_daily_report_path(construction_daily_report), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      construction_daily_report_path(construction_daily_report),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+	<!-- 追加箇所開始 -->
+    <%= paginate @construction_daily_reports %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+  
+</table>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchablePurchaseCode").select2({ theme: "classic" });
+
+        $(".searchableConstructionCode").select2({ theme: "classic" });
+	$(".searchableConstructionName").select2({ theme: "classic" });
+	$(".searchableCustomerName").select2({ theme: "classic" });
+
+        $(".searchableMaterialCode").select2({ theme: "classic" });
+
+        $(".searchableMakerName").select2({ theme: "classic" });
+  });
+</script>

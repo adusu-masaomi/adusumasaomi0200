@@ -1,0 +1,57 @@
+<%= form_for(@supplier_master) do |f| %>
+  <% if @supplier_master.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@supplier_master.errors.count, "error") %> prohibited this supplier_master from being saved:</h2>
+
+      <ul>
+      <% @supplier_master.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :supplier_name %><br>
+    <%= f.text_field :supplier_name %>
+  </div>
+  <div class="field">
+    <%= f.label :tel_main %><br>
+    <%= f.text_field :tel_main %>
+  </div>
+  <div class="field">
+    <%= f.label :fax_main %><br>
+    <%= f.text_field :fax_main %>
+  </div>
+  <div class="field">
+    <%= f.label :email_main %><br>
+    <%= f.text_field :email_main %>
+  </div>
+  <div class="field">
+    <%= f.label :responsible1 %><br>
+    <%= f.text_field :responsible1 %>
+  </div>
+  <div class="field">
+    <%= f.label :email1 %><br>
+    <%= f.text_field :email1 %>
+  </div>
+  <div class="field">
+    <%= f.label :responsible2 %><br>
+    <%= f.text_field :responsible2 %>
+  </div>
+  <div class="field">
+    <%= f.label :email2 %><br>
+    <%= f.text_field :email2 %>
+  </div>
+  <div class="field">
+    <%= f.label :responsible3 %><br>
+    <%= f.text_field :responsible3 %>
+  </div>
+  <div class="field">
+    <%= f.label :email3 %><br>
+    <%= f.text_field :email3 %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

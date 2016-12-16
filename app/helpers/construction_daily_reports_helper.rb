@@ -1,0 +1,2 @@
+module ConstructionDailyReportsHelper
+end

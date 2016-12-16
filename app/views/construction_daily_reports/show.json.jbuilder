@@ -1,0 +1,1 @@
+json.partial! "construction_daily_reports/construction_daily_report", construction_daily_report: @construction_daily_report

@@ -1,0 +1,2 @@
+json.extract! quotation_header, :id, :quatation_code, :quatation_date, :construction_datum_id, :contsrutction_name, :customer_id, :customer_name, :post, :address, :tel, :fax, :construction_period, :construction_place, :trading_method, :effective_period, :quote_price, :execution_amount, :created_at, :updated_at
+json.url quotation_header_url(quotation_header, format: :json)

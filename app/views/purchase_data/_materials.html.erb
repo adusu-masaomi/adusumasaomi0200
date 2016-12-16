@@ -1,0 +1,3 @@
+<%= simple_form_for (@material_masters) do |f| %>
+  <%= f.collection_select :material_name, MaterialMaster.where(id: material_id), :id, :material_name,  {}  %></br> 
+<% end %>

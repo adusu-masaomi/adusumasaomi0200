@@ -1,0 +1,13 @@
+<%= simple_form_for(@purchase_order_history) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.input :purchase_order_date %>
+    <%= f.input :supplier_master_id %>
+    <%= f.input :purchase_order_datum_id %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

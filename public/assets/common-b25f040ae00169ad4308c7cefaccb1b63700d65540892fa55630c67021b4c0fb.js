@@ -1,0 +1,1 @@
+$(document).ready(function(){$(".datepicker").datetimepicker({format:"YYYY/MM/DD",showOn:"button",buttonImage:"/assets/calendar.png",buttonImageOnly:!0}),$(".datetimepicker").datetimepicker({format:"YYYY/MM/DD HH:mm"})});

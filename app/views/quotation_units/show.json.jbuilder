@@ -1,0 +1,1 @@
+json.partial! "quotation_units/quotation_unit", quotation_unit: @quotation_unit

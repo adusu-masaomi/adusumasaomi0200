@@ -1,0 +1,129 @@
+<%= simple_form_for @purchase_datum, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :purchase_date, label: "仕入日" , input_html:{ style: 'width:220px;'}, as: :date_picker %>
+  <%= f.input :slip_code, label: "伝票番号", input_html: { style: 'width:220px;' }  %>
+  <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
+  <!--<%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい",class: "searchable"} , {id:'purchase_order_datum_id', :class => "my-custom-class",:onchange => "setKenmei(this.form, this.fields)"} %>-->
+  <%= f.select_tag :"purchase_datum",  options_from_collection_for_select(PurchaseOrderDatum.all, :id, :p_num_cd), {:prompt => 'どれか一つを選択して下さい' , class: "searchableSubject" , style: 'width:220px;' } %>
+  
+  <!--<%= f.select_tag :"purchase_order_data", options_from_collection_for_select(PurchaseOrderDatum.all, :id, :p_num_cd), {:prompt => 'どれか一つを選択して下さい' , class: "searchable" ,style: 'width:220px' ,:onchange => "setKenmei(this.form, this.fields)" } %>-->
+  <!-- -->
+  
+  <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
+  <%= f.simple_fields_for :@purchase_order_datum do |m| %>
+  <%= m.label :件名Ｎｏ参照用, {:class => "my-custom-class-lr"} %>
+  <%= m.collection_select :lstConstruction_datumid, ConstructionDatum.all, :id, :construction_code, {:include_blank => true,:selected => @purchase_datum.construction_datum_id} , {id:'lstConstruction_datumid',name:'lstConstruction_datumid', :class => "my-custom-class-r2"} %></br>
+  <% end %>
+  <!-- -->
+  <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:include_blank => true} , {id:'construction_datum_id', :class => "my-custom-class"} %></br>
+  <!--<%= f.input :construction_datum_id, label: "件名No（変更可）", input_html: { :class => "my-custom-class-t" }  %>-->
+  <%= f.label :品番 , {:class => "my-custom-class-l"} %>
+  <%= f.select_tag :"material_masters",  options_from_collection_for_select(MaterialMaster.all, :id, :material_code), {:prompt => 'どれか一つを選択して下さい' , class: "searchableItem" , style: 'width:220px;' } %>
+  <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code,  {:prompt => "どれか一つを選択して下さい"} , { :class => "my-custom-class",:onchange => "setMaterialName(this.form)"}  %>-->
+  <%= f.label :品名 , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :material_name, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {name: 'lstMaterialName' ,:class => "my-custom-class-r"}  %></br>-->
+  <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l"}  %></br>
+  
+  <%= f.input :material_name, label: "品名（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_name' }  %>
+  <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>
+  <%= f.input :maker_name, label: "メーカー名（手入力可）", input_html: { :class => "my-custom-class-t"}  %>
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_datum.supplier_id || 2},{:class => "my-custom-class"}  %></br>
+  <%= f.input :quantity , label: "数量" , hint: "＊入力後、必ずtabキーを押して下さい" , input_html:{ style: 'width:220px;' , :onchange => "calcMoney(this.form)" } %>
+  <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_id, UnitMaster.all, :id, :unit_name, {:selected => @purchase_datum.unit_id || 2} , {:class => "my-custom-class"} %>
+  <%= f.input :purchase_unit_price, label: "仕入単価", hint: "＊変更した場合、必ずtabキーを押して下さい" , input_html:{ style: 'width:220px;' , :onchange => "calcMoney(this.form)" } %>
+  <%= f.input :purchase_amount ,label: "金額"  %>
+  <%= f.input :list_price,label: "定価" %>
+  <%= f.label :仕入区分 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :division_id, PurchaseDivisionMaster.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"} %></br>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_data_path, :class => 'btn btn-default' %>
+				
+<% end %>
+
+<script type="text/javascript">
+
+　　$(document).ready(function(){
+  　　//検索可能なリストボックス(品名の場合)
+	　$(".searchableItem").select2({ theme: "bootstrap" });
+
+	 $( ".searchableItem" ).change(function(e) {
+	   obj = document.getElementById("material_masters");
+	 　//obj = f.purchase_datum_material_id;
+       index = obj.selectedIndex;
+	   //品名のセット（リスト）
+	   obj2 = document.getElementById("lstMaterialName");
+	   obj2.selectedIndex = index;
+       //品名のセット（テキスト）
+	   if (index != 0){
+	      obj3 = document.getElementById("material_name");
+	      obj3.value = obj2.options[index].innerText;
+        }
+      });
+	 
+      //検索可能なリストボックス(注文Noの場合)
+	　$(".searchableSubject").select2({ theme: "bootstrap" });
+
+	 $( ".searchableSubject" ).change(function(e) {
+	  
+	    //obj = f.purchase_datum_purchase_order_datum_id;
+		obj = document.getElementById("purchase_datum");
+        index = obj.selectedIndex;
+    
+	    var str = obj.options[index].innerText;
+	    //var searchIndex = obj.options[index].innerText.search("/");
+	    //指定文字を抜き出す。区切り文字はモデル内に記述
+	    var searchIndex = obj.options[index].innerText.search("<");
+        //数字だけ抜き出す。引数の10は10進数の意。
+	    var KenId = parseInt(str.substr(searchIndex + 1,8),10);
+	    
+		obj2 = document.getElementById("lstConstruction_datumid");
+	    obj2.selectedIndex = KenId;
+		obj3 = document.getElementById("construction_datum_id");
+	    obj3.selectedIndex = KenId;
+	  
+	  });
+　　   //
+   });
+
+ 
+ //メーカー名のセット
+  function setMakerName(f)
+  {
+    obj = f.purchase_datum_maker_id;
+    index = obj.selectedIndex;
+  	if (index != 0){
+      f.purchase_datum_maker_name.value = obj.options[index].innerText;
+    }
+  }
+  
+  //金額計算
+  function calcMoney(f)
+  {
+  	f.purchase_datum_purchase_amount.value = f.purchase_datum_quantity.value * f.purchase_datum_purchase_unit_price.value ;
+  }
+  
+  //件名のセット
+  function setKenmei(f,m)
+  {
+  	obj = f.purchase_datum_purchase_order_datum_id;
+    index = obj.selectedIndex;
+    
+	var str = obj.options[index].innerText;
+	//var searchIndex = obj.options[index].innerText.search("/");
+	//指定文字を抜き出す。区切り文字はモデル内に記述
+	var searchIndex = obj.options[index].innerText.search("<");
+    //数字だけ抜き出す。引数の10は10進数の意。
+	var KenId = parseInt(str.substr(searchIndex + 1,8),10);
+	
+	f.lstConstruction_datumid.selectedIndex = KenId;
+	f.purchase_datum_construction_datum_id.selectedIndex = KenId;
+  }
+ 
+  
+</script>

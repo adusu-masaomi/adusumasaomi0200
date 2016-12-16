@@ -1,0 +1,23 @@
+// Place all the styles related to the purchase_data controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+.scr {
+  overflow: scroll;   /* スクロール表示 */ 
+  width: 100px;
+  margin-bottom:1px;
+  height: 100px;
+  background-color: red;
+}
+.vsb {
+  overflow: visible;  /* はみ出して表示 */ 
+  width: 100px;
+  height: 100px;
+  background-color: green;
+}
+.hdn {
+  overflow: hidden;   /* はみ出さず表示 */ 
+  width: 100px;
+  height: 100px;
+  background-color: blue;
+}

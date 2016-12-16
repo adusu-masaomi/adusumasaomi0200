@@ -1,0 +1,2 @@
+json.extract! construction_daily_report, :id, :working_date, :construction_datum_id, :staff_id, :start_time_1, :end_time_1, :start_time_2, :end_time_2, :working_times, :man_month, :labor_cost, :created_at, :updated_at
+json.url construction_daily_report_url(construction_daily_report, format: :json)

@@ -1,0 +1,1 @@
+json.partial! "construction_costs/construction_cost", construction_cost: @construction_cost

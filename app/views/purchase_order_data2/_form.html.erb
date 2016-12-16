@@ -1,0 +1,52 @@
+<%- model_class = PurchaseOrderDatum -%>  
+<%= simple_form_for @purchase_order_datum, :url => {:controller => 'purchase_order_data2', :action => :create, } , :html => { :class => 'well form-horizontal' } do |f| %>
+
+   <%= f.collection_select :id, PurchaseOrderDatum.all, :id, :purchase_order_code, {:prompt => "どれか一つを選択して下さい"} , {id:"id",  class: "searchableId" , style: 'width:400px',} %></br>
+  </br>
+  <%= f.label :品番ID, {style: 'width:185px'}  %>
+  <%= f.label :品番CD, {style: 'width:185px'}  %>
+  <%= f.label :品名, {style: 'width:185px'}  %>
+  <%= f.label :数量, {style: 'width:185px'}  %>
+  
+  <div class="dash_actions">
+  <%= f.simple_fields_for :orders   do |orders| %>
+    <!--<%= render "order_fields", f: orders %>-->
+	<%= render "order_fields", :f => orders %>
+  <% end %>
+  
+ <!-- <%= link_to_add_association 'タスク追加' , f, :orders %>  -->
+    <%= link_to_add_association 'タスク追加' ,  f, :orders  , :class => 'btn btn-info' %> 
+  </div>
+    
+    <%= f.button :submit,   :class => 'btn-primary' %>
+  
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_order_data2_index_path, :class => 'btn btn-default' %>
+	
+	
+  
+<% end %>
+
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+     
+	$(".add_orders a").
+      data("association-insertion-method", 'append').
+      data("association-insertion-node", function(link){
+        return link.closest('.row').next('.row').find('.orders')
+      });
+    
+  //$(document).on('turbolinks:load', function(){
+      //検索可能なリストボックス(品名の場合)
+       $(".searchableId").select2({ theme: "classic" });
+       $(".searchableMaterial").select2({ theme: "classic" });
+	   
+       //$(".searchableConstructionCode").change(function(e) {
+       //  setConstructionDateDefault();
+   
+ 
+ });  
+</script>

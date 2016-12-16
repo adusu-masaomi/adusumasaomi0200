@@ -1,0 +1,2 @@
+module PurchaseDataHelper
+end

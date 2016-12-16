@@ -1,0 +1,167 @@
+<%- model_class = PurchaseDatum -%>
+<b>
+</br>
+<div class="page-header" >
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @purchase_data %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+  <%= f.label :purchase_date, '仕入日' %>
+  <%= f.text_field :purchase_date_gteq, class:"input-append date datepicker", include_blank: true  %>
+  <%= f.label :purchase_date, '～' %>
+  <%= f.text_field :purchase_date_lteq, class:"input-append date datepicker", include_blank: true  %></br>
+  
+  <!--<%= f.text_field :purchase_date_gteq, class:"my-custom-class-d datepicker", include_blank: true  %>-->
+  <!--<%= f.text_field :purchase_date_gteq, as: :datepicker, required: false, include_blank: true  %>-->
+  
+  <%= f.label :purchase_order_datum_id, '注文No：：' %>
+  <%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
+  <%= f.label :division_id, '仕入区分' %>
+  <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseDivision"}  %></br>
+  <%= f.label :construction_code, '件名コード：：' %>
+  <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") ,{ include_blank: true }, {style: 'width:220px' , class: "searchableConstructionCode" } %>
+  <%= f.label :customer_id, '得意先：：' %>
+  <%= f.select :with_customer, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" }  %></br>
+  <%= f.label :material_code, '品番：' %>
+  <!--<%= f.select :material_code_eq, MaterialMaster.all.map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" }  %>-->
+  <%= f.text_field :material_code_eq, include_blank: true  %>
+  <%= f.label :maker_code, 'メーカー：：' %>
+  <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %></br>
+  <%= f.label :slip_code, '伝票No' %>
+  <%= f.text_field :slip_code_cont, include_blank: true  %>
+    <div>
+       <%= f.submit '検索する' %>
+   </div>
+   <% end %></div>
+
+<%= link_to '新規作成',
+            new_purchase_datum_path(:new_flag => "0"),
+            :class => 'btn btn-primary' %>
+<%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default btn-xs'%>
+<td>合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></td>
+<div class="span12">
+  <style>
+   table { table-layout: fixed; }
+   table th, table td { overflow: hidden; }
+  </style>
+
+  <table class="table">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th>仕入日</th>-->
+      <th><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
+      <th>注文No</th>
+ 	  <th>件名No</th>
+	  <th style="width: 30%">件　　名</th>
+	  <th> 得意先名 </th>
+      <th>品番</th>
+      <th>品   名</th>
+      <!--<th>メ ┃ カ ┃</th>-->
+      <th>メ ┃ カ ┃</th>
+      <th>数量</th>
+      <th>単位</th>
+      <th>仕入単価</th>
+      <th>定価単価</th>
+      <th>金額</th>
+      <th>仕入業者</th>
+      <th>区分</th>
+      <!--<th>伝票No</th>-->
+      <th><%= sort_link(@q, :slip_code, "伝票No" ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_data.order("id desc").each  do  |purchase_datum| %>
+      <tr>
+        <td><%= link_to purchase_datum.id, purchase_datum_path(purchase_datum) %></td>
+        <td><%= purchase_datum.purchase_date %></td>
+        <% if purchase_datum.purchase_order_datum.purchase_order_code.present? %>
+           <td><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <% if purchase_datum.construction_datum_id.present? %>
+          <td><%= @construction_data[(purchase_datum.construction_datum_id)-1].construction_code %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <% if purchase_datum.construction_datum_id.present? %>
+           <td class="col-md-24"><%= @construction_data[(purchase_datum.construction_datum_id)-1].construction_name %></td>
+        <% else %>
+           <td class="col-md-24">-</td>
+        <% end %>
+        <% if purchase_datum.construction_datum_id.present? %>
+           <td><%= @customer_masters[(@construction_data[(purchase_datum.construction_datum_id)-1].customer_id)-1].customer_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <td><%= purchase_datum.material_code %></td>
+	<td><%= purchase_datum.material_name %></td>
+        <td><%= purchase_datum.maker_name %></td>
+        <td><%= purchase_datum.quantity %></td>
+        <% if purchase_datum.unit_id.present? %>
+          <td><%= @unit_masters[(purchase_datum.unit_id)-1].unit_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <td><%= number_to_currency(purchase_datum.purchase_unit_price, :precision => 2)  %></td>
+        <% if purchase_datum.list_price.present? %>
+             <td><%= number_to_currency(purchase_datum.list_price, precision: 0) %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <% if purchase_datum.purchase_amount.present? %>
+        <td><%= number_to_currency(purchase_datum.purchase_amount,  precision: 0) %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <td><%= @supplier_masters[(purchase_datum.supplier_id)-1].supplier_name %></td>
+        <td><%= @purchase_divisions[(purchase_datum.division_id)-1].purchase_division_name %></td>
+        <td><%= purchase_datum.slip_code %></td>
+        <td>
+          <%= link_to '編集',
+                      edit_purchase_datum_path(purchase_datum), :class => 'btn btn-default btn-xs' %>
+          <%= link_to '削除',
+                      purchase_datum_path(purchase_datum),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- kaminari用追加箇所開始 -->
+    <%= paginate @purchase_data %>
+    <!-- kaminari用追加箇所終了 -->
+
+  </tbody>
+</table>
+</div>
+ <!-- kaminari用追加箇所開始 -->
+ <%= paginate @purchase_data %>
+ <!-- kaminari用追加箇所終了 -->
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchablePurchaseCode").select2({ theme: "classic" });
+
+        $(".searchableConstructionCode").select2({ theme: "classic" });
+
+     $(".searchableCustomerName").select2({ theme: "classic" });
+
+        $(".searchableMaterialCode").select2({ theme: "classic" });
+
+        $(".searchableMakerName").select2({ theme: "classic" });
+   
+         $(".searchablePurchaseDivison").select2({ theme: "classic" }); 
+        
+       
+  });
+
+</script>

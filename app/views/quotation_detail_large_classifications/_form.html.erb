@@ -1,0 +1,115 @@
+<!--"_modal.html.erb"へ移行済み、現在未使用 -->
+<%= simple_form_for @quotation_detail_large_classification, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.label :"件名" , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :quotation_header_id, QuotationHeader.all, :id, :construction_name, {:prompt => 'どれか一つを選択して下さい'} , {id:'quotation_header_id', :selected => @quotation_detail_large_classification.quotation_header_id, :class => "searchableQuotationHeader",  style: 'width:330px' } %></br>
+  <%= f.label :"項目名／備考" , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :quotation_items_division_id, QuotationItemsDivision.all, :id, :quotation_items_division_name, {:selected => @quotation_detail_large_classification.quotation_items_division_id || 1} , {id:'quotation_items_division_id', :class => "my-custom-class", :onchange => "setWhenSpecification(this.form)" } %></br>-->
+  <%= f.select :quotation_items_division_id, QuotationDetailLargeClassification.choices, {:selected => @quotation_detail_large_classification.quotation_items_division_id || 1}, {id:'quotation_items_division_id', :class => "my-custom-class", :onchange => "setWhenSpecification(this.form)"} %></br>
+  
+  <%= f.label :"項目名" , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :quotation_large_item_id, QuotationLargeItem.all, :id, :quotation_large_item_name, {:prompt => 'どれか一つを選択して下さい'} , {id:'quotation_large_item_id', :class => "searchableQuotationItem",  style: 'width:220px' } %></br>
+  <%= f.input :quotation_large_item_name , label: "項目名(手入力可)", input_html:{id:"quotation_large_item_name"}  %>
+  <%= f.input :quotation_large_specification , label: "仕様名(手入力可)", input_html:{id:"quotation_large_specification"}  %>
+
+  <%= f.label :"行番号" , {:class => "my-custom-class-l", style: 'color:blue'} %></br>
+  <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, { class: "searchableNumber" , style: 'width:100px' } %>
+  <%= f.check_box :check_line_insert, {}, "true", "false" %>
+  <%= f.label_tag :check_line_insert, '行挿入する' %></br>
+  
+  <%= f.input :quantity, :input_html => {id:'quantity', :value => @quotation_detail_large_classification.quantity || 1 } %>
+  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :value => @quotation_detail_large_classification.execution_quantity || 1 } %>
+  <%= f.label :"単位" , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :quotation_unit_id, QuotationUnit.all, :id, :quotation_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.quotation_unit_id || 2 } , {id:'quotation_unit_id', :class => "searchableQuotationUnit",  style: 'width:220px' } %></br>
+  <%= f.input :quotation_unit_name , label: "単位名(手入力可)", input_html:{id:"quotation_unit_name"}  %>
+  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'quote_price'} %>
+  <%= f.input :execution_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'execution_price'} %>
+  <%= f.input :labor_productivity_unit, hint: "＊自動計算されます。手入力可。" %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id]), :class => 'btn btn-default' %>
+<% end %>
+
+<script type="text/javascript">
+  $(document).on('ready page:load', function(){
+     //検索可能なリストボックス(注文Noの場合)
+     $(".searchableQuotationHeader").select2({ theme: "bootstrap" });
+     $(".searchableQuotationItem").select2({ theme: "bootstrap" });
+     $( ".searchableQuotationItem" ).change(function(e) {
+      　  setQuotationLarageItemName();
+	      setQuotationLarageSpecification();
+     });
+
+     $(".searchableQuotationUnit").select2({ theme: "bootstrap" });
+	 $( ".searchableQuotationUnit" ).change(function(e) {
+      　  setQuotationUnitName();
+	 });
+     $(".searchableNumber").select2({ theme: "bootstrap" });
+     
+ 
+     //検索可能なリストボックス(顧客名の場合)
+     //$(".searchableCustomerName").select2({ theme: "bootstrap" });
+     // $( ".searchableCustomerName" ).change(function(e) {
+     // 　  setCustomerNameDefault();
+     //});
+	 
+   });
+
+   //項目名のセット
+  function setQuotationLarageItemName()
+  {  
+    obj = document.getElementById("quotation_large_item_id");
+     quotation_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_quotation_large_item_select_path %>",
+       {id: quotation_large_item_id },
+        function(data){
+          obj = document.getElementById("quotation_large_item_name").textContent;
+          document.getElementById("quotation_large_item_name").value = obj;
+		  }
+      );
+   };  
+  //仕様のセット
+  function setQuotationLarageSpecification()
+  {  
+    obj = document.getElementById("quotation_large_item_id");
+     quotation_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_quotation_large_specification_select_path %>",
+       {id: quotation_large_item_id },
+        function(data){
+          obj = document.getElementById("quotation_large_specification").textContent;
+          document.getElementById("quotation_large_specification").value = obj;
+		  }
+      );
+   };  
+  //単位名のセット
+  function setQuotationUnitName()
+  {  
+    obj = document.getElementById("quotation_unit_id");
+     quotation_unit_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_quotation_unit_name_select_path %>",
+       {id: quotation_unit_id },
+        function(data){
+          obj = document.getElementById("quotation_unit_name").textContent;
+          document.getElementById("quotation_unit_name").value = obj;
+		  }
+      );
+   };  
+   
+   //区分が仕様を選択した時　　
+   function setWhenSpecification(f)
+   {
+          obj = document.getElementById("quotation_items_division_id");
+          index = obj.selectedIndex;
+          if (index == 1){
+             //数量を０にセット
+             obj2 = document.getElementById("quantity");
+             obj2.value = 0;
+
+             //単位をデフォ(１)にセット
+             $(".searchableQuotationUnit").select2("val","1");
+          }
+   }
+   
+   //quotation_large_item_select
+
+</script>

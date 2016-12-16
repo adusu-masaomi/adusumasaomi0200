@@ -1,0 +1,1 @@
+json.array! @quotation_units, partial: 'quotation_units/quotation_unit', as: :quotation_unit

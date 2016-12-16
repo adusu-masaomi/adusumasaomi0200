@@ -1,0 +1,10 @@
+<%= simple_form_for @quotation_large_item, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :quotation_large_item_name , input_html:{:tabindex=> "0"} %>
+  <%= f.input :quotation_large_specification, input_html:{:tabindex=> "1"} %>
+  
+  <!--<%= f.button :submit, :class => 'btn-primary' %>-->
+  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_large_items_path, :class => 'btn btn-default' %>
+<% end %>
+

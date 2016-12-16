@@ -1,0 +1,145 @@
+ <script src="/assets/fixed_midashi.js?body=1" type="text/javascript"></script>
+  
+<%- model_class = ConstructionDatum -%>
+
+<div class="page-header" style="margin-bottom:0;">
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @construction_data %>
+  <!-- 追加箇所終了 -->
+  
+  <%= search_form_for @q, :html => {:style=> 'width:1280px' } do |f| %>
+    <%= f.label :construction_name, '工事名：' %>
+    <%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
+     <%= f.label :customer_name, '得意先名：' %>
+    <%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
+    </br><%= f.label :billed_flag, '請求済' %>
+	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
+	<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>
+	<div>
+    	<%= f.submit '検索する' %>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_datum_path,
+            :class => 'btn btn-primary' %> 
+  	</div>
+   <% end %>
+</div>
+<div>
+ 
+    <!-- kaminari用追加箇所開始 -->
+   <%= paginate @construction_data %>
+   <!-- kaminari用追加箇所終了 --> 
+   
+</div>
+
+
+<div style="width:1920px;", class="scroll_div">
+<!--<div class="span11 table-scrollable">-->
+
+<style>
+   table { margin: -15px 0px 0px 0px;}
+   table th , table td { white-space:nowrap; overflow:hidden; }
+  </style>
+<!--<table _fixedhead="rows:1; cols:1; div-max-width:100%;", style="font-size : 14px;" ,  class="table table-bordered" >-->
+<table _fixedhead="rows:1; cols:4; div-max-width:1280px;", class="table table-bordered" >
+<!--<table class="table table-bordered" >-->
+  <thead>
+    <tr style="height:50px">
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:construction_code) %></th>-->
+      <th></th>
+      <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
+      <th><%= model_class.human_attribute_name(:construction_name) %></th>
+      <th><%= model_class.human_attribute_name(:reception_date) %></th>
+      <th><%= model_class.human_attribute_name(:customer_name) %></th>
+      <th><%= model_class.human_attribute_name(:construction_period_start) %></th>
+      <th><%= model_class.human_attribute_name(:construction_period_end) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th><%= model_class.human_attribute_name(:billed_flag) %></th>
+    </tr>
+  </thead>
+<!--</table>-->
+
+  <!--<body onLoad="FixedMidashi.create();">-->
+  <!--<table _fixedhead="rows:1; cols:2", class="table table-bordered">-->
+  <tbody>
+    <% @construction_data.order("id desc").each do |construction_datum| %>
+      <% if construction_datum.billed_flag != nil && construction_datum.billed_flag > 0 %>
+         <tr bgcolor="#F7BE81">
+      <% else %>
+         <tr bgcolor="white">
+      <% end %>
+	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
+        <td> <%= link_to t('.edit', :default => t("指示書")),
+                      edit2_construction_datum_path(construction_datum),  :class => 'btn btn-info btn-xs' %></td>
+        <td><%= construction_datum.construction_code %></td>
+        <td><%= construction_datum.construction_name %></td>
+        <td><%= construction_datum.reception_date %></td>
+        <td><%= @customer_masters[(construction_datum.customer_id)-1].customer_name %></td>
+        <% if construction_datum.construction_period_start.present? && construction_datum.construction_period_start.strftime("%Y/%m/%d") != "2021/01/01" then %>
+           <td><%= construction_datum.construction_period_start %></td>
+		<% else %>
+		   <td align="center">-</td>
+		<% end %>
+		<% if construction_datum.construction_period_end.present? && construction_datum.construction_period_end.strftime("%Y/%m/%d") != "2021/01/01" then %>
+		　　<td><%= construction_datum.construction_period_end %></td>
+		<% else %>
+		   <td align="center">-</td>
+		<% end %>
+        <td><%=l construction_datum.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+         <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_construction_datum_path(construction_datum),  :class => 'btn btn-default btn-xs' %>
+		 
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      construction_datum_path(construction_datum),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+        <!--<td><%= check_box("test", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;", :disabled => true}, "true", "false") %></td>-->
+        <td><%= check_box("test", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;",  :disabled => true}, "true", "false") %></td>
+      </tr>
+     <% end %>
+  <!--</table>-->
+  
+  </tbody>
+</table>
+</div>
+
+<!--</div>-->
+  
+
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableCustomerName").select2({ theme: "classic" });
+	
+	
+     // $('.scrolltable').scrolltable()
+	  
+      //$(".table-scrollable").css('margin','5px','margin-top','0');
+      //event.preventDefault();
+     
+  	 
+  });
+  window.onload = function()
+{
+    FixedMidashi.create();
+};
+  
+
+</script>
+<style type="text/css" media="screen">
+  div.scroll_div { overflow: auto; }
+</style>
+
+

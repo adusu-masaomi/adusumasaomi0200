@@ -1,0 +1,1 @@
+json.partial! "working_safety_matters/working_safety_matter", working_safety_matter: @working_safety_matter

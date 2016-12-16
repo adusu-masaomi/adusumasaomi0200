@@ -1,0 +1,38 @@
+<%- model_class = PurchaseDivision -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:purchase_division_name) %></th>
+	  <th><%= model_class.human_attribute_name(:purchase_division_long_name) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_divisions.each do |purchase_division| %>
+      <tr>
+        <td><%= link_to purchase_division.id, purchase_division_path(purchase_division) %></td>
+        <td><%= purchase_division.purchase_division_name %></td>
+		<td><%= purchase_division.purchase_division_long_name %></td>
+        <td><%=l purchase_division.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_purchase_division_path(purchase_division), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      purchase_division_path(purchase_division),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_purchase_division_path,
+            :class => 'btn btn-primary' %>

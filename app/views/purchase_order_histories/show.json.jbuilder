@@ -1,0 +1,1 @@
+json.partial! "purchase_order_histories/purchase_order_history", purchase_order_history: @purchase_order_history

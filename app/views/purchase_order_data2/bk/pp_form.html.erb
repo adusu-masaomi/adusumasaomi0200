@@ -1,0 +1,60 @@
+<%= simple_form_for @purchase_order_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+  <% if @purchase_order_datum.errors.any? %>
+   <div id="error_explanation">
+    <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_order_datum.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+   </div>
+  <% end %>
+
+  <!--<%= f.select :last_header_number,PurchaseOrderDatum.header_numbers, {}, {class: "searchableHeader" , style: 'width:100px' } %>-->
+  <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
+  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1" } %>
+  <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+  <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_order_datum.supplier_master_id || 2}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
+  
+  <div>
+  <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info",  data: {confirm: "メール送信&更新します。よろしいですか？" } %>
+  <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_order_data_path, :class => 'btn btn-default' %>
+   </div>
+<% end %>
+<script type="text/javascript">
+
+　　$(document).ready(function(){
+	   //検索可能なリストボックス(注文Noの場合)
+       $(".searchableConstructionName").select2({ theme: "bootstrap" });
+	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	   $( ".searchableConstructionName" ).on("select2:close", function (e) {
+	     $('[tabindex=3]').focus(); 
+	   });
+	   
+	   $(".searchableSupplier").select2({ theme: "bootstrap" }); 
+       //$(".searchableHeader").select2({ theme: "bootstrap" }); 
+	  
+	 });
+
+
+  //最終番号のセット
+  function getLastCode()
+  {  
+    obj = document.getElementById("last_header_number");
+     //quotation_unit_id = parseInt(obj.value);
+	 header = obj.value;
+     $.get("<%= purchase_order_datum_get_last_number_select_path %>",
+       {header: header },
+        function(data){
+		  obj = document.getElementById("purchase_order_code").textContent;
+		  document.getElementById("purchase_order_code").value = obj;
+		  }
+      );
+   };  
+
+</script>

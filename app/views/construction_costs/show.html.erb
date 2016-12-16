@@ -1,0 +1,27 @@
+<%- model_class = ConstructionCost -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:construction_datum_id) %>:</strong></dt>
+  <dd><%= @construction_cost.construction_datum_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:supplies_expense) %>:</strong></dt>
+  <dd><%= @construction_cost.supplies_expense %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_cost) %>:</strong></dt>
+  <dd><%= @construction_cost.labor_cost %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:misellaneous_expense) %>:</strong></dt>
+  <dd><%= @construction_cost.misellaneous_expense %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:constructing_amount) %>:</strong></dt>
+  <dd><%= @construction_cost.constructing_amount %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              construction_costs_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_construction_cost_path(@construction_cost), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              construction_cost_path(@construction_cost),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

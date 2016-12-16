@@ -1,0 +1,1 @@
+json.array! @construction_daily_reports, partial: 'construction_daily_reports/construction_daily_report', as: :construction_daily_report

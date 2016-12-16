@@ -1,0 +1,60 @@
+<%= simple_form_for @purchase_unit_price, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @purchase_unit_price.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @purchase_unit_price.errors.count %>件のエラーがあります。</h2>
+    <ul>
+    <% @purchase_unit_price.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+
+  <%= f.label :仕入先 , {:class => "my-custom-class-l"}  %></br>
+  <!--<%= f.select_tag :'@purchase_unit_price.supplier_id', options_from_collection_for_select(SupplierMaster.all, :id, :supplier_name, { :selected => @purchase_unit_price.supplier_id.to_i }), {:prompt => 'どれか一つを選択して下さい' , class: "searchable" ,style: 'width:220px'  } %>-->
+  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"} , {class: "searchable" , style: 'width:220px'} %></br>
+  <%= f.label :資材コード , {:class => "my-custom-class-l"}  %></br>
+  <!--<%= f.select_tag :"material_master", options_from_collection_for_select(MaterialMaster.all, :id, :material_code), {:prompt => 'どれか一つを選択して下さい' , class: "searchableMaterialCode" ,style: 'width:220px'  } %>-->
+  <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_code", class: "searchableMaterialCode" , style: 'width:220px'} %>
+  <%= f.input :supplier_material_code, input_html:{id:"supplier_material_code"} %>
+  <%= f.input :unit_price %>
+  <!--<%= f.input :list_price %>-->
+  <%= f.label :単位 , {:class => "my-custom-class-l"}  %></br>
+  <!--<%= f.select_tag :"unit_master", options_from_collection_for_select(UnitMaster.all, :id, :unit_name), {:prompt => 'どれか一つを選択して下さい' , class: "searchable" ,style: 'width:220px'  } %></br>-->
+  <%= f.collection_select :unit_id, UnitMaster.all, :id, :unit_name, {:prompt => "どれか一つを選択して下さい"} , {class: "searchable" , style: 'width:220px'} %></br>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_unit_prices_path, :class => 'btn btn-default' %>
+<% end %>
+
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  //検索可能なリストボックス
+   $(".searchable").select2({theme: "bootstrap"});
+   $(".searchableMaterialCode").select2({theme: "bootstrap"});
+   
+   $( ".searchableMaterialCode" ).change(function(e) {
+      
+        obj = document.getElementById("material_code");
+        index = obj.selectedIndex;
+        var str = obj.options[index].innerText;
+        
+        document.getElementById("supplier_material_code").value = str;
+
+        //指定文字を抜き出す。区切り文字はモデル内に記述
+        //var searchIndex = obj.options[index].innerText.search("<");
+        //数字だけ抜き出す。引数の10は10進数の意。
+        //var KenId = parseInt(str.substr(searchIndex + 1,8),10);
+        
+        //obj2 = document.getElementById("lstConstruction_datumid");
+        //obj2.selectedIndex = KenId;
+        //obj3 = document.getElementById("construction_datum_id");
+        //obj3.selectedIndex = KenId;
+     
+   });
+});
+</script>

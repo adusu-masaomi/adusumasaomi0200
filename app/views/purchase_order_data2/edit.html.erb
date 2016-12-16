@@ -1,0 +1,5 @@
+<%- model_class = PurchaseOrderDatum -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => [:'xxx', '%{model}の作成'] , :model => model_class.model_name.human.titleize %></h1>
+</div>
+<%= render :partial => 'form2', :locals => {:edit_flag => true} %>

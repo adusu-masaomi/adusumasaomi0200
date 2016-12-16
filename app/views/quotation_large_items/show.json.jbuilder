@@ -1,0 +1,1 @@
+json.partial! "quotation_large_items/quotation_large_item", quotation_large_item: @quotation_large_item

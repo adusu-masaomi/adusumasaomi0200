@@ -1,0 +1,48 @@
+<p id="notice"><%= notice %></p>
+
+<br>
+</br>
+
+<h1>仕入先マスター</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>仕入先名</th>
+      <th>Tel</th>
+      <th>Fax</th>
+      <th>Email</th>
+      <th>担当者1</th>
+      <th>Email1</th>
+      <th>担当者2</th>
+      <th>Email2</th>
+      <th>担当者3</th>
+      <th>Email3</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @supplier_masters.each do |supplier_master| %>
+      <tr>
+        <td><%= supplier_master.supplier_name %></td>
+        <td><%= supplier_master.tel_main %></td>
+        <td><%= supplier_master.fax_main %></td>
+        <td><%= supplier_master.email_main %></td>
+        <td><%= supplier_master.responsible1 %></td>
+        <td><%= supplier_master.email1 %></td>
+        <td><%= supplier_master.responsible2 %></td>
+        <td><%= supplier_master.email2 %></td>
+        <td><%= supplier_master.responsible3 %></td>
+        <td><%= supplier_master.email3 %></td>
+        <td><%= link_to '閲覧', supplier_master %></td>
+        <td><%= link_to '編集', edit_supplier_master_path(supplier_master) %></td>
+        <td><%= link_to '削除', supplier_master, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to '新規作成', new_supplier_master_path %>
