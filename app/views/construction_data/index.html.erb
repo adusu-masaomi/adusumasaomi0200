@@ -1,8 +1,8 @@
- <script src="/assets/fixed_midashi.js?body=1" type="text/javascript"></script>
+ <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
   
 <%- model_class = ConstructionDatum -%>
 
-<div class="page-header" style="margin-bottom:0;">
+<div class="page-header" style="margin-bottom:0;width:1920px;">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
   
   <!-- 追加箇所開始 -->
@@ -35,16 +35,16 @@
 </div>
 
 
-<div style="width:1920px;", class="scroll_div">
-<!--<div class="span11 table-scrollable">-->
+
+<!--見出し固定用設定追加-->
+<div "margin-top : -50px;", class="span11 table-scrollable" >
 
 <style>
-   table { margin: -15px 0px 0px 0px;}
+   table { }
    table th , table td { white-space:nowrap; overflow:hidden; }
   </style>
-<!--<table _fixedhead="rows:1; cols:1; div-max-width:100%;", style="font-size : 14px;" ,  class="table table-bordered" >-->
-<table _fixedhead="rows:1; cols:4; div-max-width:1280px;", class="table table-bordered" >
-<!--<table class="table table-bordered" >-->
+<!--見出し固定用設定追加-->
+<table id="tablefix", class="table  table-bordered">
   <thead>
     <tr style="height:50px">
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
@@ -73,7 +73,7 @@
          <tr bgcolor="white">
       <% end %>
 	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
-        <td> <%= link_to t('.edit', :default => t("指示書")),
+        <td><%= link_to t('.edit', :default => t("指示書")),
                       edit2_construction_datum_path(construction_datum),  :class => 'btn btn-info btn-xs' %></td>
         <td><%= construction_datum.construction_code %></td>
         <td><%= construction_datum.construction_name %></td>
@@ -129,17 +129,11 @@
       //$(".table-scrollable").css('margin','5px','margin-top','0');
       //event.preventDefault();
      
-  	 
+  	 //見出し固定用設定追加
+     $('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 1});
+	 
   });
-  window.onload = function()
-{
-    FixedMidashi.create();
-};
   
 
 </script>
-<style type="text/css" media="screen">
-  div.scroll_div { overflow: auto; }
-</style>
-
 

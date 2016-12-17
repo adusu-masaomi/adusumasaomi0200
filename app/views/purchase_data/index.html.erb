@@ -1,7 +1,7 @@
-<script src="/assets/fixed_midashi.js?body=1" type="text/javascript"></script>
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = PurchaseDatum -%>
 
-<div class="page-header" >
+<div class="page-header", style="width:1920px" >
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
   
   <!-- kaminari用追加箇所開始 -->
@@ -65,19 +65,17 @@
  
 
 <!--見出し固定用設定追加-->
-<div style="width:1920px;margin-top : -50px", class="scroll_div">
-<!--<div class="span11 table-scrollable" >-->
+<div style="margin-top : -50px;", class="span11 table-scrollable" >
  <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
   <!--見出し固定用設定追加-->
-　<table _fixedhead="rows:1; cols:4; div-max-width:1280px;", class="table  table-striped", style="font-size : 12px;table-layout:fixed;" >  　
-  <!--<table class="table  table-striped", style="font-size : 12px;table-layout:fixed;">-->
+　<table id="tablefix", class="table  table-striped", style="font-size : 12px;table-layout:fixed;">
   <thead>
     <tr>
-      <th style="width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
-      <th style="width:90px;"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
+      <th style="width:50px;min-width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th style="width:90px;min-width:90px"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
       <th style="width:55px;"><%= sort_link(@q, :purchase_order_datum_purchase_order_code, "注文No" ) %></th>
       <th style="width:90px;"><%= sort_link(@q, :construction_datum_construction_code, "件名No" ) %></th>
 	  <th style="width:235px;"><%= sort_link(@q, :construction_datum_construction_name, "件　　名" ) %></th>
@@ -85,8 +83,8 @@
       <th style="width:120px;"><%= sort_link(@q, :material_code, "品番" ) %></th>
 	  <th style="width:370px;"><%= sort_link(@q, :material_name, "品   名" ) %></th>
 	  <th style="width:110px;"><%= sort_link(@q, :maker_name, "メーカー" ) %></th>
-	  <th style="width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
-      <th style="width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
+	  <th style="width:50px;min-width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
+      <th style="width:50px;min-width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
 	  <th style="width:85px;"><%= sort_link(@q, :purchase_unit_price, "仕入単価" ) %></th>
 	  <th style="width:80px;"><%= sort_link(@q, :purchase_amount, "金額" ) %></th>
 	  <th style="width:65px;"><%= sort_link(@q, :list_price, "定価" ) %></th>
@@ -195,17 +193,9 @@
 
         $(".searchableSupplierName").select2({ theme: "classic" }); 
         
+     //見出し固定用設定追加
+     $('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 2});
+	 
   });
-    
-	//見出し固定用設定追加
-	window.onload = function()
-      {
-    FixedMidashi.create();
-	   
-      };
+	
 </script>
-
-
-<style type="text/css" media="screen">
-  div.scroll_div { overflow: auto; }
-</style>
