@@ -20,7 +20,6 @@
 //= require jquery.turbolinks
 //= require select2
 //= require select2_locale_ja
-// require fixed_midashi
 //= require_tree .
 //= require_self
 //= require moment

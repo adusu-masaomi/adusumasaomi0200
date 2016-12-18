@@ -1,5 +1,5 @@
 class ConstructionDailyReport < ActiveRecord::Base
-  paginates_per 120  # 1ページあたり項目表示
+  paginates_per 200  # 1ページあたり項目表示
   
   #belongs_to :construction_datum, :touch => :construction_start_date
   belongs_to :construction_datum

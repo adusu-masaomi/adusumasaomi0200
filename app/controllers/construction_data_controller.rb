@@ -7,8 +7,23 @@ class ConstructionDataController < ApplicationController
   # GET /construction_data
   # GET /construction_data.json
   def index
-    #@construction_data = ConstructionDatum.all
-    @q = ConstructionDatum.ransack(params[:q])   
+    
+    #ransack保持用コード
+    query = params[:q]
+    query ||= eval(cookies[:recent_search_history].to_s)  	
+		
+	#@q = ConstructionDatum.ransack(params[:q])
+    #ransack保持用--上記はこれに置き換える
+    @q = ConstructionDatum.ransack(query)   
+    
+    #ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 30.minutes.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+	
     @construction_data  = @q.result(distinct: true)
     
     #kaminari用設定

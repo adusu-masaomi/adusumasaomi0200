@@ -1,5 +1,5 @@
 class PurchaseOrderDatum < ActiveRecord::Base
-    paginates_per 50  # 1ページあたり項目表示
+    paginates_per 200  # 1ページあたり項目表示
 
     #has_many :construction_data , :foreign_key => "construction_datum_id"
     belongs_to :construction_datum 

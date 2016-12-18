@@ -44,16 +44,15 @@
   <%= f.label :material_code, '品名：' %>
   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px' %></br>
       <div>
-       <%= f.submit '検索する' %>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <%= f.submit '検索する', :class => 'btn btn-default' %>
         <%= link_to '新規作成',
             new_purchase_datum_path(:new_flag => "0"),
             :class => 'btn btn-primary' %>
         <%= link_to "仕入表PDF",
             purchase_data_path(@purchase_datum, format: "pdf"),
             :class => 'btn  btn-success', :target=>["_blank"] %>
-      <%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default btn-xs'%>
-       <td>合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></td>
+      <%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default'%>
+       <td><font size="3">合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></font></td>
  
      </div>
    <% end %>
@@ -71,11 +70,11 @@
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
   <!--見出し固定用設定追加-->
-　<table id="tablefix", class="table  table-striped", style="font-size : 12px;table-layout:fixed;">
+　<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;table-layout:fixed;">
   <thead>
     <tr>
-      <th style="width:50px;min-width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
-      <th style="width:90px;min-width:90px"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
+      <th style="width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th style="width:90px;"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
       <th style="width:55px;"><%= sort_link(@q, :purchase_order_datum_purchase_order_code, "注文No" ) %></th>
       <th style="width:90px;"><%= sort_link(@q, :construction_datum_construction_code, "件名No" ) %></th>
 	  <th style="width:235px;"><%= sort_link(@q, :construction_datum_construction_name, "件　　名" ) %></th>
@@ -83,8 +82,8 @@
       <th style="width:120px;"><%= sort_link(@q, :material_code, "品番" ) %></th>
 	  <th style="width:370px;"><%= sort_link(@q, :material_name, "品   名" ) %></th>
 	  <th style="width:110px;"><%= sort_link(@q, :maker_name, "メーカー" ) %></th>
-	  <th style="width:50px;min-width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
-      <th style="width:50px;min-width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
+	  <th style="width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
+      <th style="width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
 	  <th style="width:85px;"><%= sort_link(@q, :purchase_unit_price, "仕入単価" ) %></th>
 	  <th style="width:80px;"><%= sort_link(@q, :purchase_amount, "金額" ) %></th>
 	  <th style="width:65px;"><%= sort_link(@q, :list_price, "定価" ) %></th>
@@ -194,8 +193,17 @@
         $(".searchableSupplierName").select2({ theme: "classic" }); 
         
      //見出し固定用設定追加
-     $('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 2});
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 520;  //デフォルトの高さ(社長PC基準)
 	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 4;  //固定列数
+		ht -= 70;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
   });
 	
 </script>

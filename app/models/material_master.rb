@@ -1,4 +1,6 @@
 class MaterialMaster < ActiveRecord::Base
+	paginates_per 200  # 1ページあたり項目表示
+	
 	#has_many :PurchaseDatum
 	belongs_to :PurchaseDatum
 	belongs_to :MakerMaster, :foreign_key => "maker_id"

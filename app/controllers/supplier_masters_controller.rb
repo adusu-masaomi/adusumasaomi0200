@@ -8,6 +8,8 @@ class SupplierMastersController < ApplicationController
 	
 	@q = SupplierMaster.ransack(params[:q])   
     @supplier_masters  = @q.result(distinct: true)
+	#kaminari用設定
+    @supplier_masters  = @supplier_masters.page(params[:page])
 	
   end
 

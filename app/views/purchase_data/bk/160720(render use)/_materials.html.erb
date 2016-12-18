@@ -1,4 +1,0 @@
-<%= simple_form_for @material_masters ,  :html => { :class => 'form-horizontal' } do |f| %>
-<%= f.collection_select :material_name, MaterialMaster.where(id: material_id), :id, :material_name,  {} , {:class => "my-custom-class"}  %></br>
-<% end %>
-

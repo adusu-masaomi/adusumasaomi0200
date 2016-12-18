@@ -18,9 +18,8 @@
 	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
 	<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>
 	<div>
-    	<%= f.submit '検索する' %>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<%= link_to t('.new', :default => t("helpers.links.new")),
+        <%= f.submit '検索する', :class => 'btn btn-default' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_datum_path,
             :class => 'btn btn-primary' %> 
   	</div>
@@ -129,8 +128,19 @@
       //$(".table-scrollable").css('margin','5px','margin-top','0');
       //event.preventDefault();
      
-  	 //見出し固定用設定追加
-     $('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 1});
+  	  //見出し固定用設定追加
+	  var sz = window.parent.screen.width;
+	  var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	  var ht = 520;  //デフォルトの高さ(社長PC基準)
+		
+	  if (sz != 1920) {
+	  //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 3;  //固定列数
+	    ht -= 50;
+      }
+	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	   //
+       //$('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 1});
 	 
   });
   

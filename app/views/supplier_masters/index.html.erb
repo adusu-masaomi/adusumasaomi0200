@@ -1,29 +1,41 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = SupplierMaster -%>
 <b>
 </br>
-<div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+<div class="page-header", style="width:1920px" >
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @supplier_masters %>
+  <!-- kaminari用追加箇所終了 -->
+  
    <%= search_form_for @q do |f| %>
     <%= f.label :supplier_name, '仕入先名：' %>
     <%= f.select :id_eq, options_from_collection_for_select(SupplierMaster.all, "id", "supplier_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
   	<div>
-    	<%= f.submit '検索する' %>
-	</div>
-   <% end %>
-</div>
-
-<%= link_to t('.new', :default => t("helpers.links.new")),
+    	<%= f.submit '検索する' , :class => 'btn btn-default' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
             new_supplier_master_path,
             :class => 'btn btn-primary' %>
+    </div>
+   <% end %>
+   <!-- kaminari用追加箇所開始 -->
+   <%= paginate @supplier_masters %>
+   <!-- kaminari用追加箇所終了 --> 
+</div>
+
 			
-<div class="span11 table-scrollable" >
- 
+<!--<div class="span11 table-scrollable" >-->
+<!--見出し固定用設定追加-->
+<div style="margin-top : -20px;", class="span11 table-scrollable" >
+
  <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
   
-  <table class="table table-striped">
+  <!--<table class="table table-striped">-->
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped">
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
@@ -79,6 +91,19 @@
   //検索可能なリストボックス
   $(document).ready(function(){
         $(".searchableSupplierName").select2({ theme: "classic" });
+        //見出し固定用設定追加
+        var sz = window.parent.screen.width;
+        var fc = 1;    //デフォルトの固定列数(社長PC基準)
+        var ht = 610;  //デフォルトの高さ(社長PC基準)
+        
+        if (sz != 1920) {
+          //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 2;  //固定列数
+		  ht -= 70;
+		}
+		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+		//
+        //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});
   });
 
 </script>

@@ -1,8 +1,7 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = PurchaseOrderDatum -%>
-<div class="page-header">
-  <b>
-  </br>
-  <h1><%= "注文データ" %></h1>
+<div class="page-header", style="margin-bottom:5px;width:1920px">
+  <h1><font size="5"><%= "注文データ" %></font></h1>
   <!-- 追加箇所開始 -->
   <%= page_entries_info @purchase_order_data %>
   <!-- 追加箇所終了 -->
@@ -13,20 +12,24 @@
       <%= f.label :construction_datum_id, '工事名：：' %>
       <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br
       <div>
-         <%= f.submit '検索する' %>
+         <%= f.submit '検索する', :class => 'btn btn-default' %>
   	  </div>
    <% end %>
+   
 </div>
-
-
-<div class="span11 table-scrollable" style="margin-left : 10px">
+<!--<div class="span11 table-scrollable" style="margin-left : 10px">-->
+<!--見出し固定用設定追加-->
+<div style="margin-top : -20px;margin-left : 10px;", class="span11 table-scrollable" >
  
  <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
 
-<table class="table table-striped">
+<!--<table class="table table-striped">-->
+<!--見出し固定用設定追加-->
+<table id="tablefix", class="table  table-striped", style="width:1920px;">
+
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
@@ -84,7 +87,7 @@
     <% end %>
     <!-- 追加箇所開始 -->
     <%= paginate @purchase_order_data %>
-    <!-- 追加箇所終了 -->
+     <!-- 追加箇所終了 -->
   </tbody>
 </table>
 </div>
@@ -96,6 +99,19 @@
 
         $(".searchablePurchaseOrderCode").select2({ theme: "classic" });
 		$(".searchableConstructionCode").select2({ theme: "classic" });
+		
+		//見出し固定用設定追加
+		var sz = window.parent.screen.width;
+		var fc = 1;    //デフォルトの固定列数(社長PC基準)
+		var ht = 610;  //デフォルトの高さ(社長PC基準)
+		
+		if (sz != 1920) {
+		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 2;  //固定列数
+		  ht -= 80;
+		}
+		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+		//
 	
   });
   

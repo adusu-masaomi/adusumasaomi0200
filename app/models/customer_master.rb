@@ -1,5 +1,5 @@
 class CustomerMaster < ActiveRecord::Base
-    paginates_per 50  # 1ページあたり項目表示
+    paginates_per 200  # 1ページあたり項目表示
 
     has_many :construction_datum  # <== 関係を追記
     
