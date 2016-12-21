@@ -7,11 +7,26 @@ class PurchaseUnitPricesController < ApplicationController
   # GET /purchase_unit_prices
   # GET /purchase_unit_prices.json
   def index
-    #@purchase_unit_prices = PurchaseUnitPrice.page(params[:page])
-    
-    @q = PurchaseUnitPrice.ransack(params[:q])   
-    @purchase_unit_prices = @q.result(distinct: true)
-    @purchase_unit_prices = @purchase_unit_prices.page(params[:page])
+   
+   #ransack保持用コード
+   query = params[:q]
+   query ||= eval(cookies[:recent_search_history].to_s)  	
+  
+   #@purchase_unit_prices = PurchaseUnitPrice.page(params[:page])
+   #@q = PurchaseUnitPrice.ransack(params[:q])   
+   #ransack保持用--上記はこれに置き換える
+   @q = PurchaseUnitPrice.ransack(query)
+   
+   #ransack保持用コード
+   search_history = {
+   value: params[:q],
+   expires: 30.minutes.from_now
+   }
+   cookies[:recent_search_history] = search_history if params[:q].present?
+   #
+   
+   @purchase_unit_prices = @q.result(distinct: true)
+   @purchase_unit_prices = @purchase_unit_prices.page(params[:page])
 
 
     @material_master = MaterialMaster.all

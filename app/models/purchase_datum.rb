@@ -14,7 +14,9 @@ class PurchaseDatum < ActiveRecord::Base
     
     #単価M更新切り分け用
     attr_accessor :check_unit
-    
+    #仕入先品番選択用
+	attr_accessor :supplier_material_code
+	
     #金額合計
     def self.sumprice  
       sum(:purchase_amount)

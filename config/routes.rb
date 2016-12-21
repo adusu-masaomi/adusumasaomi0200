@@ -116,6 +116,8 @@ Rails.application.routes.draw do
   get '/purchase_datum/maker_select' => 'purchase_data#maker_select'
   get '/purchase_datum/unit_select' => 'purchase_data#unit_select'
   
+  get '/purchase_datum/supplier_item_select' => 'purchase_data#supplier_item_select'
+  
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   #161212
   #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'

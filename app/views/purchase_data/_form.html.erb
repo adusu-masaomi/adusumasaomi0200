@@ -16,7 +16,9 @@
   <!--</br></br></br></br>-->  
 
   <!--<%= f.input :purchase_date, label: "仕入日" , input_html:{ style: 'width:220px;'}, as: :date_picker %>-->
-  <%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date", style: 'width:220px;'} %>
+  <!--<%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date",  style: 'width:220px;'} %>-->
+  <%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date", name: "purchase_datum[purchase_date][]" , style: 'width:220px;'} %>
+  
   <%= f.input :slip_code, label: "伝票番号", input_html: { style: 'width:220px;' }  %>
   <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
   <!--<%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい",class: "searchable"} , {id:'purchase_order_datum_id', :class => "my-custom-class",:onchange => "setKenmei(this.form, this.fields)"} %>-->
@@ -38,8 +40,19 @@
   <%= f.input :notes, label_html:{style: 'margin-top : -30px;'}, input_html:{id:"notes",  style: 'width:330px;margin-top : -0px;'} %>
   </div>
   
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
+  {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :onchange => "setUnitPrice(this.form)"}  %></br>
+
+  <div class="col-xs-5" , style="margin-left : -15px">
   <%= f.label :品番 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , style: 'width:220px',:onchange => "setListPriceAndMakerAndUnit(this.form)"} %>
+  </div>
+  
+  <%= f.label :仕入先品番（検索用） , {:class => "my-custom-class-l"} %>
+  <%= f.collection_select :supplier_material_code, PurchaseUnitPrice.all, :id, :supplier_material_code, {:include_blank => true} , 
+      {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px'} %>
+  
   <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
   <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;'}  %></br>
   
@@ -56,10 +69,7 @@
   <!--<%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>-->
   <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , style: 'width:220px'} %></br> 
   <%= f.input :maker_name, label: "メーカー名（手入力可）", input_html: { id:'maker_name', :class => "my-custom-class-t"}  %>
-  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
-  <!--<%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:selected => 2},{id:"supplier_id", :class => "my-custom-class",:onchange => "setUnitPrice(this.form)"}  %>-->
-  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},{id:"supplier_id", :class => "my-custom-class",:onchange => "setUnitPrice(this.form)"}  %>
-  
+    
   <!--仕入先単価-->
   <%= f.simple_fields_for :PurchaseUnitPrice, :remote => true do |k| %>
   <%= k.input :unit_price , input_html:{ id:"unit_price"} , as: :hidden%>
@@ -84,12 +94,15 @@
   <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {:class => "my-custom-class"} %></br>
   
   <%= f.button :submit, :class => 'btn-primary' %>
+  
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 purchase_data_path, :class => 'btn btn-default' %>
 				
 <% end %>
 
 <script type="text/javascript">
+
+   var item_index = 0;
 
    //$(document).ready(function(){
    $(document).on('ready page:load', function(){
@@ -106,21 +119,32 @@
      $( ".searchableItem" ).change(function(e) {
        obj = document.getElementById("material_id");
        index = obj.selectedIndex;
-       //品番のセット
-	   obj4 = document.getElementById("material_code");
-       obj4.value = obj.options[index].innerText;
-	     
-	   //品名のセット（リスト）
-       obj2 = document.getElementById("lstMaterialName");
-       obj2.selectedIndex = index;
-       //品名のセット（テキスト）
-       if (index !== 0){
-          obj3 = document.getElementById("material_name");
-          obj3.value = obj2.options[index].innerText;
-        }
+       
+	    //品番・品名をセット
+		setItem(index);
+		
+		//単価をセット
+		setUnitPrice();
       });
-
-
+      
+	  //検索可能なリストボックス(客先品番の場合)
+      $(".searchableSupplierItem").select2({ theme: "bootstrap" });
+	  $( ".searchableSupplierItem" ).change(function(e) {
+	     //normal_index = document.getElementById("supplier_material_id").value;
+	     material_id_position = document.getElementById("supplier_material_id").value.indexOf(",") + 1 ;
+		 index = document.getElementById("supplier_material_id").value.slice(material_id_position)
+		 
+		 //資材Mのインデックスも変更
+		 //debugger;
+		 //document.getElementById("material_id").options[index].selected = true;
+         $(".searchableItem").val(index).trigger("change");
+		 
+		//品番・品名をセット
+		//setItem(index);
+		//単価をセット
+		//setUnitPrice();
+	  });
+	 
       $(".searchableMaker").select2({ theme: "bootstrap" });
 
       $( ".searchableMaker" ).change(function(e) {
@@ -132,7 +156,13 @@
              obj2.value = obj.options[index].innerText;
           }
       });
-
+     
+	 //検索可能なリストボックス(仕入業者の場合)
+     $(".searchableSupplier").select2({ theme: "bootstrap" });
+     $( ".searchableSupplier" ).change(function(e) {
+       //setUnitPrice();
+	   setSupplierItem();
+     });
      
       //検索可能なリストボックス(注文Noの場合)
       $(".searchableSubject").select2({ theme: "bootstrap" });
@@ -169,44 +199,76 @@
 	  
 	
    });
+   
+   //品番・品名のセット
+   function setItem(index){
+       //品番のセット
+       obj4 = document.getElementById("material_code");
+       obj = document.getElementById("material_id");
+       obj4.value = obj.options[index].innerText;
+	  
+		 
+	   //品名のセット（リスト）
+       obj2 = document.getElementById("lstMaterialName");
+       obj2.selectedIndex = index;
+       //品名のセット（テキスト）
+       if (index !== 0){
+          obj3 = document.getElementById("material_name");
+          obj3.value = obj2.options[index].innerText;
+        }
+   }
 
   //仕入先単価のセット
-   function setUnitPrice(f)
+   function setUnitPrice()
    {
-     //仕入単価のセット
-     //f.unit_price.selectedIndex = 1;
-     //f.unit_price.value = 1;     
-
-     var supplier_id = f.supplier_id.value;
-      var material_id = f.material_id.value;
-      $.get("<%= purchase_datum_unit_price_select_path %>",
-          { supplier_id: supplier_id, material_id: material_id },
-          function(data){
-            　　//obj = document.getElementById("unit_price");
-                //index = obj.selectedIndex;
-                //f.purchase_unit_price.value = obj.options[index].innerText;     
-          　
-		obj = document.getElementById("unit_price").textContent;
-	        document.getElementById("unit_price").value = obj;
-		document.getElementById("purchase_unit_price").value = obj;
+      //仕入単価のセット
+      //var supplier_id = f.supplier_id.value;
+      //var material_id = f.material_id.value;
+	  
+      var supplier_id = document.getElementById("supplier_id").value;
+      var material_id = document.getElementById("material_id").value;
+      var last_unit_price_update_at = document.getElementById("last_unit_price_update_at").value;
+	  
+	  if (material_id > 1) {
+	  
+        $.get("<%= purchase_datum_unit_price_select_path %>",
+            { supplier_id: supplier_id, material_id: material_id },
+            function(data){
+              obj = document.getElementById("unit_price").textContent;
+	          document.getElementById("unit_price").value = obj;
+              document.getElementById("purchase_unit_price").value = obj;
+			
+              //debugger;
+             //var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;
+                 var purchase_date_set = document.getElementsByName("purchase_datum[purchase_date][]")[0].value + "/" + document.getElementsByName("purchase_datum[purchase_date][]")[1].value + "/" 
+                                    + document.getElementsByName("purchase_datum[purchase_date][]")[2].value; 
                
-　　　　　　　　 var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
-   　　　　　　　if (f.last_unit_price_update_at.value <= purchase_date_set){
-　　　　　　　　　　　document.getElementById("last_unit_price").value = obj; 
-                    f.last_unit_price_update_at.value = purchase_date_set;  
-	　　    }
+                   if (last_unit_price_update_at <= purchase_date_set){
+                     document.getElementById("last_unit_price").value = obj; 
+                      document.getElementById("last_unit_price_update_at").value = purchase_date_set;  
             }
-        );
+              }
+          );
       
-      //単位のセット
-      // var material_id = f.material_id.value;
-	  $.get("<%= purchase_datum_unit_select_path %>",
-          { supplier_id: supplier_id, material_id: material_id },
-          function(data){
-          }
-        );
-        
-       }
+        //単位のセット
+        // var material_id = document.getElementById("material_id").value;
+	    $.get("<%= purchase_datum_unit_select_path %>",
+            { supplier_id: supplier_id, material_id: material_id },
+            function(data){
+            }
+          );
+     }
+   }
+
+   //仕入先品番をセット(Ajax)
+   function setSupplierItem(){
+     var supplier_id = document.getElementById("supplier_id").value;
+     $.get("<%= purchase_datum_supplier_item_select_path %>",
+            { supplier_id: supplier_id },
+            function(data){
+            });
+     
+   }
 
    //定価・メーカー・単位のセット
    function setListPriceAndMakerAndUnit(f)
@@ -273,10 +335,12 @@
     //単価Mの直近単価も更新
     var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
    
+     //debugger;
+   
     if (f.last_unit_price_update_at.value <= purchase_date_set){
      f.last_unit_price.value = f.purchase_unit_price.value;
      f.last_unit_price_update_at.value = purchase_date_set;
-	// debugger;
+	
     }
   }
     

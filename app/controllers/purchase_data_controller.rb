@@ -151,10 +151,14 @@ class PurchaseDataController < ApplicationController
   # POST /purchase_data
   # POST /purchase_data.json
   def create
-    @purchase_datum = PurchaseDatum.new(purchase_datum_params)
-
+    
+    #viewで分解されたパラメータを、正常更新できるように復元させる。
+    adjust_purchase_date_params
+	
+	@purchase_datum = PurchaseDatum.new(purchase_datum_params)
+      
     respond_to do |format|
-      if @purchase_datum.save
+	  if @purchase_datum.save
         format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully created.' }
         format.json { render :show, status: :created, location: @purchase_datum }
        
@@ -164,7 +168,8 @@ class PurchaseDataController < ApplicationController
            @purchase_datum.update(purchase_unit_prices_params)
           
            #資材Mも更新
-           #save_material_masters
+           update_params_list_price_and_maker
+		   
            @purchase_datum.update_attributes(material_masters_params)
        end    
    
@@ -177,17 +182,26 @@ class PurchaseDataController < ApplicationController
     end
   end
 
-  # PATCH/PUT /purchase_data/1
+   # PATCH/PUT /purchase_data/1
   # PATCH/PUT /purchase_data/1.json
   def update
-    respond_to do |format|
+    
+   #viewで分解されたパラメータを、正常更新できるように復元させる。
+   adjust_purchase_date_params
+	  
+   respond_to do |format|
+      
       if @purchase_datum.update(purchase_datum_params)
         format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
         format.json { render :show, status: :ok, location: @purchase_datum }
        
+	   
+		 
         #仕入単価Mも更新する 
         if (params[:purchase_datum][:check_unit] == 'false')
           @purchase_datum.update(purchase_unit_prices_params)
+          
+          update_params_list_price_and_maker
           @purchase_datum.update(material_masters_params)         
         end 
 
@@ -198,7 +212,32 @@ class PurchaseDataController < ApplicationController
   
     end
   end
-
+  
+  def update_params_list_price_and_maker
+  #資材Mの定価・メーカーを更新する(未登録の場合)
+    if params[:purchase_datum][:MaterialMaster_attributes].present?
+      #params[:purchase_datum][:MaterialMaster_attributes].values.each do |item|
+      id = params[:purchase_datum][:material_id].to_i
+      @material_masters = MaterialMaster.find(id)
+      if @material_masters.present?
+        #定価
+        if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
+          params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
+        end
+        #メーカー
+        if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
+           params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
+        end
+      end
+    end
+  end
+  #viewで分解されたパラメータを、正常更新できるように復元させる。
+  def adjust_purchase_date_params
+    params[:purchase_datum][:purchase_date] = params[:purchase_datum][:purchase_date][0] + "/" + 
+                                                  params[:purchase_datum][:purchase_date][1] + "/" + 
+                                                  params[:purchase_datum][:purchase_date][2]
+  end
+  
   # DELETE /purchase_data/1
   # DELETE /purchase_data/1.json
   def destroy
@@ -226,18 +265,25 @@ class PurchaseDataController < ApplicationController
   def unit_select
      @unit_masters  = PurchaseUnitPrice.with_unit.where(:supplier_id => params[:supplier_id], :material_id => params[:material_id]).where("supplier_id is NOT NULL").where("material_id is NOT NULL").pluck("unit_masters.unit_name, unit_masters.id")
      
+     #登録済み単位と異なるケースもあるので、任意で変更もできるように全ての単位をセット
+     unit_all = UnitMaster.all.pluck("unit_masters.unit_name, unit_masters.id")
+     @unit_masters = @unit_masters + unit_all
+     
      #単位未登録の場合はデフォルト値をセット
      if @unit_masters.blank?
         @unit_masters  = [["-",1]]
      end
      
      #未登録(-)の場合はセットしない。
-     if @unit_masters  == [["-",1]]
-        PurchaseUnitPrice.all.pluck("unit_masters.unit_name, unit_masters.id")
-     end 
+     #if @unit_masters  == [["-",1]]
+        #PurchaseUnitPrice.all.pluck("unit_masters.unit_name, unit_masters.id")
+     #end 
   end
 
-
+  def supplier_item_select
+    @supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase_datum
@@ -257,7 +303,7 @@ class PurchaseDataController < ApplicationController
     end
 
     def material_masters_params
-         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at ])
+         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at, :list_price, :maker_id ])
     end
     
 	#資材Mへ最終単価・日付を更新用
