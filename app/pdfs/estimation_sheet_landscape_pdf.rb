@@ -71,7 +71,28 @@ class EstimationSheetLandscapePDF
 		 
 		   #得意先名
 		   @report.page.item(:customer_name).value(@quotation_headers.customer_name) 
-		 
+		   ###add161227
+		   #敬称
+		   honorific_name = CustomerMaster.honorific[0].find{0}  #"様"
+		   
+		   if @quotation_headers.honorific_id == 1   #"御中?
+		     id = @quotation_headers.honorific_id
+			 honorific_name = CustomerMaster.honorific[id].find{id} #"御中"
+		   end
+		   @report.page.item(:honorific).value(honorific_name) 
+		   
+		   #担当1
+		   if @quotation_headers.responsible1.present?
+		     responsible = @quotation_headers.responsible1 + "  様"
+		     @report.page.item(:responsible1).value(responsible)
+		   end
+		   #担当2
+		   if @quotation_headers.responsible2.present?
+		     responsible = @quotation_headers.responsible2 + "  様"
+		     @report.page.item(:responsible2).value(responsible)
+		   end
+		   #####
+		   
 		   #件名
 		   @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
 		 
@@ -201,7 +222,7 @@ class EstimationSheetLandscapePDF
                       end  
                       
                       @unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
-                      if @unit_name == "-"
+                      if @unit_name == "<手入力>"
                         @unit_name = ""
                       end 
                       #  
@@ -292,7 +313,7 @@ class EstimationSheetLandscapePDF
 		   @quotation_headers = QuotationHeader.find(quotation_detail_middle_classification.quotation_header_id)
 	       #得意先名
 		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
-		 
+		  
 		   #件名
 		   @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
 		 
@@ -321,7 +342,8 @@ class EstimationSheetLandscapePDF
                     @execution_quantity = ""
                   end  
                   @unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  if @unit_name == "-"
+                  #if @unit_name == "-"
+                  if @unit_name == "<手入力>"
                     @unit_name = ""
                   end 
                   

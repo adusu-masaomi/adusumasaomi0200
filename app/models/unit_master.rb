@@ -4,5 +4,10 @@ class UnitMaster < ActiveRecord::Base
    #def self.ransackable_scopes(auth_object=nil)
    #    [:with_unit]
    #end
-
+  
+   #即時に取り出せるよう配列化
+   def self.all_list
+      UnitMaster.all.pluck("unit_name, id")
+   end
+  
 end

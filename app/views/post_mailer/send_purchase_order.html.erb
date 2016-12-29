@@ -19,7 +19,8 @@
       &nbsp;&nbsp;&nbsp;メーカー：
       <%= item[:maker_name] %></p>
       &nbsp;&nbsp;&nbsp;数量：
-      <%= item[:quantity]  %></p>
+      <%= item[:quantity]  %>
+	  <%= UnitMaster.all_list[(item[:unit_master_id].to_i) -1][0] %></p>
       &nbsp;&nbsp;&nbsp;ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー</p>
 	<% end %>
   <% end %>

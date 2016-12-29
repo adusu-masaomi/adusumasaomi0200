@@ -37,7 +37,7 @@ class PurchaseOrderHistoriesController < ApplicationController
     $purchase_order_history = nil
     $purchase_order_date =  nil
     $supplier_master_id =  nil
-  		
+    
   end
   
   def index2
@@ -267,8 +267,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 		
 		if params[:purchase_order_history][:sent_flag] == "1" then
 	
-      
-		    #set to global
+      	  #set to global
 	      $order_parameters = params[:purchase_order_history][:orders_attributes]
       
           #画面のメアドをグローバルへセット

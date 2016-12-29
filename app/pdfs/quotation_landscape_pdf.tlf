@@ -86,7 +86,7 @@
       "description": "",
       "x": 62.1,
       "y": 51.8,
-      "width": 140.8,
+      "width": 134.4,
       "height": 10.8,
       "style": {
         "font-family": [
@@ -1623,6 +1623,119 @@
           "delimiter": ",",
           "precision": 0
         }
+      }
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 206.1,
+      "y": 52.6,
+      "width": 10.9,
+      "height": 9.1,
+      "style": {
+        "border-color": "none",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ffffff"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "honorific",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 199.1,
+      "y": 52,
+      "width": 20.9,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "responsible1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 62.1,
+      "y": 65.2,
+      "width": 60.5,
+      "height": 8.5,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "responsible2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 62.1,
+      "y": 74.3,
+      "width": 60.5,
+      "height": 8.5,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
       }
     }
   ],

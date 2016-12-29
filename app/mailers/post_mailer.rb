@@ -18,7 +18,7 @@ class PostMailer < ApplicationMailer
 		#cc: "adusu@coda.ocn.ne.jp",
         
         #test用
-        mail to: $email_responsible ,
+        mail to: "kamille1973@live.jp" ,
         cc: "ilovekyosukehimuro@yahoo.co.jp", 
         subject: '注文番号登録依頼'
   end
@@ -43,7 +43,7 @@ class PostMailer < ApplicationMailer
     #cc: "adusu@coda.ocn.ne.jp",
  
     #メアドは画面より反映(ccは固定)
-    mail to: $email_responsible ,
+    mail to: "kamille1973@live.jp" ,
     cc: "ilovekyosukehimuro@yahoo.co.jp", 
 	subject: '注文依頼'
   
