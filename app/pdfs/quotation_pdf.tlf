@@ -359,7 +359,7 @@
       "description": "",
       "x": 98,
       "y": 302,
-      "width": 190,
+      "width": 221.1,
       "height": 12.3,
       "style": {
         "font-family": [
@@ -375,7 +375,7 @@
         "font-style": [
           "bold"
         ],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",

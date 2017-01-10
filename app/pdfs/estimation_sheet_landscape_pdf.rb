@@ -58,78 +58,71 @@ class EstimationSheetLandscapePDF
 		   @construction_data = ConstructionDatum.find(@quotation_headers.construction_datum_id)
 		   @customer_masters = CustomerMaster.find(@quotation_headers.customer_id)
 		   
-		   #binding.pry
-		   
-		   #QuotationHeader.find(quotation_detail_large_classification.quotation_header_id).joins(:ConstructionDatum)
-		   #binding.pry
-		 
 		   #郵便番号
-		   @report.page.item(:post).value(@quotation_headers.post) 
+           #@report.page.item(:post).value(@quotation_headers.post) 
 		 
 		   #住所
-		   @report.page.item(:address).value(@quotation_headers.address) 
+           #@report.page.item(:address).value(@quotation_headers.address) 
 		 
 		   #得意先名
-		   @report.page.item(:customer_name).value(@quotation_headers.customer_name) 
-		   ###add161227
-		   #敬称
-		   honorific_name = CustomerMaster.honorific[0].find{0}  #"様"
+		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
 		   
-		   if @quotation_headers.honorific_id == 1   #"御中?
-		     id = @quotation_headers.honorific_id
-			 honorific_name = CustomerMaster.honorific[id].find{id} #"御中"
-		   end
-		   @report.page.item(:honorific).value(honorific_name) 
+		   #敬称
+		   #honorific_name = CustomerMaster.honorific[0].find{0}  #"様"
+		   
+		   #if @quotation_headers.honorific_id == 1   #"御中?
+		   #  id = @quotation_headers.honorific_id
+           #  honorific_name = CustomerMaster.honorific[id].find{id} #"御中"
+		   #end
+		   #@report.page.item(:honorific).value(honorific_name) 
 		   
 		   #担当1
-		   if @quotation_headers.responsible1.present?
-		     responsible = @quotation_headers.responsible1 + "  様"
-		     @report.page.item(:responsible1).value(responsible)
-		   end
+           #if @quotation_headers.responsible1.present?
+		   #  responsible = @quotation_headers.responsible1 + "  様"
+		   #  @report.page.item(:responsible1).value(responsible)
+		   #end
 		   #担当2
-		   if @quotation_headers.responsible2.present?
-		     responsible = @quotation_headers.responsible2 + "  様"
-		     @report.page.item(:responsible2).value(responsible)
-		   end
-		   #####
+		   #if @quotation_headers.responsible2.present?
+		   #  responsible = @quotation_headers.responsible2 + "  様"
+		   #  @report.page.item(:responsible2).value(responsible)
+		   #end
 		   
 		   #件名
-		   @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
+		   #@report.page.item(:construction_name).value(@quotation_headers.construction_name) 
 		 
 		   #見積No
-		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
+		   #@report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
 		 
            #税込見積合計金額	 
-		   if @quotation_headers.quote_price.present?
-             @quote_price_tax_in = @quotation_headers.quote_price * consumption_tax_in  #増税時は変更すること。
-		     @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
-		   end
+		   #if @quotation_headers.quote_price.present?
+           #  @quote_price_tax_in = @quotation_headers.quote_price * consumption_tax_in  #増税時は変更すること。
+		   #  @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
+		   #end
 		   
 		   #消費税
 		   if @quotation_headers.quote_price.present?
-		     @quote_price_tax_only = @quotation_headers.quote_price * consumption_tax  #増税時は変更すること。
-		     @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
+		     @quote_price_tax_only = @quotation_headers.quote_price * consumption_tax  
+		   #  @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
 		   end
 		 
 		   #工事期間
-		   @report.page.item(:construction_period).value(@quotation_headers.construction_period) 
+		   #@report.page.item(:construction_period).value(@quotation_headers.construction_period) 
 		 
 		   #工事場所
-		   @report.page.item(:construction_place).value(@quotation_headers.construction_place) 
-		 
+		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
 		   #取引方法
-		   @report.page.item(:trading_method).value(@quotation_headers.trading_method) 
-		 
+		   #@report.page.item(:trading_method).value(@quotation_headers.trading_method) 
 		   #有効期間
-		   @report.page.item(:effective_period).value(@quotation_headers.effective_period) 
-		 
-		   @gengou = @quotation_headers.quotation_date
-		   #元号変わったらここも要変更
-		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   @report.page.item(:quotation_date).value(@gengou) 
+		   #@report.page.item(:effective_period).value(@quotation_headers.effective_period) 
 		   
+		   #元号変わったらここも要変更
+		   @gengou = @quotation_headers.quotation_date
+		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		  
+           #@report.page.item(:quotation_date).value(@gengou) 
 		   
 		   #NET金額
+		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
 		   if @quotation_headers.net_amount.present?
 		     @net_amount = "(" + @quotation_headers.net_amount.to_s(:delimited, delimiter: ',') + ")" 
 			 
@@ -143,9 +136,7 @@ class EstimationSheetLandscapePDF
 		   @report.page.item(:quote_price).value(@quotation_headers.quote_price)
 		   
 	    ## 右側のヘッダ
-		    #実行金額
-		   @report.page.item(:execution_amount).value(@quotation_headers.execution_amount)
-		   
+		  
 		   #見積No
 		   @report.page.item(:quotation_code2).value(@quotation_headers.quotation_code) 
 		   #工事CD
@@ -239,7 +230,10 @@ class EstimationSheetLandscapePDF
            end 
 		 #end
     end	
-	 
+	   
+	   #実行金額(計)
+	   @report.page.item(:execution_amount).value(@quotation_headers.execution_amount)
+	   #歩掛(計)
 	   @report.page.item(:labor_amount).value(@@labor_amount )
 #end 
 		 
@@ -391,7 +385,7 @@ class EstimationSheetLandscapePDF
 		  #頁番号
           #(＊単独モジュールと違う箇所)
 		  page_number = @report.page_count - @estimation_sheet_pages
-  
+         
 		  #if $default_page_number > 0 
 		     #デフォルトの頁番号をセット 
 		    #page_number = @report.page_count + ($default_page_number - 1 )

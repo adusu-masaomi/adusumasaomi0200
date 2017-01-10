@@ -26,7 +26,7 @@
             quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
             :class => 'btn btn-success' , :target=>["_blank"] %>
 <%= link_to "見積書(横)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2", format: "pdf"),
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
             :class => 'btn btn-success' , :target=>["_blank"] %></br>
 <td>見積金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_large_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
 

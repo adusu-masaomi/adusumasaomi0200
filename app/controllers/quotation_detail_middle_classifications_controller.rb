@@ -6,7 +6,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     # GET /quotation_detail_middle_classifications
   # GET /quotation_detail_middle_classifications.json
   def index
-    #@quotation_detail_middle_classifications = QuotationDetailMiddleClassification.all
+    
+	  #@quotation_detail_middle_classifications = QuotationDetailMiddleClassification.all
     @null_flag = ""
     
     @number = 1
@@ -22,7 +23,13 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	  end
 	end
     
-    
+  
+    #明細データ見出用
+    if params[:quotation_header_name].present?
+      $quotation_header_name = params[:quotation_header_name]
+    end
+    #
+	
     if $quotation_header_id.present?
        #if $quotation_large_item_name.nil?
        #  $quotation_large_item_name = params[:quotation_large_item_name]
@@ -31,8 +38,6 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
       @null_flag = "1"
     end 
 
-    #binding.pry
-	
     #if query.nil?
     if @null_flag == "" 
       #ransack保持用コード
@@ -126,6 +131,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
   # GET /quotation_detail_middle_classifications/1/edit
   def edit
+   
     #@quotation_detail_large_classification = QuotationDetailLargeClassification.where(["quotation_header_id = ?", @quotation_detail_middle_classification.quotation_header_id])
     #@quotation_detail_large_classification = QuotationDetailLargeClassification.where(["id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id])
   end

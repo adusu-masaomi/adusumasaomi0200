@@ -66,11 +66,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "sample.pdf",
+        send_data report.generate,
+		  filename:    "hoge.pdf",
           type:        "application/pdf",
-          disposition: "inline")
+          disposition: "inline"
         end
     end
     #

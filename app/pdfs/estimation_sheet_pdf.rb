@@ -221,7 +221,8 @@ class EstimationSheetPDF
                     @quantity = ""
                   end  
                   @unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  if @unit_name == "-"
+                  #if @unit_name == "-"
+                  if @unit_name == "<手入力>"
                     @unit_name = ""
                   end 
 					  

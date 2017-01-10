@@ -60,7 +60,8 @@ class DetailedStatementLandscapePDF
                     @execution_quantity = ""
                   end  
                   @unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  if @unit_name == "-"
+                  #if @unit_name == "-"
+                  if @unit_name == "<手入力>"
                     @unit_name = ""
                   end 
                   
@@ -110,6 +111,8 @@ class DetailedStatementLandscapePDF
           else
 		    page_number = report.page_count
 		  end  
+		  
+		  
 		  #page_count = "(" +  report.page_count.to_s + ")"
 		  page_count = "(" +  page_number.to_s + ")"
 		  report.page.item(:page_number).value(page_count)

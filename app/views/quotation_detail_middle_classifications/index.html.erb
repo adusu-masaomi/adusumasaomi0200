@@ -22,15 +22,14 @@
 
 </div>
 
-
-
+<div style="width:1280px;">
 <%= link_to t('.new', :default => t("新規作成")),
             new_quotation_detail_middle_classification_path(quotation_header_id: params[:quotation_header_id], quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
 <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id]),
             :class => 'btn btn-warning' %>
-<%= link_to "内訳書(縦)PDF",
+<!--<%= link_to "内訳書(縦)PDF",
             quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], 
             default_page_number: params[:default_page_number], print_type: "1", format: "pdf") ,
             :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
@@ -38,7 +37,16 @@
             quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2", format: "pdf"),
             :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
   <%= label :label_page_number, '開始頁：' %>
-  <%= text_field :number,:default_page_number,  :value => 1  , :size=>"2", :id=>'default_page_number'  %></br>
+  <%= text_field :number,:default_page_number,  :value => 1  , :size=>"2", :id=>'default_page_number'  %>-->
+<font size="3";><b>
+<%= "件名:" %>
+<%= $quotation_header_name %>
+<%= "　　" %>
+<%= "項目:" %>
+<%= $quotation_large_item_name %>  
+</b></font>
+</div>
+</br>
 
 <td>見積金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
 
@@ -53,17 +61,26 @@
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
-      <th>件名</th>
-      <th>見積書品目</th>
+      <!--<th>件名</th>-->
+      <!--<th>見積書品目</th>-->
       <th><%= model_class.human_attribute_name(:line_number) %></th>
       <th><%= model_class.human_attribute_name(:quotation_middle_item_name) %></th>
+	  <th><%= model_class.human_attribute_name(:quotation_middle_specification) %></th>
       <th><%= model_class.human_attribute_name(:quantity) %></th>
       <th>実数</th>
       <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_unit_price) %></th>
       <th><%= model_class.human_attribute_name(:quote_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_unit_price) %></th>
       <th><%= model_class.human_attribute_name(:execution_price) %></th>
+      <th><%= model_class.human_attribute_name(:material_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:accessory_cost) %></th>
       <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%= model_class.human_attribute_name(:material_cost_total) %></th>
+      <th><%= model_class.human_attribute_name(:labor_cost_total) %></th>
+      <th><%= model_class.human_attribute_name(:other_cost) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>

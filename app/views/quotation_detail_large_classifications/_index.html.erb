@@ -1,7 +1,10 @@
 <% @quotation_detail_large_classifications.order("quotation_header_id desc, line_number asc").each do |quotation_detail_large_classification| %>
       <tr>
 	    <td><%= link_to "明細へ",
-            quotation_detail_middle_classifications_path(quotation_header_id: quotation_detail_large_classification.quotation_header_id, quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name, quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
+            quotation_detail_middle_classifications_path(quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
+                                                         quotation_header_name: quotation_detail_large_classification.QuotationHeader.construction_name,
+                                                         quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name, 
+                                                         quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
             :class => 'btn btn-warning'%>
         </td>
         <td><%= link_to quotation_detail_large_classification.id, quotation_detail_large_classification_path(quotation_detail_large_classification) %></td>

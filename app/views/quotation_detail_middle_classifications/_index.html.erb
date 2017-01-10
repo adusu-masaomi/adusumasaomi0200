@@ -1,18 +1,27 @@
  <% @quotation_detail_middle_classifications.order("quotation_header_id desc, quotation_detail_large_classification_id asc, line_number asc").each do |quotation_detail_middle_classification| %>
       <tr>
 	    <td><%= link_to quotation_detail_middle_classification.id, quotation_detail_middle_classification_path(quotation_detail_middle_classification) %></td>
-        <td><%= quotation_detail_middle_classification.QuotationHeader.construction_name %></td>
-        <td><%= quotation_detail_middle_classification.QuotationDetailLargeClassification.quotation_large_item_name %></td>
+        <!--<td><%= quotation_detail_middle_classification.QuotationHeader.construction_name %></td>-->
+        <!--<td><%= quotation_detail_middle_classification.QuotationDetailLargeClassification.quotation_large_item_name %></td>-->
         <td><%= quotation_detail_middle_classification.line_number %></td>
         <td><%= quotation_detail_middle_classification.quotation_middle_item_name %></td>
+        <td><%= quotation_detail_middle_classification.quotation_middle_specification %></td>
         <td align="right"><%= quotation_detail_middle_classification.quantity %></td>
         <td align="right"><%= quotation_detail_middle_classification.execution_quantity %></td>
         <!--<td align="center"><%= quotation_detail_middle_classification.QuotationUnit.quotation_unit_name %></td>-->
 		<td align="center"><%= quotation_detail_middle_classification.quotation_unit_name %></td>
         <td align="right"><%= number_to_currency(quotation_detail_middle_classification.quote_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.quotation_unit_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.execution_unit_price,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(quotation_detail_middle_classification.execution_price,  precision: 0) %></td> 
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.material_unit_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.labor_unit_price,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.accessory_cost,  precision: 0) %></td>
         <td align="right"><%= number_with_precision(quotation_detail_middle_classification.labor_productivity_unit, precision: 3) %></td>
-        <td><%=l quotation_detail_middle_classification.created_at.in_time_zone('Tokyo') %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.material_cost_total,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.labor_cost_total,  precision: 0) %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.other_cost,  precision: 0) %></td>
+        <!--<td><%=l quotation_detail_middle_classification.created_at.in_time_zone('Tokyo') %></td>-->
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_quotation_detail_middle_classification_path(quotation_detail_middle_classification), :class => 'btn btn-default btn-xs', remote: true %>
