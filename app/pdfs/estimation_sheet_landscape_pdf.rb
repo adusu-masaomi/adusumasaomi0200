@@ -6,21 +6,11 @@ class EstimationSheetLandscapePDF
  
        # tlfファイルを読み込む
 	   #変数reportはインスタンス変数に変更
-       @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_landscape_pdf.tlf")
-
-      # Thin @reportsでPDFを作成
-      #@report = Thin@reports::@report.create do |r|
-
-       # Thin@reports Editorで作成したファイルを読み込む
-      #r.use_layout "#{Rails.root}/app/pdfs/quotation_pdf.tlf" do |config|
-      #  config.list(:default) do
-      #    events.on :footer_insert do |e|
-      #      e.section.item(:footer_message).value("test")
-      #    end
-      #  end
-      #end
+       #@report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_landscape_pdf.tlf")
+	   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_landscape_pdf.tlf")
 
      @@labor_amount = 0
+	 @@labor_amount_total = 0
          
 
 		# 1ページ目を開始
@@ -44,11 +34,17 @@ class EstimationSheetLandscapePDF
            #合計へカウント
            @@labor_amount += quotation_detail_large_classification.labor_productivity_unit
          end
+		 
+		 #歩掛り計合計
+		 if quotation_detail_large_classification.labor_productivity_unit_total.present?
+           #合計へカウント
+           @@labor_amount_total += quotation_detail_large_classification.labor_productivity_unit_total
+         end
 		   
 		 #---見出し---
 		 
-         consumption_tax = 0.08   #消費税率 →→→→→ 増税時は注意する！！
-		 consumption_tax_in = 1.08   #消費税率 →→→→→ 増税時は注意する！！
+         consumption_tax = $consumption_tax_only         #消費税率 
+		 consumption_tax_in = $consumption_tax_include   #消費税率(込) 
 		 
 		 if @flag.nil? 
 		 
@@ -116,8 +112,10 @@ class EstimationSheetLandscapePDF
 		   #@report.page.item(:effective_period).value(@quotation_headers.effective_period) 
 		   
 		   #元号変わったらここも要変更
-		   @gengou = @quotation_headers.quotation_date
-		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		   if @quotation_headers.quotation_date.present?
+		     @gengou = @quotation_headers.quotation_date
+		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		   end
 		  
            #@report.page.item(:quotation_date).value(@gengou) 
 		   
@@ -212,29 +210,43 @@ class EstimationSheetLandscapePDF
                         @execution_quantity = ""
                       end  
                       
-                      @unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
+                      #@unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
+					  @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
+					  
                       if @unit_name == "<手入力>"
-                        @unit_name = ""
-                      end 
+					    #170112
+						#if quotation_detail_large_classification.quotation_unit_name != "<手入力>"
+						if quotation_detail_large_classification.working_unit_name != "<手入力>"
+                          #@unit_name = quotation_detail_large_classification.quotation_unit_name
+						  @unit_name = quotation_detail_large_classification.working_unit_name
+                        else
+						  @unit_name = ""
+						end
+					  end 
                       #  
                       
-                      row.values quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name,
-                       quotation_large_specification: quotation_detail_large_classification.quotation_large_specification,
+                      row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                       working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
-		               quotation_unit_name: @unit_name,
-                       quote_price: quotation_detail_large_classification.quote_price,
+		               working_unit_name: @unit_name,
+                       working_unit_price: quotation_detail_large_classification.working_unit_price,
+					   execution_unit_price: quotation_detail_large_classification.execution_unit_price,
+					   quote_price: quotation_detail_large_classification.quote_price,
                        execution_quantity: @execution_quantity,
-                       quotation_unit_name2: @unit_name,
+                       working_unit_name2: @unit_name,
                        execution_price: quotation_detail_large_classification.execution_price,
-                       labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit
+                       labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit,
+					   labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total
            end 
 		 #end
     end	
 	   
 	   #実行金額(計)
 	   @report.page.item(:execution_amount).value(@quotation_headers.execution_amount)
-	   #歩掛(計)
-	   @report.page.item(:labor_amount).value(@@labor_amount )
+	   #歩掛(計)→不要？？
+	   #@report.page.item(:labor_amount).value(@@labor_amount )
+	   #歩掛計(計)
+	   @report.page.item(:labor_amount_total).value(@@labor_amount_total )
 #end 
 		 
 	   #内訳のデータも取得・出力
@@ -293,9 +305,18 @@ class EstimationSheetLandscapePDF
 
 	   
 	  @flag = nil
-		
+	  
+	  #170112
+	   
+	  
+	  #@page_number = @report.page_count - @estimation_sheet_pages
+	  
+	  
       $quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
-      
+          
+	   
+	  	 
+				
       	 #---見出し---
 		 
 		  #@@page_number = @@page_number + 1
@@ -314,18 +335,49 @@ class EstimationSheetLandscapePDF
 		   #見積No
 		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
 		 
-           @gengou = @quotation_headers.quotation_date
-		   #元号変わったらここも要変更
-		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   @report.page.item(:quotation_date).value(@gengou) 
+		   if @quotation_headers.quotation_date.present?
+             @gengou = @quotation_headers.quotation_date
+		     #元号変わったらここも要変更
+		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     @report.page.item(:quotation_date).value(@gengou) 
+		  end
 		 
            #品目名
-           @report.page.item(:quotation_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.quotation_large_item_name)
+		   @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
+		   #判定用変数へセット
+		   #@@working_large_item_name = quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name
 		   
 		 end
 		 
-		 
+		    
+				
 		 @report.list(:default).add_row do |row|
+		 
+		   #170112start
+		   if @page_number != (@report.page_count - @estimation_sheet_pages) then
+		      #保持用
+			  @quote_price_save = @@quote_price
+			  @execution_price_save = @@execution_price
+			  @labor_productivity_unit_save = @@labor_productivity_unit
+			  
+			  if @quote_price_save > 0
+			    @report.page.item(:message_sum_header).value("前頁より")
+			    @report.page.item(:blackets1_header).value("(")
+		        @report.page.item(:blackets2_header).value(")")
+			    @report.page.item(:subtotal_header).value(@quote_price_save)
+			    @report.page.item(:blackets3_header).value("(")
+		        @report.page.item(:blackets4_header).value(")")
+			    @report.page.item(:subtotal_execution_header).value(@execution_price_save)
+			    @report.page.item(:blackets5_header).value("(")
+		        @report.page.item(:blackets6_header).value(")")
+			    @report.page.item(:subtotal_labor_header).value(@labor_productivity_unit_save)
+			  end 
+		   end 
+		   @page_number = @report.page_count - @estimation_sheet_pages
+		   #170112end
+	       
+				
+				
 		          #仕様の場合に数値・単位をnullにする
                   @quantity = quotation_detail_middle_classification.quantity
                   if @quantity == 0 
@@ -335,10 +387,15 @@ class EstimationSheetLandscapePDF
                   if @execution_quantity == 0 
                     @execution_quantity = ""
                   end  
-                  @unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  #if @unit_name == "-"
-                  if @unit_name == "<手入力>"
-                    @unit_name = ""
+                  #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
+				  @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
+                  
+				  if @unit_name == "<手入力>"
+				    if quotation_detail_middle_classification.working_unit_name != "<手入力>"
+                      @unit_name = quotation_detail_middle_classification.working_unit_name
+					else 
+					  @unit_name = ""
+					end
                   end 
                   
                   if quotation_detail_middle_classification.quote_price.present?
@@ -350,10 +407,11 @@ class EstimationSheetLandscapePDF
                   end
                   
 				  @labor_amount = 0
-                  if quotation_detail_middle_classification.quantity.present?
-				    if quotation_detail_middle_classification.quantity >= 0
+                  if quotation_detail_middle_classification.execution_quantity.present?
+				    if quotation_detail_middle_classification.execution_quantity >= 0
                        if quotation_detail_middle_classification.labor_productivity_unit.present?
-					      @labor_amount = quotation_detail_middle_classification.quantity * quotation_detail_middle_classification.labor_productivity_unit
+					      #@labor_amount = quotation_detail_middle_classification.quantity * quotation_detail_middle_classification.labor_productivity_unit
+						  @labor_amount = quotation_detail_middle_classification.execution_quantity * quotation_detail_middle_classification.labor_productivity_unit
                           #合計へカウント
 						  @@labor_productivity_unit += @labor_amount
 					   end
@@ -365,18 +423,21 @@ class EstimationSheetLandscapePDF
                      @labor_amount = ""
                   end
 				  
-                  row.values quotation_middle_item_name: quotation_detail_middle_classification.quotation_middle_item_name,
-                   quotation_middle_specification: quotation_detail_middle_classification.quotation_middle_specification, 
+                  row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+                   working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
-                   quotation_unit_name: @unit_name,
-                   quotation_unit_price: quotation_detail_middle_classification.quotation_unit_price,
+                   working_unit_name: @unit_name,
+                   working_unit_price: quotation_detail_middle_classification.working_unit_price,
                    quote_price: quotation_detail_middle_classification.quote_price,
                    quantity2: @execution_quantity,
-                   quotation_unit_name2: @unit_name,
+                   working_unit_name2: @unit_name,
                    execution_unit_price: quotation_detail_middle_classification.execution_unit_price,
                    execution_price: quotation_detail_middle_classification.execution_price,
                    labor_productivity_unit: quotation_detail_middle_classification.labor_productivity_unit,
-                   labor_amount: @labor_amount
+				   labor_amount: @labor_amount
+				   
+				   
+				
 		  end
 		#end 
 		  
@@ -406,15 +467,63 @@ class EstimationSheetLandscapePDF
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
 		   @report.page.item(:message_sum).value("次頁へ")
 		   
-		   @report.page.item(:subtotal).value(@@quote_price )
+		   #170112start
+		   @report.page.item(:blackets1).value("(")
+		   @report.page.item(:blackets2).value(")")
+		   
+		   @report.page.item(:subtotal).value(@@quote_price)
+		   
+		   #170112start
+		   @report.page.item(:blackets3).value("(")
+		   @report.page.item(:blackets4).value(")")
+		   
 		   @report.page.item(:subtotal_execution).value(@@execution_price )
+		   
 		   #歩掛り合計
+		   #170112start
+		   @report.page.item(:blackets5).value("(")
+		   @report.page.item(:blackets6).value(")")
+		   
 		   @report.page.item(:subtotal_labor).value(@@labor_productivity_unit )
+		   
+		   
+		  
 		   
 		   #end
     end	
      
 	   @report.page.item(:message_sum).value("計")
+		
+		#170112start
+		##
+		#改ページの最中はヘッダにも表示
+		@page_number2 = @report.page_count - @estimation_sheet_pages
+		if @page_number != @page_number2 then
+		  # 保留！
+		  
+         	#@report.page.item(:message_sum_header).value("前頁より")
+			#@report.page.item(:blackets1_header).value("(")
+		   #@report.page.item(:blackets2_header).value(")")
+		#	@report.page.item(:subtotal_header).value(@@quote_price_save)
+		#	@report.page.item(:blackets3_header).value("(")
+		 #  @report.page.item(:blackets4_header).value(")")
+		#	@report.page.item(:subtotal_execution_header).value(@@execution_price_save)
+		#	@report.page.item(:blackets5_header).value("(")
+		 #   @report.page.item(:blackets6_header).value(")")
+		#	@report.page.item(:subtotal_labor_header).value(@@labor_productivity_unit_save)
+			
+		end
+		##
+		
+		#カッコを消す
+		@report.page.item(:blackets1).value(" ")
+		@report.page.item(:blackets2).value(" ")
+		@report.page.item(:blackets3).value(" ")
+		@report.page.item(:blackets4).value(" ")
+		@report.page.item(:blackets5).value(" ")
+		@report.page.item(:blackets6).value(" ")
+		
+		#170112end
 		
 		#(＊単独モジュールと違う箇所)
         # Thin@reports::@reportを返す

@@ -1,26 +1,29 @@
-<% @quotation_detail_large_classifications.order("quotation_header_id desc, line_number asc").each do |quotation_detail_large_classification| %>
+<% @quotation_detail_large_classifications.order("quotation_header_id desc, line_number desc").each do |quotation_detail_large_classification| %>
       <tr>
 	    <td><%= link_to "明細へ",
             quotation_detail_middle_classifications_path(quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
                                                          quotation_header_name: quotation_detail_large_classification.QuotationHeader.construction_name,
-                                                         quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name, 
+                                                         working_large_item_name: quotation_detail_large_classification.working_large_item_name, 
                                                          quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
             :class => 'btn btn-warning'%>
         </td>
         <td><%= link_to quotation_detail_large_classification.id, quotation_detail_large_classification_path(quotation_detail_large_classification) %></td>
-        <td><%= quotation_detail_large_classification.QuotationHeader.construction_name %></td>
-        <td><%= quotation_detail_large_classification.quotation_items_division_id %></td>
+        <!--<td><%= quotation_detail_large_classification.QuotationHeader.construction_name %></td>-->
+        <!--<td><%= quotation_detail_large_classification.quotation_items_division_id %></td>-->
         <td><%= quotation_detail_large_classification.line_number %></td>
-        <td><%= quotation_detail_large_classification.quotation_large_item_name %></td>
-        <td><%= quotation_detail_large_classification.quotation_large_specification %></td>
+        <td><%= quotation_detail_large_classification.working_large_item_name %></td>
+        <td><%= quotation_detail_large_classification.working_large_specification %></td>
         <td align="right"><%= quotation_detail_large_classification.quantity %></td>
-        <td align="right"><%= quotation_detail_large_classification.execution_quantity %></td>
-        <!--<td><%= quotation_detail_large_classification.QuotationUnit.quotation_unit_name %></td>-->
-        <td align="center"><%= quotation_detail_large_classification.quotation_unit_name %></td>
+        <td align="center"><%= quotation_detail_large_classification.working_unit_name %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_large_classification.working_unit_price,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(quotation_detail_large_classification.quote_price,  precision: 0) %></td>
+        <td align="right"><%= quotation_detail_large_classification.execution_quantity %></td>
+        <td align="center"><%= quotation_detail_large_classification.working_unit_name %></td>
+        <td align="right"><%= number_to_currency(quotation_detail_large_classification.execution_unit_price,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(quotation_detail_large_classification.execution_price,  precision: 0) %></td>
         <td align="right"><%= number_with_precision(quotation_detail_large_classification.labor_productivity_unit, precision: 3) %></td>
-        <td><%=l quotation_detail_large_classification.created_at.in_time_zone('Tokyo') %></td>
+        <td align="right"><%= number_with_precision(quotation_detail_large_classification.labor_productivity_unit_total, precision: 3) %></td>
+        <!--<td><%=l quotation_detail_large_classification.created_at.in_time_zone('Tokyo') %></td>-->
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id), :class => 'btn btn-default btn-xs' , remote: true%>

@@ -5,7 +5,8 @@ class EstimationSheetPDF
 	#見積書PDF発行
  
        # tlfファイルを読み込む
-       @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_pdf.tlf")
+       #@report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_pdf.tlf")
+	   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
 		
 		# 1ページ目を開始
         @report.start_new_page
@@ -69,13 +70,13 @@ class EstimationSheetPDF
 		 
            #税込見積合計金額	 
 		   if @quotation_headers.quote_price.present?
-             @quote_price_tax_in = @quotation_headers.quote_price * 1.08  #増税時は変更すること。
+             @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
 		     @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
 		   end
 		   
 		   #消費税
 		   if @quotation_headers.quote_price.present?
-		     @quote_price_tax_only = @quotation_headers.quote_price * 0.08  #増税時は変更すること。
+		     @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
 		     @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
 		   end
 		 
@@ -90,11 +91,13 @@ class EstimationSheetPDF
 		 
 		   #有効期間
 		   @report.page.item(:effective_period).value(@quotation_headers.effective_period) 
-		 
-		   @gengou = @quotation_headers.quotation_date
-		   #元号変わったらここも要変更
-		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   @report.page.item(:quotation_date).value(@gengou) 
+		   
+		   if @quotation_headers.quotation_date.present?
+		     @gengou = @quotation_headers.quotation_date
+		     #元号変わったらここも要変更
+		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     @report.page.item(:quotation_date).value(@gengou) 
+		   end
 		   
 		   #NET金額
 		   if @quotation_headers.net_amount.present?
@@ -119,17 +122,25 @@ class EstimationSheetPDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
-                      @unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
-                      #if @unit_name == "-"
-                      if @unit_name == "<手入力>"
-                        @unit_name = ""
+                      #@unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
+                      @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
+					  
+					  if @unit_name == "<手入力>"
+                        #if quotation_detail_large_classification.quotation_unit_name != "<手入力>"
+						if quotation_detail_large_classification.working_unit_name != "<手入力>"
+                          #@unit_name = quotation_detail_large_classification.quotation_unit_name
+						  @unit_name = quotation_detail_large_classification.working_unit_name
+					    else 
+					      @unit_name = ""
+					    end
                       end 
                       #  
                       
-                      row.values quotation_large_item_name: quotation_detail_large_classification.quotation_large_item_name,
-                       quotation_large_specification: quotation_detail_large_classification.quotation_large_specification,
+                      row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                       working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
-		               quotation_unit_name: @unit_name,
+		               working_unit_name: @unit_name,
+					   working_unit_price: quotation_detail_large_classification.working_unit_price,
                        quote_price: quotation_detail_large_classification.quote_price
            end 
 		 #end
@@ -201,40 +212,66 @@ class EstimationSheetPDF
 		 
 		   #見積No
 		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
-		 
-           @gengou = @quotation_headers.quotation_date
-		   #元号変わったらここも要変更
-		   @gengou = "平成#{@gengou.year - 1988}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   @report.page.item(:quotation_date).value(@gengou) 
+		   
+		   if @quotation_headers.quotation_date.present?
+             @gengou = @quotation_headers.quotation_date
+		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     @report.page.item(:quotation_date).value(@gengou) 
+		   end
 		 
 		   #品目名
-		   @report.page.item(:quotation_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.quotation_large_item_name)
+		   @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
 		   
 		 end
 		 
 		
 		 
 		 @report.list(:default).add_row do |row|
-		          #仕様の場合に数値・単位をnullにする
+		          
+	       #170112start
+		   if @page_number != (@report.page_count - @estimation_sheet_pages) then
+		      #保持用
+			  @quote_price_save = @@quote_price
+			  
+			  if @quote_price_save > 0
+			    @report.page.item(:message_sum_header).value("前頁より")
+			    @report.page.item(:blackets1_header).value("(")
+		        @report.page.item(:blackets2_header).value(")")
+			    @report.page.item(:subtotal_header).value(@quote_price_save)
+			  end 
+		   end 
+		   @page_number = @report.page_count - @estimation_sheet_pages
+		   #170112end
+				  
+				  
+				  
+				  #仕様の場合に数値・単位をnullにする
                   @quantity = quotation_detail_middle_classification.quantity
                   if @quantity == 0 
                     @quantity = ""
                   end  
-                  @unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  #if @unit_name == "-"
-                  if @unit_name == "<手入力>"
-                    @unit_name = ""
-                  end 
+                  #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
+                  @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
+                  
+				  if @unit_name == "<手入力>"
+                    #if quotation_detail_middle_classification.quotation_unit_name != "<手入力>"
+                    if quotation_detail_middle_classification.working_unit_name != "<手入力>"
+                      @unit_name = quotation_detail_middle_classification.working_unit_name
+					else 
+					  @unit_name = ""
+					end
+                  end
+                   
 					  
                   if quotation_detail_middle_classification.quote_price.present?
                     @@quote_price += quotation_detail_middle_classification.quote_price
                   end
                   	  
-                  row.values quotation_middle_item_name: quotation_detail_middle_classification.quotation_middle_item_name,
-                   quotation_middle_specification: quotation_detail_middle_classification.quotation_middle_specification, 
+                  row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+                   working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
-                   quotation_unit_name: @unit_name,
-                   quotation_unit_price: quotation_detail_middle_classification.quotation_unit_price,
+                   working_unit_name: @unit_name,
+                   working_unit_price: quotation_detail_middle_classification.working_unit_price,
                    quote_price: quotation_detail_middle_classification.quote_price
 		    
     	  end
@@ -265,10 +302,18 @@ class EstimationSheetPDF
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
 		   @report.page.item(:subtotal).value(@@quote_price )
 		   
+		   #170112start
+		   @report.page.item(:blackets1).value("(")
+		   @report.page.item(:blackets2).value(")")
+		   
 		   #end
     end	
       
 	   @report.page.item(:message_sum).value("計")
+	   #カッコを消す
+		@report.page.item(:blackets1).value(" ")
+		@report.page.item(:blackets2).value(" ")
+		
   end
   #漢数字を数字に変換(未使用だが今後使えそうなので温存)
   def self.num_to_k(n)

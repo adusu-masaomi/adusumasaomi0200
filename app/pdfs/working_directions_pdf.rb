@@ -52,6 +52,10 @@ class WorkingDirectionsPDF
            report.page.item(:attention_matter).value(construction_datum.attention_matter)
 		   report.page.item(:working_safety_matter_name).value(construction_datum.working_safety_matter_name)
 		 
+		   #作業日・作業者
+		   report.page.item(:working_date).value($working_date)
+		   report.page.item(:staff_name).value($staff_name)
+		 
             #report.list(:default).add_row do |row|
 			#           row.values purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 			#	              material_code: purchase_datum.material_code
@@ -62,7 +66,8 @@ class WorkingDirectionsPDF
         return report
 		
   end  
-   
+  
+ 
 end
    
   

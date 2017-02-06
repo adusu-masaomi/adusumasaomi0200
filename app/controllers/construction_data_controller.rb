@@ -129,6 +129,20 @@ class ConstructionDataController < ApplicationController
 		  #global set
           $construction_datum = @construction_datum 
 		  
+		  #作業日をグローバルへセット
+		  #$working_date = params[:construction_datum][:working_date]
+		  
+		  $working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
+                          params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
+		  
+		
+		  #作業者をグローバルへセット
+		  staff_id = params[:construction_datum][:staff_id]
+		  @staff = Staff.find_by(id: staff_id)
+		  $staff_name = ""
+		  if @staff.present?
+		   $staff_name = @staff.staff_name
+		  end
 		  
 		  format.pdf do
             report = WorkingDirectionsPDF.create @working_dirctions

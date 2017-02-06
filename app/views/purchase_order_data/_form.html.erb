@@ -15,7 +15,7 @@
   <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
   <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1" } %>
   <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('id DESC').all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_order_datum.supplier_master_id || 2}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
   
@@ -40,6 +40,7 @@
 　　$(document).ready(function(){
 	   //検索可能なリストボックス(注文Noの場合)
        $(".searchableConstructionName").select2({ theme: "bootstrap" });
+	   
 	   $(".searchableConstructionName").change(function(e) {
          setAliasName();
        });  

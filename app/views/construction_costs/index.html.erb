@@ -13,6 +13,15 @@
   	</div>
    <% end %>
 </div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_cost_path,
+            :class => 'btn btn-primary' %>
+<%= link_to "工事費集計表PDF",
+            construction_costs_path(@construction_costs, format: "pdf"),
+            :class => 'btn  btn-success', :target=>["_blank"] %>
+<%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -22,13 +31,14 @@
       <th><%= model_class.human_attribute_name(:supplies_expense) %></th>
       <th><%= model_class.human_attribute_name(:labor_cost) %></th>
       <th><%= model_class.human_attribute_name(:misellaneous_expense) %></th>
-      <th><%= model_class.human_attribute_name(:constructing_amount) %></th>
+      <th><%= model_class.human_attribute_name(:execution_amount) %></th>
+	  <th><%= model_class.human_attribute_name(:constructing_amount) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody>
-    <% @construction_costs.each do |construction_cost| %>
+    <% @construction_costs.order("id desc").each do |construction_cost| %>
       <tr>
         <td><%= link_to construction_cost.id, construction_cost_path(construction_cost) %></td>
         <!--<td><%= construction_cost.construction_datum_id %></td>-->
@@ -37,6 +47,7 @@
 		<td><%= construction_cost.supplies_expense %></td>
         <td><%= construction_cost.labor_cost %></td>
         <td><%= construction_cost.misellaneous_expense %></td>
+		<td><%= construction_cost.execution_amount %></td>
         <td><%= construction_cost.constructing_amount %></td>
         <td><%=l construction_cost.created_at %></td>
         <td>
@@ -53,10 +64,7 @@
   </tbody>
 </table>
 
-<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_construction_cost_path,
-            :class => 'btn btn-primary' %>
-<%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>
+
 
 <script type="text/javascript">
 

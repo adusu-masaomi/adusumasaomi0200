@@ -1,2 +1,0 @@
-json.extract! quotation_middle_item, :id, :quotation_middle_item_name, :quotation_middle_item_short_name, :quotation_middle_specification, :quotation_unit_id, :unit_price, :quotation_material_id, :material_unit_price, :labor_unit_price, :labor_productivity_unit, :quantity, :accessory_cost, :material_cost_total, :labor_cost_total, :other_cost, :created_at, :updated_at
-json.url quotation_middle_item_url(quotation_middle_item, format: :json)

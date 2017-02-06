@@ -80,11 +80,20 @@ class QuotationHeadersController < ApplicationController
   # DELETE /quotation_headers/1
   # DELETE /quotation_headers/1.json
   def destroy
-    @quotation_header.destroy
+    #ヘッダIDをここで保持(内訳・明細も消すため)
+	quotation_header_id = @quotation_header.id
+	
+	@quotation_header.destroy
     respond_to do |format|
       format.html { redirect_to quotation_headers_url, notice: 'Quotation header was successfully destroyed.' }
       format.json { head :no_content }
     end
+	
+	#内訳も消す
+	QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id).destroy_all
+		
+	#明細も消す
+	QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
   end
   
   #viewで拡散されたパラメータを、正常更新できるように復元させる。
@@ -156,9 +165,9 @@ class QuotationHeadersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def quotation_header_params
-      params.require(:quotation_header).permit(:quotation_code, :quotation_date, :construction_datum_id, :construction_name, :honorific_id, :responsible1, :responsible2, 
+      params.require(:quotation_header).permit(:quotation_code, :invoice_code, :delivery_slip_code, :quotation_date, :construction_datum_id, :construction_name, :honorific_id, :responsible1, :responsible2, 
                                                :customer_id, :customer_name, :post, :address, :tel, :fax, :construction_period, :construction_place, :trading_method, 
-                                               :effective_period, :net_amount, :quote_price, :execution_amount )
+                                               :effective_period, :net_amount, :quote_price, :execution_amount, :invoice_period_start_date, :invoice_period_end_date )
     end
     
     # 

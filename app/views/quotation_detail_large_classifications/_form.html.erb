@@ -7,9 +7,9 @@
   <%= f.select :quotation_items_division_id, QuotationDetailLargeClassification.choices, {:selected => @quotation_detail_large_classification.quotation_items_division_id || 1}, {id:'quotation_items_division_id', :class => "my-custom-class", :onchange => "setWhenSpecification(this.form)"} %></br>
   
   <%= f.label :"項目名" , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :quotation_large_item_id, QuotationLargeItem.all, :id, :quotation_large_item_name, {:prompt => 'どれか一つを選択して下さい'} , {id:'quotation_large_item_id', :class => "searchableQuotationItem",  style: 'width:220px' } %></br>
-  <%= f.input :quotation_large_item_name , label: "項目名(手入力可)", input_html:{id:"quotation_large_item_name"}  %>
-  <%= f.input :quotation_large_specification , label: "仕様名(手入力可)", input_html:{id:"quotation_large_specification"}  %>
+  <%= f.collection_select :working_large_item_id, WorkingLargeItem.all, :id, :working_large_item_name, {:prompt => 'どれか一つを選択して下さい'} , {id:'working_large_item_id', :class => "searchableWorkingItem",  style: 'width:220px' } %></br>
+  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name"}  %>
+  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification"}  %>
 
   <%= f.label :"行番号" , {:class => "my-custom-class-l", style: 'color:blue'} %></br>
   <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, { class: "searchableNumber" , style: 'width:100px' } %>
@@ -19,8 +19,8 @@
   <%= f.input :quantity, :input_html => {id:'quantity', :value => @quotation_detail_large_classification.quantity || 1 } %>
   <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :value => @quotation_detail_large_classification.execution_quantity || 1 } %>
   <%= f.label :"単位" , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :quotation_unit_id, QuotationUnit.all, :id, :quotation_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.quotation_unit_id || 2 } , {id:'quotation_unit_id', :class => "searchableQuotationUnit",  style: 'width:220px' } %></br>
-  <%= f.input :quotation_unit_name , label: "単位名(手入力可)", input_html:{id:"quotation_unit_name"}  %>
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.working_unit_id || 2 } , {id:'working_unit_id', :class => "searchableQuotationUnit",  style: 'width:220px' } %></br>
+  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name"}  %>
   <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'quote_price'} %>
   <%= f.input :execution_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'execution_price'} %>
   <%= f.input :labor_productivity_unit, hint: "＊自動計算されます。手入力可。" %>
@@ -34,15 +34,15 @@
   $(document).on('ready page:load', function(){
      //検索可能なリストボックス(注文Noの場合)
      $(".searchableQuotationHeader").select2({ theme: "bootstrap" });
-     $(".searchableQuotationItem").select2({ theme: "bootstrap" });
-     $( ".searchableQuotationItem" ).change(function(e) {
-      　  setQuotationLarageItemName();
-	      setQuotationLarageSpecification();
+     $(".searchableWorkingItem").select2({ theme: "bootstrap" });
+     $( ".searchableWorkingItem" ).change(function(e) {
+      　  setWorkingLarageItemName();
+	      setWorkingLarageSpecification();
      });
 
-     $(".searchableQuotationUnit").select2({ theme: "bootstrap" });
-	 $( ".searchableQuotationUnit" ).change(function(e) {
-      　  setQuotationUnitName();
+     $(".searchableWorkingUnit").select2({ theme: "bootstrap" });
+	 $( ".searchableWorkingUnit" ).change(function(e) {
+      　  setWorkingUnitName();
 	 });
      $(".searchableNumber").select2({ theme: "bootstrap" });
      
@@ -56,41 +56,41 @@
    });
 
    //項目名のセット
-  function setQuotationLarageItemName()
+  function setWorkingLarageItemName()
   {  
-    obj = document.getElementById("quotation_large_item_id");
-     quotation_large_item_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_large_item_select_path %>",
-       {id: quotation_large_item_id },
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_large_item_select_path %>",
+       {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("quotation_large_item_name").textContent;
-          document.getElementById("quotation_large_item_name").value = obj;
+          obj = document.getElementById("working_large_item_name").textContent;
+          document.getElementById("working_large_item_name").value = obj;
 		  }
       );
    };  
   //仕様のセット
-  function setQuotationLarageSpecification()
+  function setWorkingLarageSpecification()
   {  
-    obj = document.getElementById("quotation_large_item_id");
-     quotation_large_item_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_large_specification_select_path %>",
-       {id: quotation_large_item_id },
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_large_specification_select_path %>",
+       {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("quotation_large_specification").textContent;
-          document.getElementById("quotation_large_specification").value = obj;
+          obj = document.getElementById("working_large_specification").textContent;
+          document.getElementById("working_large_specification").value = obj;
 		  }
       );
    };  
   //単位名のセット
-  function setQuotationUnitName()
+  function setWorkingUnitName()
   {  
-    obj = document.getElementById("quotation_unit_id");
-     quotation_unit_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_unit_name_select_path %>",
-       {id: quotation_unit_id },
+    obj = document.getElementById("working_unit_id");
+     working_unit_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_unit_name_select_path %>",
+       {id: working_unit_id },
         function(data){
-          obj = document.getElementById("quotation_unit_name").textContent;
-          document.getElementById("quotation_unit_name").value = obj;
+          obj = document.getElementById("working_unit_name").textContent;
+          document.getElementById("working_unit_name").value = obj;
 		  }
       );
    };  
@@ -106,7 +106,7 @@
              obj2.value = 0;
 
              //単位をデフォ(１)にセット
-             $(".searchableQuotationUnit").select2("val","1");
+             $(".searchableWorkingUnit").select2("val","1");
           }
    }
    

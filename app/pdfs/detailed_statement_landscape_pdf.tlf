@@ -27,7 +27,7 @@
         },
         "items": [
           {
-            "id": "quotation_middle_item_name",
+            "id": "working_middle_item_name",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -59,7 +59,7 @@
             }
           },
           {
-            "id": "quotation_middle_specification",
+            "id": "working_middle_specification",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -123,7 +123,7 @@
             }
           },
           {
-            "id": "quotation_unit_name",
+            "id": "working_unit_name",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -159,7 +159,7 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 403.7,
+            "x": 397.7,
             "y": 125.8,
             "width": 46.9,
             "height": 8.9,
@@ -191,11 +191,11 @@
             }
           },
           {
-            "id": "quotation_unit_price",
+            "id": "working_unit_price",
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 344.7,
+            "x": 339.7,
             "y": 125.8,
             "width": 37.1,
             "height": 8.9,
@@ -259,7 +259,7 @@
             }
           },
           {
-            "id": "quotation_unit_name2",
+            "id": "working_unit_name2",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -331,7 +331,7 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 593.7,
+            "x": 589.7,
             "y": 125.8,
             "width": 46.8,
             "height": 10,
@@ -403,7 +403,7 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 678.7,
+            "x": 674.7,
             "y": 126.8,
             "width": 26.9,
             "height": 7.9,
@@ -642,7 +642,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 374,
+      "x": 370,
       "y": 565,
       "width": 46.9,
       "height": 10,
@@ -674,7 +674,7 @@
       }
     },
     {
-      "id": "quotation_large_item_name",
+      "id": "working_large_item_name",
       "type": "text-block",
       "display": true,
       "description": "",
@@ -710,7 +710,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 564,
+      "x": 560,
       "y": 565,
       "width": 47.8,
       "height": 10,
@@ -746,7 +746,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 649,
+      "x": 645,
       "y": 565.5,
       "width": 26.9,
       "height": 7.9,
@@ -1756,6 +1756,530 @@
       "texts": [
         "計"
       ]
+    },
+    {
+      "id": "blackets1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 361.1,
+      "y": 565,
+      "width": 10.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 417.3,
+      "y": 565.6,
+      "width": 5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets5",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 640,
+      "y": 565,
+      "width": 7,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets3",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 551.1,
+      "y": 564.4,
+      "width": 10.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets6",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 671,
+      "y": 565,
+      "width": 6.5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets4",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 607.9,
+      "y": 565,
+      "width": 6.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "message_sum_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 314.3,
+      "y": 98,
+      "width": 37.3,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "subtotal_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 370,
+      "y": 98,
+      "width": 46.9,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "blackets1_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 361.1,
+      "y": 98,
+      "width": 12,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets2_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 417.3,
+      "y": 98,
+      "width": 5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets3_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 551.1,
+      "y": 98,
+      "width": 10.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "subtotal_execution_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 560,
+      "y": 98,
+      "width": 47.8,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "blackets4_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 607.9,
+      "y": 98,
+      "width": 6.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "blackets5_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 640,
+      "y": 98,
+      "width": 7,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "subtotal_labor_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 645,
+      "y": 99,
+      "width": 26.9,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 3
+        }
+      }
+    },
+    {
+      "id": "blackets6_header",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 672.4,
+      "y": 98,
+      "width": 5.3,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
     }
   ],
   "state": {

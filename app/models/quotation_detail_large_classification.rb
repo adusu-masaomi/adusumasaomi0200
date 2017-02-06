@@ -1,9 +1,10 @@
 class QuotationDetailLargeClassification < ActiveRecord::Base
   belongs_to :QuotationHeader, :foreign_key => "quotation_header_id"
-  belongs_to :QuotationUnit, :foreign_key => "quotation_unit_id"
+  #belongs_to :QuotationUnit, :foreign_key => "quotation_unit_id"
+  belongs_to :WorkingUnit, :foreign_key => "working_unit_id"
   has_many :quotation_detail_middle_classifications
 
-  def self.choices 
+    def self.choices 
     [["項目", 1], ["備考", 2]] 
   end
 
@@ -16,6 +17,9 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   
   #行挿入用
   attr_accessor :check_line_insert
+  #マスターセット用
+  attr_accessor :check_update_item
+  attr_accessor :check_update_all
   
   #金額合計(見積)
   def self.sumpriceQuote  
@@ -29,6 +33,11 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   #合計(歩掛り)
   def self.sumLaborProductivityUnit  
     sum(:labor_productivity_unit)
+  end
+  
+  #合計(歩掛り計)
+  def self.sumLaborProductivityUnitTotal  
+    sum(:labor_productivity_unit_total)
   end
 
   scope :with_header_id, -> (quotation_detail_large_classifications_quotation_header_id=1) { joins(:QuotationHeader).where("quotation_headers.id = ?", quotation_detail_large_classifications_quotation_header_id )}

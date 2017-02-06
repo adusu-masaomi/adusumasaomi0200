@@ -10,13 +10,18 @@
   <!-- 追加箇所終了 -->
   
   <%= search_form_for @q, :html => {:style=> 'width:1280px' } do |f| %>
-    <%= f.label :construction_name, '工事名：' %>
-    <%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
-     <%= f.label :customer_name, '得意先名：' %>
-    <%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
-    </br><%= f.label :billed_flag, '請求済' %>
+    <%= f.label :construction_name, '工事名　' %>
+    <!--<%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>-->
+    <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
+    <%= f.label :customer_name, '得意先名　' %>
+    <!--<%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
+    <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
+
+	</br><%= f.label :billed_flag, '請求済' %>
 	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
-	<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>
+	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
+	<%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {style: 'width:150px'} %>
+	
 	<div>
         <%= f.submit '検索する', :class => 'btn btn-default' %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
@@ -55,6 +60,7 @@
       <th><%= model_class.human_attribute_name(:customer_name) %></th>
       <th><%= model_class.human_attribute_name(:construction_period_start) %></th>
       <th><%= model_class.human_attribute_name(:construction_period_end) %></th>
+	  <th><%= model_class.human_attribute_name(:construction_end_date) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
       <th><%= model_class.human_attribute_name(:billed_flag) %></th>
@@ -85,6 +91,11 @@
 		<% end %>
 		<% if construction_datum.construction_period_end.present? && construction_datum.construction_period_end.strftime("%Y/%m/%d") != "2021/01/01" then %>
 		　　<td><%= construction_datum.construction_period_end %></td>
+		<% else %>
+		   <td align="center">-</td>
+		<% end %>
+		<% if construction_datum.construction_end_date.present? && construction_datum.construction_end_date.strftime("%Y/%m/%d") != "2000/01/01" then %>
+           <td><%= construction_datum.construction_end_date %></td>
 		<% else %>
 		   <td align="center">-</td>
 		<% end %>
@@ -131,7 +142,7 @@
   	  //見出し固定用設定追加
 	  var sz = window.parent.screen.width;
 	  var fc = 1;    //デフォルトの固定列数(社長PC基準)
-	  var ht = 520;  //デフォルトの高さ(社長PC基準)
+	  var ht = 628;  //デフォルトの高さ(社長PC基準)old-586
 		
 	  if (sz != 1920) {
 	  //画面サイズ1920px(社長PC基準)以外は、列固定させる。

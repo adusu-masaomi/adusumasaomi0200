@@ -1,4 +1,15 @@
 Rails.application.routes.draw do
+  resources :delivery_slip_detail_middle_classifications
+  resources :invoice_detail_middle_classifications
+  resources :invoice_detail_middle_classifications
+  resources :working_middle_items
+  resources :working_large_items
+  resources :working_units
+  resources :delivery_slip_detail_large_classifications
+  resources :invoice_detail_large_classifications
+  resources :working_units
+  resources :delivery_slip_headers
+  resources :invoice_headers
   #resources :purchase_order_histories
   resources :purchase_order_histories do
     collection do
@@ -146,47 +157,172 @@ Rails.application.routes.draw do
   get '/quotation_headerz/customer_info_select' => 'quotation_headers#customer_info_select'
 
   #  add161003
-  get '/quotation_detail_large_classificationz/quotation_large_item_select' => 'quotation_detail_large_classifications#quotation_large_item_select'
-  get '/quotation_detail_large_classificationz/quotation_large_specification_select' => 'quotation_detail_large_classifications#quotation_large_specification_select'
+  # upd170131
+  get '/quotation_detail_large_classificationz/working_large_item_select' => 'quotation_detail_large_classifications#working_large_item_select'
+  get '/quotation_detail_large_classificationz/working_large_specification_select' => 'quotation_detail_large_classifications#working_large_specification_select'
   #見積書内訳D単位名
-  get '/quotation_detail_large_classificationz/quotation_unit_name_select' => 'quotation_detail_large_classifications#quotation_unit_name_select'
+  #upd170130
+  get '/quotation_detail_large_classificationz/working_unit_name_select' => 'quotation_detail_large_classifications#working_unit_name_select'
+  get '/quotation_detail_large_classificationz/working_unit_id_select' => 'quotation_detail_large_classifications#working_unit_id_select'
+  
+  # upd170131
+  get '/quotation_detail_large_classificationz/working_unit_price_select' => 'quotation_detail_large_classifications#working_unit_price_select'
+  get '/quotation_detail_large_classificationz/execution_unit_price_select' => 'quotation_detail_large_classifications#execution_unit_price_select'
+  #歩掛
+  get '/quotation_detail_large_classificationz/labor_productivity_unit_select' => 'quotation_detail_large_classifications#labor_productivity_unit_select'
+  #歩掛計
+  get '/quotation_detail_large_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_large_classifications#labor_productivity_unit_total_select'
+  #
+  
+  #add170202-pm
+  ###
+  #請求書見出D関連
+  get '/invoice_headerz/customer_info_select' => 'invoice_headers#customer_info_select'
+  #請求書内訳D関連
+  get '/invoice_detail_large_classificationz/working_large_item_select' => 'invoice_detail_large_classifications#working_large_item_select'
+  get '/invoice_detail_large_classificationz/working_large_specification_select' => 'invoice_detail_large_classifications#working_large_specification_select'
+  #見積書内訳D単位名
+  get '/invoice_detail_large_classificationz/working_unit_name_select' => 'invoice_detail_large_classifications#working_unit_name_select'
+  get '/invoice_detail_large_classificationz/working_unit_id_select' => 'invoice_detail_large_classifications#working_unit_id_select'
+  get '/invoice_detail_large_classificationz/working_unit_price_select' => 'invoice_detail_large_classifications#working_unit_price_select'
+  get '/invoice_detail_large_classificationz/execution_unit_price_select' => 'invoice_detail_large_classifications#execution_unit_price_select'
+  #歩掛
+  get '/invoice_detail_large_classificationz/labor_productivity_unit_select' => 'invoice_detail_large_classifications#labor_productivity_unit_select'
+  #歩掛計
+  get '/invoice_detail_large_classificationz/labor_productivity_unit_total_select' => 'invoice_detail_large_classifications#labor_productivity_unit_total_select'
+  #add170203
+  ###
+  #納品書見出D関連
+  get '/delivery_slip_headerz/customer_info_select' => 'delivery_slip_headers#customer_info_select'
+  #納品書内訳D関連
+  get '/delivery_slip_detail_large_classificationz/working_large_item_select' => 'delivery_slip_detail_large_classifications#working_large_item_select'
+  get '/delivery_slip_detail_large_classificationz/working_large_specification_select' => 'delivery_slip_detail_large_classifications#working_large_specification_select'
+  #納品書内訳D単位名
+  get '/delivery_slip_detail_large_classificationz/working_unit_name_select' => 'delivery_slip_detail_large_classifications#working_unit_name_select'
+  get '/delivery_slip_detail_large_classificationz/working_unit_id_select' => 'delivery_slip_detail_large_classifications#working_unit_id_select'
+  get '/delivery_slip_detail_large_classificationz/working_unit_price_select' => 'delivery_slip_detail_large_classifications#working_unit_price_select'
+  get '/delivery_slip_detail_large_classificationz/execution_unit_price_select' => 'delivery_slip_detail_large_classifications#execution_unit_price_select'
+  #歩掛
+  get '/delivery_slip_detail_large_classificationz/labor_productivity_unit_select' => 'delivery_slip_detail_large_classifications#labor_productivity_unit_select'
+  #歩掛計
+  get '/delivery_slip_detail_large_classificationz/labor_productivity_unit_total_select' => 'delivery_slip_detail_large_classifications#labor_productivity_unit_total_select'
+  ###
   
   #見積明細D,見積内訳M連動用
-  get '/quotation_detail_middle_classificationz/quotation_middle_item_select' => 'quotation_detail_middle_classifications#quotation_middle_item_select'
-  get '/quotation_detail_middle_classificationz/quotation_middle_specification_select' => 'quotation_detail_middle_classifications#quotation_middle_specification_select'
-  get '/quotation_detail_middle_classificationz/quotation_unit_price_select' => 'quotation_detail_middle_classifications#quotation_unit_price_select'
+  get '/quotation_detail_middle_classificationz/working_middle_item_select' => 'quotation_detail_middle_classifications#working_middle_item_select'
+  get '/quotation_detail_middle_classificationz/working_middle_specification_select' => 'quotation_detail_middle_classifications#working_middle_specification_select'
+  #見積書明細D単位ID
+  get '/quotation_detail_middle_classificationz/working_unit_id_select' => 'quotation_detail_middle_classifications#working_unit_id_select'
+  #見積書明細D単位名
+  get '/quotation_detail_middle_classificationz/working_unit_name_select' => 'quotation_detail_middle_classifications#working_unit_name_select'
+  get '/quotation_detail_middle_classificationz/working_unit_price_select' => 'quotation_detail_middle_classifications#working_unit_price_select'
   get '/quotation_detail_middle_classificationz/execution_unit_price_select' => 'quotation_detail_middle_classifications#execution_unit_price_select'
   get '/quotation_detail_middle_classificationz/material_id_select' => 'quotation_detail_middle_classifications#material_id_select'
   get '/quotation_detail_middle_classificationz/quotation_material_name_select' => 'quotation_detail_middle_classifications#quotation_material_name_select'
   get '/quotation_detail_middle_classificationz/material_unit_price_select' => 'quotation_detail_middle_classifications#material_unit_price_select'
-
-  #見積書明細D単位名
-  get '/quotation_detail_middle_classificationz/quotation_unit_name_select' => 'quotation_detail_middle_classifications#quotation_unit_name_select'
+  #労務単価 
+  get '/quotation_detail_middle_classificationz/labor_unit_price_select' => 'quotation_detail_middle_classifications#labor_unit_price_select'
+  #歩掛
+  get '/quotation_detail_middle_classificationz/labor_productivity_unit_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_select'
+  #歩掛計
+  get '/quotation_detail_middle_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_total_select'
+  #使用材料数
+  get '/quotation_detail_middle_classificationz/material_quantity_select' => 'quotation_detail_middle_classifications#material_quantity_select'
+  #付属品等
+  get '/quotation_detail_middle_classificationz/accessory_cost_select' => 'quotation_detail_middle_classifications#accessory_cost_select'
+  #材料費等
+  get '/quotation_detail_middle_classificationz/material_cost_total_select' => 'quotation_detail_middle_classifications#material_cost_total_select'
+  #労務費等
+  get '/quotation_detail_middle_classificationz/labor_cost_total_select' => 'quotation_detail_middle_classifications#labor_cost_total_select'
+  #その他計
+  get '/quotation_detail_middle_classificationz/other_cost_select' => 'quotation_detail_middle_classifications#other_cost_select'
+  #材料名(材料Mから)
+  get '/quotation_detail_middle_classificationz/m_quotation_material_name_select' => 'quotation_detail_middle_classifications#m_quotation_material_name_select'
+  #材料単価(材料Mから)
+  get '/quotation_detail_middle_classificationz/m_material_unit_price_select' => 'quotation_detail_middle_classifications#m_material_unit_price_select'
+  #見出し→品目プルダウン絞り込み用
+  get '/quotation_detail_middle_classificationz/quotation_detail_large_classification_id_select' => 'quotation_detail_middle_classifications#quotation_detail_large_classification_id_select'
   
- #労務単価 
-get '/quotation_detail_middle_classificationz/labor_unit_price_select' => 'quotation_detail_middle_classifications#labor_unit_price_select'
- #歩掛
-get '/quotation_detail_middle_classificationz/labor_productivity_unit_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_select'
- #使用材料数
- get '/quotation_detail_middle_classificationz/material_quantity_select' => 'quotation_detail_middle_classifications#material_quantity_select'
- #付属品等
- get '/quotation_detail_middle_classificationz/accessory_cost_select' => 'quotation_detail_middle_classifications#accessory_cost_select'
- #材料費等
- get '/quotation_detail_middle_classificationz/material_cost_total_select' => 'quotation_detail_middle_classifications#material_cost_total_select'
- #労務費等
- get '/quotation_detail_middle_classificationz/labor_cost_total_select' => 'quotation_detail_middle_classifications#labor_cost_total_select'
- #その他計
- get '/quotation_detail_middle_classificationz/other_cost_select' => 'quotation_detail_middle_classifications#other_cost_select'
- #材料名(材料Mから)
-get '/quotation_detail_middle_classificationz/m_quotation_material_name_select' => 'quotation_detail_middle_classifications#m_quotation_material_name_select'
- #材料単価(材料Mから)
- get '/quotation_detail_middle_classificationz/m_material_unit_price_select' => 'quotation_detail_middle_classifications#m_material_unit_price_select'
- #見出し→品目プルダウン絞り込み用
- get '/quotation_detail_middle_classificationz/quotation_detail_large_classification_id_select' => 'quotation_detail_middle_classifications#quotation_detail_large_classification_id_select'
-
+  #add170203
+  ########
+  #請求明細D,請求内訳M連動用
+  get '/invoice_detail_middle_classificationz/working_middle_item_select' => 'invoice_detail_middle_classifications#working_middle_item_select'
+  get '/invoice_detail_middle_classificationz/working_middle_specification_select' => 'invoice_detail_middle_classifications#working_middle_specification_select'
+  #請求明細D-単位ID
+  get '/invoice_detail_middle_classificationz/working_unit_id_select' => 'invoice_detail_middle_classifications#working_unit_id_select'
+  #請求明細D-単位名
+  get '/invoice_detail_middle_classificationz/working_unit_name_select' => 'invoice_detail_middle_classifications#working_unit_name_select'
+  get '/invoice_detail_middle_classificationz/working_unit_price_select' => 'invoice_detail_middle_classifications#working_unit_price_select'
+  get '/invoice_detail_middle_classificationz/execution_unit_price_select' => 'invoice_detail_middle_classifications#execution_unit_price_select'
+  get '/invoice_detail_middle_classificationz/material_id_select' => 'invoice_detail_middle_classifications#material_id_select'
+  get '/invoice_detail_middle_classificationz/working_material_name_select' => 'invoice_detail_middle_classifications#working_material_name_select'
+  get '/invoice_detail_middle_classificationz/material_unit_price_select' => 'invoice_detail_middle_classifications#material_unit_price_select'
+  #請求明細D-労務単価 
+  get '/invoice_detail_middle_classificationz/labor_unit_price_select' => 'invoice_detail_middle_classifications#labor_unit_price_select'
+  #請求明細D-歩掛
+  get '/invoice_detail_middle_classificationz/labor_productivity_unit_select' => 'invoice_detail_middle_classifications#labor_productivity_unit_select'
+  #請求明細D-歩掛計
+  get '/invoice_detail_middle_classificationz/labor_productivity_unit_total_select' => 'invoice_detail_middle_classifications#labor_productivity_unit_total_select'
+  #請求明細D-使用材料数
+  get '/invoice_detail_middle_classificationz/material_quantity_select' => 'invoice_detail_middle_classifications#material_quantity_select'
+  #請求明細D-付属品等
+  get '/invoice_detail_middle_classificationz/accessory_cost_select' => 'invoice_detail_middle_classifications#accessory_cost_select'
+  #請求明細D-材料費等
+  get '/invoice_detail_middle_classificationz/material_cost_total_select' => 'invoice_detail_middle_classifications#material_cost_total_select'
+  #請求明細D-労務費等
+  get '/invoice_detail_middle_classificationz/labor_cost_total_select' => 'invoice_detail_middle_classifications#labor_cost_total_select'
+  #請求明細D-その他計
+  get '/invoice_detail_middle_classificationz/other_cost_select' => 'invoice_detail_middle_classifications#other_cost_select'
+  #請求明細D-材料名(材料Mから)
+  get '/invoice_detail_middle_classificationz/m_working_material_name_select' => 'invoice_detail_middle_classifications#m_working_material_name_select'
+  #請求明細D-材料単価(材料Mから)
+  get '/invoice_detail_middle_classificationz/m_material_unit_price_select' => 'invoice_detail_middle_classifications#m_material_unit_price_select'
+  #請求明細D-見出し→品目プルダウン絞り込み用
+  get '/invoice_detail_middle_classificationz/invoice_detail_large_classification_id_select' => 'invoice_detail_middle_classifications#invoice_detail_large_classification_id_select'
+  ########
+  
+  #add170203
+  ########
+  #納品明細D,納品内訳M連動用
+  get '/delivery_slip_detail_middle_classificationz/working_middle_item_select' => 'delivery_slip_detail_middle_classifications#working_middle_item_select'
+  get '/delivery_slip_detail_middle_classificationz/working_middle_specification_select' => 'delivery_slip_detail_middle_classifications#working_middle_specification_select'
+  #納品明細D-単位ID
+  get '/delivery_slip_detail_middle_classificationz/working_unit_id_select' => 'delivery_slip_detail_middle_classifications#working_unit_id_select'
+  #納品明細D-単位名
+  get '/delivery_slip_detail_middle_classificationz/working_unit_name_select' => 'delivery_slip_detail_middle_classifications#working_unit_name_select'
+  get '/delivery_slip_detail_middle_classificationz/working_unit_price_select' => 'delivery_slip_detail_middle_classifications#working_unit_price_select'
+  get '/delivery_slip_detail_middle_classificationz/execution_unit_price_select' => 'delivery_slip_detail_middle_classifications#execution_unit_price_select'
+  get '/delivery_slip_detail_middle_classificationz/material_id_select' => 'delivery_slip_detail_middle_classifications#material_id_select'
+  get '/delivery_slip_detail_middle_classificationz/working_material_name_select' => 'delivery_slip_detail_middle_classifications#working_material_name_select'
+  get '/delivery_slip_detail_middle_classificationz/material_unit_price_select' => 'delivery_slip_detail_middle_classifications#material_unit_price_select'
+  #納品明細D-労務単価 
+  get '/delivery_slip_detail_middle_classificationz/labor_unit_price_select' => 'delivery_slip_detail_middle_classifications#labor_unit_price_select'
+  #納品明細D-歩掛
+  get '/delivery_slip_detail_middle_classificationz/labor_productivity_unit_select' => 'delivery_slip_detail_middle_classifications#labor_productivity_unit_select'
+  #納品明細D-歩掛計
+  get '/delivery_slip_detail_middle_classificationz/labor_productivity_unit_total_select' => 'delivery_slip_detail_middle_classifications#labor_productivity_unit_total_select'
+  #納品明細D-使用材料数
+  get '/delivery_slip_detail_middle_classificationz/material_quantity_select' => 'delivery_slip_detail_middle_classifications#material_quantity_select'
+  #納品明細D-付属品等
+  get '/delivery_slip_detail_middle_classificationz/accessory_cost_select' => 'delivery_slip_detail_middle_classifications#accessory_cost_select'
+  #納品明細D-材料費等
+  get '/delivery_slip_detail_middle_classificationz/material_cost_total_select' => 'delivery_slip_detail_middle_classifications#material_cost_total_select'
+  #納品明細D-労務費等
+  get '/delivery_slip_detail_middle_classificationz/labor_cost_total_select' => 'delivery_slip_detail_middle_classifications#labor_cost_total_select'
+  #納品明細D-その他計
+  get '/delivery_slip_detail_middle_classificationz/other_cost_select' => 'delivery_slip_detail_middle_classifications#other_cost_select'
+  #納品明細D-材料名(材料Mから)
+  get '/delivery_slip_detail_middle_classificationz/m_working_material_name_select' => 'delivery_slip_detail_middle_classifications#m_working_material_name_select'
+  #納品明細D-材料単価(材料Mから)
+  get '/delivery_slip_detail_middle_classificationz/m_material_unit_price_select' => 'delivery_slip_detail_middle_classifications#m_material_unit_price_select'
+  #納品明細D-見出し→品目プルダウン絞り込み用
+  get '/delivery_slip_detail_middle_classificationz/delivery_slip_detail_large_classification_id_select' => 'delivery_slip_detail_middle_classifications#delivery_slip_detail_large_classification_id_select'
+  ########
+  
+  
   #見積内訳M,資材M連動用
-  get '/quotation_middle_itemz/quotation_material_name_select' => 'quotation_middle_items#quotation_material_name_select'
-  get '/quotation_middle_itemz/material_unit_price_select' => 'quotation_middle_items#material_unit_price_select'
+  get '/working_middle_itemz/working_material_name_select' => 'working_middle_items#working_material_name_select'
+  get '/working_middle_itemz/material_unit_price_select' => 'working_middle_items#material_unit_price_select'
   
   # うまくいかない・・・
   get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
@@ -208,15 +344,29 @@ get '/quotation_detail_middle_classificationz/m_quotation_material_name_select' 
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :delivery_slip_detail_middle_classifications
+  resources :invoice_detail_middle_classifications
+  resources :working_middle_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_large_items
+  resources :working_units
+  resources :delivery_slip_detail_large_classifications
+  resources :invoice_detail_large_classifications
+  resources :delivery_slip_headers
+  resources :invoice_headers
   resources :purchase_order_histories
   resources :purchase_order_histories
   resources :orders
   resources :working_safety_matters
   resources :quotation_items_divisions
   resources :quotation_detail_middle_classifications
-  resources :quotation_middle_items
   resources :quotation_units
-  resources :quotation_large_items
   resources :quotation_detail_large_classifications
   resources :quotation_headers
   get 'session/index'

@@ -19,7 +19,9 @@
   <%= f.label :slip_code, '伝票No' %>
   <%= f.text_field :slip_code_cont, include_blank: true  %>
   <%= f.label :supplier_id, '仕入先：：' %>
-  <%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> 
+  <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
+  <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+  
   </br>
   
   <!--<%= f.text_field :purchase_date_gteq, class:"my-custom-class-d datepicker", include_blank: true  %>-->
@@ -27,19 +29,24 @@
   
   <%= f.label :purchase_order_datum_id, '注文No：：' %>
   <%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
+  
   <%= f.label :division_id, '仕入区分' %>
   <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseDivision"}  %>
   <!--<%= f.label :construction_code, '件名コード：：' %>-->
   <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") ,{ include_blank: true }, {style: 'width:220px' , class: "searchableConstructionCode" } %></br>-->
   <%= f.label :construction_code, '件名：：' %>
-  <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
+  <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
+  <%= f.select :with_construction, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
+  
   <%= f.label :customer_id, '得意先：：' %>
-  <%= f.select :with_customer, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" }  %>
-  <%= f.label :material_code, '品番：' %>
-  <!--<%= f.select :material_code_eq, MaterialMaster.all.map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" }  %>-->
-  <%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %> 
-  <!--<%= f.text_field :material_code_eq, include_blank: true  %>-->
-　<%= f.label :material_code, '品番(キーワード)：' %>
+  <!--<%= f.select :with_customer, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" }  %>-->
+  <%= f.select :with_customer, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" } %>
+  
+  <%= f.label :material_code, '品番：：' %>
+  <!--<%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
+  <%= f.select :material_code_eq, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %></b
+  
+  <%= f.label :material_code, '品番(キーワード)：' %>
   <%= f.text_field :material_code_cont, include_blank: true  %>
   <%= f.label :material_code, '品名：' %>
   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px' %></br>
@@ -70,27 +77,27 @@
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
   <!--見出し固定用設定追加-->
-　<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;table-layout:fixed;">
+　<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
   <thead>
     <tr>
       <th style="width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
       <th style="width:90px;"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
       <th style="width:55px;"><%= sort_link(@q, :purchase_order_datum_purchase_order_code, "注文No" ) %></th>
       <th style="width:90px;"><%= sort_link(@q, :construction_datum_construction_code, "件名No" ) %></th>
-	  <th style="width:235px;"><%= sort_link(@q, :construction_datum_construction_name, "件　　名" ) %></th>
-      <th style="width:177px;"><%= sort_link(@q, :construction_datum_CustomerMaster_customer_name, "得意先名" ) %></th>
+	  <th style="width:240px;"><%= sort_link(@q, :construction_datum_construction_name, "件　　名" ) %></th>
+      <th style="width:160px;"><%= sort_link(@q, :construction_datum_CustomerMaster_customer_name, "得意先名" ) %></th>
       <th style="width:120px;"><%= sort_link(@q, :material_code, "品番" ) %></th>
 	  <th style="width:370px;"><%= sort_link(@q, :material_name, "品   名" ) %></th>
-	  <th style="width:110px;"><%= sort_link(@q, :maker_name, "メーカー" ) %></th>
+	  <th style="width:100px;"><%= sort_link(@q, :maker_name, "メーカー" ) %></th>
 	  <th style="width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
       <th style="width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
 	  <th style="width:85px;"><%= sort_link(@q, :purchase_unit_price, "仕入単価" ) %></th>
 	  <th style="width:80px;"><%= sort_link(@q, :purchase_amount, "金額" ) %></th>
 	  <th style="width:65px;"><%= sort_link(@q, :list_price, "定価" ) %></th>
-	  <th style="width:82px;"><%= sort_link(@q, :SupplierMaster_supplier_name, "仕入業者" ) %></th>
-	  <th style="width:50px;"><%= sort_link(@q, :PurchaseDivision_purchase_division_name, "区分" ) %></th>
+	  <th style="width:79px;"><%= sort_link(@q, :SupplierMaster_supplier_name, "仕入業者" ) %></th>
+	  <th style="width:40px;"><%= sort_link(@q, :PurchaseDivision_purchase_division_name, "区分" ) %></th>
       <!--<th>伝票No</th>-->
-      <th align="left;", style="width:55px;"><%= sort_link(@q, :slip_code, "伝票No" ) %></th>
+      <th align="left;", style="width:50px;"><%= sort_link(@q, :slip_code, "伝票No" ) %></th>
       <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
       <th style="width:90px;"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -144,8 +151,12 @@
            <td align="right">-</td>
         <% end %>
         <% if purchase_datum.list_price.present? %>
+		  <% if purchase_datum.list_price > 0 %>
              <td align="right", style="font-size : 12px;"><%= number_to_currency(purchase_datum.list_price, precision: 0) %></td>
-        <% else %>
+          <% else %>
+		     <td align="right">-</td>
+		  <% end %>
+		<% else %>
            <td align="right">-</td>
         <% end %>
         <td style="font-size : 12px;"><%= @supplier_masters[(purchase_datum.supplier_id)-1].supplier_name %></td>
@@ -195,7 +206,7 @@
      //見出し固定用設定追加
 	 var sz = window.parent.screen.width;
 	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
-	 var ht = 520;  //デフォルトの高さ(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
 	 
 	 if (sz != 1920) {
 	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。

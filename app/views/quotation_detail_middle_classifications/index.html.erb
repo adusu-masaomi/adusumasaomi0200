@@ -1,18 +1,19 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailMiddleClassification -%>
-<div class="page-header">
+<div class="page-header", style="width:1920px" >
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   
   <%= search_form_for @q do |f| %>
-  <%= f.label :construction_code, '見積Ｎｏ：' %>
+  <%= f.label :construction_code, '見積Ｎｏ　' %>
   <%= f.select :quotation_header_id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
-  <%= f.label :construction_code, '件名：' %>
+  <%= f.label :construction_code, '件名　' %>
   <%= f.select :with_header_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
   
-  <%= f.label :quotation_large_item, '品目名：' %>
-  <%= f.select :with_large_item, options_from_collection_for_select(QuotationDetailLargeClassification.group(:quotation_large_item_name), "quotation_large_item_name","quotation_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  <%= f.label :quotation_large_item, '品目名　' %>
+  <%= f.select :with_large_item, options_from_collection_for_select(QuotationDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
   
-  <%= f.label :quotation_middle_item, '内訳名：' %>
-  <%= f.select :quotation_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.group(:quotation_middle_item_name), "quotation_middle_item_name","quotation_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
+  <%= f.label :quotation_middle_item, '内訳名　' %>
+  <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
   
   	<div>
     	<%= f.submit '検索する' %>
@@ -43,44 +44,43 @@
 <%= $quotation_header_name %>
 <%= "　　" %>
 <%= "項目:" %>
-<%= $quotation_large_item_name %>  
+<%= $working_large_item_name %>  
 </b></font>
 </div>
 </br>
 
-<td>見積金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
+<td>見積金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceQuote,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceExecution,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @quotation_detail_middle_classifications.sumLaborProductivityUnitTotal.to_s + "人" %>
+</td>
 
 <div id="quotation_detail_middle_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
-<div class="span11 table-scrollable">
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
   <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
-  <table class="table table-striped">
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
+
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <!--<th>件名</th>-->
-      <!--<th>見積書品目</th>-->
-      <th><%= model_class.human_attribute_name(:line_number) %></th>
-      <th><%= model_class.human_attribute_name(:quotation_middle_item_name) %></th>
-	  <th><%= model_class.human_attribute_name(:quotation_middle_specification) %></th>
-      <th><%= model_class.human_attribute_name(:quantity) %></th>
-      <th>実数</th>
-      <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
-      <th><%= model_class.human_attribute_name(:quotation_unit_price) %></th>
-      <th><%= model_class.human_attribute_name(:quote_price) %></th>
-      <th><%= model_class.human_attribute_name(:execution_unit_price) %></th>
-      <th><%= model_class.human_attribute_name(:execution_price) %></th>
-      <th><%= model_class.human_attribute_name(:material_unit_price) %></th>
-      <th><%= model_class.human_attribute_name(:labor_unit_price) %></th>
-      <th><%= model_class.human_attribute_name(:accessory_cost) %></th>
-      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
-      <th><%= model_class.human_attribute_name(:material_cost_total) %></th>
-      <th><%= model_class.human_attribute_name(:labor_cost_total) %></th>
-      <th><%= model_class.human_attribute_name(:other_cost) %></th>
-      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
+      <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
+	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
+      <th style="width:50px;">　数量</th>
+      <th style="width:50px;">単位</th>
+	  <th style="width:80px;">　 見積単価</th>
+      <th style="width:80px;">　 見積金額</th>
+      <th style="width:50px;">　実数</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 実行単価</th>
+      <th style="width:80px;">　 実行金額</th>
+      <th style="width:80px;">　　　 歩掛</th>
+      <th style="width:80px;">　　 歩掛計</th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -98,6 +98,20 @@
         $(".searchableConstructionName").select2({ theme: "classic" });
         $(".searchableLargeItem").select2({ theme: "classic" });
         $(".searchableMiddleItem").select2({ theme: "classic" });
+		
+	   //見出し固定用設定追加
+	   var sz = window.parent.screen.width;
+	   var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	   var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	   if (sz != 1920) {
+	   //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 1;  //固定列数
+		  //ht -= 70;
+		  ht -= 108;
+	   }
+	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	   //
   });
   
   function addParam(link){

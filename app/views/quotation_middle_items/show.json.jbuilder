@@ -1,1 +1,0 @@
-json.partial! "quotation_middle_items/quotation_middle_item", quotation_middle_item: @quotation_middle_item

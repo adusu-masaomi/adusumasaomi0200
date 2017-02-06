@@ -1,14 +1,29 @@
 <%= simple_form_for @quotation_header, :html => { :class => 'well form-horizontal' } do |f| %>
-  <%= f.input :quotation_code, input_html:{:tabindex=>"0"} %>
-  <%= f.input :quotation_date, input_html:{:tabindex=>"1"} %>
+  <div class="col-md-3" , style="margin-left : -15px">
+  <%= f.input :quotation_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
+  </div>
+  <div class="col-md-3", style="margin-left : -0px">
+  <%= f.input :invoice_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
+  </div>
+  <div style="margin-left : -0px">
+  <%= f.input :delivery_slip_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
+  </div>
+  <%= f.input :quotation_date, input_html:{:tabindex=>"1",style: 'width:100px'} %>
+  <div class="col-md-6" , style="margin-left : -15px">
+   <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{:tabindex=>"1",style: 'width:100px'} %>
+  </div>
+  <div style="margin-left : 0px">
+     <%= f.input :invoice_period_end_date, :include_blank => true, input_html:{:tabindex=>"1",style: 'width:100px'} %>
+  </div></br>
+  
   <%= f.label :"件名Ｎｏ(＊該当無は”-”のままにする)" , {:class => "my-custom-class-l"} %></br>
   <!--<%= f.input :construction_datum_id %>-->
   <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:selected => @quotation_header.construction_datum_id || 1, :include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"2",  style: 'width:220px' } %></br>
-  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3"} %>
+  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3", style: 'ime-mode:active'} %>
   <%= f.label :"得意先(＊該当無は”-”のままにする)", {:class => "my-custom-class-l"} %></br>
   <!--<%= f.input :customer_id %>-->
   <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:selected => @quotation_header.customer_id || 1 } , {id:'customer_id', :class => "searchableCustomerName",  style: 'width:330px' , :tabindex=>"4"} %></br>
-  <%= f.input :customer_name , input_html:{id:"customer_name", :tabindex=>"5"} %>
+  <%= f.input :customer_name , input_html:{id:"customer_name", :tabindex=>"5", style: 'ime-mode:active'} %>
   <%= f.label :"敬称", {:class => "my-custom-class-l"}  %></br>
   
   <div class="col-xs-3" ,  style="margin-left : -15px">

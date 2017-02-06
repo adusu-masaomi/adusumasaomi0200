@@ -8,15 +8,21 @@
   <%= f.input :supplies_expense %>
   <%= f.input :labor_cost, input_html:{id:"labor_cost"} %>
   <%= f.input :misellaneous_expense %>
-  <%= f.input :constructing_amount %>
-  <%= f.input :purchase_order_amount, input_html:{id:"purchase_order_amount"} , as: :hidden %>
+  <%= f.input :constructing_amount , input_html:{}%>
+  <!--<%= f.input :purchase_order_amount, input_html:{id:"purchase_order_amount"} , as: :hidden %>-->
+  <%= f.input :purchase_order_amount, hint: "＊自動計算されるので入力しないで下さい。但し更新したい場合は、ここに一旦カーソルを当ててから解除下さい。", input_html:{id:"purchase_order_amount",:onfocusout => "setPurchaseOrder()"} %>
   
-  <%= f.button :submit, :class => 'btn-primary' %>
+  <!--<%= f.button :submit, :class => 'btn-primary' %>-->
+  <%= f.button_tag :登録する, :type => 'button', :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" %>
+			   
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 construction_costs_path, :class => 'btn btn-default' %>
 <% end %>
 
 <script type="text/javascript">
+
+   datasetflag = 0;
 
 　　$(document).ready(function(){
 		//検索可能なリストボックス(注文Noの場合)
@@ -26,8 +32,19 @@
 	  　  setConstructionDateDefault();
           setLaborCost();
 		  setPurchaseOrderAmount();
+		  datasetflag = 1;
 	  });
 	});
+
+  function setPurchaseOrder()
+  {
+       if (datasetflag == 0) {
+  	       setLaborCost();
+		   setPurchaseOrderAmount();
+       }
+		 
+   
+  }
 
   //工事名のセット
   function setConstructionDateDefault()
@@ -72,12 +89,24 @@
           function(data){
 	           obj = document.getElementById("purchase_order_amount").textContent;
 	           document.getElementById("purchase_order_amount").value = obj;
-			   
-			   //obj = document.getElementById("purchase_order_amount");
+
+               //obj = document.getElementById("purchase_order_amount");
 		       //debugger;
           }
         );
 	 };
 
+    //入力チェック後の、更新処理
+   function submitAfterValidation() {
+
+	   //if (window.confirm('更新しますか？')) {
+	  	 //if (datasetflag == 0) {
+  	     //  setLaborCost();
+		 //  setPurchaseOrderAmount();
+        // }
+		 
+		 document.forms[0].submit();
+       //}
+ }
 
 </script>

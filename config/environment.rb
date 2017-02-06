@@ -1,5 +1,5 @@
 #本番用(テスト時はコメントにする)
-ENV['RAILS_ENV'] = 'production'
+#ENV['RAILS_ENV'] = 'production'
 
 # Load the Rails application.
 require File.expand_path('../application', __FILE__)

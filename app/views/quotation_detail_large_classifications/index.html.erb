@@ -1,14 +1,15 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailLargeClassification -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 
    <%= search_form_for @q do |f| %>
-  <%= f.label :construction_code, '見積Ｎｏ：' %>
+  <%= f.label :construction_code, '見積Ｎｏ　' %>
   <%= f.select :quotation_header_id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
-  <%= f.label :construction_code, '件名：' %>
+  <%= f.label :construction_code, '件名　' %>
   <%= f.select :with_header_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
-  <%= f.label :quotation_large_item, '品目名：' %>
-  <%= f.select :quotation_large_item_name_eq, options_from_collection_for_select(QuotationDetailLargeClassification.group(:quotation_large_item_name), "quotation_large_item_name","quotation_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
+  <%= f.label :working_large_item, '品目名　' %>
+  <%= f.select :working_large_item_name_eq, options_from_collection_for_select(QuotationDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
 
   	<div>
     	<%= f.submit '検索する' %>
@@ -16,45 +17,86 @@
    <% end %>
 
 </div>
+<div style="width:1280px;">
 <%= link_to t('.new', :default => t("新規作成")),
             new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
 <%= link_to "一覧へ",
             quotation_headers_path(),
             :class => 'btn btn-info' %>
-<%= link_to "見積書(縦)PDF",
+<%= link_to "見積書(提出用)PDF",
             quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
             :class => 'btn btn-success' , :target=>["_blank"] %>
-<%= link_to "見積書(横)PDF",
+<%= link_to "見積書(控え)PDF",
             quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
-            :class => 'btn btn-success' , :target=>["_blank"] %></br>
-<td>見積金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceQuote,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>&nbsp;&nbsp;&nbsp;&nbsp;歩掛合計:<%=number_to_currency(@quotation_detail_large_classifications.sumLaborProductivityUnit,  precision: 3 ) %></td>
+            :class => 'btn btn-success' , :target=>["_blank"] %>
+<%= link_to "請求書データ作成",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], 
+            quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
+            data_type: "1" ),
+            :class => 'btn btn-default' , :data => {:confirm => '請求書データを作成しますか？'}  %>
+<%= link_to "納品書データ作成",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id],
+            quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
+            data_type: "2" ),
+            :class => 'btn btn-warning' , :data => {:confirm => '納品書データを作成しますか？'} %>
+
+<!--以下は復活する可能性があるので残しておく-->
+<!--<%= link_to "請求書(提出用)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
+            :class => 'btn btn-default' , :target=>["_blank"] %>
+<%= link_to "請求書(控え)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "4",  format: "pdf" ),
+            :class => 'btn btn-default' , :target=>["_blank"] %>
+<%= link_to "納品書(提出用)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "5",  format: "pdf" ),
+            :class => 'btn btn-warning' , :target=>["_blank"] %>
+<%= link_to "納品書(控え)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "6",  format: "pdf" ),
+            :class => 'btn btn-warning' , :target=>["_blank"] %>-->
+</br>
+<font size="3";><b>
+<%= "件名:" %>
+<%= $quotation_header_name %>
+</b></font>
+
+<td>見積金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceQuote,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @quotation_detail_large_classifications.sumLaborProductivityUnitTotal.to_s + "人" %>
+</td>
+</div>
 
 <div id="quotation_detail_large_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
-<div class="span11 table-scrollable">
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+
   <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
   
-  <table class="table table-striped">
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
+  
   <thead>
     <tr>
-      <th></th>
-	  <th><%= model_class.human_attribute_name(:id) %></th>
-      <th>見積書件名</th>
-      <th><%= model_class.human_attribute_name(:quotation_items_division_id) %></th>
-      <th><%= model_class.human_attribute_name(:line_number) %></th>
-      <th><%= model_class.human_attribute_name(:quotation_large_item_name) %></th>
-      <th><%= model_class.human_attribute_name(:quotation_large_specification) %></th>
-      <th><%= model_class.human_attribute_name(:quantity) %></th>
-      <th>実数</th>
-      <th><%= model_class.human_attribute_name(:quotation_unit_id) %></th>
-      <th><%= model_class.human_attribute_name(:quote_price) %></th>
-      <th><%= model_class.human_attribute_name(:execution_price) %></th>
-      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th style="width:80px;"></th>
+	  <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
+      <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_item_name) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_specification) %></th>
+      <th align="right" , style="width:50px;">　数量</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 見積単価</th>
+	  <th style="width:80px;">　 見積金額</th>
+      <th style="width:50px;">　実数</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 実行単価</th>
+      <th style="width:80px;">　 実行金額</th>
+      <th style="width:80px;">　　　 歩掛</th>
+	  <th style="width:80px;">　　 歩掛計</th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
@@ -71,6 +113,19 @@
 	$(".searchableQuotationCode").select2({ theme: "classic" });
         $(".searchableConstructionName").select2({ theme: "classic" });
         $(".searchableLargeItem").select2({ theme: "classic" });
+     //見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 1;  //固定列数
+		//ht -= 70;
+		ht -= 108;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
   });
 </script>
 

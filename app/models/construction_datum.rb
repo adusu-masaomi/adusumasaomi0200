@@ -14,6 +14,10 @@ class ConstructionDatum < ActiveRecord::Base
 	#発行日用
     attr_accessor :issue_date
 	
+	#作業日・作業者（指示書発行一時用）
+	attr_accessor :working_date
+	attr_accessor :staff_id
+	
 	#バリデーション
 	validates :customer_id, presence: true
     validates :construction_code, presence: true, uniqueness: true

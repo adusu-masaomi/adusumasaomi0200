@@ -44,23 +44,25 @@
    <%= link_to '新規／データ呼出', { id: params[:id] }, :onclick=> "dispDiv()", :class => 'btn btn-warning'  %>
    <%= link_to t('.cancel', :default => t("前の画面に戻る")),
                 purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
+   
+         
   
    </br>
    <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
    <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
-	
-   <!--<%= link_to '新規／データ呼出', { id: params[:id] }, :onclick=> "dispDiv()" , :class => 'btn btn-warning'  %>-->
-   <!--<%= link_to t('.cancel', :default => t("戻る")),
-                purchase_order_histories_path, :class => 'btn btn-default' %>-->
+   </br></br>
+	 <%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
+               id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
+                
+	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" %>
       
   　<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
    
-       <!-- <div class = "row">-->
-       <div id="subForms" >
-	   
-	   
-        <%= f.simple_fields_for :orders   do |orders| %>
-		
+       <!--<div id="subForms" >-->
+	   <div id="subForms", class="sortThese" >
+	      
+        <%= f.simple_fields_for :orders  do |orders| %>
             <%= render 'order_fields', f: orders %>
        <!--</div>-->
        <% end %>
@@ -68,20 +70,17 @@
        </div>
 
 	   <!--<div class="links" id="filter" class="hideMe" style="display: none">-->
-	   <!--<div id="filter" class="hide"  >-->
-       <div id="filter" class="hide"  >    
+	   <!--<div id="filter" class="hide"  >-->    
+		<div id="filter" class="sortThese"  >
+		   <!--<%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success', :data => {"association-insertion-method" => "after", "association-insertion-node" => 'this' } %> -->
+           <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success', :data => { association_insertion_method: "after", association_insertion_node: "#place-to-insert" } %>
+		   <!--<%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success' %>-->
 		   
-		   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success' %> 
-           <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button",  data: {confirm: "メール送信&更新します。よろしいですか？" } %>-->
-           <%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
+		   <!--<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
                id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
-                
-		   <!--<%= f.submit '登録のみ', name: "upd", class: "btn btn-primary"  %>-->
            <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
-               :onclick => "submitAfterValidation()" %>
-			   
+               :onclick => "submitAfterValidation()" %>-->
 			
-		   
 		  
       </div>
 <% end %>
@@ -95,6 +94,9 @@
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
       
+	  $(".sortThese").sortable();
+	  
+	  
       //検索可能なリストボックス(品名の場合)
        $(".searchableId").select2({ theme: "classic" });
        $(".searchableMaterial").select2({ theme: "classic" });
@@ -182,6 +184,8 @@ function dispDiv() {
   $.get("<%= purchase_order_historiez_get_data_path %>",
     {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, supplier_master_id: supplier_master_id},
      function(data){
+	   // マウスカーソルの形を変える
+       $("body").css("cursor", "progress");
      }
    );
   
@@ -189,6 +193,9 @@ function dispDiv() {
   //画面再ロードする
   window.location.reload();
   event.preventDefault();
+  
+  // マウスカーソルの形を変える
+  $("body").css("cursor", "default");
 
 };
   

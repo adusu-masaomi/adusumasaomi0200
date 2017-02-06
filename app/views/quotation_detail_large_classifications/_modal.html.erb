@@ -4,33 +4,64 @@
   <div style="padding-left : 15px;">
 <%= simple_form_for @quotation_detail_large_classification, remote: true, :html => { id: "mymodal", :class => 'form-horizontal' } do |f| %>
   
-  <%= f.label :"件名", {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :quotation_header_id, QuotationHeader.all, :id, :construction_name, {:prompt => 'どれか一つを選択して下さい'} , {id:'quotation_header_id', :selected => @quotation_detail_large_classification.quotation_header_id, :class => "searchableQuotationHeader", :tabindex=>"0", style: 'width:330px; border-bottom-left-radius: -15px'  } %></br>
-  <%= f.label :"項目名／備考", {:class => "my-custom-class-l"}  %></br>
-  <!--<%= f.collection_select :quotation_items_division_id, QuotationItemsDivision.all, :id, :quotation_items_division_name, {:selected => @quotation_detail_large_classification.quotation_items_division_id || 1} , {id:'quotation_items_division_id', :class => "my-custom-class", :onchange => "setWhenSpecification(this.form)" } %></br>-->
-  <%= f.select :quotation_items_division_id, QuotationDetailLargeClassification.choices, {:selected => @quotation_detail_large_classification.quotation_items_division_id || 1}, {id:'quotation_items_division_id', :tabindex=>"1", :class => "my-custom-class", :onchange => "setWhenSpecification(this.form)"} %></br>
-  
-  <%= f.label :"項目名", {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :quotation_large_item_id, QuotationLargeItem.all, :id, :quotation_large_item_name, {:selected => @quotation_detail_large_classification.quotation_large_item_id || 1} , {id:'quotation_large_item_id', :tabindex=>"2", :class => "searchableQuotationItem",  style: 'width:220px' } %></br>
-  <%= f.input :quotation_large_item_name , label: "項目名(手入力可)", input_html:{id:"quotation_large_item_name", :tabindex=> "3"}  %>
-  <%= f.input :quotation_large_specification , label: "仕様名(手入力可)", input_html:{id:"quotation_large_specification", :tabindex=>"4" }  %>
-
+  <!--非表示のフィールド-->
+  <!--件名(非表示)-->
+  <%= f.input :quotation_header_id, input_html:{id:"quotation_header_id", :value => @quotation_detail_large_classification.quotation_header_id } , as: :hidden %>
+  <!--品名／仕様区分(非表示)-->
+  <%= f.input :quotation_items_division_id, input_html:{id:"quotation_items_division_id",  :value => 1 } , as: :hidden %>
+  <!---->
   <%= f.label :"行番号" , { :class => "my-custom-class-l"} %></br>
-  <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, { :tabindex=>"5", class: "searchableNumber" , style: 'width:100px' } %>
+  <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, { :tabindex=>"0", class: "searchableNumber" , style: 'width:100px' } %>
   <%= f.check_box :check_line_insert, {}, "true", "false" %>
   <%= f.label_tag :check_line_insert, '行挿入する' %></br>
   
-  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"6", :value => @quotation_detail_large_classification.execution_quantity || 1, :onchange => "changeQuantity()" } %>
-  <%= f.input :quantity, label: "見積数量", :input_html => {id:'quantity', :tabindex=>"7", :value => @quotation_detail_large_classification.quantity || 1 } %>
+  <%= f.label :"項目名", {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :working_large_item_id, WorkingLargeItem.all, :id, :working_large_item_name, {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , {id:'working_large_item_id', :tabindex=>"2", :class => "searchableWorkingItem",  style: 'width:420px' } %></br>
+  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "3"}  %>
+  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"4" }  %>
+  
+  <div class="col-xs-2" , style="margin-left : -15px">
+  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"5", style: 'width:120px', :value => @quotation_detail_large_classification.execution_quantity || 1, :onchange => "changeQuantity()" } %>
+  </div>
+  <div style="margin-left : -50px">
+  <%= f.input :quantity, label: "見積数量", :input_html => {id:'quantity', :tabindex=>"6", style: 'width:120px', :value => @quotation_detail_large_classification.quantity || 1 , :onchange => "calcTotalPrice()" } %>
+  </div>
+  
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
   <%= f.label :"単位" , {} %></br>
-  <%= f.collection_select :quotation_unit_id, QuotationUnit.all, :id, :quotation_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.quotation_unit_id || 1 } , {id:'quotation_unit_id', :tabindex=>"8", :class => "searchableQuotationUnit",  style: 'width:220px' } %></br>
-  <%= f.input :quotation_unit_name , label: "単位名(手入力可)", input_html:{id:"quotation_unit_name", :tabindex=>"9", :value => @quotation_detail_large_classification.quotation_unit_name || QuotationUnit.where(:id => 1).pluck(:quotation_unit_name)   }  %>
-  <%= f.input :execution_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'execution_price', :tabindex=>"10"} %>
-  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。", :input_html => {id:'quote_price', :tabindex=>"11"} %>
-  <%= f.input :labor_productivity_unit, hint: "＊自動計算されます。手入力可。", :input_html => {:tabindex=>"12"}  %>
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.working_unit_id || 1 } , {id:'working_unit_id', :tabindex=>"7", :class => "searchableWorkingUnit",  style: 'width:120px' } %></br>
+  </div>
+  <div style="margin-left : -50px;margin-top : -15px">
+  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", :tabindex=>"8", style: 'width:120px',  :value => @quotation_detail_large_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name)   }  %>
+  </div>
+  
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"9", :onchange => "calcTotalPrice()" } %>
+  </div>
+  <div style="margin-left : -50px;margin-top : -15px">
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"10", :onchange => "calcTotalPrice()"} %>
+  </div>
+  
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
+  <%= f.input :execution_price,  :input_html => {id:'execution_price', :tabindex=>"11", style: 'width:120px'} %>
+  </div>
+  <div style="margin-left : -50px;margin-top : -20px">
+  <%= f.input :quote_price, :input_html => {id:'quote_price', :tabindex=>"12", style: 'width:120px'} %>
+  </div>
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
+  <%= f.input :labor_productivity_unit,  :input_html => {id:"labor_productivity_unit", :tabindex=>"13", style: 'width:120px', :onchange => "calcLaborTotal()"}  %>
+  </div>
+  <div style="margin-top : -15px">
+  <%= f.input :labor_productivity_unit_total,  :input_html => {id:"labor_productivity_unit_total", :tabindex=>"14", style: 'width:120px'}  %>
+  </div>
+  
+  <%= f.check_box :check_update_item, {}, "true", "false" %>
+  <%= f.label_tag :check_update_item, '品名・仕様・単位のみマスター反映　　　' %> 
+  <%= f.check_box :check_update_all, {}, "true", "false" %>
+  <%= f.label_tag :check_update_all, '全てマスター反映' %></br>
   
   <%= hidden_field_tag(:quotation_header_id, 'index') %>
-  <%= hidden_field_tag(:quotation_large_item_id, 'index') %>
+  <%= hidden_field_tag(:working_large_item_id, 'index') %>
   
   <%= f.button :submit, :class => 'btn-primary' %>
   <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
@@ -70,33 +101,40 @@
 		}, 0);  
 	 });
 	 
-     //$(".searchableQuotationItem").select2({ theme: "bootstrap"  });
-	 $(".searchableQuotationItem").select2({ theme: "bootstrap"  });
-     $( ".searchableQuotationItem" ).change(function(e) {
-      　  setQuotationLarageItemName();
-	      setQuotationLarageSpecification();
+     //$(".searchableWorkingItem").select2({ theme: "bootstrap"  });
+	 $(".searchableWorkingItem").select2({ theme: "bootstrap"  });
+     $( ".searchableWorkingItem" ).change(function(e) {
+      　  setWorkingLargeItemName();
+	      setWorkingLarageSpecification();
+		  setUnit();
+		  setWorkingUnitPrice();
+		  setExecutionUnitPrice();
+		  //金額も計算
+		  calcTotalPrice();
+		  setLaborProductivityUnit();
+		  setLaborProductivityUnitTotal();
      });
-	 $( ".searchableQuotationItem" ).on("select2:close", function (e) {
+	 $( ".searchableWorkingItem" ).on("select2:close", function (e) {
 	 　setTimeout(function() {
           $('[tabindex=3]').focus();
         }, 0);  
 	 });
  
 　　 　
-     $(".searchableQuotationUnit").select2({ theme: "bootstrap"});
-	 $( ".searchableQuotationUnit" ).change(function(e) {
-      　  setQuotationUnitName();
+     $(".searchableWorkingUnit").select2({ theme: "bootstrap"});
+	 $( ".searchableWorkingUnit" ).change(function(e) {
+      　  setWorkingUnitName();
 	 });
-	 $( ".searchableQuotationUnit" ).on("select2:close", function (e) {
+	 $( ".searchableWorkingUnit" ).on("select2:close", function (e) {
 	 　setTimeout(function() {
-          $('[tabindex=9]').focus();
+          $('[tabindex=8]').focus();
         }, 0);  
 	 });
 	 
      $(".searchableNumber").select2({ theme: "bootstrap"  });
      $( ".searchableNumber" ).on("select2:close", function (e) {
 	 　setTimeout(function() {
-          $('[tabindex=6]').focus();
+          $('[tabindex=2]').focus();
         }, 0);  
 	 });
  
@@ -114,49 +152,126 @@
      //debugger;
      if (document.getElementById("execution_quantity").value > 0) {
   　　document.getElementById("quantity").value = document.getElementById("execution_quantity").value;
-     }
+     //金額も計算
+	 calcTotalPrice();
+	 }
   } 
-
-   //項目名のセット
-  function setQuotationLarageItemName()
-  {  
-    obj = document.getElementById("quotation_large_item_id");
-     quotation_large_item_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_large_item_select_path %>",
-       {id: quotation_large_item_id },
+  
+  //単位のセット
+  function setUnit(){
+      $.get("<%= quotation_detail_large_classificationz_working_unit_id_select_path %>",
+       {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("quotation_large_item_name").textContent;
-          document.getElementById("quotation_large_item_name").value = obj;
+		  //単位名もセット
+		  setWorkingUnitName();
+        }
+      );       
+  }
+  //見積単価のセット
+  function setWorkingUnitPrice(){
+	  $.get("<%= quotation_detail_large_classificationz_working_unit_price_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("working_unit_price").textContent;
+          document.getElementById("working_unit_price").value = obj;
+		  
+		  calcTotalPrice();
+		  }
+      ); 
+  }    
+  //実行単価のセット
+  function setExecutionUnitPrice(){
+      $.get("<%= quotation_detail_large_classificationz_execution_unit_price_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("execution_unit_price").textContent;
+          document.getElementById("execution_unit_price").value = obj;
+		  
+		  calcTotalPrice();
+		  //debugger;
+		  }
+      );
+  }
+  
+  //歩掛りのセット
+  function setLaborProductivityUnit(){
+      $.get("<%= quotation_detail_large_classificationz_labor_productivity_unit_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("labor_productivity_unit").textContent;
+          document.getElementById("labor_productivity_unit").value = obj;
+		  }
+      );      
+  }
+  //歩掛り計のセット
+  function setLaborProductivityUnitTotal(){
+	  $.get("<%= quotation_detail_large_classificationz_labor_productivity_unit_total_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("labor_productivity_unit_total").textContent;
+          document.getElementById("labor_productivity_unit_total").value = obj;
+		  }
+      );      
+  }
+  
+   //項目名のセット
+  function setWorkingLargeItemName()
+  {  
+   
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+	 
+	 $.get("<%= quotation_detail_large_classificationz_working_large_item_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("working_large_item_name").textContent;
+          document.getElementById("working_large_item_name").value = obj;
 		  }
       );
    };  
   //仕様のセット
-  function setQuotationLarageSpecification()
+  function setWorkingLarageSpecification()
   {  
-    obj = document.getElementById("quotation_large_item_id");
-     quotation_large_item_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_large_specification_select_path %>",
-       {id: quotation_large_item_id },
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_large_specification_select_path %>",
+       {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("quotation_large_specification").textContent;
-          document.getElementById("quotation_large_specification").value = obj;
+          obj = document.getElementById("working_large_specification").textContent;
+          document.getElementById("working_large_specification").value = obj;
 		  }
       );
    };  
    //単位名のセット
-  function setQuotationUnitName()
+  function setWorkingUnitName()
   {  
-    obj = document.getElementById("quotation_unit_id");
-     quotation_unit_id = parseInt(obj.value);
-     $.get("<%= quotation_detail_large_classificationz_quotation_unit_name_select_path %>",
-       {id: quotation_unit_id },
+    obj = document.getElementById("working_unit_id");
+     working_unit_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_unit_name_select_path %>",
+       {id: working_unit_id },
         function(data){
 		  //debugger;
-          obj = document.getElementById("quotation_unit_name").textContent;
-          document.getElementById("quotation_unit_name").value = obj;
+          obj = document.getElementById("working_unit_name").textContent;
+          document.getElementById("working_unit_name").value = obj;
 		  }
       );
    };  
+   
+  //歩掛り計を求める
+  function calcLaborTotal()
+  {
+    var obj1 = document.getElementById("execution_quantity");
+    var obj2 = document.getElementById("labor_productivity_unit");
+    //実数＊歩掛
+	if (obj1.value > 0 && obj2.value >0) {
+	  var num = (obj1.value * obj2.value)
+	  num = num * 1000;
+	  num = Math.round(num);
+	  num = num / 1000;
+	  document.getElementById("labor_productivity_unit_total").value = num;
+	}
+  }
+  
    //区分が仕様を選択した時　　
    function setWhenSpecification(f)
    {
@@ -172,9 +287,35 @@
              obj3.value = 0;
 
              //単位をデフォ(１)にセット
-             $(".searchableQuotationUnit").select2("val","1");
+             $(".searchableWorkingUnit").select2("val","1");
           }
    }
+   //見積・実行金額計算
+  function calcTotalPrice()
+  {
+    var obj1 = document.getElementById("quantity"); 
+    var obj2 = document.getElementById("execution_quantity");  
+    
+	//見積金額計算
+    var obj3 = document.getElementById("working_unit_price");      
+    if (obj3.value > 0){ 
+      var num = parseInt(obj1.value) * parseInt(obj3.value);
+      document.getElementById("quote_price").value = num;
+    };
+    //実行金額計算(仮)
+    var obj3 = document.getElementById("execution_unit_price");
+   
+    if (obj3.value > 0){ 
+      //var num = parseInt(obj1.value) * parseInt(obj3.value);
+      if (obj2.value > 0){
+        var num = parseInt(obj2.value) * parseInt(obj3.value);
+        document.getElementById("execution_price").value = num;
+      } 
+    }
+	
+	//歩掛りも計算
+	calcLaborTotal();
+  } 
    
   //ENTER→TABキーに変換する処理。
   //modalの場合は、共通化ができない（なぜか）

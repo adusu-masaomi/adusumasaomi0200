@@ -1579,6 +1579,73 @@
         "base": "",
         "type": ""
       }
+    },
+    {
+      "id": "working_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 140,
+      "y": 374,
+      "width": 102.2,
+      "height": 13.4,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 12,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "datetime",
+        "datetime": {
+          "format": "%gee/%m/%d"
+        }
+      }
+    },
+    {
+      "id": "staff_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 411,
+      "y": 374,
+      "width": 122.5,
+      "height": 13.5,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 12,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
     }
   ],
   "state": {

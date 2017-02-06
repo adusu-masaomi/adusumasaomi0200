@@ -29,5 +29,15 @@ class ApplicationController < ActionController::Base
     end
   end
   ### ここまで追加(ログイン) ###
-
+  
+  #元号の設定(改定時はここを変更する)
+  $gengo_name = "平成"
+  #$gengo_alphabet = "H"
+  #$ad = 1988
+  $gengo_minus_ad = 1988
+  
+  #消費税の設定(改定時はここを変更する)
+  $consumption_tax_only = 0.08
+  $consumption_tax_include = 1.08
+  
 end

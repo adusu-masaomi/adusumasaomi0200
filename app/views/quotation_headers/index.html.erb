@@ -1,5 +1,6 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationHeader -%>
-<div class="page-header">
+<div class="page-header", style="width:1920px">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   
   <!-- 追加箇所開始 -->
@@ -21,12 +22,17 @@
 <%= link_to t('.new',:default => t("新規作成")),
             new_quotation_header_path,
             :class => 'btn btn-primary' %>
-<div class="span11 table-scrollable">
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+
   <style>
    table { }
    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
-  <table class="table table-striped">
+
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="width:1880px;">
+
   <thead>
     <tr>
       <th></th>
@@ -35,17 +41,17 @@
       <th><%= sort_link(@q, :quotation_date, model_class.human_attribute_name(:quotation_date) ) %></th>
       <th><%= sort_link(@q, :customer_name, model_class.human_attribute_name(:customer_name) ) %></th>
       <th><%= sort_link(@q, :construction_name, model_class.human_attribute_name(:construction_name) ) %></th>
-      <th><%= model_class.human_attribute_name(:post) %></th>
-      <th><%= model_class.human_attribute_name(:address) %></th>
-      <th><%= model_class.human_attribute_name(:tel) %></th>
-      <th><%= model_class.human_attribute_name(:fax) %></th>
-      <th><%= model_class.human_attribute_name(:construction_period) %></th>
-      <th><%= model_class.human_attribute_name(:construction_place) %></th>
-      <th><%= model_class.human_attribute_name(:trading_method) %></th>
-      <th><%= model_class.human_attribute_name(:effective_period) %></th>
-      <th><%= model_class.human_attribute_name(:quote_price) %></th>
-      <th><%= model_class.human_attribute_name(:net_amount) %></th>
-	  <th><%= model_class.human_attribute_name(:execution_amount) %></th>
+      <!--<th><%= model_class.human_attribute_name(:post) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:address) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:tel) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:fax) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:construction_period) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:construction_place) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:trading_method) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:effective_period) %></th>-->
+      <th><div class="text-right"><%= model_class.human_attribute_name(:quote_price) %></div></th>
+      <th><div class="text-right"><%= model_class.human_attribute_name(:net_amount) %></div></th>
+	  <th><div class="text-right"><%= model_class.human_attribute_name(:execution_amount) %></div></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -54,22 +60,27 @@
     <% @quotation_headers.order("id desc").each do |quotation_header| %>
       <tr>
         <td><%= link_to "内訳へ",
-            quotation_detail_large_classifications_path(quotation_header_id: quotation_header.id, new_flag: "1"),
+            quotation_detail_large_classifications_path(quotation_header_id: quotation_header.id, 
+                                                        quotation_header_name: quotation_header.construction_name,
+                                                        quotation_code: quotation_header.quotation_code,
+                                                        delivery_slip_code: quotation_header.delivery_slip_code,
+                                                        invoice_code: quotation_header.invoice_code,
+                                                        new_flag: "1"),
             :class => 'btn btn-info' %>
         </td>
-		<td><%= link_to quotation_header.id, quotation_header_path(quotation_header) %></td>
+        <td><%= link_to quotation_header.id, quotation_header_path(quotation_header) %></td>
         <td><%= quotation_header.quotation_code %></td>
         <td><%= quotation_header.quotation_date %></td>
         <td><%= quotation_header.customer_name %></td>
         <td><%= quotation_header.construction_name %></td>
-        <td><%= quotation_header.post %></td>
-        <td><%= quotation_header.address %></td>
-        <td><%= quotation_header.tel %></td>
-        <td><%= quotation_header.fax %></td>
-        <td><%= quotation_header.construction_period %></td>
-        <td><%= quotation_header.construction_place %></td>
-        <td><%= quotation_header.trading_method %></td>
-        <td><%= quotation_header.effective_period %></td>
+        <!--<td><%= quotation_header.post %></td>-->
+        <!--<td><%= quotation_header.address %></td>-->
+        <!--<td><%= quotation_header.tel %></td>-->
+        <!--<td><%= quotation_header.fax %></td>-->
+        <!--<td><%= quotation_header.construction_period %></td>-->
+        <!--<td><%= quotation_header.construction_place %></td>-->
+        <!--<td><%= quotation_header.trading_method %></td>-->
+        <!--<td><%= quotation_header.effective_period %></td>-->
         <td align="right"><%= number_to_currency(quotation_header.quote_price,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(quotation_header.net_amount,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(quotation_header.execution_amount,  precision: 0) %></td>
@@ -102,6 +113,19 @@
   $(document).ready(function(){
 	$(".searchableQuotationCode").select2({ theme: "classic" });
         $(".searchableConstructionName").select2({ theme: "classic" });
+    //見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 1;  //固定列数
+		//ht -= 70;
+		ht -= 108;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
   });
 </script>
 

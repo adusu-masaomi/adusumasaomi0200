@@ -1,1 +1,0 @@
-json.array! @quotation_middle_items, partial: 'quotation_middle_items/quotation_middle_item', as: :quotation_middle_item

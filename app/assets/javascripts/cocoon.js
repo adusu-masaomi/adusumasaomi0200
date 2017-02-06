@@ -43,7 +43,7 @@
         assoc                 = $this.data('association'),
         assocs                = $this.data('associations'),
         content               = $this.data('association-insertion-template'),
-        insertionMethod       = $this.data('association-insertion-method') || $this.data('association-insertion-position') || 'before',
+        insertionMethod       = $this.data('association-insertion-method') || $this.data('association-insertion-position') || 'after',
         insertionNode         = $this.data('association-insertion-node'),
         insertionTraversal    = $this.data('association-insertion-traversal'),
         count                 = parseInt($this.data('count'), 10),
