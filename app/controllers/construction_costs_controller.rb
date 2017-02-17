@@ -6,11 +6,11 @@ class ConstructionCostsController < ApplicationController
   def index
     # @construction_costs = ConstructionCost.all
     #@q = ConstructionCost.ransack(params[:q]) 
-	
+    
     ###
-	#ransack保持用コード
+    #ransack保持用コード
     query = params[:q]
-    query ||= eval(cookies[:recent_search_history].to_s)  	
+    query ||= eval(cookies[:recent_search_history].to_s)      
 
     #ransack保持用--上記はこれに置き換える
     @q = ConstructionCost.ransack(query)   
@@ -18,29 +18,38 @@ class ConstructionCostsController < ApplicationController
     #ransack保持用コード
     search_history = {
     value: params[:q],
-    expires: 30.minutes.from_now
+    expires: 480.minutes.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     ###
-	
+    
     @construction_costs = @q.result(distinct: true)
 
    respond_to do |format|
       format.html
       format.csv { send_data @construction_costs.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }
-	  
-	  #pdf!!!!!!!
-	  #global set
-	  $construction_costs = @construction_costs
-	  format.pdf do
+      
+      #pdf
+      #global set
+      
+      if params[:construction_costs_id].present?
+        @construction_costs = ConstructionCost.where(id: params[:construction_costs_id])
+        $construction_costs = @construction_costs
+      
+      else
+        $construction_costs = @construction_costs
+      end
+      
+      
+      format.pdf do
 
-        report = PurchaseListPDF.create @purchase_list 
+        report = ConstructionCostSummaryPDF.create @construction_costs 
         
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
         send_data(
           report.generate,
-          filename:  "purchase_list.pdf",
+          filename:  "construction_cost_summary.pdf",
           type:        "application/pdf",
           disposition: "inline")
       end
@@ -67,13 +76,14 @@ class ConstructionCostsController < ApplicationController
   # POST /construction_costs.json
   def create
     
-	#仕入金額・実行金額をセットする
-	set_amount
-	  
-	@construction_cost = ConstructionCost.new(construction_cost_params)
+    #仕入金額・実行金額をセットする
+    #upd170209 入力時に反映することにした。
+    ##set_amount
+      
+    @construction_cost = ConstructionCost.new(construction_cost_params)
 
     respond_to do |format|
-	  
+      
       if @construction_cost.save
         format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully created.' }
         format.json { render :show, status: :created, location: @construction_cost }
@@ -88,12 +98,11 @@ class ConstructionCostsController < ApplicationController
   # PATCH/PUT /construction_costs/1.json
   def update
     
-	#仕入金額・実行金額をセットする
-	set_amount
-	
-	#binding.pry
-	
-	respond_to do |format|
+    #仕入金額・実行金額をセットする
+    #upd170209 入力時に反映することにした。
+    #set_amount
+    
+    respond_to do |format|
       if @construction_cost.update(construction_cost_params)
         format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully updated.' }
         format.json { render :show, status: :ok, location: @construction_cost }
@@ -119,53 +128,50 @@ class ConstructionCostsController < ApplicationController
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
   end
   def construction_labor_cost_select
-     @construction_labor_cost = ConstructionDailyReport.where(:construction_datum_id => params[:construction_datum_id]).sum(:labor_cost)
+   
+       @construction_labor_cost_origin = ConstructionDailyReport.where(:construction_datum_id => params[:construction_datum_id]).sum(:labor_cost)
+       @construction_labor_cost = ConstructionCost.where(:construction_datum_id => params[:construction_datum_id]).pluck(:labor_cost).flatten.join(" ")
+       
+       if params[:labor_cost].nil? || params[:labor_cost] == "0"
+         if @construction_labor_cost.to_i > 0
+           @construction_labor_cost = @construction_labor_cost.to_i
+         else
+           @construction_labor_cost = @construction_labor_cost_origin.to_i
+         end
+       else
+         @construction_labor_cost = params[:labor_cost]
+       end
+    
+     
   end
   def purchase_order_amount_select
-     #ok
-	 #@purchase_order_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_datum_id]).group(:purchase_order_datum_id).sum(:purchase_amount).flatten.join(",")
-	 #good
-	 #@purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).where(:construction_datum_id => params[:construction_datum_id]).group('purchase_order_data.purchase_order_code').sum(:purchase_amount).flatten.join(",")
-	 
-	 #@purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).where(:construction_datum_id => params[:construction_datum_id]).group('purchase_order_data.purchase_order_code').pluck("purchase_order_data.purchase_order_code, supplier_masters.supplier_name, SUM(purchase_data.purchase_amount) ").flatten.join(",")
-	 
-	 @purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).joins(:PurchaseDivision).where(:construction_datum_id => params[:construction_datum_id]).group('purchase_order_data.purchase_order_code').pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
-	 
-	 
-  end
-  
-  def set_amount
-  #仕入金額・実行金額をセットする
     
-	#仕入金額
-    purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_cost][:construction_datum_id]).sum(:purchase_amount)
-    if purchase_amount.present?
-	#binding.pry
-	  params[:construction_cost][:purchase_amount] = purchase_amount
-	end
-	
-	execution_amount = 0
-	#実行金額へ加算
-	if params[:construction_cost][:supplies_expense].present?
-	  #binding.pry
-	  execution_amount += params[:construction_cost][:supplies_expense].to_i
-	end
-	
-	if params[:construction_cost][:labor_cost].present?
-	  execution_amount += params[:construction_cost][:labor_cost].to_i
-	end
-	
-	if params[:construction_cost][:misellaneous_expense].present?
-	  execution_amount += params[:construction_cost][:misellaneous_expense].to_i
-	end
-	
-	if purchase_amount.present?
-	  execution_amount += purchase_amount
-	  params[:construction_cost][:execution_amount] = execution_amount.to_s
-	end
-	
+    #仕入明細データをセット 
+    @purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).joins(:PurchaseDivision).where(:construction_datum_id => params[:construction_datum_id]).group('purchase_order_data.purchase_order_code').pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
+  
   end
   
+  def purchase_amount_etc_select
+    
+    #仕入金額を取得
+    @purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_datum_id]).sum(:purchase_amount)
+    
+    #消耗品を取得
+    @supplies_expense = ConstructionCost.where(:construction_datum_id => params[:construction_datum_id]).pluck(:supplies_expense).flatten.join(" ")
+    
+    #諸経費を取得
+    @misellaneous_expense = ConstructionCost.where(:construction_datum_id => params[:construction_datum_id]).pluck(:misellaneous_expense).flatten.join(" ")
+    
+    #請負金額を取得
+    @constructing_amount = ConstructionCost.where(:construction_datum_id => params[:construction_datum_id]).pluck(:constructing_amount).flatten.join(" ")
+    
+    
+  end
+  def purchase_amount_select
+    #仕入金額を取得
+    @purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_datum_id]).sum(:purchase_amount)
+  end
+   
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_construction_cost

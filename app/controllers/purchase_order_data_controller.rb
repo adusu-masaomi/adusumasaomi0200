@@ -21,11 +21,6 @@ class PurchaseOrderDataController < ApplicationController
   # GET /purchase_order_data.json
   def index
     
-	#render :template => 'purchase_order_data/index'
-	
-      # @purchase_order_data = PurchaseOrderDatum.all
-    # @purchase_order_data = PurchaseOrderDatum.page(params[:page])
-    
     @q = PurchaseOrderDatum.ransack(params[:q])   
     @purchase_order_data  = @q.result(distinct: true)
     @purchase_order_data  = @purchase_order_data.page(params[:page])
@@ -63,26 +58,8 @@ end
   # GET /purchase_order_data/1/edit
   def edit
     @@update_flag = 2
-	
-    #@construction_data = ConstructionDatum.where(["id = ?", @purchase_order_datum.construction_datum_id])
-    #@construction_data_alias_name ||= ""
-	
-    #binding.pry
-  end
-  
-  #def send_email
-  #	#登録または更新を行う。
-  #  case @@update_flag
-  #  when 1 then
-  #     create
-  #when 2 then
-  #     set_purchase_order_datum
-  #     update
-  #end
-  #  #メール送信する
-  #  PostMailer.send_when_update(@purchase_order_datum).deliver
-  #end
-
+   end
+ 
   # POST /purchase_order_data
   # POST /purchase_order_data.json
   def create
@@ -151,7 +128,8 @@ end
   
   #インスタンスへパラメータを再セットする
   def reset_parameters
-    @purchase_order_datum.construction_datum.alias_name = params[:purchase_order_datum][:construction_datum_attributes][:alias_name]
+    #@purchase_order_datum.construction_datum.alias_name = params[:purchase_order_datum][:construction_datum_attributes][:alias_name]
+	@purchase_order_datum.alias_name = params[:purchase_order_datum][:alias_name]
     @purchase_order_datum.purchase_order_code = params[:purchase_order_datum][:purchase_order_code]
     id = params[:purchase_order_datum][:construction_datum_attributes][:id]
     @purchase_order_datum.construction_datum.construction_name = ConstructionDatum.where(:id => id).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
@@ -195,8 +173,10 @@ end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_datum_params
-      params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id , :mail_sent_flag, 
-                     :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity],
-                     :construction_datum_attributes => [:alias_name])
+      #params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id , :mail_sent_flag, 
+      #               :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity],
+      #               :construction_datum_attributes => [:alias_name])
+      params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id , :alias_name, :mail_sent_flag, 
+                     :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity])
     end
 end

@@ -2,18 +2,20 @@ class ConstructionCost < ActiveRecord::Base
 
   belongs_to :construction_datum, :touch => :construction_start_date
   accepts_nested_attributes_for :construction_datum
-  
   has_one :construction_daily_reports
-  
   belongs_to :purchase_order_datum
   
- # has_many :supplier_masters, :through => :PurchaseDatum, :foreign_key => "supplier_id"
+  #労務費(日報)
+  attr_accessor :labor_cost_origin
+  #差額
+  attr_accessor :differense
+  #小計1
+  attr_accessor :subtotal_1
+  #小計2
+  attr_accessor :subtotal_2
   
-  # has_many :supplier_masters, through purchase_datum
-  
-  # include ActiveModel::Model
-  # attr_accessor :purchase_order_amount
-  # validates :name, presence: true
+  #バリデーション
+  validates :construction_datum_id, uniqueness: true # 値がユニークであれば検証成功
   
   scope :with_construction, -> (construction_costs_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id = ?", construction_costs_construction_datum_id )}
   

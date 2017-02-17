@@ -20,12 +20,30 @@ class ConstructionDailyReportsController < ApplicationController
     @construction_data = ConstructionDatum.all
     @staff = Staff.all
     # @staff_pay = Staff.all
+   
     
     respond_to do |format|
       format.html
-      #format.csv { render :text => @construction_daily_reports.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }
       format.csv { send_data @construction_daily_reports.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis', disposition: 'attachment' }
-    end
+    
+	  #pdf
+      #global set
+      $construction_daily_reports = @construction_daily_reports
+      
+	  
+	  format.pdf do
+        report = LaborCostSummaryPDF.create @construction_daily_reports 
+        # ブラウザでPDFを表示する
+        send_data(
+          report.generate,
+          filename:  "labor_cost_summary.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+      #
+	
+	
+	end
   	
   end
 

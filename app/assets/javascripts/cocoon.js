@@ -92,6 +92,8 @@
       var addedContent = insertionNodeElem[insertionMethod](contentNode);
 
       insertionNodeElem.trigger('cocoon:after-insert', [contentNode]);
+      
+      
     });
   });
 

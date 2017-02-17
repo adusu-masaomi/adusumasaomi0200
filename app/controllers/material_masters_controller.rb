@@ -77,7 +77,15 @@ class MaterialMastersController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+  
+  #select2高速化のための処理
+  #def searchableMaterial
+  #  respond_to do |format|
+  #    format.json { render json: @material_master = MaterialMaster.search_faster(params[:q]) }
+  #  end
+  #end
+  
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_material_master

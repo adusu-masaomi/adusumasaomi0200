@@ -18,6 +18,7 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_slip_code = []
   @@purchase_datum_construction_id = []
   @@purchase_datum_notes = ""
+  @@purchase_datum_division_id = []
   
   @@new_flag = []
   #binding.pry
@@ -112,7 +113,7 @@ class PurchaseDataController < ApplicationController
     @@purchase_datum_slip_code = @purchase_datum.slip_code
     @@purchase_datum_construction_id = @purchase_datum.construction_datum_id
 	@@purchase_datum_notes = @purchase_datum.notes
-    #binding.pry
+	@@purchase_datum_division_id = @purchase_datum.division_id
     
   end
 
@@ -137,6 +138,7 @@ class PurchaseDataController < ApplicationController
 	     @purchase_datum.slip_code ||= @@purchase_datum_slip_code 
 	     @purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
 		 @purchase_datum.notes ||= @@purchase_datum_notes
+		 @purchase_datum.division_id ||= @@purchase_datum_division_id
 	   end
 	   
   end

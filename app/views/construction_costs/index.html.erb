@@ -1,3 +1,4 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = ConstructionCost -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
@@ -12,21 +13,29 @@
     	<%= f.submit '検索する' %>
   	</div>
    <% end %>
-</div>
 
+</div>
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_cost_path,
             :class => 'btn btn-primary' %>
-<%= link_to "工事費集計表PDF",
-            construction_costs_path(@construction_costs, format: "pdf"),
-            :class => 'btn  btn-success', :target=>["_blank"] %>
+
 <%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>
 
-<table class="table table-striped">
+
+<!--見出し固定用設定追加-->
+<div class="span11 table-scrollable" >
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+<!--見出し固定用設定追加-->
+<table id="tablefix", class="table  table-striped", style="font-size : 14px;width:1880px;">
+<!--<table class="table table-striped">-->
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
-      <th><%= model_class.human_attribute_name(:construction_code) %></th>
+      <th>　　　　　　</th>
+	  <th><%= model_class.human_attribute_name(:construction_code) %></th>
 	  <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:supplies_expense) %></th>
       <th><%= model_class.human_attribute_name(:labor_cost) %></th>
@@ -41,6 +50,9 @@
     <% @construction_costs.order("id desc").each do |construction_cost| %>
       <tr>
         <td><%= link_to construction_cost.id, construction_cost_path(construction_cost) %></td>
+		<td><%= link_to "工事費集計表",
+            construction_costs_path(construction_cost, construction_costs_id: construction_cost.id, format: "pdf"),
+            :class => 'btn  btn-success', :target=>["_blank"] %></td>
         <!--<td><%= construction_cost.construction_datum_id %></td>-->
         <td><%= construction_cost.construction_datum.construction_code %></td>
 		<td><%= construction_cost.construction_datum.construction_name %></td>
@@ -63,7 +75,7 @@
     <% end %>
   </tbody>
 </table>
-
+</div>
 
 
 <script type="text/javascript">
@@ -74,6 +86,21 @@
 	
 	//検索可能なリストボックス(工事名の場合)
 	$(".searchableConstructionName").select2({ theme: "classic" });
+	
+	//見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 1;  //固定列数
+		//ht -= 70;
+		ht -= 108;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
+	 
   });
   
   

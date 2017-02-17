@@ -1,8 +1,5 @@
 class PurchaseOrderHistoriesController < ApplicationController
   #before_action :set_purchase_order_history, only: [:show, :edit, :update, :destroy]
-  #update,destroy未検証
-  #binding.pry
-  
   before_action :set_purchase_order_history, only: [:show, :update, :destroy]
   
 
@@ -145,10 +142,11 @@ class PurchaseOrderHistoriesController < ApplicationController
 
    #既存のデータを取得する(日付・仕入先指定後。)
   def get_data
-     
-     
-     $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
+ 
+	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
       
+	 #binding.pry 
+	  
      if $purchase_order_history.nil?
 	    $purchase_order_date = params[:purchase_order_date]
 		$supplier_master_id = params[:supplier_master_id]
@@ -157,13 +155,7 @@ class PurchaseOrderHistoriesController < ApplicationController
         $supplier_master_id = nil
 
      end
-	 
-	 #binding.pry
-	 #@purchase_order_history.email_responsible = @purchase_order_history.supplier_master.email1
-	 
-	 
-	 #ボタン表示用
-     #$get_flag = 1
+
   end
 
   # POST /purchase_order_histories
@@ -183,16 +175,10 @@ class PurchaseOrderHistoriesController < ApplicationController
     
     
     respond_to do |format|
-      #if @purchase_order_history.save
 	  if PurchaseOrderHistory.create(purchase_order_history_params)
 	    format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully created.' }
         format.json { render :show, status: :created, location: @purchase_order_history }
       end
-	  #else
-	  #	set_edit_params  
-	  #	format.html { render :edit }
-	  #    format.json { render json: @purchase_order_history.errors, status: :unprocessable_entity }
-      #end
     end
   end
 
@@ -200,13 +186,8 @@ class PurchaseOrderHistoriesController < ApplicationController
   # PATCH/PUT /purchase_order_histories/1.json
   def update
       
-	  #flash.now[:notice] = "ようこそ。本日は#{Date.today}です。"
-	  #redirect_to @purchase_order_history, notice: 'ようこしそ'
-	  
 	  #パラーメータ補完＆メール送信する
       send_mail_and_params_complement
-	  
-	  #binding.pry
 	  
 	  respond_to do |format|
         
@@ -234,15 +215,25 @@ class PurchaseOrderHistoriesController < ApplicationController
   
   def send_mail_and_params_complement
     
+	
 	i = 0
    
     if params[:purchase_order_history][:orders_attributes].present?
-        params[:purchase_order_history][:orders_attributes].values.each do |item|
-          
+	
+	    params[:purchase_order_history][:orders_attributes].values.each do |item|
+		
 		  ######
           #varidate用のために、本来の箇所から離れたパラメータを再セットする
 		  item[:quantity] = params[:quantity][i]
 		  item[:material_id] = params[:material_id][i]
+		  
+		  ##add170213
+		  item[:material_code] = params[:material_code][i]
+		  item[:material_name] = params[:material_name][i]
+		  item[:maker_name] = params[:maker_name][i]
+		  item[:list_price] = params[:list_price][i]
+		  #
+		  
 		  i = i + 1
 		  ######
 		  
@@ -253,8 +244,7 @@ class PurchaseOrderHistoriesController < ApplicationController
               @material_master = MaterialMaster.find(id)
               item[:material_code] = @material_master.material_code
               item[:material_name] = @material_master.material_name
-              #add161208  
-			  item[:list_price] = @material_master.list_price
+              item[:list_price] = @material_master.list_price
 			  @maker_master = MakerMaster.find(@material_master.maker_id)
 			  item[:maker_name] = @maker_master.maker_name
 		  end 
@@ -263,9 +253,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 		end 
     
 	    #メール送信する(メール送信ボタン押した場合)
-        #if params[:send].present?
-		
-		if params[:purchase_order_history][:sent_flag] == "1" then
+        if params[:purchase_order_history][:sent_flag] == "1" then
 	
       	  #set to global
 	      $order_parameters = params[:purchase_order_history][:orders_attributes]
@@ -290,10 +278,24 @@ class PurchaseOrderHistoriesController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+  
+ 
   # ajax
   def email_select
      @email_responsible = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
+  end
+  
+  #商品名などを取得
+  def material_select
+  
+     @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
+	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
+	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
+  
+     maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+	 @maker_name = MakerMaster.where(:id => maker_id).where("id is NOT NULL").pluck(:maker_name).flatten.join(" ")
+	 
+	 
   end
   
 
@@ -301,14 +303,10 @@ class PurchaseOrderHistoriesController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase_order_history
       @purchase_order_history = PurchaseOrderHistory.find(params[:id])
-	  #親データ取得
-	  #binding.pry
-	  #@purchase_order_datum = PurchaseOrderDatum.find(params[:purchase_order_datum_id])
     end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_history_params
-      #params.require(:purchase_order_history).permit(:purchase_order_date, :supplier_master_id, :purchase_order_history_id)
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
 	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, :maker_name, :list_price, :_destroy])
     end

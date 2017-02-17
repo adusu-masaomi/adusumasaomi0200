@@ -58,11 +58,7 @@
         <% else %>
 		  <td><%= purchase_order_datum.construction_datum.construction_name %></td>
         <% end %>
-		<% if purchase_order_datum.construction_datum.nil? || purchase_order_datum.construction_datum.alias_name.nil? %>
-           <td>-</td>
-        <% else %>
-		  <td><%= purchase_order_datum.construction_datum.alias_name %></td>
-        <% end %>
+		<td><%= purchase_order_datum.alias_name %></td>
 		<% if purchase_order_datum.supplier_master.nil? %>
            <td>-</td>
         <% else %>

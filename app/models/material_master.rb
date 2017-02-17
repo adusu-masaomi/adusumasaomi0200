@@ -34,6 +34,9 @@ class MaterialMaster < ActiveRecord::Base
     
    validate :maker_existing
    
+   #select2高速化のための処理
+   #scope :search_faster, lambda { |query| where('material_name LIKE ?', "%#{query}%").limit(100) }
+	 
    scope :with_maker, -> (id=1){joins(:MakerMaster).where("maker_masters.id = material_masters.maker_id" )}
    
    def self.ransackable_scopes(auth_object=nil)
@@ -58,14 +61,16 @@ class MaterialMaster < ActiveRecord::Base
       else 
         material_name = self.material_name
       end    
-      if self.MakerMaster.nil?
-        maker_name = "-"
-      else 
-        maker_name = self.MakerMaster.maker_name
-      end    	
+      #if self.MakerMaster.nil?
+      #  maker_name = "-"
+      #else 
+      #  maker_name = self.MakerMaster.maker_name
+      #end    	
       
-	  #self.construction_code + ':' + self.construction_name
-      material_code + ':' + material_name + ':' + maker_name  
+	  #material_code + ':' + material_name + ':' + maker_name  
+	  #上記だと著しく遅くなる・・・
+	  
+	  material_code + ':' + material_name 
     end
 
 end

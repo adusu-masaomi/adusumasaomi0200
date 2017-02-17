@@ -71,7 +71,7 @@
   <!--<body onLoad="FixedMidashi.create();">-->
   <!--<table _fixedhead="rows:1; cols:2", class="table table-bordered">-->
   <tbody>
-    <% @construction_data.order("id desc").each do |construction_datum| %>
+    <% @construction_data.order("construction_code desc").each do |construction_datum| %>
       <% if construction_datum.billed_flag != nil && construction_datum.billed_flag > 0 %>
          <tr bgcolor="#F7BE81">
       <% else %>

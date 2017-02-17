@@ -1,4 +1,4 @@
-
+<div class="sortThese">
 <div class="nested-fields well form-inline">
   <%= f.label :品番選択, {style: 'width:770px'}  %>
   <!--<%= f.label :数量, {style: 'width:100px'}  %>-->
@@ -7,7 +7,8 @@
   <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
        {id:"material_id", name:"material_id[]",  class: "searchableMaterial" , style: 'width:650px'  } %>-->
   <%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
-  {class: "searchableMaterial" , name:"material_id[]",  style: 'width:650px'  } %>
+  {class: "searchableMaterial" , id: "material_id" , name:"material_id[]",  style: 'width:650px'  } %>
+  
   <!--<%= f.input :quantity,  input_html:{id: "quantity", name: "quantity", style: 'width:100px', :tabindex=>"0"} %>-->
   <!--<%= f.input :quantity,  input_html:{ id: "quantity", name:"purchase_order_history[quantity]", style: 'width:100px', :tabindex=>"0"} %>-->
   <%= f.label :数量, {style: 'width:28px'}  %>
@@ -17,41 +18,53 @@
   <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
+  <!--<%= f.label :x , { class: "fa fa-sort-alpha-asc" } %>-->
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <%= fa_icon("reorder 2x") %>
   </br>
-  <%= f.input :material_code,  input_html:{style: 'width:150px', :tabindex=>"2" } %>
-  <%= f.input :material_name,  input_html:{style: 'width:400px', :tabindex=>"3" } %>
-  <%= f.input :maker_name,  input_html:{style: 'width:150px', :tabindex=>"4" } %>
-  <%= f.input :list_price,  input_html:{style: 'width:100px', :tabindex=>"5" } %>
+  <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"2" } %>
+  <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px', :tabindex=>"3" , :class => "material_name"} %>
+  <%= f.input :maker_name,  input_html:{ id: "maker_name", name: "maker_name[]", style: 'width:150px', :tabindex=>"4" } %>
+  <%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px', :tabindex=>"5" } %>
   
-  <!--<%= f.label :＊手入力用 %>-->
+  
   
   <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %></br>
-  
+
   <!--<hr style="border-top:2px outset #c0c0c0;width: 100%;height:2;">-->
-</div>  
+</div>
+</div>
  
  <script type="text/javascript">
 
-  cIndex = 0;
+  //cIndex = 0;
   //var i = 0;
 
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
-      //検索可能なリストボックス(品名の場合)
-       //$(".searchableId").select2({ theme: "classic" });
-	   $(".searchableMaterial").select2({ theme: "classic" });
-　　　　　　
-          //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+      
+	  
+      //$(".sortThese").sortable();
+	  
+	  //検索可能なリストボックス(品名の場合)
+       $(".searchableMaterial").select2({ theme: "classic" });
+      
+        
+       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
 	   $( ".searchableMaterial" ).on("select2:close", function (e) {
 	        setTimeout(function() {
 		    $('[tabindex=0]').focus();
 		}, 0);  
 	   });　　　　　	   
 
-
+         
 	   $( ".searchableMaterial" ).change(function(e) {
-	     //うまくいかないため一旦保留 
-		 setItem(e);
+	    
+	      material_id = $(this).val();
+	      selectedIndex  = getSelectedChildIndex(material_id);
+		 
+		  setItem(material_id, selectedIndex);
 	   });
 	   
 	   
@@ -66,10 +79,27 @@
 	        setTimeout(function() {
 		    $('[tabindex=2]').focus();
 		}, 0);  
-	   });　　　　　   
+	   });   
       
  });  
   
+  //選択した行のインデックスを取得
+  function getSelectedChildIndex(id){
+    item = document.getElementsByName("material_id[]");
+    var select_index = 0;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  if (id == item[index].value){
+	    select_index = index;
+	  }
+	}
+	
+
+	
+	return select_index;
+	
+	
+  }
   
   //更新前に数量をチェックする
   //function checkQuantity(ok_flag){
@@ -100,48 +130,60 @@
 	return ok_flag;
   }
   
-  
-  //function checkMaker(f)
-  //{
-  //   checkQuantity(f.quantity.value);
-  //}  
-  
- //function checkQuantity(f)
- // {
- //    if (f.value == undefined || f.value == 0){
- //      window.confirm('数量を入力してください。')
- //	   return false;
- //	 }
- // }
-  
-    // this refers to the select that its value has changed
-    // and next('input') finds the input right after it
-	//debugger;
-    //$(this).next('input[data-field=material_id]').val(data.item.default_price);
-  
+ 
   //各値の自動セット-ajax
-  function setItem(e)
+  function setItem(item_id, selected_index)
+  {
+		 id = parseInt(item_id);
+         
+		 if (id != 1 ) {
+		 //手入力は除外&明細に同一品番はないものとする(ある場合は正常動作しない）
+			$.get("<%= purchase_order_historiez_material_select_path %>",
+             {id: id },
+              function(data){
+		        
+				//商品コードをセット
+				obj = document.getElementById("material_code").textContent;
+				document.getElementsByName("material_code[]")[selected_index].value = obj;
+				
+				//商品名をセット
+				obj = document.getElementById("material_name").textContent;
+				document.getElementsByName("material_name[]")[selected_index].value = obj;
+				
+				//メーカー名をセット
+				obj = document.getElementById("maker_name").textContent;
+				document.getElementsByName("maker_name[]")[selected_index].value = obj;
+				
+				//定価をセット
+				obj = document.getElementById("list_price").textContent;
+				document.getElementsByName("list_price[]")[selected_index].value = obj;
+				
+			  }
+            );
+		  }
+  }
+  
+  function setItem_old(e)
   {  
      //objId = document.getElementsByName("material_id");
 	 objId = document.getElementById("material_id");
-	 
-	 product_select = $(this)
-	 //product_select.parent().find('.cost-input').val(product_select.find(':selected').data('unit_cost'))
+	 product_select = $(this);
+	
+    //product_select.parent().find('.cost-input').val(product_select.find(':selected').data('unit_cost'))
 	 //product_select.parent().find('.searchableMaterial').val(product_select.find(':selected').data('material_id'))
 	 
-	 var id = product_select.find(':selected').data('material_id')
-	 
+	 var id = product_select.find(':selected').data('material_id');
 	 //debugger;
 	 
-	 //it's pending caz not work..
-	 //cIndex += 1;     
+	 // cIndex += 1;     
      //項目名
      // $.get("<%= purchase_order_datum_material_select_path %>",
      //  {id: id },
      //   function(data){
      //     document.getElementsByName("material_code")[cIndex -1].value = document.getElementsByName("material_code_hide")[0].textContent;
-	//	  }
+	 //	  }
      // );
+
   }  
   
   //ENTER→TABキーに変換する処理。

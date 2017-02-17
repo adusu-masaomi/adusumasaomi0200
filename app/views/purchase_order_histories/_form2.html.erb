@@ -56,33 +56,18 @@
                 
 	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" %>
-      
+     
   　<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
-   
-       <!--<div id="subForms" >-->
-	   <div id="subForms", class="sortThese" >
-	      
-        <%= f.simple_fields_for :orders  do |orders| %>
-            <%= render 'order_fields', f: orders %>
-       <!--</div>-->
-       <% end %>
+       
+           <div id="subForms" class="sortDone" >
+           	<%= f.simple_fields_for :orders, :include_id => false  do |orders| %>
+                       <%= render 'order_fields', f: orders %>
+	        <% end %>
+           </div>
 
-       </div>
-
-	   <!--<div class="links" id="filter" class="hideMe" style="display: none">-->
-	   <!--<div id="filter" class="hide"  >-->    
-		<div id="filter" class="sortThese"  >
-		   <!--<%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success', :data => {"association-insertion-method" => "after", "association-insertion-node" => 'this' } %> -->
-           <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success', :data => { association_insertion_method: "after", association_insertion_node: "#place-to-insert" } %>
-		   <!--<%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success' %>-->
-		   
-		   <!--<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
-               id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
-           <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
-               :onclick => "submitAfterValidation()" %>-->
-			
-		  
-      </div>
+	   <div id="filter" >
+	      <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
+	   </div>
 <% end %>
 
   </div>  
@@ -94,8 +79,12 @@
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
       
-	  $(".sortThese").sortable();
 	  
+	  //$(".sortThese").sortable();
+	  
+	//  $("#filter").on("cocoon:after-insert", function() {
+	  //   $(".sortThese").sortable();
+      //});
 	  
       //検索可能なリストボックス(品名の場合)
        $(".searchableId").select2({ theme: "classic" });
@@ -111,16 +100,39 @@
 	   }
 	   
 	   //
-	   var visibled = sessionStorage.getItem('onvisible');
-	   if (visibled == "true") {
-	     $('#filter').removeClass('hide');
-	   }
+	   //var visibled = sessionStorage.getItem('onvisible');
+	   //if (visibled == "true") {
+	   //  $('#filter').removeClass('hide');
+	   //}
 	   
 	   //デフォルトのメアド取得
 	   setEmail();
 	   
  });  
 
+window.onload = function(){
+         
+          $(".sortDone").sortable();
+
+	  $("#filter").on("cocoon:after-insert", function() {
+	     $(".sortThese").parent().sortable();
+         });
+	  
+	 //$(".sortCocoon").parent().sortable();
+	 
+	 var visibled = sessionStorage.getItem('onvisible');
+	 
+	 	 if (visibled == "true") {
+	     
+		 
+		 
+       	 $('#filter').removeClass('hide');
+		 // マウスカーソルの形を変える
+		 $("body").css("cursor", "default");
+	 }else{
+	     $('#filter').addClass('hide');
+	 }
+}
  //入力チェック(eメール用）
  function submitAfterValidationEmail(){
    document.getElementById("sent_flag").value = 1;
@@ -135,6 +147,7 @@
 	
 	 if (after_check == true){
        if (window.confirm('実行しますか？')) {
+	     reset_value();
          document.forms[0].submit();
        }
 	 }
@@ -159,16 +172,10 @@ function setEmail()
 
 function reset_value() {
 //セッション用のパラメータをリセットする
-  //debugger;
   sessionStorage.setItem('onvisible', 'false');
 }
 
 function dispDiv() {
-  
-  //隠れていたボタンをここで表示させる
-  $('#filter').removeClass('hide');
-  //セッション用のパラメータへセットする
-  sessionStorage.setItem('onvisible', 'true');
   
   
   //下記必須（ボタンが消えてしまう）
@@ -186,16 +193,27 @@ function dispDiv() {
      function(data){
 	   // マウスカーソルの形を変える
        $("body").css("cursor", "progress");
+	   
+	   
+	   //画面再ロードする
+       window.location.reload();
+       event.preventDefault();
+  
+  
+       //隠れていたボタンをここで表示させる
+       //$('#filter').removeClass('hide');
+       //セッション用のパラメータへセットする
+       sessionStorage.setItem('onvisible', 'true');
+  
+  
+       // マウスカーソルの形を変える
+       //$("body").css("cursor", "default");
+  
      }
    );
   
   
-  //画面再ロードする
-  window.location.reload();
-  event.preventDefault();
   
-  // マウスカーソルの形を変える
-  $("body").css("cursor", "default");
 
 };
   

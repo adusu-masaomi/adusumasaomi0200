@@ -136,6 +136,9 @@ Rails.application.routes.draw do
   get '/purchase_order_histories_list' => "purchase_order_histories#index2"
   #add161128
   get "/purchase_order_historiez/email_select" => 'purchase_order_histories#email_select'
+  #add170212
+  get "/purchase_order_historiez/material_select" => 'purchase_order_histories#material_select'
+  
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
   get '/purchase_order_datum/get_last_number_select' => 'purchase_order_data#get_last_number_select'
@@ -150,6 +153,10 @@ Rails.application.routes.draw do
   get '/construction_costz/construction_name_select' => 'construction_costs#construction_name_select'
   get '/construction_costz/construction_labor_cost_select' => 'construction_costs#construction_labor_cost_select'
   get '/construction_costz/purchase_order_amount_select' => 'construction_costs#purchase_order_amount_select'
+  
+  #add170210
+  get '/construction_costz/purchase_amount_etc_select' => 'construction_costs#purchase_amount_etc_select'
+  get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
 
   #get '/quotation_headerz/customer_name_select' => 'quotation_headers#customer_name_select'
   #upd161028

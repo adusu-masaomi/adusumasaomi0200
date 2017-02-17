@@ -4,16 +4,19 @@
 </div>
 
 <dl class="dl-horizontal">
-  <dt><strong><%= model_class.human_attribute_name(:construction_datum_id) %>:</strong></dt>
-  <dd><%= @construction_cost.construction_datum_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_code) %>:</strong></dt>
+  <dd><%= @construction_cost.construction_datum.construction_code %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></dt>
+  <!--<dd><%= @construction_cost.construction_datum_id %></dd>-->
+  <dd><%= @construction_cost.construction_datum.construction_name %></dd>
   <dt><strong><%= model_class.human_attribute_name(:supplies_expense) %>:</strong></dt>
-  <dd><%= @construction_cost.supplies_expense %></dd>
+  <dd><%= number_to_currency(@construction_cost.supplies_expense,  precision: 0) %></dd>
   <dt><strong><%= model_class.human_attribute_name(:labor_cost) %>:</strong></dt>
-  <dd><%= @construction_cost.labor_cost %></dd>
+  <dd><%= number_to_currency(@construction_cost.labor_cost,  precision: 0) %></dd>
   <dt><strong><%= model_class.human_attribute_name(:misellaneous_expense) %>:</strong></dt>
-  <dd><%= @construction_cost.misellaneous_expense %></dd>
+  <dd><%= number_to_currency(@construction_cost.misellaneous_expense,  precision: 0) %></dd>
   <dt><strong><%= model_class.human_attribute_name(:constructing_amount) %>:</strong></dt>
-  <dd><%= @construction_cost.constructing_amount %></dd>
+  <dd><%= number_to_currency(@construction_cost.constructing_amount,  precision: 0) %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

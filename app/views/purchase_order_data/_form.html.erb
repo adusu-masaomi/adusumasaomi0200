@@ -15,7 +15,7 @@
   <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
   <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1" } %>
   <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('id DESC').all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_order_datum.supplier_master_id || 2}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
   
@@ -24,8 +24,10 @@
   <% end %>
   
   <%= f.simple_fields_for :construction_datum, :remote => true do |m| %>
-     <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>
+  <!--   <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>-->
+    <%= m.input :alias_name, label:"通称" , as: :hidden  %>
   <% end %>
+  <%= f.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>
   <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
   
   <div>
@@ -62,13 +64,20 @@
        if (flag == 1) {
 	     document.getElementById("mail_sent_button").disabled = true;
 	   } 
-	 });
+   });
   
-  //
-  
+  window.onload = function(){
+    //通称名をデフォルトで表示させる(未登録の場合)
+   	obj = document.getElementById("alias_name");
+    if (obj.value == ""){
+      setAliasName();
+    }
+  } 
+
   //ajax
   function setAliasName()
   {
+  
        obj = document.getElementById("construction_datum_id");
        construction_id = parseInt(obj.value);
        $.get("<%= purchase_order_datum_get_alias_name_path %>",

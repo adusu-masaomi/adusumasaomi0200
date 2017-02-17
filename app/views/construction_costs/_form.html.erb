@@ -1,20 +1,56 @@
 <%= simple_form_for @construction_cost, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @construction_cost.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @construction_cost.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @construction_cost.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
   <!--<%= f.input :construction_datum_id %>-->
   <%= f.label :工事コード, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , style: 'width:220px'} %>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , :tabindex=>"0", style: 'width:440px'} %>
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
   	<%= p.input :construction_name , input_html:{id:"construction_name", :disabled => true} %>
   <% end %>
-  <%= f.input :supplies_expense %>
-  <%= f.input :labor_cost, input_html:{id:"labor_cost"} %>
-  <%= f.input :misellaneous_expense %>
-  <%= f.input :constructing_amount , input_html:{}%>
-  <!--<%= f.input :purchase_order_amount, input_html:{id:"purchase_order_amount"} , as: :hidden %>-->
-  <%= f.input :purchase_order_amount, hint: "＊自動計算されるので入力しないで下さい。但し更新したい場合は、ここに一旦カーソルを当ててから解除下さい。", input_html:{id:"purchase_order_amount",:onfocusout => "setPurchaseOrder()"} %>
+  <div class="col-xs-3" , style="margin-left : -15px">
+    <%= f.input :purchase_amount , input_html:{id:"purchase_amount",  :readonly => true , style: 'width:130px'} %>
+  </div>
+  <%= f.input :labor_cost_origin, :label => "労務費(日報)", input_html:{id:"labor_cost_origin", style: 'width:130px', :disabled => true } %>
   
+  <div class="col-xs-3" , style="margin-left : -15px">
+    <%= f.input :supplies_expense , input_html:{id:"supplies_expense", :tabindex=>"1", style: 'width:130px', :onfocusout => "calcExecutionAmount()"  } %>
+  </div>
+  <div class="col-xs-3">
+      <%= f.input :labor_cost, :label => "労務費(調整入力用)", input_html:{id:"labor_cost", :tabindex=>"2" , style: 'width:130px', :onfocusout => "calcExecutionAmount()" } %>
+   </div>
+  <%= f.input :misellaneous_expense , input_html:{id:"misellaneous_expense",  :tabindex=>"3" , style: 'width:130px', :onchange => "calcExecutionAmount()" } %>
+  
+  <div class="col-xs-3" , style="margin-left : -15px">
+      <%= f.input :subtotal_1, :label => "小計１", input_html:{id:"subtotal_1", :readonly => true,  style: 'width:130px' } %>
+  </div>
+  <%= f.input :subtotal_2 , :label => "小計２", input_html:{id:"subtotal_2",  :readonly => true , style: 'width:130px' } %>
+  
+  <div class="col-xs-3" , style="margin-left : -15px">
+    <%= f.input :execution_amount , input_html:{id:"execution_amount", style: 'width:130px', :readonly => true } %>
+  </div>
+  <div class="col-xs-3">
+    <%= f.input :constructing_amount , input_html:{ id:"constructing_amount", :tabindex=>"4", style: 'width:130px', :onchange => "calcExecutionAmount()" }%>
+  </div>
+  
+  <%= f.input :differense, input_html:{id:"differense", style: 'width:130px', :readonly => true } %>
+   
+   
+  <%= f.input :purchase_order_amount,
+ input_html:{id:"purchase_order_amount", :readonly => true } %>
   <!--<%= f.button :submit, :class => 'btn-primary' %>-->
   <%= f.button_tag :登録する, :type => 'button', :class => "btn btn-primary", 
-               :onclick => "submitAfterValidation()" %>
+               :onclick => "submitAfterValidation()" , :tabindex=>"5"  %>
 			   
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 construction_costs_path, :class => 'btn btn-default' %>
@@ -26,29 +62,114 @@
 
 　　$(document).ready(function(){
 		//検索可能なリストボックス(注文Noの場合)
-	　$(".searchableConstructionCode").select2({ theme: "bootstrap" });
+	  $(".searchableConstructionCode").select2({ theme: "bootstrap" });
 
 	  $( ".searchableConstructionCode" ).change(function(e) {
-	  　  setConstructionDateDefault();
-          setLaborCost();
+	      setConstructionDateDefault();
+	      //setPurchaseOrder();
+		  
+		  //労務費の取得
+		  setLaborCost();
+		  //仕入明細の取得
 		  setPurchaseOrderAmount();
-		  datasetflag = 1;
+		  //仕入合計・消耗品・諸経費・請負金額取得
+		  setPurchaseAmountEtc();
+		  //実行金額等を計算
+		  //calcExecutionAmount();
+		  
+		  //datasetflag = 1;
 	  });
+	  //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	  $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+	    $('[tabindex=1]').focus(); 
+	  });
+	 
 	});
-
-  function setPurchaseOrder()
-  {
-       if (datasetflag == 0) {
-  	       setLaborCost();
-		   setPurchaseOrderAmount();
-       }
+  
+   window.onload = function(){
+     //労務費合計(日報)をデフォルトでセットする
+         obj = document.getElementById("construction_datum_id");
+         construction_datum_id = parseInt(obj.value);
 		 
-   
+		 obj3 = document.getElementById("labor_cost");
+	     if (obj3.value != "") {
+           labor_cost = parseInt(obj3.value);
+	     }
+	     
+		 if (construction_datum_id > 0) {
+           $.get("<%= construction_costz_construction_labor_cost_select_path %>",
+             {construction_datum_id: construction_datum_id, labor_cost: labor_cost },
+              function(data){
+	             obj = document.getElementById("labor_cost_origin").textContent;
+	             document.getElementById("labor_cost_origin").value = obj;
+		      }
+            );
+			
+			 supplies_expense = 0;
+			 labor_cost = 0;
+			 //仕入明細も更新
+	         $.get("<%= construction_costz_purchase_order_amount_select_path %>",
+             {construction_datum_id: construction_datum_id, supplies_expense: supplies_expense,
+               labor_cost: labor_cost },
+              function(data){
+	            obj = document.getElementById("purchase_order_amount").textContent;
+				document.getElementById("purchase_order_amount").value = obj;
+	    	    
+				//仕入合計取得
+		        setPurchaseAmount();
+		  
+			    //差額を求める
+			    setDifferense();
+			 
+			  }
+             );
+			 
+			 
+		 }
+	 
+  } 
+  
+  
+  //仕入明細・労務費を取得
+  //function setPurchaseOrder()
+  //{
+  //  calcExecutionAmount();
+  //}
+  
+  //差額の計算
+  function setDifferense()
+  {
+    constructing_amount = parseInt(document.getElementById("constructing_amount").value);
+    execution_amount = parseInt(document.getElementById("execution_amount").value);
+    
+	differense = 0
+    if (constructing_amount > 0 && execution_amount > 0) {
+	  differense = constructing_amount - execution_amount;
+	  document.getElementById("differense").value = differense;
+	}
+	
+	//debugger;
   }
-
-  //工事名のセット
+ 
+  //工事名のセット、その他のフィールド初期化
   function setConstructionDateDefault()
     {  
+	   
+	   //労務費を初期化
+	   document.getElementById("labor_cost").value = 0;
+	   //消耗品費を初期化
+	   document.getElementById("supplies_expense").value = 0;
+	   //諸経費を初期化
+	   document.getElementById("misellaneous_expense").value = 0;
+	   //差額を初期化
+	   document.getElementById("differense").value = 0;
+	   //請負金額を初期化
+	   document.getElementById("constructing_amount").value = 0;
+	   //小計1初期化
+	   document.getElementById("subtotal_1").value = 0;
+	   //小計2初期化
+	   document.getElementById("subtotal_2").value = 0;
+		
       obj = document.getElementById("construction_datum_id");
        construction_id = parseInt(obj.value);
        $.get("<%= construction_costz_construction_name_select_path %>",
@@ -65,35 +186,155 @@
    //労務費のセット
   function setLaborCost()
     {  
-      obj = document.getElementById("construction_datum_id");
-       construction_datum_id = parseInt(obj.value);
-       $.get("<%= construction_costz_construction_labor_cost_select_path %>",
-         {construction_datum_id: construction_datum_id },
-          function(data){
-	           obj = document.getElementById("labor_cost").textContent;
-	           document.getElementById("labor_cost").value = obj;
-			   
-			   //obj = document.getElementById("labor_cost");
-		       //debugger;
-          }
-        );
+	     obj = document.getElementById("construction_datum_id");
+         construction_datum_id = parseInt(obj.value);
+		 
+		 obj3 = document.getElementById("labor_cost");
+	     if (obj3.value != "") {
+           labor_cost = parseInt(obj3.value);
+	     }
+	   
+         $.get("<%= construction_costz_construction_labor_cost_select_path %>",
+           {construction_datum_id: construction_datum_id, labor_cost: labor_cost },
+            function(data){
+	             obj = document.getElementById("labor_cost_origin").textContent;
+	             document.getElementById("labor_cost_origin").value = obj;
+				 
+				 obj = document.getElementById("labor_cost").textContent;
+	             document.getElementById("labor_cost").value = obj;
+			     
+				 //差額を求める
+                 //setDifferense();
+	        }
+          );
+		
 	 };
 	 
-   //注文No,合計セット
+   //注文Noを取得
    function setPurchaseOrderAmount()
     {  
-       obj = document.getElementById("construction_datum_id");
-       construction_datum_id = parseInt(obj.value);
+	
+	   
+       obj1 = document.getElementById("construction_datum_id");
+       construction_datum_id = parseInt(obj1.value);
+	  
        $.get("<%= construction_costz_purchase_order_amount_select_path %>",
-         {construction_datum_id: construction_datum_id },
+         {construction_datum_id: construction_datum_id},
           function(data){
 	           obj = document.getElementById("purchase_order_amount").textContent;
 	           document.getElementById("purchase_order_amount").value = obj;
-
-               //obj = document.getElementById("purchase_order_amount");
-		       //debugger;
-          }
+	      }
         );
+	 };
+	 
+   //仕入合計・消耗品・諸経費・請負金額を取得
+   function setPurchaseAmountEtc()
+    {  
+	   
+       obj1 = document.getElementById("construction_datum_id");
+       construction_datum_id = parseInt(obj1.value);
+	  
+       $.get("<%= construction_costz_purchase_amount_etc_select_path %>",
+         {construction_datum_id: construction_datum_id},
+          function(data){
+	         //仕入金額
+             obj = document.getElementById("purchase_amount").textContent;
+             document.getElementById("purchase_amount").value = obj;
+			 //消耗品
+             obj = document.getElementById("supplies_expense").textContent;
+             document.getElementById("supplies_expense").value = obj;
+			 //諸経費
+			 obj = document.getElementById("misellaneous_expense").textContent;
+             document.getElementById("misellaneous_expense").value = obj;
+			 //請負金額
+			 obj = document.getElementById("constructing_amount").textContent;
+             document.getElementById("constructing_amount").value = obj;
+			 
+			 //実行金額計算
+			 calcExecutionAmount();
+			 
+	      }
+        );
+	 };
+   //仕入合計を取得
+   function setPurchaseAmount()
+    {  
+	   obj1 = document.getElementById("construction_datum_id");
+       construction_datum_id = parseInt(obj1.value);
+	  
+       $.get("<%= construction_costz_purchase_amount_etc_select_path %>",
+         {construction_datum_id: construction_datum_id},
+          function(data){
+	         //仕入金額
+             obj = document.getElementById("purchase_amount").textContent;
+             document.getElementById("purchase_amount").value = obj;
+			 
+			  //実行金額計算
+			 calcExecutionAmount();
+	      }
+        );
+	 };
+	 
+   //実行金額の計算
+   function calcExecutionAmount()
+    {  
+	   obj1 = document.getElementById("construction_datum_id");
+       construction_datum_id = parseInt(obj1.value);
+	   
+	   supplies_expense = 0;
+	   labor_cost = 0;
+	   misellaneous_expense = 0;
+	   purchase_amount = 0;
+	   
+	   //労務費
+	   labor_cost = document.getElementById("labor_cost").value;
+	   if (labor_cost != ""){
+	     labor_cost = parseInt(labor_cost);
+	   }else{
+         labor_cost = 0;
+	   }
+			   
+			  
+       //仕入合計
+       purchase_amount = document.getElementById("purchase_amount").value;
+	   if (purchase_amount != ""){
+	     purchase_amount = parseInt(purchase_amount);
+	   }else{
+         purchase_amount = 0;
+	   }
+	  
+	   //消耗品
+       supplies_expense = document.getElementById("supplies_expense").value;
+	   if (supplies_expense != ""){
+	     supplies_expense = parseInt(supplies_expense);
+	   }else{
+         supplies_expense = 0;
+	   }
+	   
+	   //小計１
+	   subtotal_1 = 0;
+	   subtotal_1 = purchase_amount + supplies_expense;
+	   document.getElementById("subtotal_1").value = subtotal_1;
+	   //小計２
+	   subtotal_2 = 0;
+	   subtotal_2 = subtotal_1 + labor_cost;
+	   document.getElementById("subtotal_2").value = subtotal_2;
+	   
+	   //諸経費
+	   misellaneous_expense = document.getElementById("misellaneous_expense").value;
+	   if (misellaneous_expense != ""){
+	     misellaneous_expense = parseInt(misellaneous_expense);
+	   }else{
+         misellaneous_expense = 0;
+	   }
+	   
+       //実行金額
+	   execution_amount = purchase_amount + labor_cost + supplies_expense + misellaneous_expense;
+			   
+	   document.getElementById("execution_amount").value = execution_amount;
+			   
+	   //差額を求める
+       setDifferense();
 	 };
 
     //入力チェック後の、更新処理

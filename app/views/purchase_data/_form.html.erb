@@ -34,7 +34,7 @@
   <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
   
   <div class="col-xs-5" , style="margin-left : -15px">
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode",  style: 'width:220px;' } %>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode",  style: 'width:260px;' } %>
   </div>
   <div style="margin-left : -10px">
   <%= f.input :notes, label_html:{style: 'margin-top : -30px;'}, input_html:{id:"notes",  style: 'width:330px;margin-top : -0px;'} %>

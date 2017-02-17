@@ -9,9 +9,11 @@
   <p><%= @construction_name %></p>
   </p>
   </p>
-  <% $order_parameters.values.each_with_index do |item, index| %>
+  <% cnt = 0 %>
+  <% $order_parameters.values.each_with_index.reverse_each do |item, index| %>
     <% if item[:_destroy] != "1" then %>     
-      <%= "#{h(index + 1)}." %>
+      <%= "#{h(cnt + 1)}." %>
+      <% cnt += 1 %>
       品番：
       <%= item[:material_code] %></p>
       &nbsp;&nbsp;&nbsp;品名：
