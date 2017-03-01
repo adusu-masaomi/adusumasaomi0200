@@ -138,13 +138,19 @@ class PurchaseOrderHistoriesController < ApplicationController
 	if @purchase_order_history.supplier_master.present?
       @purchase_order_history.email_responsible = @purchase_order_history.supplier_master.email1
     end
+	
+	#add170221
+	#@purchase_order_history.assign_attributes(material_master_params)
+	
   end
 
    #既存のデータを取得する(日付・仕入先指定後。)
   def get_data
  
-	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
-      
+	 #$purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
+     $purchase_order_history = PurchaseOrderHistory.where(purchase_order_datum_id: params[:purchase_order_datum_id],
+       purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id]).first
+	 
 	 #binding.pry 
 	  
      if $purchase_order_history.nil?
@@ -186,8 +192,12 @@ class PurchaseOrderHistoriesController < ApplicationController
   # PATCH/PUT /purchase_order_histories/1.json
   def update
       
+	  #すでに登録していた注文データは一旦抹消する。
+	  destroy_before_update
+	  
 	  #パラーメータ補完＆メール送信する
       send_mail_and_params_complement
+	  
 	  
 	  respond_to do |format|
         
@@ -212,6 +222,11 @@ class PurchaseOrderHistoriesController < ApplicationController
 	#
   end 
   
+  def destroy_before_update
+    #すでに登録していた注文データは一旦抹消する。
+	purchase_order_history_id = @purchase_order_history.id
+	Order.where(purchase_order_history_id: purchase_order_history_id).destroy_all
+  end
   
   def send_mail_and_params_complement
     
@@ -234,7 +249,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  item[:list_price] = params[:list_price][i]
 		  #
 		  
-		  i = i + 1
+		  #i = i + 1
 		  ######
 		  
 		  id = item[:material_id].to_i
@@ -243,12 +258,24 @@ class PurchaseOrderHistoriesController < ApplicationController
           if id != 1 then
               @material_master = MaterialMaster.find(id)
               item[:material_code] = @material_master.material_code
-              item[:material_name] = @material_master.material_name
+              #upd170218 名称は直接変更の場合もありえる
+			  #item[:material_name] = @material_master.material_name
               item[:list_price] = @material_master.list_price
 			  @maker_master = MakerMaster.find(@material_master.maker_id)
 			  item[:maker_name] = @maker_master.maker_name
+			  
+			  
+			  if params[:material_name][i] != @material_master.material_name
+			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
+			    materials = MaterialMaster.where(:id => @material_master.id).first
+			    if materials.present?
+                  materials.update_attributes!(:material_name => params[:material_name][i])
+                end 
+			  end
+			  
 		  end 
 		  
+		  i = i + 1
 		   
 		end 
     
@@ -309,5 +336,14 @@ class PurchaseOrderHistoriesController < ApplicationController
     def purchase_order_history_params
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
 	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, :maker_name, :list_price, :_destroy])
+	  
+       #params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
+	   #               orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
+        #              :maker_name, :list_price, :_destroy], material_masters_attributes: [:id, :material_name])
     end
+
+    #def material_masters_params
+    #     params.require(:purchase_order_history).permit(MaterialMaster_attributes: [:id,  :material_name ])
+    #end
+
 end

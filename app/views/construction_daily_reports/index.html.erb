@@ -8,23 +8,27 @@
   <!-- 追加箇所終了 -->
 
   <%= search_form_for @q do |f| %>
-  <%= f.label :construction_code, '工事コード：' %>
-  <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCode" } %></br>
-  <%= f.label :construction_code, '工事名：' %>
-  <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableConstructionName" } %></br>
+  
+  <!--<%= f.label :construction_code, '工事コード：' %>-->
+  <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCode" } %></br>-->
+  <!--<%= f.label :construction_code, '工事名：' %>-->
+  <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableConstructionName" } %></br>-->
+  
+  <%= f.label :construction_code, '工事名　' %>
+  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
+  </br>
+  
   <%= f.label :staff_id, '社員' %>
   <%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {style: 'width:220px' } %>
   	<div>
-    	<%= f.submit '検索(集計)', :class => 'btn btn-default' %>
-		<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_construction_daily_report_path(:new_flag => "0"),
-            :class => 'btn btn-primary' %>
+        <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
         <%= link_to "労務費集計表",
             construction_daily_reports_path(@construction_daily_reports, format: "pdf"),
             :class => 'btn  btn-info', :target=>["_blank"] %>
-		
-		<%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default'%>
-			
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_construction_daily_report_path(:new_flag => "0"),
+            :class => 'btn btn-primary' %>
+        <%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default'%>
         <td><font size="3">合計金額:<%=number_to_currency(@construction_daily_reports.sumprice,  precision: 0 ) %></font></td>
 
   	</div>

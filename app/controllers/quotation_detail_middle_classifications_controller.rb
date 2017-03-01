@@ -55,7 +55,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     if @null_flag == "" 
 	  search_history = {
        value: params[:q],
-       expires: 24.hours.from_now
+       #expires: 24.hours.from_now
+       expires: 480.minutes.from_now
       }
       cookies[:recent_search_history] = search_history if params[:q].present?
     end
@@ -138,8 +139,14 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   def create
     
     ###モーダル化対応
+	#save
     @quotation_detail_middle_classification = QuotationDetailMiddleClassification.create(quotation_detail_middle_classification_params)
-
+    
+    #add170223
+    #歩掛りの集計を最新のもので書き換える。
+    update_labor_productivity_unit_summary
+	  
+	
      #手入力用IDの場合は、単位マスタへも登録する。
     #@quotation_unit = nil
     @working_unit = nil
@@ -234,6 +241,10 @@ other_cost: @quotation_detail_middle_classification.other_cost
     
     @quotation_detail_middle_classification.update(quotation_detail_middle_classification_params)
     
+    #add170223
+    #歩掛りの集計を最新のもので書き換える。
+    update_labor_productivity_unit_summary
+	
     #品目データの金額を更新
 	save_price_to_large_classifications
 	
@@ -484,7 +495,60 @@ other_cost: @quotation_detail_middle_classification.other_cost
   def working_unit_name_select
      @working_unit_name = WorkingUnit.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_unit_name).flatten.join(" ")
   end
-
+  
+  #add170223
+  #歩掛り(配管配線集計用)
+  def LPU_piping_wiring_select
+    @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    @labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+  end
+  #歩掛り(機器取付集計用)
+  def LPU_equipment_mounting_select
+    @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+	@labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+  end
+  #歩掛り(労務費集計用)
+  def LPU_labor_cost_select
+    @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+	@labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+  end
+  
+  #歩掛りの集計を最新のもので書き換える。
+  def update_labor_productivity_unit_summary
+    quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
+    quotation_detail_large_classification_id = params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id]
+	
+    #配管配線の計を更新(construction_type=1)
+    @QDMC_piping_wiring = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 1).first
+	if @QDMC_piping_wiring.present?
+      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_PipingWiring(quotation_header_id, quotation_detail_large_classification_id)
+      labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_PipingWiring(quotation_header_id, quotation_detail_large_classification_id)
+      @QDMC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+    end
+    
+	#機器取付の計を更新(construction_type=2)
+    @QDMC_equipment_mounting = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 2).first
+    if @QDMC_equipment_mounting.present?
+      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_equipment_mounting(quotation_header_id, quotation_detail_large_classification_id)
+      labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_equipment_mounting(quotation_header_id, quotation_detail_large_classification_id)
+      @QDMC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+    end
+    
+     #労務費の計を更新(construction_type=3)
+    @QDMC_labor_cost = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 3).first
+    if @QDMC_labor_cost.present?
+      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_labor_cost(quotation_header_id, quotation_detail_large_classification_id)
+      labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_labor_cost(quotation_header_id, quotation_detail_large_classification_id)
+      @QDMC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+    end
+  
+  end
+  
+  #add end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_quotation_detail_middle_classification
@@ -585,7 +649,7 @@ other_cost: @quotation_detail_middle_classification.other_cost
 	  @quotation_detail_middle_classification.line_number = @line_number
     end
 	
-	
+	#ストロングパラメータ
 	# Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_middle_classification_params
       params.require(:quotation_detail_middle_classification).permit(:quotation_header_id, :quotation_detail_large_classification_id, :line_number, 
@@ -594,7 +658,8 @@ other_cost: @quotation_detail_middle_classification.other_cost
                                                                      :working_unit_id, :working_unit_name, :working_unit_price, :quote_price, :execution_unit_price,
                                                                      :execution_price, :material_id, :quotation_material_name, :material_unit_price, :labor_unit_price,
                                                                      :labor_productivity_unit, :labor_productivity_unit_total, :material_quantity, :accessory_cost, 
-                                                                     :material_cost_total, :labor_cost_total, :other_cost )
+                                                                     :material_cost_total, :labor_cost_total, :other_cost, :remarks, :construction_type, 
+                                                                     :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag )
     end
     
 end

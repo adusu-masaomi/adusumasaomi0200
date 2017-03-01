@@ -1,7 +1,24 @@
 <%- model_class = MakerMaster -%>
 <div class="page-header">
-  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+
+  <!-- kaminari用追加箇所開始 -->
+   <%= page_entries_info @maker_masters %>
+   <!-- kaminari用追加箇所終了 -->
+   
+    <%= search_form_for @q do |f| %>
+   <%= f.label :maker_name, 'メーカー名：：' %>
+   <%= f.select :id_eq, options_from_collection_for_select(MakerMaster.all, "id","maker_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %>
+  	<div>
+    	<%= f.submit '検索する', :class => 'btn btn-default' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_maker_master_path,
+            :class => 'btn btn-primary' %>
+    </div>
+   <% end %>
+   
 </div>
+
 <table class="table table-striped">
   <thead>
     <tr>
@@ -28,9 +45,32 @@
         </td>
       </tr>
     <% end %>
+	<!-- kaminari用追加箇所開始 -->
+    <%= paginate @maker_masters %>
+    <!-- kaminari用追加箇所終了 -->
   </tbody>
+  　
 </table>
+<!-- kaminari用追加箇所開始 -->
+<%= paginate @maker_masters %>
+<!-- kaminari用追加箇所終了 -->
+	
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+        $(".searchableMakerName").select2({ theme: "classic" });
+		
+		//見出し固定用設定追加
+	    //var sz = window.parent.screen.width;
+	    //var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	    //var ht = 610;  //デフォルトの高さ(社長PC基準)
+	    //if (sz != 1920) {
+	    ////画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        //  fc = 1;  //固定列数
+	    //  ht -= 100;
+        //}
+	    //$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+  });
+</script>
 
-<%= link_to t('.new', :default => t("helpers.links.new")),
-            new_maker_master_path,
-            :class => 'btn btn-primary' %>

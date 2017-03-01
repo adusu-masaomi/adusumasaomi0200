@@ -28,7 +28,8 @@ class PurchaseOrderDatum < ActiveRecord::Base
   
 	
     #validation
-    validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
+    validates :purchase_order_code, uniqueness: true
+	#validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
  
     
     #scope

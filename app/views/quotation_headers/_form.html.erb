@@ -48,7 +48,9 @@
   <%= f.input :net_amount, input_html:{:tabindex=>"17"}  %>
   <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{:tabindex=>"18"} %>
   <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{:tabindex=>"19"}  %>
-
+  
+  <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
+  
   <!--得意先M-->
   <%= f.simple_fields_for :customer_master, :remote => true do |m| %>
     <%= m.input :honorific_id , input_html:{ id:"honorific_id"}, as: :hidden %>
@@ -101,12 +103,23 @@
     //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
     obj = document.getElementById("construction_datum_id");
      construction_id = parseInt(obj.value);
-     $.get("<%= construction_costz_construction_name_select_path %>",
+     //$.get("<%= construction_costz_construction_name_select_path %>",
+	 //upd170218
+	 $.get("<%= construction_dataz_construction_and_customer_select_path %>",
 	   {id: construction_id },
         function(data){
           obj = document.getElementById("construction_name").textContent;
           document.getElementById("construction_name").value = obj;
-	      }
+		  
+		  //add170218
+		  //顧客情報も合わせてセットする
+		  obj = document.getElementById("customer_id_hide").textContent;
+		  if (obj != null){
+		    index = parseInt(obj);
+            $(".searchableCustomerName").val(index).trigger("change");
+			
+			}
+		  }
 	  );
 	  
    };
@@ -114,6 +127,7 @@
   function setCustomerInfoDefault()
   {  
     obj = document.getElementById("customer_id");
+	
      customer_id = parseInt(obj.value);
      $.get("<%= quotation_headerz_customer_info_select_path %>",
        {id: customer_id },

@@ -12,9 +12,14 @@
   <!---->
   
   <%= f.label :"行番号" , {:class => "my-custom-class-l" } %></br>
+  <div class="col-md-7" , style="margin-left : -15px">
   <%= f.select :line_number, QuotationDetailMiddleClassification.serial_number, {}, { :tabindex=>"0", class: "searchableNumber" , style: 'width:100px' } %>
   <%= f.check_box :check_line_insert, {}, "true", "false" %>
-  <%= f.label_tag :check_line_insert, '行挿入する' %></br>
+  <%= f.label_tag :check_line_insert, '行挿入する　　' %>
+  <%= f.label_tag :construction_type, '工事種別：' %>
+  <%= f.select :construction_type, QuotationDetailMiddleClassification.types, {:selected => @quotation_detail_middle_classification.construction_type || 0}, 
+  {id:'construction_type', :class => "my-custom-class", style: 'width:120px;margin-left:8px;font-size:14px;', :onchange => "setLaborType()" } %>
+  </div></br></br>
   
   <%= f.label :"品名" , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :working_middle_item_id, WorkingMiddleItem.all, :id, :working_middle_item_name, {:selected => @quotation_detail_middle_classification.working_middle_item_id || 1} , {id:'working_middle_item_id', :tabindex=>"1", :class => "searchableWorkingMiddleItem",  style: 'width:420px' } %></br>
@@ -24,10 +29,10 @@
   <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"3" }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
-  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"4", :onchange => "calcMoneyforQuantity()"}  %>
+  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"4", :onchange => "calcMoneyforQuantity()"}  %>
   </div>
   <div style="margin-left : -50px">
-  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"5", :onchange => "calcTotalPrice()"}  %>
+  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"5", :onchange => "calcMoneyforQuantity()"}  %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
@@ -39,17 +44,17 @@
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"8", :onchange => "calcTotalPrice()" } %>
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"8", :onchange => "calcTotalPrice()" } %>
   </div>
   <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"9", :onchange => "calcTotalPrice()"} %>
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"9", :onchange => "calcTotalPrice()"} %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"10"} %>
+  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"10"} %>
   </div>
   <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"11"} %>
+  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"11"} %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
@@ -58,6 +63,17 @@
   <div style="margin-left : -50px;margin-top : -20px">
   <%= f.input :labor_productivity_unit_total, input_html:{id:"labor_productivity_unit_total", style: 'width:120px', :tabindex=>"13"}  %>
   </div>
+  
+  <!--add170222-->
+  <%= f.check_box :piping_wiring_flag, :class => "piping_wiring_flag" %>
+  <%= f.label_tag :piping_wiring_flag, '配管配線　　　' %> 
+  <%= f.check_box :equipment_mounting_flag, :class => "equipment_mounting_flag" %>
+  <%= f.label_tag :equipment_mounting_flag, '機器取付　　' %>
+  <%= f.check_box :labor_cost_flag, :class => "labor_cost_flag" %>
+  <%= f.label_tag :labor_cost_flag, '労務費' %>
+  <!--add end-->
+  
+  <%= f.input :remarks,  :input_html => {:tabindex=>"14", style: 'width:420px'}  %>
   
   <%= f.check_box :check_update_item, {}, "true", "false" %>
   <%= f.label_tag :check_update_item, '品名・仕様・単位のみマスター反映　　　' %> 
@@ -86,7 +102,14 @@
 </div>
 
 <script type="text/javascript">
-
+  
+  //add170223
+  //歩掛り集計専用の作業内訳マスターIDの定数(マスター変更時注意！)
+  var piping_wiring_construction_index = 2;  //配管配線工事のマスターID
+  var equipment_mounting_index = 3;          //機器取付工事のマスターID
+  var labor_cost_index = 4;                  //労務費のマスターID
+  //
+  
   //モーダルの場合は、このコードがないとselect2が正常動作しない。
   $.fn.modal.Constructor.prototype.enforceFocus = function () {};
   
@@ -151,7 +174,94 @@
 		    $('[tabindex=17]').focus();
 		}, 0);  
 	 });
+	 
+	  //add170223
+	 //歩掛りの集計をデフォルトでセットする
+	 //-->随時更新するのでセットしない（手入力も考慮。）
+	 //setLaborType();
+	 
+     //add170223
+     //１つチェックがあれば、他のチェックを外す処理
+	 $('.piping_wiring_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.equipment_mounting_flag').prop("checked",false);
+		$('.labor_cost_flag').prop("checked",false);
+       }
+     });
+     $('.equipment_mounting_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.piping_wiring_flag').prop("checked",false);
+		$('.labor_cost_flag').prop("checked",false);
+       }
+     });
+	 $('.labor_cost_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.piping_wiring_flag').prop("checked",false);
+		$('.equipment_mounting_flag').prop("checked",false);
+       }
+     });
+	 //add end
   });
+  
+  //add170223
+  //歩掛りのセット(配管集計時)
+  function setLaborType(){
+    obj = document.getElementById("construction_type").value;
+	switch (obj){
+      case "1":
+        //アイテム名は自動でセット。
+		//”配管配線工事”のiDに切り替える。
+		$(".searchableWorkingMiddleItem").val(piping_wiring_construction_index).trigger("change");
+		
+	    //配管配線チェック済みのものから歩掛りを集計する。
+		quotation_header_id = document.getElementById("quotation_header_id").value;
+		quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").value;
+		$.get("<%= quotation_detail_middle_classificationz_LPU_piping_wiring_select_path %>",{quotation_header_id: quotation_header_id, 
+                                                    quotation_detail_large_classification_id: quotation_detail_large_classification_id}, 
+		  function(data){
+	        setLaborUnit();
+		    }
+	    );
+		break;
+	  case "2":
+	    //アイテム名は自動でセット。
+		$(".searchableWorkingMiddleItem").val(equipment_mounting_index).trigger("change");
+	    //機器取付チェック済みのものから歩掛りを集計する。
+		quotation_header_id = document.getElementById("quotation_header_id").value;
+		quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").value;
+	    $.get("<%= quotation_detail_middle_classificationz_LPU_equipment_mounting_select_path %>",{quotation_header_id: quotation_header_id, 
+                                                         quotation_detail_large_classification_id: quotation_detail_large_classification_id}, 
+		  function(data){
+	        setLaborUnit();
+		    }
+	    );
+	    break;
+	  case "3":
+	    //アイテム名は自動でセット。
+		$(".searchableWorkingMiddleItem").val(labor_cost_index).trigger("change");
+		
+	    //労務費チェック済みのものから歩掛りを集計する。
+		quotation_header_id = document.getElementById("quotation_header_id").value;
+        quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").value;
+	    $.get("<%= quotation_detail_middle_classificationz_LPU_labor_cost_select_path %>",{quotation_header_id: quotation_header_id, 
+                                                 quotation_detail_large_classification_id: quotation_detail_large_classification_id}, 
+		  function(data){
+	          setLaborUnit();
+		    }
+	    );
+		break;
+     }
+  }
+  function setLaborUnit(){
+  //合計値をセットする
+      //歩掛りへセット
+	  obj = document.getElementById("labor_productivity_unit").textContent;
+      document.getElementById("labor_productivity_unit").value = obj;
+	  //歩掛り計へセット
+      obj = document.getElementById("labor_productivity_unit_total").textContent;
+      document.getElementById("labor_productivity_unit_total").value = obj;
+  }
+  //add end 
   
   //品目の絞り込み-ajax
   function setLargeItemName()
@@ -491,10 +601,13 @@
   //実行→見積数量の自動変更
   function changeQuantity()
   {  
-     //debugger;
-     if (document.getElementById("execution_quantity").value > 0) {
-       document.getElementById("quantity").value = document.getElementById("execution_quantity").value;
+     //if (document.getElementById("execution_quantity").value > 0) {
+     //  document.getElementById("quantity").value = document.getElementById("execution_quantity").value;
+     //}
+     if (document.getElementById("quantity").value > 0 && document.getElementById("execution_quantity").value == "" ) {
+       document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
      }
+	 
   }
   //実行数量変更時のバージョン(ファンクション複数)
   function calcMoneyforQuantity(){

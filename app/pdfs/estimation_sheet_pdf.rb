@@ -264,7 +264,15 @@ class EstimationSheetPDF
                    
 					  
                   if quotation_detail_middle_classification.quote_price.present?
-                    @@quote_price += quotation_detail_middle_classification.quote_price
+                    #upd170220
+                    tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
+                    if tmp > 0
+                       num = quotation_detail_middle_classification.quote_price.to_i
+                    else
+                       num = tmp
+                    end
+                    #
+                    @@quote_price += num
                   end
                   	  
                   row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,

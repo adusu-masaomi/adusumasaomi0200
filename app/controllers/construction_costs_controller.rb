@@ -147,8 +147,16 @@ class ConstructionCostsController < ApplicationController
   def purchase_order_amount_select
     
     #仕入明細データをセット 
-    @purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).joins(:PurchaseDivision).where(:construction_datum_id => params[:construction_datum_id]).group('purchase_order_data.purchase_order_code').pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
-  
+    #@purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).joins(:PurchaseDivision).
+    #where(:construction_datum_id => params[:construction_datum_id]).
+    #group('purchase_order_data.purchase_order_code').
+    #pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
+    
+    @purchase_order_amount = PurchaseDatum.joins(:purchase_order_datum).joins(:SupplierMaster).joins(:PurchaseDivision).
+    where(:construction_datum_id => params[:construction_datum_id]).
+    group('purchase_order_data.purchase_order_code').order('purchase_data.division_id, purchase_order_data.purchase_order_code').
+    pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
+    
   end
   
   def purchase_amount_etc_select

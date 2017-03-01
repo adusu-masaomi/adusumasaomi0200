@@ -236,7 +236,8 @@ class EstimationSheetLandscapePDF
                        working_unit_name2: @unit_name,
                        execution_price: quotation_detail_large_classification.execution_price,
                        labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit,
-					   labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total
+					   labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total,
+					   remarks: quotation_detail_large_classification.remarks
            end 
 		 #end
     end	
@@ -399,11 +400,29 @@ class EstimationSheetLandscapePDF
                   end 
                   
                   if quotation_detail_middle_classification.quote_price.present?
-                    @@quote_price += quotation_detail_middle_classification.quote_price
+                    #@@quote_price += quotation_detail_middle_classification.quote_price
+                    #upd170220
+                    tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
+                    if tmp > 0
+                       num = quotation_detail_middle_classification.quote_price.to_i
+                    else
+                       num = tmp
+                    end
+                    #
+                    @@quote_price += num
                   end
                   #実行金額合計
                   if quotation_detail_middle_classification.execution_price.present?
-                    @@execution_price += quotation_detail_middle_classification.execution_price
+                    #@@execution_price += quotation_detail_middle_classification.execution_price
+                    #upd170220
+                    tmp = quotation_detail_middle_classification.execution_price.delete("^0-9").to_i
+                    if tmp > 0
+                       num = quotation_detail_middle_classification.execution_price.to_i
+                    else
+                       num = tmp
+                    end
+                    #
+                    @@execution_price += num
                   end
                   
 				  @labor_amount = 0
@@ -434,7 +453,8 @@ class EstimationSheetLandscapePDF
                    execution_unit_price: quotation_detail_middle_classification.execution_unit_price,
                    execution_price: quotation_detail_middle_classification.execution_price,
                    labor_productivity_unit: quotation_detail_middle_classification.labor_productivity_unit,
-				   labor_amount: @labor_amount
+				   labor_amount: @labor_amount,
+				   remarks: quotation_detail_middle_classification.remarks
 				   
 				   
 				

@@ -224,6 +224,12 @@ class ConstructionDataController < ApplicationController
      @working_safety_matter_name = WorkingSafetyMatter.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_safety_matter_name).flatten.join(" ")
   end
   
+  # ajax
+  #add170218 見積書などで使用
+  def construction_and_customer_select
+     @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+  end
     
   private
     # Use callbacks to share common setup or constraints between actions.

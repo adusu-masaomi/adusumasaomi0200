@@ -9,7 +9,7 @@
   <dt><strong>品名:</strong></dt>
   <dd><%= @material_master.material_name %></dd>
   <dt><strong>メーカー:</strong></dt>
-  <dd><%= @maker_masters[(@material_master.maker_id)-1].maker_name %></dd>
+  <dd><%= @material_master.MakerMaster.maker_name %></dd>
   <dt><strong>定価:</strong></dt>
   <dd><%= @material_master.list_price %></dd>
 </dl>

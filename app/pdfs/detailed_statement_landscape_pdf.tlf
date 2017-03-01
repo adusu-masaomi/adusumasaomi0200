@@ -433,6 +433,38 @@
                 "precision": 3
               }
             }
+          },
+          {
+            "id": "remarks",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 720.7,
+            "y": 126.8,
+            "width": 127.5,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
           }
         ]
       },
@@ -2280,6 +2312,32 @@
         "base": "",
         "type": ""
       }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 740,
+      "y": 81,
+      "width": 20,
+      "height": 16.7,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "備考"
+      ]
     }
   ],
   "state": {

@@ -4,7 +4,12 @@ class MakerMastersController < ApplicationController
   # GET /maker_masters
   # GET /maker_masters.json
   def index
-    @maker_masters = MakerMaster.all
+    #@maker_masters = MakerMaster.all
+	
+	@q = MakerMaster.ransack(params[:q])   
+    @maker_masters = @q.result(distinct: true)
+    @maker_masters = @maker_masters.page(params[:page])
+
   end
 
   # GET /maker_masters/1

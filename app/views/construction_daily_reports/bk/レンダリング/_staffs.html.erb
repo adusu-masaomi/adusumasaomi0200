@@ -1,3 +1,0 @@
-<%= simple_form_for (@staff) do |g| %>
-  <%= g.collection_select :dayly_pay, Staff.where(id: @staff_pay), :id, :dayly_pay,  { id:"dayly_pay" } %>
-<% end %>

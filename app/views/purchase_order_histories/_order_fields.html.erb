@@ -7,28 +7,23 @@
   <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
        {id:"material_id", name:"material_id[]",  class: "searchableMaterial" , style: 'width:650px'  } %>-->
   <%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
-  {class: "searchableMaterial" , id: "material_id" , name:"material_id[]",  style: 'width:650px'  } %>
+  {class: "searchableMaterial form-control" , id: "material_id" , name:"material_id[]",  style: 'width:650px' } %>
   
-  <!--<%= f.input :quantity,  input_html:{id: "quantity", name: "quantity", style: 'width:100px', :tabindex=>"0"} %>-->
-  <!--<%= f.input :quantity,  input_html:{ id: "quantity", name:"purchase_order_history[quantity]", style: 'width:100px', :tabindex=>"0"} %>-->
   <%= f.label :数量, {style: 'width:28px'}  %>
-  <%= f.text_field :quantity, size:10, tabindex:"0", name:"quantity[]" %>
+  <%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>
   <td>&nbsp;&nbsp;</td>
-  <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px', :tabindex=>"1"} %>
+  <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px' } %>
   <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
-  <!--<%= f.label :x , { class: "fa fa-sort-alpha-asc" } %>-->
   <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <%= fa_icon("reorder 2x") %>
+  <%= fa_icon('sort-alpha-asc 3x') %>
   </br>
-  <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"2" } %>
-  <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px', :tabindex=>"3" , :class => "material_name"} %>
-  <%= f.input :maker_name,  input_html:{ id: "maker_name", name: "maker_name[]", style: 'width:150px', :tabindex=>"4" } %>
-  <%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px', :tabindex=>"5" } %>
-  
-  
+  <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onkeydown => "setMaterialCode($(this).val())" } %>
+  <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
+  <%= f.input :maker_name,  input_html:{ id: "maker_name", name: "maker_name[]", style: 'width:150px' , :tabindex=>"3" } %>
+  <%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px' , :tabindex=>"4" } %>
   
   <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %></br>
 
@@ -40,6 +35,10 @@
 
   //cIndex = 0;
   //var i = 0;
+  
+  gSelectedIndex = 0;
+  gMaterial_id = 0;
+  gMaterial_code = "";
 
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
@@ -52,19 +51,33 @@
       
         
        //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	   $( ".searchableMaterial" ).on("select2:close", function (e) {
+	   //$( ".searchableMaterial" ).on("select2:close", function (e) {  
+	   //↓これだとchangeの後に走る！
+	   $( ".searchableMaterial" ).on("select2:select", function (e) {
 	        setTimeout(function() {
-		    $('[tabindex=0]').focus();
-		}, 0);  
+			$('[tabindex=0]')[gSelectedIndex].focus();
+			//うまくいかない・・
+			//debugger;
+		  }, 0);  
 	   });　　　　　	   
 
          
 	   $( ".searchableMaterial" ).change(function(e) {
 	    
-	      material_id = $(this).val();
-	      selectedIndex  = getSelectedChildIndex(material_id);
-		 
-		  setItem(material_id, selectedIndex);
+		  gMaterial_id = $(this).val();
+	      selectedIndex  = getSelectedChildIndex(gMaterial_id);
+		  setItem(gMaterial_id, selectedIndex);
+		  
+		  //手入力以外はグローバルへセット
+		  if (gMaterial_id != 0) {
+		    gSelectedIndex = selectedIndex;
+		  }else{
+		    gSelectedIndex = 0;
+		  }
+		  
+		  //$('[tabindex=0]')[selectedIndex].focus();
+		
+		  
 	   });
 	   
 	   
@@ -76,9 +89,9 @@
 	   $(".searchableUnit").select2({ theme: "classic" });
 	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
 	   $( ".searchableUnit" ).on("select2:close", function (e) {
-	        setTimeout(function() {
-		    $('[tabindex=2]').focus();
-		}, 0);  
+	   //     setTimeout(function() {
+		//    $('[tabindex=2]').focus();
+	//	}, 0);  
 	   });   
       
  });  
@@ -93,11 +106,24 @@
 	    select_index = index;
 	  }
 	}
+    return select_index;
+  }
+  //選択した行のインデックスを取得(手入力を考慮し、品番で判別)
+  function getSelectedChildIndexCode(){
+    item = document.getElementsByName("material_code[]");
+    var select_index = 0;
 	
-
-	
-	return select_index;
-	
+	for (var index = 0; index < item.length  ; index ++) {
+	  if (gMaterial_code == item[index].value){
+	    select_index = index;
+	  }
+	}
+    return select_index;
+  }
+  
+  //タブ判定のため、品番をグローバルへセット
+  function setMaterialCode(thisValue){
+    gMaterial_code = thisValue;
 	
   }
   
@@ -135,7 +161,8 @@
   function setItem(item_id, selected_index)
   {
 		 id = parseInt(item_id);
-         
+   
+  	  
 		 if (id != 1 ) {
 		 //手入力は除外&明細に同一品番はないものとする(ある場合は正常動作しない）
 			$.get("<%= purchase_order_historiez_material_select_path %>",
@@ -186,12 +213,30 @@
 
   }  
   
+  function focusQuantity(selected_index)
+  {
+     document.getElementsByName("quantity[]")[selected_index].focus();
+     //debugger;
+  }
+  
   //ENTER→TABキーに変換する処理。
   //レンダリングの場合は、共通化ができない（なぜか）
   $('[tabindex]').keydown(function (e) {
     if (e.keyCode == 13 || e.keyCode == 9) {
-        var tabindex = parseInt($(this).attr('tabindex'));
-        $('[tabindex='+(tabindex+1)+']').focus();
+	    //if (document.getElementById("material_id").value == 1) {
+		//if (gMaterial_id == 0) {
+        // gMaterial_id = document.getElementById("material_id").value;
+		//}
+		
+		if (gSelectedIndex == 0){
+		   //手入力の場合はコードでインデックス取得
+		   selectedIndex  = getSelectedChildIndexCode();
+ 		 }else{
+		   selectedIndex = gSelectedIndex ;
+		 }
+		
+		var tabindex = parseInt($(this).attr('tabindex'));
+        $('[tabindex='+(tabindex+1)+']')[selectedIndex].focus();
     
 	    return false;
 	}

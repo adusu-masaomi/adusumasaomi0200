@@ -12,11 +12,18 @@ class ConstructionDailyReport < ActiveRecord::Base
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true
-  validates :construction_datum_id, presence: true
+  #validates :construction_datum_id, presence: true
   # 数値であり、0以上の場合有効
   validates :working_times, numericality: {
             only_integer: true, greater_than_or_equal_to: 0
           }
+  
+  #作業日＆時間の重複登録防止
+  validates :construction_datum_id,  presence: true, uniqueness: { scope: [:working_date, :staff_id, :start_time_1, :end_time_1] }
+  
+  #入力チェック(日またがりで計算がおかしくなるのを防止)
+  validate :time_too_large
+  
   
   #scope
   scope :with_construction, -> (construction_daily_reports_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id = ?", construction_daily_reports_construction_datum_id )}
@@ -33,6 +40,16 @@ class ConstructionDailyReport < ActiveRecord::Base
    #def my_callback_method
     # self.construction_datum.update(construction_start_date: "2011/01/01")  これは機能した
   #end
+   
+   #入力チェック用
+   def time_too_large
+     #22:00~4:00のように入力すると計算がおかしくなるため、２行に入力させるため警告する
+     if end_time_1.to_s(:time) != "00:00"
+       if start_time_1 > end_time_1
+         errors.add(:time1, ": 日またがりの場合は、０時以降を時間２へ入力してくだい。")
+       end
+     end
+   end
    
    #労務費合計
    def self.sumprice  

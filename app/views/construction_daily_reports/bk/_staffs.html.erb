@@ -1,4 +1,0 @@
-<% @staff = Staff.new unless @staff %>
-<%= simple_form_for (@staff) do |f| %>
-  <%= f.collection_select :dayly_pay, Staff.where(id: staff_id), :id, :dayly_pay,  { id:"dayly_pay" } %>
-<% end %>

@@ -47,7 +47,7 @@
         <td><%= link_to material_master.id, material_master_path(material_master) %></td>
         <td><%= material_master.material_code %></td>
         <td><%= material_master.material_name %></td>
-	<td><%= @maker_masters[(material_master.maker_id)-1].maker_name %></td>
+	<td><%= material_master.MakerMaster.maker_name %></td>
 	<td><%= number_to_currency(material_master.list_price, precision: 0) %></td>
         <td><%=l material_master.created_at %></td>
         <td>

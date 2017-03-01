@@ -129,6 +129,9 @@ Rails.application.routes.draw do
   
   get '/purchase_datum/supplier_item_select' => 'purchase_data#supplier_item_select'
   
+  #add170226
+  get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
+  
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   #161212
   #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
@@ -145,6 +148,9 @@ Rails.application.routes.draw do
   #add161207
   get '/purchase_order_datum/get_alias_name' => 'purchase_order_data#get_alias_name'
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
+  
+  #add170218
+  get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -180,8 +186,31 @@ Rails.application.routes.draw do
   #歩掛計
   get '/quotation_detail_large_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_large_classifications#labor_productivity_unit_total_select'
   #
+  #add170223
+  #歩掛-配管配線用
+  get '/quotation_detail_large_classificationz/LPU_piping_wiring_select' => 'quotation_detail_large_classifications#LPU_piping_wiring_select'
+  get '/quotation_detail_middle_classificationz/LPU_piping_wiring_select' => 'quotation_detail_middle_classifications#LPU_piping_wiring_select'
+  get '/invoice_detail_large_classificationz/LPU_piping_wiring_select' => 'invoice_detail_large_classifications#LPU_piping_wiring_select'
+  get '/invoice_detail_middle_classificationz/LPU_piping_wiring_select' => 'invoice_detail_middle_classifications#LPU_piping_wiring_select'
+  get '/delivery_slip_detail_large_classificationz/LPU_piping_wiring_select' => 'delivery_slip_detail_large_classifications#LPU_piping_wiring_select'
+  get '/delivery_slip_detail_middle_classificationz/LPU_piping_wiring_select' => 'delivery_slip_detail_middle_classifications#LPU_piping_wiring_select'
+  #歩掛-機器取付用
+  get '/quotation_detail_large_classificationz/LPU_equipment_mounting_select' => 'quotation_detail_large_classifications#LPU_equipment_mounting_select'
+  get '/quotation_detail_middle_classificationz/LPU_equipment_mounting_select' => 'quotation_detail_middle_classifications#LPU_equipment_mounting_select'
+  get '/invoice_detail_large_classificationz/LPU_equipment_mounting_select' => 'invoice_detail_large_classifications#LPU_equipment_mounting_select'
+  get '/invoice_detail_middle_classificationz/LPU_equipment_mounting_select' => 'invoice_detail_middle_classifications#LPU_equipment_mounting_select'
+  get '/delivery_slip_detail_large_classificationz/LPU_equipment_mounting_select' => 'delivery_slip_detail_large_classifications#LPU_equipment_mounting_select'
+  get '/delivery_slip_detail_middle_classificationz/LPU_equipment_mounting_select' => 'delivery_slip_detail_middle_classifications#LPU_equipment_mounting_select'
   
-  #add170202-pm
+  #歩掛-労務費用
+  get '/quotation_detail_large_classificationz/LPU_labor_cost_select' => 'quotation_detail_large_classifications#LPU_labor_cost_select'
+  get '/quotation_detail_middle_classificationz/LPU_labor_cost_select' => 'quotation_detail_middle_classifications#LPU_labor_cost_select'
+  get '/invoice_detail_large_classificationz/LPU_labor_cost_select' => 'invoice_detail_large_classifications#LPU_labor_cost_select'
+  get '/invoice_detail_middle_classificationz/LPU_labor_cost_select' => 'invoice_detail_middle_classifications#LPU_labor_cost_select'
+  get '/delivery_slip_detail_large_classificationz/LPU_labor_cost_select' => 'delivery_slip_detail_large_classifications#LPU_labor_cost_select'
+  get '/delivery_slip_detail_middle_classificationz/LPU_labor_cost_select' => 'delivery_slip_detail_middle_classifications#LPU_labor_cost_select'
+  #add end
+  
   ###
   #請求書見出D関連
   get '/invoice_headerz/customer_info_select' => 'invoice_headers#customer_info_select'

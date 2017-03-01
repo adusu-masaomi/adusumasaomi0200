@@ -22,6 +22,11 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   def self.serial_number
     [[("<行選択>").to_s , (1..100).to_a ]]
   end 
+  
+  #add170223
+  def self.types 
+    [["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
+  end
 
   #金額合計(見積)
   def self.sumpriceQuote  
@@ -41,6 +46,27 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   end 
   
   #scope
+  #add170223
+  #合計(歩掛り-配管配線集計用)
+  scope :sum_LPU_PipingWiring, -> quotation_header_id, quotation_detail_large_classification_id {where(:piping_wiring_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit)}
+  #合計(歩掛り計-配管配線集計用)
+  scope :sum_LPUT_PipingWiring, -> quotation_header_id, quotation_detail_large_classification_id {where(:piping_wiring_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                    where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit_total)}
+  #合計(歩掛り-機器取付集計用)
+  scope :sum_LPU_equipment_mounting, -> quotation_header_id, quotation_detail_large_classification_id {where(:equipment_mounting_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                    where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit)}
+  #合計(歩掛り-機器取付集計用)
+  scope :sum_LPUT_equipment_mounting, -> quotation_header_id, quotation_detail_large_classification_id {where(:equipment_mounting_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                    where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit_total)}
+  #合計(歩掛り-労務費集計用)
+  scope :sum_LPU_labor_cost, -> quotation_header_id, quotation_detail_large_classification_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                    where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit)}
+  #合計(歩掛り-労務費集計用)
+  scope :sum_LPUT_labor_cost, -> quotation_header_id, quotation_detail_large_classification_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                    where(quotation_detail_large_classification_id: quotation_detail_large_classification_id ).sum(:labor_productivity_unit_total)}
+  #add end
+  
   scope :with_header_id, -> (quotation_detail_middle_classifications_quotation_header_id=1) { joins(:QuotationHeader).where("quotation_headers.id = ?", quotation_detail_middle_classifications_quotation_header_id )}
 
   #scope :with_large_item, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1) { joins(:QuotationDetailLargeClassification).where("quotation_detail_large_classifications.quotation_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )}

@@ -16,6 +16,10 @@ class PurchaseDatum < ActiveRecord::Base
     attr_accessor :check_unit
     #仕入先品番選択用
 	attr_accessor :supplier_material_code
+	#add170226
+	attr_accessor :supplier_id_hide
+	
+    attr_accessor :unit_price_hide
 	
     #金額合計
     def self.sumprice  

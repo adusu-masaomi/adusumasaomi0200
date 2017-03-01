@@ -51,14 +51,14 @@
   <%= f.label :material_code, '品名：' %>
   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px' %></br>
       <div>
-       <%= f.submit '検索する', :class => 'btn btn-default' %>
-        <%= link_to '新規作成',
-            new_purchase_datum_path(:new_flag => "0"),
-            :class => 'btn btn-primary' %>
-        <%= link_to "仕入表PDF",
+       <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
+       <%= link_to "仕入表",
             purchase_data_path(@purchase_datum, format: "pdf"),
             :class => 'btn  btn-success', :target=>["_blank"] %>
-      <%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default'%>
+       <%= link_to '新規作成',
+            new_purchase_datum_path(:new_flag => "0"),
+            :class => 'btn btn-primary' %>
+       <%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default'%>
        <td><font size="3">合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></font></td>
  
      </div>

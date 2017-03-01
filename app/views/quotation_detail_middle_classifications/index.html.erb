@@ -67,20 +67,24 @@
 
   <thead>
     <tr>
-      <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
+      <th style="width:40px;"><%= model_class.human_attribute_name(:id) %></th>
       <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
       <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
 	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
       <th style="width:50px;">　数量</th>
       <th style="width:50px;">単位</th>
 	  <th style="width:80px;">　 見積単価</th>
-      <th style="width:80px;">　 見積金額</th>
+      <th style="width:110px;">　 見積金額</th>
       <th style="width:50px;">　実数</th>
       <th style="width:50px;">単位</th>
       <th style="width:80px;">　 実行単価</th>
-      <th style="width:80px;">　 実行金額</th>
+      <th style="width:110px;">　 実行金額</th>
       <th style="width:80px;">　　　 歩掛</th>
       <th style="width:80px;">　　 歩掛計</th>
+      <th style="width:20px;">配</th>
+      <th style="width:20px;">機</th>
+      <th style="width:20px;">労</th>
+      <th style="width:250px;"><%= model_class.human_attribute_name(:remarks) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170202014047) do
+ActiveRecord::Schema.define(version: 20170227041737) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -52,6 +52,8 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.datetime "created_at",                                              null: false
     t.datetime "update_at",                                               null: false
   end
+
+  add_index "construction_daily_reports", ["construction_datum_id", "working_date", "staff_id", "start_time_1", "end_time_1"], name: "idx_working_hours", unique: true, using: :btree
 
   create_table "construction_data", force: :cascade do |t|
     t.string   "construction_code",          limit: 255
@@ -101,12 +103,17 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "working_unit_id",                 limit: 4
     t.string   "working_unit_name",               limit: 255
     t.integer  "working_unit_price",              limit: 4
-    t.integer  "delivery_slip_price",             limit: 4
+    t.string   "delivery_slip_price",             limit: 255
     t.integer  "execution_unit_price",            limit: 4
-    t.integer  "execution_price",                 limit: 4
+    t.string   "execution_price",                 limit: 255
     t.float    "labor_productivity_unit",         limit: 24
     t.float    "labor_productivity_unit_total",   limit: 24
     t.integer  "last_line_number",                limit: 4
+    t.string   "remarks",                         limit: 255
+    t.integer  "construction_type",               limit: 4
+    t.integer  "piping_wiring_flag",              limit: 4
+    t.integer  "equipment_mounting_flag",         limit: 4
+    t.integer  "labor_cost_flag",                 limit: 4
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
   end
@@ -125,9 +132,9 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "working_unit_id",                              limit: 4
     t.string   "working_unit_name",                            limit: 255
     t.integer  "working_unit_price",                           limit: 4
-    t.integer  "delivery_slip_price",                          limit: 4
+    t.string   "delivery_slip_price",                          limit: 255
     t.integer  "execution_unit_price",                         limit: 4
-    t.integer  "execution_price",                              limit: 4
+    t.string   "execution_price",                              limit: 255
     t.integer  "material_id",                                  limit: 4
     t.string   "working_material_name",                        limit: 255
     t.integer  "material_unit_price",                          limit: 4
@@ -139,6 +146,11 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "material_cost_total",                          limit: 4
     t.integer  "labor_cost_total",                             limit: 4
     t.integer  "other_cost",                                   limit: 4
+    t.string   "remarks",                                      limit: 255
+    t.integer  "construction_type",                            limit: 4
+    t.integer  "piping_wiring_flag",                           limit: 4
+    t.integer  "equipment_mounting_flag",                      limit: 4
+    t.integer  "labor_cost_flag",                              limit: 4
     t.datetime "created_at",                                               null: false
     t.datetime "updated_at",                                               null: false
   end
@@ -190,12 +202,17 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "working_unit_id",               limit: 4
     t.string   "working_unit_name",             limit: 255
     t.integer  "working_unit_price",            limit: 4
-    t.integer  "invoice_price",                 limit: 4
+    t.string   "invoice_price",                 limit: 255
     t.integer  "execution_unit_price",          limit: 4
-    t.integer  "execution_price",               limit: 4
+    t.string   "execution_price",               limit: 255
     t.float    "labor_productivity_unit",       limit: 24
     t.float    "labor_productivity_unit_total", limit: 24
     t.integer  "last_line_number",              limit: 4
+    t.string   "remarks",                       limit: 255
+    t.integer  "construction_type",             limit: 4
+    t.integer  "piping_wiring_flag",            limit: 4
+    t.integer  "equipment_mounting_flag",       limit: 4
+    t.integer  "labor_cost_flag",               limit: 4
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
   end
@@ -214,9 +231,9 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "working_unit_id",                        limit: 4
     t.string   "working_unit_name",                      limit: 255
     t.integer  "working_unit_price",                     limit: 4
-    t.integer  "invoice_price",                          limit: 4
+    t.string   "invoice_price",                          limit: 255
     t.integer  "execution_unit_price",                   limit: 4
-    t.integer  "execution_price",                        limit: 4
+    t.string   "execution_price",                        limit: 255
     t.integer  "material_id",                            limit: 4
     t.string   "working_material_name",                  limit: 255
     t.integer  "material_unit_price",                    limit: 4
@@ -228,6 +245,11 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "material_cost_total",                    limit: 4
     t.integer  "labor_cost_total",                       limit: 4
     t.integer  "other_cost",                             limit: 4
+    t.string   "remarks",                                limit: 255
+    t.integer  "construction_type",                      limit: 4
+    t.integer  "piping_wiring_flag",                     limit: 4
+    t.integer  "equipment_mounting_flag",                limit: 4
+    t.integer  "labor_cost_flag",                        limit: 4
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
   end
@@ -325,6 +347,7 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.string   "purchase_order_code",   limit: 255
     t.integer  "construction_datum_id", limit: 4
     t.integer  "supplier_master_id",    limit: 4
+    t.string   "alias_name",            limit: 255
     t.date     "purchase_order_date"
     t.integer  "mail_sent_flag",        limit: 4
     t.datetime "created_at",                        null: false
@@ -363,12 +386,17 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "working_unit_id",               limit: 4
     t.string   "working_unit_name",             limit: 255
     t.integer  "working_unit_price",            limit: 4
-    t.integer  "quote_price",                   limit: 4
+    t.string   "quote_price",                   limit: 255
     t.integer  "execution_unit_price",          limit: 4
-    t.integer  "execution_price",               limit: 4
+    t.string   "execution_price",               limit: 255
     t.float    "labor_productivity_unit",       limit: 24
     t.float    "labor_productivity_unit_total", limit: 24
     t.integer  "last_line_number",              limit: 4
+    t.string   "remarks",                       limit: 255
+    t.integer  "construction_type",             limit: 4
+    t.integer  "piping_wiring_flag",            limit: 4
+    t.integer  "equipment_mounting_flag",       limit: 4
+    t.integer  "labor_cost_flag",               limit: 4
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
   end
@@ -392,9 +420,9 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.string   "working_unit_name",                        limit: 255
     t.integer  "quotation_unit_price",                     limit: 4
     t.integer  "working_unit_price",                       limit: 4
-    t.integer  "quote_price",                              limit: 4
+    t.string   "quote_price",                              limit: 255
     t.integer  "execution_unit_price",                     limit: 4
-    t.integer  "execution_price",                          limit: 4
+    t.string   "execution_price",                          limit: 255
     t.integer  "material_id",                              limit: 4
     t.string   "quotation_material_name",                  limit: 255
     t.integer  "material_unit_price",                      limit: 4
@@ -406,6 +434,11 @@ ActiveRecord::Schema.define(version: 20170202014047) do
     t.integer  "material_cost_total",                      limit: 4
     t.integer  "labor_cost_total",                         limit: 4
     t.integer  "other_cost",                               limit: 4
+    t.string   "remarks",                                  limit: 255
+    t.integer  "construction_type",                        limit: 4
+    t.integer  "piping_wiring_flag",                       limit: 4
+    t.integer  "equipment_mounting_flag",                  limit: 4
+    t.integer  "labor_cost_flag",                          limit: 4
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
   end

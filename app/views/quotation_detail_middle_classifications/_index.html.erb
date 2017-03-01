@@ -1,25 +1,71 @@
  <% @quotation_detail_middle_classifications.order("quotation_header_id desc, quotation_detail_large_classification_id asc, line_number desc").each do |quotation_detail_middle_classification| %>
       <tr>
-	    <td><%= link_to quotation_detail_middle_classification.id, quotation_detail_middle_classification_path(quotation_detail_middle_classification) %></td>
+
+        <!--add170223-->
+        <!--条件によって色を変える処理-->
+        <% case quotation_detail_middle_classification.construction_type %>
+        <% when 1  %>
+          <% color = "red" %>
+          <% bold = "font-weight:bold" %> 
+        <% when 2  %>
+          <% color = "blue" %>
+          <% bold = "font-weight:bold" %> 
+        <% when 3  %>
+          <% color = "brown"%>
+          <% bold = "font-weight:bold" %> 
+        <% else %>
+          <% color = "black"%>
+        <% end %>
+        <!--add end-->
+        <td style="font-size : 8px;"><%= link_to quotation_detail_middle_classification.id, quotation_detail_middle_classification_path(quotation_detail_middle_classification) %></td>
         <!--<td><%= quotation_detail_middle_classification.QuotationHeader.construction_name %></td>-->
         <td><%= quotation_detail_middle_classification.line_number %></td>
-        <td><%= quotation_detail_middle_classification.working_middle_item_name %></td>
+        <!--upd170223-->
+        <td style = <%= bold %> ><font color = <%= color %>  ><%= quotation_detail_middle_classification.working_middle_item_name %></font></td>
+        <!--upd end-->
         <td><%= quotation_detail_middle_classification.working_middle_specification %></td>
         <td align="right"><%= quotation_detail_middle_classification.quantity %></td>
-        <td align="center"><%= quotation_detail_middle_classification.working_unit_name %></td>
+        <% if quotation_detail_middle_classification.working_unit_name != "<手入力>" %>
+          <td align="center"><%= quotation_detail_middle_classification.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
         <td align="right"><%= number_to_currency(quotation_detail_middle_classification.working_unit_price,  precision: 0) %></td>
-        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.quote_price,  precision: 0) %></td>
+        <% if quotation_detail_middle_classification.quote_price.present? && quotation_detail_middle_classification.quote_price.delete("^0-9").to_i > 0 %>
+          <td align="right"><%= number_to_currency(quotation_detail_middle_classification.quote_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right"><%= quotation_detail_middle_classification.quote_price %></td>
+        <% end %>
         <td align="right"><%= quotation_detail_middle_classification.execution_quantity %></td>
-        <td align="center"><%= quotation_detail_middle_classification.working_unit_name %></td>
+        <% if quotation_detail_middle_classification.working_unit_name != "<手入力>" %>
+          <td align="center"><%= quotation_detail_middle_classification.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
         <td align="right"><%= number_to_currency(quotation_detail_middle_classification.execution_unit_price,  precision: 0) %></td>
-        <td align="right"><%= number_to_currency(quotation_detail_middle_classification.execution_price,  precision: 0) %></td> 
-        
+        <% if quotation_detail_middle_classification.execution_price.present? && quotation_detail_middle_classification.execution_price.delete("^0-9").to_i > 0 %>
+          <td align="right"><%= number_to_currency(quotation_detail_middle_classification.execution_price,  precision: 0) %></td> 
+        <% else %>
+          <td align="right"><%= quotation_detail_middle_classification.execution_price %></td>
+        <% end %>
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.material_unit_price,  precision: 0) %></td>-->
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.labor_unit_price,  precision: 0) %></td>-->
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.accessory_cost,  precision: 0) %></td>-->
-        <td align="right"><%= number_with_precision(quotation_detail_middle_classification.labor_productivity_unit, precision: 3) %></td>
-        <td align="right"><%= number_with_precision(quotation_detail_middle_classification.labor_productivity_unit_total, precision: 3) %></td>
-
+        <!--upd170223-->
+        <td align="right" style = <%= bold %> ><font color = <%= color %>  >
+        <%= number_with_precision(quotation_detail_middle_classification.labor_productivity_unit, precision: 3) %></font></td>
+        <td align="right" style = <%= bold %> ><font color = <%= color %>  >
+        <%= number_with_precision(quotation_detail_middle_classification.labor_productivity_unit_total, precision: 3) %></font></td>
+        <!--upd end-->
+        <!--add170223-->
+        <td><%= check_box("piping_wiring_flag", "active", {checked: check_if_true(quotation_detail_middle_classification.piping_wiring_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("equipment_mounting_flag", "active", {checked: check_if_true(quotation_detail_middle_classification.equipment_mounting_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("labor_cost_flag", "active", {checked: check_if_true(quotation_detail_middle_classification.labor_cost_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <!--add end-->
+        <td><%= quotation_detail_middle_classification.remarks %></td>
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.material_cost_total,  precision: 0) %></td>-->
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.labor_cost_total,  precision: 0) %></td>-->
         <!--<td align="right"><%= number_to_currency(quotation_detail_middle_classification.other_cost,  precision: 0) %></td>-->

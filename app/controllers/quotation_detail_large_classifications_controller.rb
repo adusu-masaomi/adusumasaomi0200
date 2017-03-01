@@ -39,7 +39,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       #ransack保持用コード
       search_history = {
        value: params[:q],
-       expires: 24.hours.from_now
+       #expires: 24.hours.from_now
+       expires: 480.minutes.from_now
       }
       cookies[:recent_search_history] = search_history if params[:q].present?
     end 
@@ -149,6 +150,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   def create
   	  @quotation_detail_large_classification = QuotationDetailLargeClassification.create(quotation_detail_large_classification_params)
 	  
+	  #add170223
+	  #歩掛りの集計を最新のもので書き換える。
+	  update_labor_productivity_unit_summary
+	  
       # 見出データを保存 
       save_price_to_headers
       
@@ -228,7 +233,11 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   # PATCH/PUT /quotation_detail_large_classifications/1.json
   def update
   
-	  @quotation_detail_large_classification.update(quotation_detail_large_classification_params)
+      @quotation_detail_large_classification.update(quotation_detail_large_classification_params)
+	  
+	  #add170223
+	  #歩掛りの集計を最新のもので書き換える。
+	  update_labor_productivity_unit_summary
 	  
       # 見出データを保存 
       save_price_to_headers
@@ -377,19 +386,71 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   def labor_productivity_unit_total_select
      @labor_productivity_unit_total = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit_total).flatten.join(" ")
   end
-
+  
+  #add170223
+  #歩掛り(配管配線集計用)
+  def LPU_piping_wiring_select
+    @labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_PipingWiring(params[:quotation_header_id])
+    @labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_PipingWiring(params[:quotation_header_id])
+  end
+  #歩掛り(機器取付集計用)
+  def LPU_equipment_mounting_select
+    @labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_equipment_mounting(params[:quotation_header_id])
+	@labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_equipment_mounting(params[:quotation_header_id])
+  end
+  #歩掛り(労務費集計用)
+  def LPU_labor_cost_select
+  
+    @labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_labor_cost(params[:quotation_header_id])
+	@labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_labor_cost(params[:quotation_header_id])
+  end
+  
+  
+  #歩掛りの集計を最新のもので書き換える。
+  def update_labor_productivity_unit_summary
+    quotation_header_id = params[:quotation_detail_large_classification][:quotation_header_id]
+    
+    #配管配線の計を更新(construction_type=1)
+    @QDLC_piping_wiring = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 1).first
+    if @QDLC_piping_wiring.present?
+      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_PipingWiring(quotation_header_id)
+      labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_PipingWiring(quotation_header_id)
+      @QDLC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	end
+	
+	#機器取付の計を更新(construction_type=2)
+    @QDLC_equipment_mounting = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 2).first
+	if @QDLC_equipment_mounting.present?
+      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_equipment_mounting(quotation_header_id)
+      labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_equipment_mounting(quotation_header_id)
+	  @QDLC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	end
+    #労務費の計を更新(construction_type=3)
+    @QDLC_labor_cost = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 3).first
+	if @QDLC_labor_cost.present?
+      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_labor_cost(quotation_header_id)
+      labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_labor_cost(quotation_header_id)
+	  @QDLC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	end
+  
+  end
+  
+  #add end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_quotation_detail_large_classification
 	   
 	   @quotation_detail_large_classification = QuotationDetailLargeClassification.find(params[:id])
     end
-
+    
+    # ストロングパラメータ
     # Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_large_classification_params
       params.require(:quotation_detail_large_classification).permit(:quotation_header_id, :quotation_items_division_id, :working_large_item_id, 
                      :working_large_item_name, :working_large_specification, :line_number, :quantity, :execution_quantity, :working_unit_id, 
-                     :working_unit_name, :working_unit_price, :execution_unit_price, :quote_price, :execution_price, :labor_productivity_unit, :labor_productivity_unit_total)
+                     :working_unit_name, :working_unit_price, :execution_unit_price, :quote_price, :execution_price, :labor_productivity_unit, 
+                     :labor_productivity_unit_total, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag)
     end
    
     #以降のレコードの行番号を全てインクリメントする
@@ -489,7 +550,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   billing_amount: @quotation_header.quote_price, execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
           #上記、見積日は移行しないものとする。
           @invoice_header = InvoiceHeader.new(invoice_header_params)
-          if @invoice_header.save!
+          if @invoice_header.save!(:validate => false)
 		  else
 		    @success_flag = false
 		  end
@@ -523,10 +584,12 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                 execution_quantity: q_d_l_c.execution_quantity, working_unit_id: q_d_l_c.working_unit_id, working_unit_name: q_d_l_c.working_unit_name, 
                 working_unit_price: q_d_l_c.working_unit_price, invoice_price: q_d_l_c.quote_price, execution_unit_price: q_d_l_c.execution_unit_price, 
                 execution_price: q_d_l_c.execution_price, labor_productivity_unit: q_d_l_c.labor_productivity_unit, 
-                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.last_line_number }
+                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.remarks, last_line_number: q_d_l_c.remarks,
+                construction_type: q_d_l_c.construction_type , piping_wiring_flag: q_d_l_c.piping_wiring_flag , equipment_mounting_flag: q_d_l_c.equipment_mounting_flag , 
+                labor_cost_flag: q_d_l_c.labor_cost_flag }
             
 			  @invoice_detail_large_classification = InvoiceDetailLargeClassification.new(invoice_detail_large_classification_params)
-              if @invoice_detail_large_classification.save!
+              if @invoice_detail_large_classification.save!(:validate => false)
 		      
                  #IDをここでセットしておく（明細で参照するため）
 			     @invoice_detail_large_classification_id = InvoiceDetailLargeClassification.maximum("id")
@@ -559,12 +622,14 @@ class QuotationDetailLargeClassificationsController < ApplicationController
              quantity: q_d_m_c.quantity, execution_quantity: q_d_m_c.execution_quantity, working_unit_id: q_d_m_c.working_unit_id, working_unit_name: q_d_m_c.working_unit_name,
              working_unit_price: q_d_m_c.working_unit_price, invoice_price: q_d_m_c.quote_price, execution_unit_price: q_d_m_c.execution_unit_price, execution_price: q_d_m_c.execution_price,
              material_id: q_d_m_c.material_id, working_material_name: q_d_m_c.quotation_material_name, material_unit_price: q_d_m_c.material_unit_price, 
-			 labor_unit_price: q_d_m_c.labor_unit_price, labor_productivity_unit: q_d_m_c.labor_productivity_unit, labor_productivity_unit_total: q_d_m_c.labor_productivity_unit_total,
-			 material_quantity: q_d_m_c.material_quantity, accessory_cost: q_d_m_c.accessory_cost, material_cost_total: q_d_m_c.material_cost_total, 
-			 labor_cost_total: q_d_m_c.labor_cost_total, other_cost: q_d_m_c.other_cost } 
+             labor_unit_price: q_d_m_c.labor_unit_price, labor_productivity_unit: q_d_m_c.labor_productivity_unit, labor_productivity_unit_total: q_d_m_c.labor_productivity_unit_total,
+             material_quantity: q_d_m_c.material_quantity, accessory_cost: q_d_m_c.accessory_cost, material_cost_total: q_d_m_c.material_cost_total, 
+             labor_cost_total: q_d_m_c.labor_cost_total, other_cost: q_d_m_c.other_cost, remarks: q_d_m_c.remarks,
+             construction_type: q_d_m_c.construction_type , piping_wiring_flag: q_d_m_c.piping_wiring_flag , equipment_mounting_flag: q_d_m_c.equipment_mounting_flag , 
+             labor_cost_flag: q_d_m_c.labor_cost_flag } 
           	
           @invoice_detail_middle_classification = InvoiceDetailMiddleClassification.new(invoice_detail_middle_classification_params)
-          if @invoice_detail_middle_classification.save!
+          if @invoice_detail_middle_classification.save!(:validate => false)
 		  else
 		    @success_flag = false
 			flash[:notice] = "データ作成に失敗しました！再度行ってください。"
@@ -615,7 +680,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   delivery_amount: @quotation_header.quote_price, execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
           #上記、見積日は移行しないものとする。
           @deliver_slip_header = DeliverySlipHeader.new(delivery_slip_header_params)
-          if @deliver_slip_header.save!
+          if @deliver_slip_header.save!(:validate => false)
 		  else
             flash[:notice] = "データ作成に失敗しました！見積書コードを登録してください。"
             @success_flag = false
@@ -646,10 +711,12 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                 execution_quantity: q_d_l_c.execution_quantity, working_unit_id: q_d_l_c.working_unit_id, working_unit_name: q_d_l_c.working_unit_name, 
                 working_unit_price: q_d_l_c.working_unit_price, delivery_slip_price: q_d_l_c.quote_price, execution_unit_price: q_d_l_c.execution_unit_price, 
                 execution_price: q_d_l_c.execution_price, labor_productivity_unit: q_d_l_c.labor_productivity_unit, 
-                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.last_line_number }
+                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.last_line_number, remarks: q_d_l_c.remarks,
+                construction_type: q_d_l_c.construction_type , piping_wiring_flag: q_d_l_c.piping_wiring_flag , equipment_mounting_flag: q_d_l_c.equipment_mounting_flag , 
+                labor_cost_flag: q_d_l_c.labor_cost_flag }
             
 			  @delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.new(delivery_slip_detail_large_classification_params)
-              if @delivery_slip_detail_large_classification.save!
+              if @delivery_slip_detail_large_classification.save!(:validate => false)
 		      
                  #IDをここでセットしておく（明細で参照するため）
 			     @delivery_slip_detail_large_classification_id = DeliverySlipDetailLargeClassification.maximum("id")
@@ -684,12 +751,13 @@ class QuotationDetailLargeClassificationsController < ApplicationController
              material_id: q_d_m_c.material_id, working_material_name: q_d_m_c.quotation_material_name, material_unit_price: q_d_m_c.material_unit_price, 
 			 labor_unit_price: q_d_m_c.labor_unit_price, labor_productivity_unit: q_d_m_c.labor_productivity_unit, labor_productivity_unit_total: q_d_m_c.labor_productivity_unit_total,
 			 material_quantity: q_d_m_c.material_quantity, accessory_cost: q_d_m_c.accessory_cost, material_cost_total: q_d_m_c.material_cost_total, 
-			 labor_cost_total: q_d_m_c.labor_cost_total, other_cost: q_d_m_c.other_cost } 
+			 labor_cost_total: q_d_m_c.labor_cost_total, other_cost: q_d_m_c.other_cost, remarks: q_d_m_c.remarks,
+             construction_type: q_d_m_c.construction_type , piping_wiring_flag: q_d_m_c.piping_wiring_flag , equipment_mounting_flag: q_d_m_c.equipment_mounting_flag , 
+             labor_cost_flag: q_d_m_c.labor_cost_flag } 
           
-          #binding.pry
-	
+          
           @delivery_slip_detail_middle_classification = DeliverySlipDetailMiddleClassification.new(delivery_slip_detail_middle_classification_params)
-          if @delivery_slip_detail_middle_classification.save!
+          if @delivery_slip_detail_middle_classification.save!(:validate => false)
 		  else
 		    @success_flag = false
 		  end 

@@ -10,9 +10,23 @@ class ConstructionDailyReportsController < ApplicationController
   # GET /construction_daily_reports.json
   def index
     # @construction_daily_reports = ConstructionDailyReport.all
-    
-     @q = ConstructionDailyReport.ransack(params[:q])  
-     @construction_daily_reports = @q.result(distinct: true)
+     
+	  #ransack保持用コード
+      query = params[:q]
+      query ||= eval(cookies[:recent_search_history].to_s)  	
+		
+     #@q = ConstructionDailyReport.ransack(params[:q])  
+     #ransack保持用--上記はこれに置き換える
+     @q = ConstructionDailyReport.ransack(query)   
+     #ransack保持用コード
+     search_history = {
+     value: params[:q],
+     expires: 240.minutes.from_now
+     }
+     cookies[:recent_search_history] = search_history if params[:q].present?
+     #
+	 
+	 @construction_daily_reports = @q.result(distinct: true)
      @construction_daily_reports = @construction_daily_reports.page(params[:page])
    
     # @users = User.all.order(sort_column + ' ' + sort_direction)　
@@ -30,7 +44,6 @@ class ConstructionDailyReportsController < ApplicationController
       #global set
       $construction_daily_reports = @construction_daily_reports
       
-	  
 	  format.pdf do
         report = LaborCostSummaryPDF.create @construction_daily_reports 
         # ブラウザでPDFを表示する

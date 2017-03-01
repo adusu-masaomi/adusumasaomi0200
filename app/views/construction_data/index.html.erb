@@ -13,7 +13,11 @@
     <%= f.label :construction_name, '工事名　' %>
     <!--<%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>-->
     <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
-    <%= f.label :customer_name, '得意先名　' %>
+    
+    <%= f.label :construction_code, '工事コード(範囲)' %>
+    <%= f.text_field :construction_code_cont, include_blank: true  %>
+	
+	<%= f.label :customer_name, '得意先名　' %>
     <!--<%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
     <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
 

@@ -57,7 +57,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @quotation_headers.order("id desc").each do |quotation_header| %>
+    <% @quotation_headers.order("quotation_code desc").each do |quotation_header| %>
       <tr>
         <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: quotation_header.id, 

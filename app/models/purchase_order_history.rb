@@ -4,10 +4,11 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	belongs_to :supplier_master
 	
 	has_many :orders
-    #accepts_nested_attributes_for :orders, reject_if: proc { |attributes| attributes['quantity'].blank? }, :allow_destroy => true
-	#accepts_nested_attributes_for :orders, :allow_destroy => true, :reject_if => :no_quantity
-	
-	accepts_nested_attributes_for :orders, :allow_destroy => true
+    #accepts_nested_attributes_for :orders, :allow_destroy => true
+	accepts_nested_attributes_for :orders, allow_destroy: true
+    
+	#has_many :material_maters
+    #accepts_nested_attributes_for :material_maters
 	
 	#eメール取得用
     attr_accessor :email_responsible

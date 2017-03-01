@@ -17,6 +17,7 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_order_id = []
   @@purchase_datum_slip_code = []
   @@purchase_datum_construction_id = []
+  @@purchase_datum_supplier_id = []
   @@purchase_datum_notes = ""
   @@purchase_datum_division_id = []
   
@@ -35,14 +36,14 @@ class PurchaseDataController < ApplicationController
 	#@q = PurchaseDatum.ransack(params[:q]) 
         #ransack保持用--上記はこれに置き換える
         @q = PurchaseDatum.ransack(query)   
-        
-        #ransack保持用コード
+         #ransack保持用コード
         search_history = {
         value: params[:q],
         expires: 30.minutes.from_now
         }
         cookies[:recent_search_history] = search_history if params[:q].present?
         #
+       
 
 	@purchase_data = @q.result(distinct: true)
 	
@@ -112,6 +113,7 @@ class PurchaseDataController < ApplicationController
     @@purchase_datum_order_id = @purchase_datum.purchase_order_datum_id
     @@purchase_datum_slip_code = @purchase_datum.slip_code
     @@purchase_datum_construction_id = @purchase_datum.construction_datum_id
+    @@purchase_datum_supplier_id = @purchase_datum.supplier_id
 	@@purchase_datum_notes = @purchase_datum.notes
 	@@purchase_datum_division_id = @purchase_datum.division_id
     
@@ -137,7 +139,8 @@ class PurchaseDataController < ApplicationController
 	     @purchase_datum.purchase_order_datum_id ||= @@purchase_datum_order_id
 	     @purchase_datum.slip_code ||= @@purchase_datum_slip_code 
 	     @purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
-		 @purchase_datum.notes ||= @@purchase_datum_notes
+		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id
+         @purchase_datum.notes ||= @@purchase_datum_notes
 		 @purchase_datum.division_id ||= @@purchase_datum_division_id
 	   end
 	   
@@ -285,6 +288,13 @@ class PurchaseDataController < ApplicationController
   def supplier_item_select
     @supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
   end
+  
+  #add170226
+  def supplier_select
+   @supplier_id  = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("supplier_master_id")
+	#binding.pry
+  end
+  
   
   private
     # Use callbacks to share common setup or constraints between actions.

@@ -6,7 +6,7 @@
 <!--<%= javascript_include_tag 'cocoon' %>-->
 
 
-<%= simple_form_for @purchase_order_history, :html => { :class => 'well form-inline', :style => "width: 1200px;"} do |f| %>
+<%= simple_form_for @purchase_order_history, :html => { :class => 'well form-inline', :style => "width: 1880px;"} do |f| %>
    
 <% if @purchase_order_history.errors.any? %>
   <div id="error_explanation">
@@ -56,8 +56,12 @@
                 
 	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" %>
-     
-  　<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
+      </br></br>
+       <div id="filter" >
+	      <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
+	   </div>
+	   
+   <hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
        
            <div id="subForms" class="sortDone" >
            	<%= f.simple_fields_for :orders, :include_id => false  do |orders| %>
@@ -65,9 +69,9 @@
 	        <% end %>
            </div>
 
-	   <div id="filter" >
-	      <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
-	   </div>
+	   <!--<div id="filter" >-->
+	   <!--   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>-->
+	   <!--</div>-->
 <% end %>
 
   </div>  
@@ -176,8 +180,6 @@ function reset_value() {
 }
 
 function dispDiv() {
-  
-  
   //下記必須（ボタンが消えてしまう）
   //event.preventDefault();
   //debugger;
@@ -194,28 +196,27 @@ function dispDiv() {
 	   // マウスカーソルの形を変える
        $("body").css("cursor", "progress");
 	   
+	   //３秒待つ（描写されないことがあるため）
+	   setTimeout("reloadDiv()", 3000);
 	   
-	   //画面再ロードする
-       window.location.reload();
-       event.preventDefault();
-  
-  
-       //隠れていたボタンをここで表示させる
+	   //隠れていたボタンをここで表示させる
        //$('#filter').removeClass('hide');
        //セッション用のパラメータへセットする
        sessionStorage.setItem('onvisible', 'true');
   
-  
-       // マウスカーソルの形を変える
+	   // マウスカーソルの形を変える
        //$("body").css("cursor", "default");
   
      }
    );
-  
-  
-  
-
 };
+
+function reloadDiv(){
+  //画面再ロードする
+  window.location.reload();
+  event.preventDefault();
+       
+}
   
 </script>
 
