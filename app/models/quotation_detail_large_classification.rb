@@ -7,10 +7,11 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   def self.choices 
     [["項目", 1], ["備考", 2]] 
   end
-
-  def self.types 
-    [["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
-  end
+  
+  #del170308 
+  #def self.types 
+    #[["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
+  #end
 
   #enum serial_number: {1: 1, 2: 2, 3: 3 }
   def self.serial_number
@@ -27,11 +28,17 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   
   #金額合計(見積)
   def self.sumpriceQuote  
-    sum(:quote_price)
+    #sum(:quote_price)
+    #upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
   end
   #金額合計(実行)
   def self.sumpriceExecution  
-    sum(:execution_price)
+    #sum(:execution_price)
+    #upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
   end
   
   #合計(歩掛り)
@@ -40,10 +47,12 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   end
   #合計(歩掛り計)
   def self.sumLaborProductivityUnitTotal  
-    sum(:labor_productivity_unit_total)
+    #where(:construction_type => "0").sum(:labor_productivity_unit_total)
+    #upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total)
   end
   
-  #add170223
   #合計(歩掛り-配管配線集計用)
   scope :sum_LPU_PipingWiring, -> quotation_header_id {where(:piping_wiring_flag => 1).where(quotation_header_id: quotation_header_id ).
                                    sum(:labor_productivity_unit)}
@@ -62,16 +71,9 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   #合計(歩掛り-労務費集計用)
   scope :sum_LPUT_labor_cost, -> quotation_header_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
                                    sum(:labor_productivity_unit_total)}
-  #add end
   
   scope :with_header_id, -> (quotation_detail_large_classifications_quotation_header_id=1) { joins(:QuotationHeader).where("quotation_headers.id = ?", quotation_detail_large_classifications_quotation_header_id )}
-
-  #イマイチ
-  #scope :with_large_item, -> (quotation_detail_large_classifications_id=1) { where("quotation_detail_large_classifications.id = ?", quotation_detail_large_classifications_id).select('distinct quotation_large_item_name, id, quotation_header_id, quotation_items_division_id, quotation_large_item_id, line_number, quantity, quotation_unit_id, quote_price, execution_price, labor_productivity_unit, created_at') }
-
-  #scope :with_large_item, -> (quotation_detail_large_classifications_id=1) { where("quotation_detail_large_classifications.id = ?", quotation_detail_large_classifications_id).group('quotation_large_item_name') }
-  
-  
+   
   def self.ransackable_scopes(auth_object=nil)
      [:with_header_id]
   end

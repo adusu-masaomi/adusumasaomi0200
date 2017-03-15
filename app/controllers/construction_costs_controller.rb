@@ -11,7 +11,15 @@ class ConstructionCostsController < ApplicationController
     #ransack保持用コード
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)      
-
+    
+    if params[:move_flag] == "1"
+       #工事一覧画面から遷移した場合
+       construction_id = params[:construction_id]
+       query = {"construction_datum_id_eq"=> construction_id }
+    end
+	
+	#@search = ConstructionCost.search(params[:q])
+    
     #ransack保持用--上記はこれに置き換える
     @q = ConstructionCost.ransack(query)   
         
@@ -24,7 +32,8 @@ class ConstructionCostsController < ApplicationController
     ###
     
     @construction_costs = @q.result(distinct: true)
-
+    
+	
    respond_to do |format|
       format.html
       format.csv { send_data @construction_costs.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }

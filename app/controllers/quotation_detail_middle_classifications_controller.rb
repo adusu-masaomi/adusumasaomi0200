@@ -16,7 +16,9 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     if params[:quotation_header_id].present?
       $quotation_header_id = params[:quotation_header_id]
       if params[:working_large_item_name].present?
-          $working_large_item_name = params[:working_large_item_name]
+         #$working_large_item_name = params[:working_large_item_name]
+		  #upd170308
+		  $working_large_item_name = [params[:working_large_item_name], params[:working_large_specification]]
       end
 	  if params[:quotation_detail_large_classification_id].present?
           $quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
@@ -31,10 +33,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #
 	
     if $quotation_header_id.present?
-       #if $working_large_item_name.nil?
-       #  $working_large_item_name = params[:working_large_item_name]
-       #end
-      query = {"quotation_header_id_eq"=>"", "with_header_id"=> $quotation_header_id, "with_large_item"=> $working_large_item_name , "working_middle_item_name_eq"=>""}
+    
+      query = {"quotation_header_id_eq"=>"", "with_header_id"=> $quotation_header_id, "with_large_item"=> $working_large_item_name , 
+             "working_middle_item_name_eq"=>""}
+
       @null_flag = "1"
     end 
 
@@ -145,7 +147,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #add170223
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
-	  
+	#add170308
+	recalc_subtotal  
 	
      #手入力用IDの場合は、単位マスタへも登録する。
     #@quotation_unit = nil
@@ -244,6 +247,8 @@ other_cost: @quotation_detail_middle_classification.other_cost
     #add170223
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
+	#add170308
+	recalc_subtotal
 	
     #品目データの金額を更新
 	save_price_to_large_classifications
@@ -393,6 +398,96 @@ other_cost: @quotation_detail_middle_classification.other_cost
   #
 
   # ajax
+  #add170308
+  def subtotal_select
+  #小計を取得、セットする
+     @search_records = QuotationDetailMiddleClassification.where("quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+                                                                 params[:quotation_header_id], params[:quotation_detail_large_classification_id] )
+     if @search_records.present?
+        start_line_number = 0
+        end_line_number = 0
+        current_line_number = params[:line_number].to_i
+        
+		@search_records.order(:line_number).each do |qdmc|
+           if qdmc.construction_type.to_i != $INDEX_SUBTOTAL &&
+              qdmc.construction_type.to_i != $INDEX_DISCOUNT  
+			  #小計,値引き以外なら開始行をセット
+             if start_line_number == 0
+                start_line_number = qdmc.line_number
+		     end
+		   else 
+		     if qdmc.line_number < current_line_number
+		       start_line_number = 0   #開始行を初期化
+			 end
+           end
+		   
+		   if qdmc.line_number < current_line_number   #更新の場合もあるので現在の行はカウントしない。
+		     end_line_number = qdmc.line_number  #終了行をセット
+           end
+        end
+        
+        #範囲内の計を集計
+        @quote_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:quote_price)
+        @execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+        @labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+        
+     end
+  end 
+  #add170308
+  def recalc_subtotal
+  #小計を再計算する
+     @search_records = QuotationDetailMiddleClassification.where("quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+                                                                 params[:quotation_detail_middle_classification][:quotation_header_id], 
+                                                                 params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id] )
+	 if @search_records.present?
+		start_line_number = 0
+        end_line_number = 0
+        current_line_number = params[:quotation_detail_middle_classification][:line_number].to_i
+        
+		subtotal_exist = false
+		id_saved = 0
+		@search_records.order(:line_number).each do |qdmc|
+           if qdmc.construction_type.to_i != $INDEX_SUBTOTAL &&
+              qdmc.construction_type.to_i != $INDEX_DISCOUNT  
+			  
+			 #小計,値引き以外なら開始行をセット
+             if start_line_number == 0
+                start_line_number = qdmc.line_number
+		     end
+		   else 
+		     
+			 if qdmc.line_number < current_line_number
+		       start_line_number = 0   #開始行を初期化
+			 elsif qdmc.line_number > current_line_number
+             #小計欄に来たら、処理を抜ける。
+			   subtotal_exist = true
+			   id_saved = qdmc.id
+               
+			   break
+			 end
+           end
+		   
+		   if qdmc.line_number >= current_line_number   
+		     end_line_number = qdmc.line_number  #終了行をセット
+           end
+        end
+        #範囲内の計を集計
+		if subtotal_exist == true
+          subtotal_records = QuotationDetailMiddleClassification.find(id_saved)
+    
+	      if subtotal_records.present?
+		    quote_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:quote_price)
+            execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+            labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+
+            subtotal_records.update_attributes!(:quote_price => quote_price, :execution_price => execution_price, 
+                                                :labor_productivity_unit_total => labor_productivity_unit_total)
+	      end
+		end
+     end
+  end 
+  #
+  
   def working_middle_item_select
      @working_middle_item_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_name).flatten.join(" ")
   end
@@ -518,31 +613,42 @@ other_cost: @quotation_detail_middle_classification.other_cost
     quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
     quotation_detail_large_classification_id = params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id]
 	
-    #配管配線の計を更新(construction_type=1)
+    #upd170308 construction_typeを定数化・順番変更
+	
+    #配管配線の計を更新(construction_type=x)
     @QDMC_piping_wiring = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
-                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 1).first
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: $INDEX_PIPING_WIRING_CONSTRUCTION).first
 	if @QDMC_piping_wiring.present?
-      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_PipingWiring(quotation_header_id, quotation_detail_large_classification_id)
+      #upd170306
+	  #labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_PipingWiring(quotation_header_id, quotation_detail_large_classification_id)
       labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_PipingWiring(quotation_header_id, quotation_detail_large_classification_id)
-      @QDMC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #@QDMC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #upd170306
+      @QDMC_piping_wiring.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
     end
     
-	#機器取付の計を更新(construction_type=2)
+	#機器取付の計を更新(construction_type=x)
     @QDMC_equipment_mounting = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
-                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 2).first
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: $INDEX_EUIPMENT_MOUNTING).first
     if @QDMC_equipment_mounting.present?
-      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_equipment_mounting(quotation_header_id, quotation_detail_large_classification_id)
+      #upd170306
+      #labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_equipment_mounting(quotation_header_id, quotation_detail_large_classification_id)
       labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_equipment_mounting(quotation_header_id, quotation_detail_large_classification_id)
-      @QDMC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #@QDMC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #upd170306
+      @QDMC_equipment_mounting.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
     end
     
-     #労務費の計を更新(construction_type=3)
+     #労務費の計を更新(construction_type=x)
     @QDMC_labor_cost = QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id, 
-                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: 3).first
+                          quotation_detail_large_classification_id: quotation_detail_large_classification_id, construction_type: $INDEX_LABOR_COST).first
     if @QDMC_labor_cost.present?
-      labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_labor_cost(quotation_header_id, quotation_detail_large_classification_id)
+      #upd170306
+      #labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_labor_cost(quotation_header_id, quotation_detail_large_classification_id)
       labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_labor_cost(quotation_header_id, quotation_detail_large_classification_id)
-      @QDMC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #@QDMC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #upd170306
+      @QDMC_labor_cost.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
     end
   
   end

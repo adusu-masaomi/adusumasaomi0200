@@ -13,11 +13,11 @@
 
   <!--<%= f.select :last_header_number,PurchaseOrderDatum.header_numbers, {}, {class: "searchableHeader" , style: 'width:100px' } %>-->
   <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
-  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1" } %>
+  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1", :onfocusout => "checkAutoOutSourcing()" } %>
   <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => @purchase_order_datum.supplier_master_id || 2}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
   
   <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
      <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"4"}  %>
@@ -74,6 +74,19 @@
     }
   } 
 
+  function checkAutoOutSourcing() {
+    obj = document.getElementById("purchase_order_code").value;
+	if (obj != ""){
+	  purchase_order_code_header = obj.substr(0, 1) ;
+	  if (purchase_order_code_header == "M"){
+	  //仕入先を村山電気にする
+         index = 37;
+         $(".searchableSupplier").val(index).trigger("change"); 
+	  }
+	
+	}
+  }
+
   //ajax
   function setAliasName()
   {
@@ -118,6 +131,9 @@
         function(data){
 		  obj = document.getElementById("purchase_order_code").textContent;
 		  document.getElementById("purchase_order_code").value = obj;
+		  
+		  //村山電気対応 add170307
+		  checkAutoOutSourcing();
 		  }
       );
    };  

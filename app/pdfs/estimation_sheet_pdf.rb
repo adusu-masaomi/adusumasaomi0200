@@ -135,13 +135,35 @@ class EstimationSheetPDF
 					    end
                       end 
                       #  
-                      
-                      row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                      #add170310
+					  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+					  case quotation_detail_large_classification.construction_type.to_i
+					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+                          item_name = ""
+						  unit_price_or_notices = quotation_detail_large_classification.working_large_item_name
+						  @quantity = ""
+						  @unit_name = ""
+						else
+                          item_name = quotation_detail_large_classification.working_large_item_name
+						  unit_price_or_notices = quotation_detail_large_classification.working_unit_price
+					  end
+					  #
+					  
+                      #明細欄出力
+                      #upd170308
+                      row.values working_large_item_name: item_name,
                        working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
 		               working_unit_name: @unit_name,
-					   working_unit_price: quotation_detail_large_classification.working_unit_price,
+					   working_unit_price: unit_price_or_notices,
                        quote_price: quotation_detail_large_classification.quote_price
+					   
+                      #row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                      # working_large_specification: quotation_detail_large_classification.working_large_specification,
+                      # quantity: @quantity,
+		              # working_unit_name: @unit_name,
+					  # working_unit_price: quotation_detail_large_classification.working_unit_price,
+                      # quote_price: quotation_detail_large_classification.quote_price
            end 
 		 #end
     end	
@@ -222,6 +244,10 @@ class EstimationSheetPDF
 		   #品目名
 		   @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
 		   
+		   #add170308
+		   #仕様名
+		   @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
+		   
 		 end
 		 
 		
@@ -261,26 +287,50 @@ class EstimationSheetPDF
 					  @unit_name = ""
 					end
                   end
-                   
+                  #  
+                  #add170308
+				  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+				  case quotation_detail_middle_classification.construction_type.to_i
+				  when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+                    item_name = ""
+					unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
+					@quantity = ""
+					@unit_name = ""
+				  else
+                    item_name = quotation_detail_middle_classification.working_middle_item_name
+					unit_price_or_notices = quotation_detail_middle_classification.working_unit_price
+				  end
+				  #
 					  
                   if quotation_detail_middle_classification.quote_price.present?
-                    #upd170220
-                    tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
-                    if tmp > 0
-                       num = quotation_detail_middle_classification.quote_price.to_i
-                    else
-                       num = tmp
+                    if quotation_detail_middle_classification.construction_type.to_i != $INDEX_SUBTOTAL  #add 170308
+                      #upd170220
+                      tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
+                      if tmp > 0
+                         num = quotation_detail_middle_classification.quote_price.to_i
+                      else
+                         num = tmp
+                      end
+                      #
+                      @@quote_price += num
                     end
-                    #
-                    @@quote_price += num
                   end
-                  	  
-                  row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+                  
+                   #明細欄出力
+                  #upd170308
+                  row.values working_middle_item_name: item_name,
                    working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
                    working_unit_name: @unit_name,
-                   working_unit_price: quotation_detail_middle_classification.working_unit_price,
+                   working_unit_price: unit_price_or_notices,
                    quote_price: quotation_detail_middle_classification.quote_price
+				   
+                  #row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+                  # working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
+                  # quantity: @quantity,
+                  # working_unit_name: @unit_name,
+                  # working_unit_price: quotation_detail_middle_classification.working_unit_price,
+                  # quote_price: quotation_detail_middle_classification.quote_price
 		    
     	  end
 		  

@@ -7,6 +7,10 @@ class ConstructionDatum < ActiveRecord::Base
         accepts_nested_attributes_for :CustomerMaster 
         #belongs_to :purchase_order_datum
 	belongs_to :PurchaseDivisionMaster
+    
+	#add170307
+    #belongs_to :construction_costs, :foreign_key => "construction_datum_id"
+   
     #belongs_to :purchase_order_datum, :foreign_key => "construction_id"
 	has_many :purchase_order_datum
 	has_many :construction_daily_reports

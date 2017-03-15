@@ -40,4 +40,17 @@ class ApplicationController < ActionController::Base
   $consumption_tax_only = 0.08
   $consumption_tax_include = 1.08
   
+  #add170308
+  #見積等での工事種別の定数
+  #(変更時はapplication.html.erbも要変更)
+  $INDEX_SUBTOTAL = 1                    #小計
+  $INDEX_DISCOUNT = 2                    #値引き
+  $INDEX_PIPING_WIRING_CONSTRUCTION = 3  #配管配線工事
+  $INDEX_EUIPMENT_MOUNTING = 4          #機器取付工事
+  $INDEX_LABOR_COST = 5                  #労務費
+  
+  #add170310
+  #見積書などの、見出しコードの仮番
+  $HEADER_CODE_MAX = "9999999999"
+  
 end

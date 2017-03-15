@@ -11,14 +11,22 @@ class ConstructionDailyReportsController < ApplicationController
   def index
     # @construction_daily_reports = ConstructionDailyReport.all
      
-	  #ransack保持用コード
-      query = params[:q]
-      query ||= eval(cookies[:recent_search_history].to_s)  	
+	 #ransack保持用コード
+     query = params[:q]
+     query ||= eval(cookies[:recent_search_history].to_s)  	
 		
-     #@q = ConstructionDailyReport.ransack(params[:q])  
+     
+	 if params[:move_flag] == "1"
+	   #工事一覧画面から遷移した場合
+	   construction_id = params[:construction_id]
+	   query = {"construction_datum_id_eq"=> construction_id }
+	 end
+	 
+	 #@q = ConstructionDailyReport.ransack(params[:q])  
      #ransack保持用--上記はこれに置き換える
-     @q = ConstructionDailyReport.ransack(query)   
-     #ransack保持用コード
+	 @q = ConstructionDailyReport.ransack(query)
+     
+	 #ransack保持用コード
      search_history = {
      value: params[:q],
      expires: 240.minutes.from_now
@@ -45,8 +53,24 @@ class ConstructionDailyReportsController < ApplicationController
       $construction_daily_reports = @construction_daily_reports
       
 	  format.pdf do
-        report = LaborCostSummaryPDF.create @construction_daily_reports 
-        # ブラウザでPDFを表示する
+        
+        if confirm_outsourcing == false
+            #縦型PDF
+            report = LaborCostSummaryPDF.create @construction_daily_reports 
+        else
+            #横型PDF
+            report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
+		end
+		
+		#case params[:pdf_flag] 
+		#  when "1"
+        #    report = LaborCostSummaryPDF.create @construction_daily_reports 
+        #  when "2"
+        #  #横型
+        #    report = LaborCostSummaryLandscapePDF.create @construction_daily_reports 
+        #end
+		
+		# ブラウザでPDFを表示する
         send_data(
           report.generate,
           filename:  "labor_cost_summary.pdf",
@@ -59,7 +83,20 @@ class ConstructionDailyReportsController < ApplicationController
 	end
   	
   end
-
+  
+  def confirm_outsourcing
+  #外注さんが作業に関わっているかどうかのチェック(PDF用)
+  #(社員IDが5または6の場合。)
+    outsourcing = @construction_daily_reports.where('staff_id= ? OR staff_id= ?', '5', '6')
+    
+    if outsourcing.present?
+       return true
+	else   
+	   return false
+    end
+    
+  end
+  
   # GET /construction_daily_reports/1
   # GET /construction_daily_reports/1.json
   def show

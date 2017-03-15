@@ -1,5 +1,8 @@
- <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
-  
+ <!--<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>-->
+ <!--カスタマイズ版を使用-->
+ <%= javascript_include_tag 'jquery.tablefix' %>
+ <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+ 
 <%- model_class = ConstructionDatum -%>
 
 <div class="page-header" style="margin-bottom:0;width:1920px;">
@@ -28,6 +31,9 @@
 	
 	<div>
         <%= f.submit '検索する', :class => 'btn btn-default' %>
+        <%= link_to "一覧表",
+            construction_data_path(@construction_data, action:"index", format: "pdf"),
+            :class => 'btn  btn-success', :target=>["_blank"] %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_datum_path,
             :class => 'btn btn-primary' %> 
@@ -45,19 +51,25 @@
 
 
 <!--見出し固定用設定追加-->
-<div "margin-top : -50px;", class="span11 table-scrollable" >
+<div id="header" , "margin-top : -50px;", class="span11 table-scrollable" >
 
 <style>
    table { }
    table th , table td { white-space:nowrap; overflow:hidden; }
   </style>
 <!--見出し固定用設定追加-->
+
+<div id="inbody">
 <table id="tablefix", class="table  table-bordered">
   <thead>
     <tr style="height:50px">
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
       <!--<th><%= model_class.human_attribute_name(:construction_code) %></th>-->
       <th></th>
+      <th></th>
+      <th></th>
+	  <th></th>
+	  <th></th>
       <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:reception_date) %></th>
@@ -74,7 +86,9 @@
 
   <!--<body onLoad="FixedMidashi.create();">-->
   <!--<table _fixedhead="rows:1; cols:2", class="table table-bordered">-->
+
   <tbody>
+  
     <% @construction_data.order("construction_code desc").each do |construction_datum| %>
       <% if construction_datum.billed_flag != nil && construction_datum.billed_flag > 0 %>
          <tr bgcolor="#F7BE81">
@@ -83,7 +97,21 @@
       <% end %>
 	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
         <td><%= link_to t('.edit', :default => t("指示書")),
-                      edit2_construction_datum_path(construction_datum),  :class => 'btn btn-info btn-xs' %></td>
+                      edit2_construction_datum_path(construction_datum),  :class => 'btn btn-info btn-xs keep-disp' %></td>
+        <td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-warning btn-xs keep-disp'  %></td>
+        <td><%= link_to t('.back', :default => t("注文")), purchase_order_data_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-danger btn-xs keep-disp'  %></td>
+        <td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-success btn-xs keep-disp'  %></td>
+        <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
+		<% if @search.present? %>
+          <td><%= link_to t('.back', :default => t("集計")), construction_costs_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-primary btn-xs'  %></td>
+		<% else %>
+		  <td></td>
+		<% end %>
+		
         <td><%= construction_datum.construction_code %></td>
         <td><%= construction_datum.construction_name %></td>
         <td><%= construction_datum.reception_date %></td>
@@ -124,6 +152,8 @@
 </table>
 </div>
 
+</div>
+
 <!--</div>-->
   
 
@@ -134,8 +164,8 @@
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
 
-        $(".searchableConstructionName").select2({ theme: "classic" });
-        $(".searchableCustomerName").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        $(".searchableCustomerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	
 	
      // $('.scrolltable').scrolltable()
@@ -156,8 +186,32 @@
 	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	   //
        //$('#tablefix').tablefix({width: 1920, height: 520, fixRows: 1, fixCols: 1});
-	 
+	   
+	   
+       //実行
+       $('form').keepPosition();
+	   //$('ul.nav-tabs a').keepPosition();
+
   });
+  
+  
+  //プラグイン化
+  $.fn.keepPosition = function(){
+    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+    var key = 'keep-position-'+location.pathname;
+    var win = $(window);
+    this.each(function(){
+        //$(this).on('submit',function(){
+        $(".keep-disp").click(function(){
+			div_top = bodyDiv.scrollTop();
+			$.cookie(key, div_top);
+	    });
+    });
+    setTimeout(function(){
+		bodyDiv.scrollTop($.cookie(key));
+    },0);
+  }
+ 
   
 
 </script>

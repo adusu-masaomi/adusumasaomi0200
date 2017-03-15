@@ -6,8 +6,8 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 5,
-      "y": 28.9,
+      "x": 10,
+      "y": 60.9,
       "width": 127.7,
       "height": 12.2,
       "style": {
@@ -38,8 +38,8 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 224.6,
-      "y": 28,
+      "x": 229.6,
+      "y": 60,
       "width": 203.4,
       "height": 12.2,
       "style": {
@@ -70,8 +70,8 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 788,
-      "y": 29.3,
+      "x": 793,
+      "y": 61.3,
       "width": 44.6,
       "height": 16,
       "style": {
@@ -96,8 +96,8 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 507,
-      "y": 28.3,
+      "x": 512,
+      "y": 60.3,
       "width": 209.8,
       "height": 12.2,
       "style": {
@@ -128,8 +128,8 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 163,
-      "y": 29.3,
+      "x": 168,
+      "y": 61.3,
       "width": 56.7,
       "height": 18.3,
       "style": {
@@ -154,8 +154,8 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 457,
-      "y": 29.3,
+      "x": 462,
+      "y": 61.3,
       "width": 60.8,
       "height": 20,
       "style": {
@@ -180,16 +180,16 @@
       "type": "list",
       "display": true,
       "description": "",
-      "x": 0,
-      "y": 43.4,
+      "x": 7,
+      "y": 75,
       "width": 829.7,
-      "height": 551.8,
+      "height": 515.2,
       "header": {
         "enabled": true,
         "height": 18.8,
         "translate": {
-          "x": -20,
-          "y": -54.3
+          "x": -13,
+          "y": -22.7
         },
         "items": [
           {
@@ -676,8 +676,8 @@
       "detail": {
         "height": 16.8,
         "translate": {
-          "x": -20,
-          "y": -78.4
+          "x": -13,
+          "y": -46.8
         },
         "items": [
           {
@@ -846,7 +846,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -1038,7 +1038,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -1205,21 +1205,21 @@
         "enabled": true,
         "height": 1.7,
         "translate": {
-          "x": -20,
-          "y": -104.5
+          "x": -13,
+          "y": -72.9
         },
         "items": []
       },
       "footer": {
         "enabled": true,
-        "height": 32.2,
+        "height": 3.3,
         "translate": {
-          "x": -20,
-          "y": -135
+          "x": -13,
+          "y": -103.4
         },
         "items": []
       },
-      "content-height": 533,
+      "content-height": 496.40000000000003,
       "auto-page-break": true
     },
     {
@@ -1228,7 +1228,7 @@
       "display": true,
       "description": "",
       "x": 792,
-      "y": 13,
+      "y": 45,
       "width": 29.3,
       "height": 10.3,
       "style": {
@@ -1263,7 +1263,7 @@
     "paper-type": "A4",
     "orientation": "landscape",
     "margin": [
-      10,
+      40,
       0,
       0,
       20

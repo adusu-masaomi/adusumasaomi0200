@@ -3,21 +3,31 @@
 	    <td><%= link_to "明細へ",
             quotation_detail_middle_classifications_path(quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
                                                          quotation_header_name: quotation_detail_large_classification.QuotationHeader.construction_name,
-                                                         working_large_item_name: quotation_detail_large_classification.working_large_item_name, 
+                                                         working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                                                         working_large_specification: quotation_detail_large_classification.working_large_specification,
                                                          quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
             :class => 'btn btn-warning'%>
         </td>
 		
-		<!--add170223-->
-		<!--条件によって色を変える処理-->
-		<% case quotation_detail_large_classification.construction_type %>
-		<% when 1  %>
-		  <% color = "red" %>
-		  <% bold = "font-weight:bold" %> 
-		<% when 2  %>
-		  <% color = "blue" %>
-		  <% bold = "font-weight:bold" %> 
-		<% when 3  %>
+        <!--add170223-->
+        <!--upd170308-->
+        <!--条件によって色を変える処理-->
+        <!--種別順の変更時はここも変更する-->
+        <% case quotation_detail_large_classification.construction_type %>
+        <% when $INDEX_SUBTOTAL  %>
+        <!--小計-->
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_DISCOUNT  %>
+        <!--値引-->
+          <% color = "green" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_PIPING_WIRING_CONSTRUCTION  %>
+          <% color = "red" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_EUIPMENT_MOUNTING  %>
+          <% color = "blue" %>
+          <% bold = "font-weight:bold" %> 
+		<% when $INDEX_LABOR_COST  %>
 		  <% color = "brown"%>
 		  <% bold = "font-weight:bold" %> 
 		<% else %>
@@ -38,22 +48,24 @@
           <td align="center">-</td>
         <% end %>
         <td align="right"><%= number_to_currency(quotation_detail_large_classification.working_unit_price,  precision: 0) %></td>
+        <!--upd170308-->
         <% if quotation_detail_large_classification.quote_price.present? && quotation_detail_large_classification.quote_price.delete("^0-9").to_i > 0 %>
-          <td align="right"><%= number_to_currency(quotation_detail_large_classification.quote_price,  precision: 0) %></td>
+          <td align="right" style = <%= bold %> ><font color = <%= color %>  ><%= number_to_currency(quotation_detail_large_classification.quote_price,  precision: 0) %></font></td>
         <% else %>
-          <td align="right"><%= quotation_detail_large_classification.quote_price %></td>
+          <td align="right" style = <%= bold %> ><font color = <%= color %>  ><%= quotation_detail_large_classification.quote_price %></font></td>
         <% end %>
-        <td align="right"><%= quotation_detail_large_classification.execution_quantity %></td>
+        <td align="right" ><%= quotation_detail_large_classification.execution_quantity %></td>
         <% if quotation_detail_large_classification.working_unit_name != "<手入力>" %>
           <td align="center"><%= quotation_detail_large_classification.working_unit_name %></td>
         <% else %>
           <td align="center">-</td>
         <% end %>
         <td align="right"><%= number_to_currency(quotation_detail_large_classification.execution_unit_price,  precision: 0) %></td>
+        <!--upd170308-->
         <% if quotation_detail_large_classification.execution_price.present? && quotation_detail_large_classification.execution_price.delete("^0-9").to_i > 0 %>
-          <td align="right"><%= number_to_currency(quotation_detail_large_classification.execution_price,  precision: 0) %></td>
+          <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= number_to_currency(quotation_detail_large_classification.execution_price,  precision: 0) %></font></td>
         <% else %>
-          <td align="right"><%= quotation_detail_large_classification.execution_price %></td>
+          <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= quotation_detail_large_classification.execution_price %></font></td>
         <% end %>
         
 		<!--upd170223-->

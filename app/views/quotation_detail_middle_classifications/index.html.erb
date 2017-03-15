@@ -44,7 +44,10 @@
 <%= $quotation_header_name %>
 <%= "　　" %>
 <%= "項目:" %>
-<%= $working_large_item_name %>  
+<%= $working_large_item_name[0] %>
+<%= "　　" %>
+<%= "仕様:" %>
+<%= $working_large_item_name[1] %>  
 </b></font>
 </div>
 </br>
@@ -102,6 +105,7 @@
         $(".searchableConstructionName").select2({ theme: "classic" });
         $(".searchableLargeItem").select2({ theme: "classic" });
         $(".searchableMiddleItem").select2({ theme: "classic" });
+		$(".searchableMiddleSpecification").select2({ theme: "classic" });
 		
 	   //見出し固定用設定追加
 	   var sz = window.parent.screen.width;

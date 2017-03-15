@@ -36,7 +36,9 @@
       <th><%= model_class.human_attribute_name(:purchase_order_code) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
 	  <th><%= model_class.human_attribute_name(:alias_name) %></th>
-	  <th><%= model_class.human_attribute_name(:supplier_name) %></th>
+      <th><%= model_class.human_attribute_name(:supplier_name) %></th>
+      <th>担当者名</th>
+	  <th>Email</th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -62,9 +64,13 @@
 		<td><%= purchase_order_datum.alias_name %></td>
 		<% if purchase_order_datum.supplier_master.nil? %>
            <td>-</td>
+		   <td>-</td>
+		   <td>-</td>
 		   <% @supplier_name = "-" %>
 		<% else %>
 		  <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
+		  <td><%= purchase_order_datum.supplier_master.responsible1 %></td>
+		  <td><%= purchase_order_datum.supplier_master.email1 %></td>
 		  <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
         <% end %>
 		

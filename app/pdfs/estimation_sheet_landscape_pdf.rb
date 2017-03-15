@@ -37,8 +37,10 @@ class EstimationSheetLandscapePDF
 		 
 		 #歩掛り計合計
 		 if quotation_detail_large_classification.labor_productivity_unit_total.present?
-           #合計へカウント
-           @@labor_amount_total += quotation_detail_large_classification.labor_productivity_unit_total
+           if quotation_detail_large_classification.construction_type.to_i != $INDEX_SUBTOTAL  #add 170308
+             #合計へカウント
+             @@labor_amount_total += quotation_detail_large_classification.labor_productivity_unit_total
+           end
          end
 		   
 		 #---見出し---
@@ -224,13 +226,31 @@ class EstimationSheetLandscapePDF
 						end
 					  end 
                       #  
-                      
-                      row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                      #add170308
+					  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+					  case quotation_detail_large_classification.construction_type.to_i
+					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+                          item_name = ""
+						  unit_price_or_notices = quotation_detail_large_classification.working_large_item_name
+						  execution_unit_price_or_notices = quotation_detail_large_classification.working_large_item_name
+						  @quantity = ""
+						  @execution_quantity = ""
+						  @unit_name = ""
+						else
+                          item_name = quotation_detail_large_classification.working_large_item_name
+                          unit_price_or_notices = quotation_detail_large_classification.working_unit_price
+                          execution_unit_price_or_notices = quotation_detail_large_classification.execution_unit_price
+					  end
+					  #
+					  
+					  #明細欄出力
+                      #upd170308
+					  row.values working_large_item_name: item_name,
                        working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
 		               working_unit_name: @unit_name,
-                       working_unit_price: quotation_detail_large_classification.working_unit_price,
-					   execution_unit_price: quotation_detail_large_classification.execution_unit_price,
+                       working_unit_price: unit_price_or_notices,
+					   execution_unit_price: execution_unit_price_or_notices,
 					   quote_price: quotation_detail_large_classification.quote_price,
                        execution_quantity: @execution_quantity,
                        working_unit_name2: @unit_name,
@@ -238,6 +258,20 @@ class EstimationSheetLandscapePDF
                        labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit,
 					   labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total,
 					   remarks: quotation_detail_large_classification.remarks
+					  
+                      #row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
+                      # working_large_specification: quotation_detail_large_classification.working_large_specification,
+                      # quantity: @quantity,
+		              # working_unit_name: @unit_name,
+                      # working_unit_price: quotation_detail_large_classification.working_unit_price,
+					  # execution_unit_price: quotation_detail_large_classification.execution_unit_price,
+					  # quote_price: quotation_detail_large_classification.quote_price,
+                      # execution_quantity: @execution_quantity,
+                      # working_unit_name2: @unit_name,
+                      # execution_price: quotation_detail_large_classification.execution_price,
+                      # labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit,
+					  # labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total,
+					  # remarks: quotation_detail_large_classification.remarks
            end 
 		 #end
     end	
@@ -344,9 +378,13 @@ class EstimationSheetLandscapePDF
 		  end
 		 
            #品目名
-		   @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
-		   #判定用変数へセット
-		   #@@working_large_item_name = quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name
+           @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
+           #判定用変数へセット
+           #@@working_large_item_name = quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name
+           
+           #add170308
+           #仕様名
+           @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
 		   
 		 end
 		 
@@ -400,63 +438,119 @@ class EstimationSheetLandscapePDF
                   end 
                   
                   if quotation_detail_middle_classification.quote_price.present?
-                    #@@quote_price += quotation_detail_middle_classification.quote_price
-                    #upd170220
-                    tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
-                    if tmp > 0
-                       num = quotation_detail_middle_classification.quote_price.to_i
-                    else
-                       num = tmp
+                    if quotation_detail_middle_classification.construction_type.to_i != $INDEX_SUBTOTAL  #add 170308
+                      #@@quote_price += quotation_detail_middle_classification.quote_price
+                      #upd170220
+                      tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
+                      if tmp > 0
+                         num = quotation_detail_middle_classification.quote_price.to_i
+                      else
+                         num = tmp
+                      end
+                      #
+                      @@quote_price += num
                     end
-                    #
-                    @@quote_price += num
                   end
+				  
                   #実行金額合計
                   if quotation_detail_middle_classification.execution_price.present?
-                    #@@execution_price += quotation_detail_middle_classification.execution_price
-                    #upd170220
-                    tmp = quotation_detail_middle_classification.execution_price.delete("^0-9").to_i
-                    if tmp > 0
-                       num = quotation_detail_middle_classification.execution_price.to_i
-                    else
-                       num = tmp
+                    if quotation_detail_middle_classification.construction_type.to_i != $INDEX_SUBTOTAL  #add 170308
+                      #@@execution_price += quotation_detail_middle_classification.execution_price
+                      #upd170220
+                      tmp = quotation_detail_middle_classification.execution_price.delete("^0-9").to_i
+                      if tmp > 0
+                         num = quotation_detail_middle_classification.execution_price.to_i
+                      else
+                         num = tmp
+                      end
+                      #
+                      @@execution_price += num
                     end
-                    #
-                    @@execution_price += num
                   end
                   
-				  @labor_amount = 0
-                  if quotation_detail_middle_classification.execution_quantity.present?
-				    if quotation_detail_middle_classification.execution_quantity >= 0
-                       if quotation_detail_middle_classification.labor_productivity_unit.present?
-					      #@labor_amount = quotation_detail_middle_classification.quantity * quotation_detail_middle_classification.labor_productivity_unit
-						  @labor_amount = quotation_detail_middle_classification.execution_quantity * quotation_detail_middle_classification.labor_productivity_unit
-                          #合計へカウント
-						  @@labor_productivity_unit += @labor_amount
-					   end
-                    end
-				  end
+				  #del 170308
+				  #@labor_amount = 0
+                  #if quotation_detail_middle_classification.execution_quantity.present?
+				  #upd170311
+				  #
+				  #歩掛り計は直接フィールドから取得。
+				  #if quotation_detail_middle_classification.execution_quantity.present? 
+				  #  if quotation_detail_middle_classification.execution_quantity >= 0
+                       #if quotation_detail_middle_classification.labor_productivity_unit.present?
+					   #upd170308
+					  # if quotation_detail_middle_classification.labor_productivity_unit_total != blank?
+					      #@labor_amount = quotation_detail_middle_classification.execution_quantity * quotation_detail_middle_classification.labor_productivity_unit
+                      #    @labor_amount = quotation_detail_middle_classification.labor_productivity_unit_total.to_f
+						  
+						  #合計へカウント
+					#	  @@labor_productivity_unit += @labor_amount
+					#   end
+                  #  end
+				  #end
 				  
-				  # binding.pry
-                  if @labor_amount == 0
+				  #  
+                  #add170308
+				  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+				  case quotation_detail_middle_classification.construction_type.to_i
+				  when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+				    item_name = ""
+					unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
+					execution_unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
+					@quantity = ""
+					@unit_name = ""
+					#歩掛りの計も表示させる
+					if quotation_detail_middle_classification.labor_productivity_unit_total != blank?
+					  @labor_amount = quotation_detail_middle_classification.labor_productivity_unit_total
+                    end
+					#
+				  else
+                    item_name = quotation_detail_middle_classification.working_middle_item_name
+					unit_price_or_notices = quotation_detail_middle_classification.working_unit_price
+					execution_unit_price_or_notices = quotation_detail_middle_classification.execution_unit_price
+					
+					 #upd170308
+					 if quotation_detail_middle_classification.labor_productivity_unit_total != blank?
+					    @labor_amount = quotation_detail_middle_classification.labor_productivity_unit_total.to_f
+						  
+						#合計へカウント
+						@@labor_productivity_unit += @labor_amount
+					 end
+				  end
+				  #
+				  
+				  if @labor_amount == 0
                      @labor_amount = ""
                   end
 				  
-                  row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+				  #明細欄出力
+                  #upd170308
+				  row.values working_middle_item_name: item_name,
                    working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
                    working_unit_name: @unit_name,
-                   working_unit_price: quotation_detail_middle_classification.working_unit_price,
+                   working_unit_price: unit_price_or_notices,
                    quote_price: quotation_detail_middle_classification.quote_price,
                    quantity2: @execution_quantity,
                    working_unit_name2: @unit_name,
-                   execution_unit_price: quotation_detail_middle_classification.execution_unit_price,
+                   execution_unit_price: execution_unit_price_or_notices,
                    execution_price: quotation_detail_middle_classification.execution_price,
                    labor_productivity_unit: quotation_detail_middle_classification.labor_productivity_unit,
 				   labor_amount: @labor_amount,
 				   remarks: quotation_detail_middle_classification.remarks
 				   
-				   
+                  #row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
+                  # working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
+                  # quantity: @quantity,
+                  # working_unit_name: @unit_name,
+                  # working_unit_price: quotation_detail_middle_classification.working_unit_price,
+                  # quote_price: quotation_detail_middle_classification.quote_price,
+                  # quantity2: @execution_quantity,
+                  # working_unit_name2: @unit_name,
+                  # execution_unit_price: quotation_detail_middle_classification.execution_unit_price,
+                  # execution_price: quotation_detail_middle_classification.execution_price,
+                  # labor_productivity_unit: quotation_detail_middle_classification.labor_productivity_unit,
+				  # labor_amount: @labor_amount,
+				  # remarks: quotation_detail_middle_classification.remarks
 				
 		  end
 		#end 

@@ -24,7 +24,7 @@
   <dd><%= @purchase_datum.quantity %></dd>
   <dt><strong>単位</strong></dt>
   <% if @purchase_datum.unit_id.present? %>
-  <dd><%= @unit_masters[(@purchase_datum.unit_id)-1].unit_name %></dd>
+  <dd><%= @purchase_datum.unit_master.unit_name %></dd>
   <% else %>
   <dd>-</dd>
   <% end %>

@@ -22,7 +22,8 @@ class ConstructionDailyReport < ActiveRecord::Base
   validates :construction_datum_id,  presence: true, uniqueness: { scope: [:working_date, :staff_id, :start_time_1, :end_time_1] }
   
   #入力チェック(日またがりで計算がおかしくなるのを防止)
-  validate :time_too_large
+  # ↑ 計算異常を修正したので下記は未使用にした
+  #validate :time_too_large
   
   
   #scope
@@ -35,12 +36,7 @@ class ConstructionDailyReport < ActiveRecord::Base
   		[:with_construction]
   end
 
-  #after_update :my_callback_method
   
-   #def my_callback_method
-    # self.construction_datum.update(construction_start_date: "2011/01/01")  これは機能した
-  #end
-   
    #入力チェック用
    def time_too_large
      #22:00~4:00のように入力すると計算がおかしくなるため、２行に入力させるため警告する

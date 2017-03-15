@@ -13,11 +13,13 @@
   
   <%= f.label :"行番号" , {:class => "my-custom-class-l" } %></br>
   <div class="col-md-7" , style="margin-left : -15px">
-  <%= f.select :line_number, QuotationDetailMiddleClassification.serial_number, {}, { :tabindex=>"0", class: "searchableNumber" , style: 'width:100px' } %>
+  <!--upd170308 id追加-->
+  <%= f.select :line_number, QuotationDetailMiddleClassification.serial_number, {}, { id:"line_number", :tabindex=>"0", class: "searchableNumber" , style: 'width:100px' } %>
   <%= f.check_box :check_line_insert, {}, "true", "false" %>
   <%= f.label_tag :check_line_insert, '行挿入する　　' %>
   <%= f.label_tag :construction_type, '工事種別：' %>
-  <%= f.select :construction_type, QuotationDetailMiddleClassification.types, {:selected => @quotation_detail_middle_classification.construction_type || 0}, 
+  <!--upd170308 WorkingUnitから種別取得-->
+  <%= f.select :construction_type, WorkingUnit.types, {:selected => @quotation_detail_middle_classification.construction_type || 0}, 
   {id:'construction_type', :class => "my-custom-class", style: 'width:120px;margin-left:8px;font-size:14px;', :onchange => "setLaborType()" } %>
   </div></br></br>
   
@@ -204,11 +206,41 @@
   });
   
   //add170223
+  //upd170308
   //歩掛りのセット(配管集計時)
   function setLaborType(){
-    obj = document.getElementById("construction_type").value;
+    //obj = document.getElementById("construction_type").value;
+    obj = parseInt(document.getElementById("construction_type").value);
+	
 	switch (obj){
-      case "1":
+      case INDEX_SUBTOTAL:
+      //小計
+	    $(".searchableWorkingMiddleItem").val(ID_SUBTOTAL).trigger("change");
+        quotation_header_id = document.getElementById("quotation_header_id").value;
+		quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").value;
+		line_number = document.getElementById("line_number").value;
+	    $.get("<%= quotation_detail_middle_classificationz_subtotal_select_path %>",{quotation_header_id: quotation_header_id, line_number: line_number,
+                                                                                     quotation_detail_large_classification_id: quotation_detail_large_classification_id}, 
+		  function(data){
+	        //小計へセット
+            //  見積金額
+            obj = document.getElementById("quote_price").textContent;
+            document.getElementById("quote_price").value = obj;
+            //  実行金額
+            obj = document.getElementById("execution_price").textContent;
+            document.getElementById("execution_price").value = obj;
+            //  歩掛計
+            obj = document.getElementById("labor_productivity_unit_total").textContent;
+            document.getElementById("labor_productivity_unit_total").value = obj;
+            
+		    }
+	    );
+        break;
+	  case INDEX_DISCOUNT:
+	  //値引き
+	    $(".searchableWorkingMiddleItem").val(ID_DISCOUNT).trigger("change");
+	    break;
+      case INDEX_PIPING_WIRING_CONSTRUCTION:
         //アイテム名は自動でセット。
 		//”配管配線工事”のiDに切り替える。
 		$(".searchableWorkingMiddleItem").val(piping_wiring_construction_index).trigger("change");
@@ -223,7 +255,7 @@
 		    }
 	    );
 		break;
-	  case "2":
+	  case INDEX_EQUIPMENT_MOUNTING:
 	    //アイテム名は自動でセット。
 		$(".searchableWorkingMiddleItem").val(equipment_mounting_index).trigger("change");
 	    //機器取付チェック済みのものから歩掛りを集計する。
@@ -236,7 +268,7 @@
 		    }
 	    );
 	    break;
-	  case "3":
+	  case INDEX_LABOR_COST:
 	    //アイテム名は自動でセット。
 		$(".searchableWorkingMiddleItem").val(labor_cost_index).trigger("change");
 		
@@ -254,9 +286,10 @@
   }
   function setLaborUnit(){
   //合計値をセットする
-      //歩掛りへセット
-	  obj = document.getElementById("labor_productivity_unit").textContent;
-      document.getElementById("labor_productivity_unit").value = obj;
+      //del170306
+	  //歩掛りへセット
+	  //obj = document.getElementById("labor_productivity_unit").textContent;
+      //document.getElementById("labor_productivity_unit").value = obj;
 	  //歩掛り計へセット
       obj = document.getElementById("labor_productivity_unit_total").textContent;
       document.getElementById("labor_productivity_unit_total").value = obj;
@@ -496,17 +529,24 @@
   //歩掛り計を求める
   function calcLaborTotal()
   {
-    var obj1 = document.getElementById("execution_quantity");
-    var obj2 = document.getElementById("labor_productivity_unit");
-    //実数＊歩掛
-	if (obj1.value > 0 && obj2.value >0) {
-	  var num = (obj1.value * obj2.value)
-	  num = num * 1000;
-	  num = Math.round(num);
-	  num = num / 1000;
+     //upd170306
+	  //種別が通常の場合のみ処理
+      var obj = document.getElementById("construction_type");
+      if (obj.value == "0"){
+  
+        var obj1 = document.getElementById("execution_quantity");
+        var obj2 = document.getElementById("labor_productivity_unit");
+        //実数＊歩掛
+	    if (obj1.value > 0 && obj2.value >0) {
+	      var num = (obj1.value * obj2.value)
+	      num = num * 1000;
+	      num = Math.round(num);
+	      num = num / 1000;
 	  
-	  document.getElementById("labor_productivity_unit_total").value = num;
-	}
+	      document.getElementById("labor_productivity_unit_total").value = num;
+        }
+    
+    }
   }
   
   //金額計算(労務費用計)

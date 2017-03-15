@@ -249,7 +249,6 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  item[:list_price] = params[:list_price][i]
 		  #
 		  
-		  #i = i + 1
 		  ######
 		  
 		  id = item[:material_id].to_i
@@ -258,12 +257,19 @@ class PurchaseOrderHistoriesController < ApplicationController
           if id != 1 then
               @material_master = MaterialMaster.find(id)
               item[:material_code] = @material_master.material_code
-              #upd170218 名称は直接変更の場合もありえる
-			  #item[:material_name] = @material_master.material_name
-              item[:list_price] = @material_master.list_price
-			  @maker_master = MakerMaster.find(@material_master.maker_id)
-			  item[:maker_name] = @maker_master.maker_name
+              
+              if @material_master.list_price != 0  #upd170310
+			  #資材マスターの定価をセット
+			  #(マスター側未登録を考慮。但しアプデは考慮していない）
+                item[:list_price] = @material_master.list_price
+			  end
 			  
+			  @maker_master = MakerMaster.find(@material_master.maker_id)
+			  if @maker_master.maker_name != "-"  #upd170310
+			  #資材マスターのメーカー名をセット
+			  #(マスター側未登録を考慮。但しアプデは考慮していない）
+                item[:maker_name] = @maker_master.maker_name
+			  end
 			  
 			  if params[:material_name][i] != @material_master.material_name
 			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
@@ -272,7 +278,41 @@ class PurchaseOrderHistoriesController < ApplicationController
                   materials.update_attributes!(:material_name => params[:material_name][i])
                 end 
 			  end
+		  else
+		  #手入力した場合も、商品＆単価マスターへ新規登録する
+		    if item[:_destroy] != "1"
+			  if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+			    @maker_master = MakerMaster.find_by(maker_name: params[:maker_name][i])
+			    maker_id = 1
+			    if @maker_master.present?
+                  maker_id = @maker_master.id
+			    end
 			  
+			    @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
+			    #商品マスターへセット(商品コード存在しない場合)
+			    if @material_master.nil?
+			      material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+                                        maker_id: maker_id, list_price: params[:list_price][i] }
+			      @material_master = MaterialMaster.create(material_master_params)
+			    end
+			  
+                #仕入単価マスターへも登録。
+                @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
+			    if @material_master.present?
+			      material_id = @material_master.id
+				  supplier_id = params[:purchase_order_history][:supplier_master_id]
+				  
+                  purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
+                                        supplier_material_code: params[:material_code][i], unit_price: 0 ,
+                                        unit_id: item[:unit_master_id]}
+			      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
+                
+		  	    end
+			  end
+			  
+			end
+			
+		    
 		  end 
 		  
 		  i = i + 1

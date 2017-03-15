@@ -53,7 +53,7 @@ class PurchaseListPDF
       $purchase_data.joins(:purchase_order_datum).order("purchase_order_code, purchase_date, id").each do |purchase_datum| 
 	  	 
 		 #---見出し---
-                 page_count = report.page_count.to_s + "頁"
+         page_count = report.page_count.to_s + "頁"
 		 report.page.item(:pageno).value(page_count)
 
 		 if @flag.nil? 
@@ -109,11 +109,22 @@ class PurchaseListPDF
 					   list_price = @num
 					   ###
 					   
+					   #add170307
+                       #数量は小数点の場合あり、その場合で表示を切り分ける。
+                       quantity = ""
+                       first, second = purchase_datum.quantity.to_s.split('.')
+                       if second.to_i > 0
+                         quantity = sprintf("%.2f", purchase_datum.quantity)
+                       else
+                         quantity = sprintf("%.0f", purchase_datum.quantity)
+                       end
+                       #
+					   
 			           row.values purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              material_code: purchase_datum.material_code,
                                   material_name: purchase_datum.material_name,
 								  maker_name: purchase_datum.maker_name,
-                                  quantity: purchase_datum.quantity,
+                                  quantity: quantity,
                                   unit_name: purchase_datum.unit_master.unit_name,
 								  purchase_unit_price: unit_price,
 								  purchase_amount: purchase_amount,
@@ -121,26 +132,15 @@ class PurchaseListPDF
                                   supplier_name: purchase_datum.SupplierMaster.supplier_name,
 								  purchase_division_name: purchase_datum.PurchaseDivision.purchase_division_name
 	                    
-						#lineCount = lineCount +  1
-						
-						#binding.pry
-						
-                        #if lineCount > maxLine then
-			            #  @@page_number = @@page_number + 1
-				        #  lineCount = 0
-			            #end
-			end 
-			
-		   #if @@page_number == 0
-		    #  @@page_number = 1
-		    #end
-		   
-		    #頁番号
-            #@page_number = @@page_number.to_s + "頁"
-		    #report.page.item(:page_number).value(@page_number)
-		
-    end	
-#end 
+            end 
+
+
+	end	
+#end   
+        #add170302 最終ページの出力はここで定義する
+        page_count = report.page_count.to_s + "頁"
+        report.page.item(:pageno).value(page_count)
+
 		#小計(ラスト分)
 		@num = @purchase_amount_subtotal
 		formatNum()

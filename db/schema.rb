@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170227041737) do
+ActiveRecord::Schema.define(version: 20170227044736) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -405,20 +405,15 @@ ActiveRecord::Schema.define(version: 20170227041737) do
     t.integer  "quotation_header_id",                      limit: 4
     t.integer  "quotation_detail_large_classification_id", limit: 4
     t.integer  "quotation_items_division_id",              limit: 4
-    t.integer  "quotation_middle_item_id",                 limit: 4
     t.integer  "working_middle_item_id",                   limit: 4
-    t.string   "quotation_middle_item_name",               limit: 255
     t.string   "working_middle_item_name",                 limit: 255
-    t.string   "quotation_middle_item_short_name",         limit: 255
     t.string   "working_middle_item_short_name",           limit: 255
     t.integer  "line_number",                              limit: 4
-    t.string   "quotation_middle_specification",           limit: 255
     t.string   "working_middle_specification",             limit: 255
     t.integer  "quantity",                                 limit: 4
     t.integer  "execution_quantity",                       limit: 4
     t.integer  "working_unit_id",                          limit: 4
     t.string   "working_unit_name",                        limit: 255
-    t.integer  "quotation_unit_price",                     limit: 4
     t.integer  "working_unit_price",                       limit: 4
     t.string   "quote_price",                              limit: 255
     t.integer  "execution_unit_price",                     limit: 4

@@ -54,7 +54,13 @@
   <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
   <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;width:100px'}  %></br>
   
-  <%= f.input :material_code, label: "品番（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' , :tabindex=>"7" }  %>
+  <div class="col-lg-5" , style="margin-left : -15px">
+  <%= f.input :material_code, label: "品番（手入力用）", input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' , :tabindex=>"7" }  %>
+  </div>
+  <div class="col-lg-5" , style="margin-left : -15px">
+  <%= f.input :supplier_material_code, label: "仕入先品番（手入力用）", input_html: { :class => "my-custom-class-t", id:'supplier_material_code' , 
+                   style: 'width:220px;', :tabindex=>"8", :onchange => "copySupplierCodeToMaterial()" }  %>
+  </div>
   
   <!--<%= f.hidden_field :material_masters, :value => @material_masters, id:"material_list_price" %>-->
   
@@ -62,11 +68,11 @@
   <!--<%= f.collection_select :material_name, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {name: 'lstMaterialName' ,:class => "my-custom-class-r"}  %></br>-->
   <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l"}  %></br>
   
-  <%= f.input :material_name, label: "品名（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"8"  }  %>
+  <%= f.input :material_name, label: "品名（手入力可）", input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"9"  }  %>
   <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
   <!--<%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>-->
-  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , :tabindex=>"9", style: 'width:220px'} %></br> 
-  <%= f.input :maker_name, label: "メーカー名（手入力可）", input_html: { id:'maker_name', :class => "my-custom-class-t", :tabindex=>"10" }  %>
+  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , :tabindex=>"10", style: 'width:220px'} %></br> 
+  <%= f.input :maker_name, label: "メーカー名（手入力可）", input_html: { id:'maker_name', :class => "my-custom-class-t", :tabindex=>"11" }  %>
     
   <!--仕入先単価-->
   <%= f.input :unit_price_hide , input_html:{ id:"unit_price_hide"} , as: :hidden%>
@@ -80,17 +86,17 @@
     <%= m.input :last_unit_price_update_at , input_html:{ id:"last_unit_price_update_at"} ,as: :date_picker, as: :hidden %>
   <% end %>
 
-  <%= f.input :quantity , label: "数量" , hint: "＊(PCのみ)入力後必ずtabキーを押す!" , input_html:{ style: 'width:220px;' , :tabindex=>"11" , :onfocusout => "calcMoney(this.form)" } %>
+  <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"12" , :onfocusout => "calcMoney(this.form)" } %>
   <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
   <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"12" , style: 'width:110px;' , :class => "searchableUnit"} %>
-  <%= f.input :purchase_unit_price, label: "仕入単価", hint: "＊(PCのみ)変更した場合必ずtabキーを押す!" , input_html:{id:"purchase_unit_price", :tabindex=>"13" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
+  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"13" , style: 'width:110px;' , :class => "searchableUnit"} %>
+  <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
   <%= f.check_box :check_unit, {}, "true", "false" %>
   <%= f.label_tag :check_unit, '単価マスタを更新しない場合はチェック' %> 
-  <%= f.input :purchase_amount ,label: "金額" , input_html:{:tabindex=>"14"} %>
-  <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"15"} %>
+  <%= f.input :purchase_amount ,label: "金額" , input_html:{:tabindex=>"15"} %>
+  <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
   <%= f.label :仕入区分 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {:tabindex=>"16", :class => "my-custom-class"} %></br>
+  <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {id: "division_id", :tabindex=>"17", :class => "my-custom-class"} %></br>
   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
   
@@ -120,7 +126,7 @@
 	 $(".searchableUnit").select2({ theme: "bootstrap" });
      //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
 	 $( ".searchableUnit" ).on("select2:close", function (e) {
-	   $('[tabindex=13]').focus(); 
+	   $('[tabindex=14]').focus(); 
 	 });
 	  
      //検索可能なリストボックス(品名の場合)
@@ -149,7 +155,10 @@
 	     material_id_position = document.getElementById("supplier_material_id").value.indexOf(",") + 1 ;
 		 index = document.getElementById("supplier_material_id").value.slice(material_id_position)
 		 
-		
+		 //得意先品番（手入力）へセット
+         var supplier_material_code = $('.searchableSupplierItem').select2('data')[0].text;
+		 document.getElementById("supplier_material_code").value = supplier_material_code;
+		 
 		 
 		 //資材Mのインデックスも変更
 		 //debugger;
@@ -176,7 +185,7 @@
       });
       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
 	  $( ".searchableMaker" ).on("select2:close", function (e) {
-	    $('[tabindex=10]').focus(); 
+	    $('[tabindex=11]').focus(); 
 	  });
 	  
 	 //検索可能なリストボックス(仕入業者の場合)
@@ -224,16 +233,25 @@
         $(".searchableConstructionCode").val(KenId).change(); 
         
 		purchase_order_code = str.substr(0, searchIndex) ;
+		
+        //add170306 注文Noの頭文字を抜き出す
+		purchase_order_code_header = str.substr(0, 1) ;
+		
         $.get("<%= purchase_datum_supplier_select_path %>",
           {purchase_order_code: purchase_order_code },
           function(data){
             //
-              obj = document.getElementById("supplier_id_hide").textContent;
+			  //外注・機材借入の場合の入力自動化
+              if (purchase_order_code_header == "M" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+			    setForOursourcing(purchase_order_code_header);
+			  }
+			  
+			  
+			  obj = document.getElementById("supplier_id_hide").textContent;
 			  if (obj != null){
 		      index = parseInt(obj);
               $(".searchableSupplier").val(index).trigger("change"); 
 		      }
-			  		  
 			  
               //index = obj.selectedIndex;
               //f.list_price.value = obj.options[index].innerText;
@@ -262,6 +280,42 @@
    window.onload = function(){
   //    $(".searchableSupplier").val(index).trigger("change");
      setSupplierItem();
+   }
+   
+   //村山電気等、外注用の入力自動化
+   function setForOursourcing(purchase_order_code_header){
+     if (purchase_order_code_header == "M" || purchase_order_code_header == "O" ) {
+       //品番を切り替え
+       $(".searchableItem").val(1).trigger("change");
+	   //品名を切り替え
+	   document.getElementById("lstMaterialName").value = 1;
+	   if (purchase_order_code_header == "M"){
+         document.getElementById("material_name").value = "外注費";
+	   }
+	 
+	   //メーカーを切り替え
+	   $(".searchableMaker").val(1).trigger("change");
+	 
+       //１式を自動化
+       document.getElementById("quantity").value = 1;
+       index_set = 12;
+	   $(".searchableUnit").val(index_set).trigger("change");
+       //区分を自動化(外注に)
+	   document.getElementById("division_id").value = 2;
+	 }
+	 
+	 if (purchase_order_code_header == "R"){
+	   //区分を自動化(機材借入に)
+	 document.getElementById("division_id").value = 3;
+	 }
+   }
+   
+   function copySupplierCodeToMaterial(){
+   //手入力の仕入先品番→通常の仕入先品番へセット
+     if (document.getElementById("supplier_material_code").value != ""){
+       document.getElementById("material_code").value = 
+          document.getElementById("supplier_material_code").value;
+      }
    }
    
    //品番・品名のセット
@@ -390,7 +444,9 @@
   function calcMoney(f)
   {
    
-    var num = f.purchase_datum_quantity.value * f.purchase_unit_price.value ;
+    //var num = f.purchase_datum_quantity.value * f.purchase_unit_price.value ;
+	//upd170307
+	var num = document.getElementById("quantity").value * f.purchase_unit_price.value ;
     //小数点以下を切り捨て
     f.purchase_datum_purchase_amount.value = Math.floor(num);
 

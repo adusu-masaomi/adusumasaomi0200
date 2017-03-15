@@ -67,7 +67,7 @@
             "description": "",
             "x": 61.9,
             "y": 146.5,
-            "width": 242.5,
+            "width": 270,
             "height": 11.1,
             "style": {
               "font-family": [
@@ -81,7 +81,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -113,7 +113,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -145,7 +145,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -177,7 +177,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -213,7 +213,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -235,7 +235,7 @@
             "description": "",
             "x": 62.4,
             "y": 155.8,
-            "width": 242.5,
+            "width": 270,
             "height": 11.1,
             "style": {
               "font-family": [
@@ -249,7 +249,7 @@
               "line-height-ratio": "",
               "letter-spacing": "",
               "font-style": [],
-              "overflow": "truncate",
+              "overflow": "fit",
               "word-wrap": "none"
             },
             "reference-id": "",
@@ -636,7 +636,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -668,7 +668,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -711,8 +711,8 @@
       "display": true,
       "description": "",
       "x": 58.2,
-      "y": 110,
-      "width": 245,
+      "y": 109,
+      "width": 270,
       "height": 11.1,
       "style": {
         "font-family": [
@@ -725,8 +725,10 @@
         "line-height": "",
         "line-height-ratio": "",
         "letter-spacing": "",
-        "font-style": [],
-        "overflow": "truncate",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1212,7 +1214,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1248,7 +1250,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1377,6 +1379,40 @@
         "letter-spacing": "",
         "font-style": [],
         "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "working_large_specification",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 58.2,
+      "y": 118,
+      "width": 270,
+      "height": 10,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",

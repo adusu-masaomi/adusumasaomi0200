@@ -4,6 +4,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   @@new_flag = []
   max_line_number = 0
   
+  
   # GET /quotation_detail_large_classifications
   # GET /quotation_detail_large_classifications.json
   def index
@@ -153,6 +154,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  #add170223
 	  #歩掛りの集計を最新のもので書き換える。
 	  update_labor_productivity_unit_summary
+	  #add170308
+	  recalc_subtotal
 	  
       # 見出データを保存 
       save_price_to_headers
@@ -238,6 +241,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  #add170223
 	  #歩掛りの集計を最新のもので書き換える。
 	  update_labor_productivity_unit_summary
+	  #add170308
+	  recalc_subtotal
 	  
       # 見出データを保存 
       save_price_to_headers
@@ -348,6 +353,96 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 
 
  # ajax
+ 
+  #add170308
+  def subtotal_select
+  #小計を取得、セットする
+     @search_records = QuotationDetailLargeClassification.where("quotation_header_id = ?", params[:quotation_header_id])
+     if @search_records.present?
+        
+        
+        start_line_number = 0
+        end_line_number = 0
+        
+        current_line_number = params[:line_number].to_i
+        
+		@search_records.order(:line_number).each do |qdlc|
+           if qdlc.construction_type.to_i != $INDEX_SUBTOTAL &&
+              qdlc.construction_type.to_i != $INDEX_DISCOUNT  
+			  #小計,値引き以外なら開始行をセット
+             if start_line_number == 0
+                start_line_number = qdlc.line_number
+		     end
+		   else 
+		     if qdlc.line_number < current_line_number
+		       start_line_number = 0   #開始行を初期化
+			 end
+           end
+		   
+		   if qdlc.line_number < current_line_number   #更新の場合もあるので現在の行はカウントしない。
+		     end_line_number = qdlc.line_number  #終了行をセット
+           end
+        end
+        
+        #範囲内の計を集計
+        @quote_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:quote_price)
+        @execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+        @labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+        
+     end
+  end 
+  #add170308
+  def recalc_subtotal
+  #小計を再計算する
+     @search_records = QuotationDetailLargeClassification.where("quotation_header_id = ?", params[:quotation_detail_large_classification][:quotation_header_id])
+     if @search_records.present?
+		start_line_number = 0
+        end_line_number = 0
+        current_line_number = params[:quotation_detail_large_classification][:line_number].to_i
+        
+		subtotal_exist = false
+		id_saved = 0
+		@search_records.order(:line_number).each do |qdlc|
+           if qdlc.construction_type.to_i != $INDEX_SUBTOTAL &&
+              qdlc.construction_type.to_i != $INDEX_DISCOUNT  
+			  
+			 #小計,値引き以外なら開始行をセット
+             if start_line_number == 0
+                start_line_number = qdlc.line_number
+		     end
+		   else 
+		     
+			 if qdlc.line_number < current_line_number
+		       start_line_number = 0   #開始行を初期化
+			 elsif qdlc.line_number > current_line_number
+             #小計欄に来たら、処理を抜ける。
+			   subtotal_exist = true
+			   id_saved = qdlc.id
+               
+			   break
+			 end
+           end
+		   
+		   if qdlc.line_number >= current_line_number   
+		     end_line_number = qdlc.line_number  #終了行をセット
+           end
+        end
+        #範囲内の計を集計
+		if subtotal_exist == true
+          subtotal_records = QuotationDetailLargeClassification.find(id_saved)
+    
+	      if subtotal_records.present?
+		    quote_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:quote_price)
+            execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+            labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+
+            subtotal_records.update_attributes!(:quote_price => quote_price, :execution_price => execution_price, 
+                                                :labor_productivity_unit_total => labor_productivity_unit_total)
+	      end
+		end
+     end
+  end 
+ 
   def working_large_item_select
      @working_large_item_name = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_large_item_name).flatten.join(" ")
   end
@@ -410,27 +505,33 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   def update_labor_productivity_unit_summary
     quotation_header_id = params[:quotation_detail_large_classification][:quotation_header_id]
     
-    #配管配線の計を更新(construction_type=1)
-    @QDLC_piping_wiring = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 1).first
+    #upd170308 construction_typeを定数化・順番変更
+	
+    #配管配線の計を更新(construction_type=constant)
+    @QDLC_piping_wiring = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: $INDEX_PIPING_WIRING_CONSTRUCTION).first
     if @QDLC_piping_wiring.present?
-      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_PipingWiring(quotation_header_id)
+      #del170307
+	  #labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_PipingWiring(quotation_header_id)
       labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_PipingWiring(quotation_header_id)
-      @QDLC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+      #@QDLC_piping_wiring.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	  @QDLC_piping_wiring.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
 	end
 	
-	#機器取付の計を更新(construction_type=2)
-    @QDLC_equipment_mounting = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 2).first
+	#機器取付の計を更新(construction_type=)
+    @QDLC_equipment_mounting = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: $INDEX_EUIPMENT_MOUNTING).first
 	if @QDLC_equipment_mounting.present?
-      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_equipment_mounting(quotation_header_id)
+      #labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_equipment_mounting(quotation_header_id)
       labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_equipment_mounting(quotation_header_id)
-	  @QDLC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	  #@QDLC_equipment_mounting.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	  @QDLC_equipment_mounting.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
 	end
-    #労務費の計を更新(construction_type=3)
-    @QDLC_labor_cost = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: 3).first
+    #労務費の計を更新(construction_type=x)
+    @QDLC_labor_cost = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id, construction_type: $INDEX_LABOR_COST).first
 	if @QDLC_labor_cost.present?
-      labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_labor_cost(quotation_header_id)
+      #labor_productivity_unit = QuotationDetailLargeClassification.sum_LPU_labor_cost(quotation_header_id)
       labor_productivity_unit_total = QuotationDetailLargeClassification.sum_LPUT_labor_cost(quotation_header_id)
-	  @QDLC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	  #@QDLC_labor_cost.update_attributes!(:labor_productivity_unit => labor_productivity_unit, :labor_productivity_unit_total => labor_productivity_unit_total)
+	  @QDLC_labor_cost.update_attributes!(:labor_productivity_unit_total => labor_productivity_unit_total)
 	end
   
   end
@@ -514,9 +615,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     
 	  if @invoice_header.present?
 	    invoice_header_id = @invoice_header.id
-		
-		#binding.pry
-		
+
 	    #明細データ抹消
 	    InvoiceDetailMiddleClassification.where(invoice_header_id: invoice_header_id).destroy_all
         #内訳データ抹消
@@ -539,7 +638,16 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  
 	  if @quotation_header.present?
         if @quotation_header.quotation_code.present?
-          invoice_header_params = { invoice_code:  @quotation_header.invoice_code, quotation_code:  @quotation_header.quotation_code, 
+		  
+		  #add170310 見出しコードが空の場合は仮番号をセット。
+		  if @quotation_header.invoice_code.blank?
+		    invoice_code = $HEADER_CODE_MAX
+          else
+            invoice_code = @quotation_header.invoice_code
+		  end
+		  #
+		  
+          invoice_header_params = { invoice_code: invoice_code, quotation_code:  @quotation_header.quotation_code, 
                                   delivery_slip_code:  @quotation_header.delivery_slip_code, 
                                   construction_datum_id: @quotation_header.construction_datum_id, construction_name: @quotation_header.construction_name, 
                                   customer_id: @quotation_header.customer_id, customer_name: @quotation_header.customer_name, honorific_id: @quotation_header.honorific_id,
@@ -668,9 +776,17 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	    @quotation_header = QuotationHeader.find(params[:quotation_header_id])
 	  end
 	  
+	  #add170310 見出しコードが空の場合は仮番号をセット。
+	   if @quotation_header.delivery_slip_code.blank?
+	     delivery_slip_code = $HEADER_CODE_MAX
+       else
+         delivery_slip_code = @quotation_header.delivery_slip_code
+	   end
+	   #
+		  
 	  if @quotation_header.present?
         if @quotation_header.quotation_code.present?
-          delivery_slip_header_params = { delivery_slip_code:  @quotation_header.delivery_slip_code, quotation_code:  @quotation_header.quotation_code, 
+          delivery_slip_header_params = { delivery_slip_code:  delivery_slip_code, quotation_code:  @quotation_header.quotation_code, 
                                   invoice_code:  @quotation_header.invoice_code,
                                   construction_datum_id: @quotation_header.construction_datum_id, construction_name: @quotation_header.construction_name, 
                                   customer_id: @quotation_header.customer_id, customer_name: @quotation_header.customer_name, honorific_id: @quotation_header.honorific_id,

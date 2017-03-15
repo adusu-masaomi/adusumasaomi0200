@@ -12,6 +12,7 @@ class ConstructionDataController < ApplicationController
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  	
 		
+   
 	#@q = ConstructionDatum.ransack(params[:q])
     #ransack保持用--上記はこれに置き換える
     @q = ConstructionDatum.ransack(query)   
@@ -19,7 +20,7 @@ class ConstructionDataController < ApplicationController
     #ransack保持用コード
     search_history = {
     value: params[:q],
-    expires: 30.minutes.from_now
+    expires: 24.hours.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
@@ -31,8 +32,27 @@ class ConstructionDataController < ApplicationController
 
     @customer_masters = CustomerMaster.all
     
-	
 	#binding.pry
+	
+	$construction_data = @construction_data
+	
+	respond_to do |format|
+	  format.html
+		
+	  format.pdf do
+       
+	    
+        report = ConstructionListPDF.create @construction_list 
+        
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "construction_list.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+	end
   end
 
   # GET /construction_data/1
@@ -235,6 +255,7 @@ class ConstructionDataController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_construction_datum
 	  #binding.pry
+	  
       @construction_datum = ConstructionDatum.find(params[:id])
     end
 

@@ -31,15 +31,36 @@ class PurchaseDataController < ApplicationController
         
         #ransack保持用コード
         query = params[:q]
+
         query ||= eval(cookies[:recent_search_history].to_s)  	
 
-	#@q = PurchaseDatum.ransack(params[:q]) 
+        #if params[:move_flag] == "1"
+		#binding.pry
+		
+        case params[:move_flag]
+		when "1"
+          #工事一覧画面から遷移した場合
+          construction_id = params[:construction_id]
+		  query = {"with_construction"=> construction_id }
+		when "2"
+          #注文一覧画面から遷移した場合
+		  if params[:construction_id].present?
+		  #工事→注文→仕入→注文の場合の分岐
+		    params[:move_flag] = "1"
+		  end
+		  
+		  purchase_order_id = params[:purchase_order_id]
+          query = {"purchase_order_datum_id_eq"=> purchase_order_id }
+		end
+		
+		#@q = PurchaseDatum.ransack(params[:q]) 
         #ransack保持用--上記はこれに置き換える
-        @q = PurchaseDatum.ransack(query)   
-         #ransack保持用コード
+		@q = PurchaseDatum.ransack(query)
+		
+        #ransack保持用コード
         search_history = {
         value: params[:q],
-        expires: 30.minutes.from_now
+        expires: 24.hours.from_now
         }
         cookies[:recent_search_history] = search_history if params[:q].present?
         #
@@ -223,24 +244,71 @@ class PurchaseDataController < ApplicationController
     if params[:purchase_datum][:MaterialMaster_attributes].present?
       #params[:purchase_datum][:MaterialMaster_attributes].values.each do |item|
       id = params[:purchase_datum][:material_id].to_i
-      @material_masters = MaterialMaster.find(id)
-      if @material_masters.present?
-        #定価
-        if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
-          params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
+      if id != 1   #手入力以外
+        @material_masters = MaterialMaster.find(id)
+        if @material_masters.present?
+          #定価
+          #if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
+            params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
+          #end
+          #メーカー
+          if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
+             params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
+          end
         end
-        #メーカー
-        if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
-           params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
-        end
-      end
-    end
+      else 
+	      #手入力をマスター反映させる
+	      add_manual_input_to_masters
+	  end
+	end
   end
   #viewで分解されたパラメータを、正常更新できるように復元させる。
   def adjust_purchase_date_params
     params[:purchase_datum][:purchase_date] = params[:purchase_datum][:purchase_date][0] + "/" + 
                                                   params[:purchase_datum][:purchase_date][1] + "/" + 
                                                   params[:purchase_datum][:purchase_date][2]
+  end
+  
+  #手入力のマスター反映
+  def add_manual_input_to_masters
+    
+    if params[:purchase_datum][:material_id] == "1" && 
+         params[:purchase_datum][:material_code] != "" && 
+         params[:purchase_datum][:material_code] != "-"
+       #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+       @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
+	   #商品マスターへセット(商品コード存在しない場合)
+	   if @material_master.nil?
+		   material_master_params = {material_code: params[:purchase_datum][:material_code], 
+		                             material_name: params[:purchase_datum][:material_name], 
+                                     maker_id: params[:purchase_datum][:maker_id],
+									 list_price: params[:purchase_datum][:list_price] }
+		   @material_master = MaterialMaster.create(material_master_params)
+	   end
+	  
+	   
+	  
+       #仕入単価マスターへも登録。
+       @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
+	   if @material_master.present?
+	     material_id = @material_master.id
+		 supplier_id = params[:purchase_datum][:supplier_id]
+         if params[:purchase_datum][:supplier_material_code].present?
+		   supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+		 else
+		   #仕入先品番が未入力の場合は、品番をそのままセットする
+		   supplier_masterial_code = params[:purchase_datum][:material_code]
+		 end
+		 
+		 purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
+                  supplier_material_code: supplier_masterial_code, 
+                  unit_price: params[:purchase_datum][:purchase_unit_price] ,
+                  unit_id: params[:purchase_datum][:unit_id]}
+	     @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
+                
+	     end
+	   end
+  
   end
   
   # DELETE /purchase_data/1

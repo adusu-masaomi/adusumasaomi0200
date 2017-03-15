@@ -18,6 +18,7 @@
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_cost_path,
             :class => 'btn btn-primary' %>
+<%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
 
 <%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>
 
@@ -47,7 +48,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @construction_costs.order("id desc").each do |construction_cost| %>
+    <% @construction_costs.joins(:construction_datum).order("construction_code desc").each do |construction_cost| %>
       <tr>
         <td><%= link_to construction_cost.id, construction_cost_path(construction_cost) %></td>
 		<td><%= link_to "工事費集計表",

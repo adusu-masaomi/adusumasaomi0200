@@ -24,17 +24,24 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   end 
   
   #add170223
-  def self.types 
-    [["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
-  end
+  #del170308 
+  #def self.types 
+  #  [["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
+  #end
 
   #金額合計(見積)
   def self.sumpriceQuote  
-    sum(:quote_price)
+    #sum(:quote_price)
+    #upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("quotation_detail_middle_classifications.construction_type = ? or quotation_detail_middle_classifications.construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
   end
   #金額合計(実行)
   def self.sumpriceExecution  
-    sum(:execution_price)
+    #sum(:execution_price)
+    #upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("quotation_detail_middle_classifications.construction_type = ? or quotation_detail_middle_classifications.construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
   end
   #合計(歩掛り)
   def self.sumLaborProductivityUnit 
@@ -42,7 +49,12 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   end 
    #合計(歩掛り計)
   def self.sumLaborProductivityUnitTotal 
-    sum(:labor_productivity_unit_total).round(3)
+    #sum(:labor_productivity_unit_total).round(3)
+    #upd170306
+    #where(:construction_type => "0").sum(:labor_productivity_unit_total).round(3)
+	#upd170308
+    #工事種別が通常かまたは値引の場合のみ合算。
+    where("quotation_detail_middle_classifications.construction_type = ? or quotation_detail_middle_classifications.construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total).round(3)
   end 
   
   #scope
@@ -69,12 +81,18 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   
   scope :with_header_id, -> (quotation_detail_middle_classifications_quotation_header_id=1) { joins(:QuotationHeader).where("quotation_headers.id = ?", quotation_detail_middle_classifications_quotation_header_id )}
 
-  #scope :with_large_item, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1) { joins(:QuotationDetailLargeClassification).where("quotation_detail_large_classifications.quotation_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )}
-  scope :with_large_item, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1) { joins(:QuotationDetailLargeClassification).where("quotation_detail_large_classifications.working_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )}
-
+  #scope :with_large_item, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1) { joins(:QuotationDetailLargeClassification)
+  #.where("quotation_detail_large_classifications.working_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )}
+  
+  #upd170308
+  scope :with_large_item, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1, hoge) { joins(:QuotationDetailLargeClassification)
+  .where("quotation_detail_large_classifications.working_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )
+  .where("quotation_detail_large_classifications.working_large_specification = ?", hoge )}
+  
+  
   def self.ransackable_scopes(auth_object=nil)
      #[:with_header_id, :with_large_item_id]
-     [:with_header_id, :with_large_item]
+     [:with_header_id, :with_large_item, :with_large_specification]
   end
 
 end

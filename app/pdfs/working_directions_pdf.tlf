@@ -167,7 +167,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -189,7 +189,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -199,7 +199,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -273,7 +273,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -283,7 +283,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -331,7 +331,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -341,7 +341,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1495,7 +1495,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -1505,7 +1505,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1527,7 +1527,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -1537,7 +1537,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1559,7 +1559,7 @@
       "height": 13.5,
       "style": {
         "font-family": [
-          "IPAGothic"
+          "IPAPGothic"
         ],
         "font-size": 12,
         "color": "#000000",
@@ -1569,7 +1569,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1601,7 +1601,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1636,7 +1636,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",

@@ -12,32 +12,34 @@
   </div>
  <% end %>
   
-  <!--スマホ対応 datepicker使う場合--> 
-  </br></br></br></br>
+  <!--スマホ対応 datepicker使う場合は多めに上余白を空ける--> 
+  <!--</br></br></br></br>-->
   
-  <%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'} , as: :date_picker %>
+  <%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px' , :tabindex=>"0" } , as: :date_picker %>
   <!--下記だと工事日がうまく更新されないので保留・・・-->
   <!--<%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'}  %>-->
   <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px',} %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
+         {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px', :tabindex=>"1" } %></br>
   <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , :onchange=> "getDailyPay(this.form)" }  %>
-  <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :disabled => true } %>
+  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
+      :tabindex=>"2", :onchange=> "getDailyPay(this.form)" }  %>
+  <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :disabled => true, :readonly => true } %>
   <!--<%= f.hidden_field_tag 'staff_pay', @staff_pay, input_html:{id: "daily_pay"} %>-->
-  <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :onchange => "calcTimeVarious(this.form)"} %>
-  <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :onchange => "calcTimeVarious(this.form)"} %>
-  <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
-  <%= f.input :end_time_2, default: Time.parse('00:00') , input_html:{id: "end_time_2", :onchange => "calcTimeVarious_2(this.form)"} %>
-  <%= f.input :working_times, input_html:{id:"working_times"} , hint: "*自動計算されるので入力不要です。" %>
-  <%= f.input :man_month, input_html:{id:"man_month"} , hint: "*自動計算されるので入力不要です。"  %>
-  <%= f.input :labor_cost, input_html:{id:"labor_cost"} , hint: "*自動計算されるので入力不要です。"  %>
+  <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :tabindex=>"3", :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :tabindex=>"4", :onchange => "calcTimeVarious(this.form)"} %>
+  <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :tabindex=>"5", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :end_time_2, default: Time.parse('00:00') , input_html:{id: "end_time_2", :tabindex=>"6", :onchange => "calcTimeVarious_2(this.form)"} %>
+  <%= f.input :working_times, input_html:{id:"working_times", :tabindex=>"7"} , hint: "*ここは自動計算されますので、通常は入力不要です。" %>
+  <%= f.input :man_month, input_html:{id:"man_month", :tabindex=>"8"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
+  <%= f.input :labor_cost, input_html:{id:"labor_cost", :tabindex=>"9"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
   
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
   <%= p.input :construction_start_date , input_html:{id:"construction_start_date"}, as: :date_picker, as: :hidden   %>
   <%= p.input :construction_end_date , input_html:{id:"construction_end_date"}, as: :date_picker, as: :hidden    %>
   <% end %>
   
-  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= f.button :submit, :class => 'btn-primary', :tabindex => "10" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 construction_daily_reports_path, :class => 'btn btn-default' %>
 
@@ -55,6 +57,10 @@
        $(".searchableConstructionCode").change(function(e) {
          setConstructionDateDefault();
        });  
+       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+       $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+         $('[tabindex=2]').focus(); 
+       });
 
    //工事日のセット(デフォルト)
    function setConstructionDateDefault()
@@ -246,7 +252,9 @@
          // フルタイム勤務に近ければ、休憩時間をマイナスする(但し小休憩は引かない) 161207 end=16:00以降→14:00以降に変更
 		 tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
        } else if (start_time >= 55800 & start_time <= 86400 & end_time >= 0 & end_time <= 28800){
-         tmp_kinmu_time = tmp_kinmu_time + 86400 - end_time + start_time;   
+         //tmp_kinmu_time = tmp_kinmu_time + 86400 - end_time + start_time;
+         //upd 170303
+         tmp_kinmu_time = tmp_kinmu_time + 86400 - start_time + end_time ;   
       } else {
          tmp_kinmu_time = tmp_kinmu_time + end_time - start_time;   
   }

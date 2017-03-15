@@ -185,6 +185,17 @@ Rails.application.routes.draw do
   get '/quotation_detail_large_classificationz/labor_productivity_unit_select' => 'quotation_detail_large_classifications#labor_productivity_unit_select'
   #歩掛計
   get '/quotation_detail_large_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_large_classifications#labor_productivity_unit_total_select'
+  
+  #add170308
+  #小計用
+  get '/quotation_detail_large_classificationz/subtotal_select' => 'quotation_detail_large_classifications#subtotal_select'
+  get '/quotation_detail_middle_classificationz/subtotal_select' => 'quotation_detail_middle_classifications#subtotal_select'
+  get '/invoice_detail_large_classificationz/subtotal_select' => 'invoice_detail_large_classifications#subtotal_select'
+  get '/invoice_detail_middle_classificationz/subtotal_select' => 'invoice_detail_middle_classifications#subtotal_select'
+  get '/delivery_slip_detail_large_classificationz/subtotal_select' => 'delivery_slip_detail_large_classifications#subtotal_select'
+  get '/delivery_slip_detail_middle_classificationz/subtotal_select' => 'delivery_slip_detail_middle_classifications#subtotal_select'
+  #add end
+  
   #
   #add170223
   #歩掛-配管配線用

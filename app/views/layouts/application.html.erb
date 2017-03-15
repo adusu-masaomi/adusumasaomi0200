@@ -198,6 +198,24 @@ body > .container {
 <script type="text/javascript">
 //共通モジュールを記述
   
+  //グローバル定数をここで宣言する
+  //add170308
+  //歩掛り集計専用の作業内訳マスターIDの定数(マスター変更時注意！)
+  var ID_PIPING_WIRING_CONSTRUCTION = 2;  //配管配線工事のマスターID
+  var ID_EQUIPMENT_MOUNTING = 3;          //機器取付工事のマスターID
+  var ID_LABOR_COST = 4;                  //労務費のマスターID
+  var ID_SUBTOTAL = 5;                    //小計のマスターID
+  var ID_DISCOUNT = 6;                    //値引きのマスターID
+
+  //歩掛り集計専用などに使う、工事種別のインデックス定数(モデルのインデックス変更時注意)
+  var INDEX_SUBTOTAL = 1;                    //小計の要素順
+  var INDEX_DISCOUNT = 2;                    //値引きの要素順
+  var INDEX_PIPING_WIRING_CONSTRUCTION = 3;  //配管配線工事の要素順
+  var INDEX_EQUIPMENT_MOUNTING = 4;          //機器取付工事の要素順
+  var INDEX_LABOR_COST = 5;                  //労務費の要素順
+  //
+  var MESSAGE_LIST = "指定無し";    //select2のデフォルトのメッセージ
+  
   $(document).ready(function() {
     $("a.add_fields").
       data("association-insertion-position", 'before').

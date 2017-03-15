@@ -21,17 +21,30 @@ class PurchaseOrderDataController < ApplicationController
   # GET /purchase_order_data.json
   def index
     
-    #ransack保持用コード
+	#ransack保持用コード
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  
-
+    
+    case params[:move_flag] 
+    when "1"
+	   #工事一覧画面から遷移した場合
+       construction_id = params[:construction_id]
+       query = {"construction_datum_id_eq"=> construction_id }
+	   
+	#when "2"
+	#   #注文一覧画面から遷移した場合
+	#   purchase_order_id = params[:purchase_order_id]
+    #   query = {"id_eq"=> purchase_order_id }
+    end
+	
 	 #@q = PurchaseOrderDatum.ransack(params[:q])   
 	 #ransack保持用--上記はこれに置き換える
      @q = PurchaseOrderDatum.ransack(query)   
      #ransack保持用コード
      search_history = {
      value: params[:q],
-     expires: 240.minutes.from_now
+     #expires: 240.minutes.from_now
+	 expires: 24.hours.from_now
      }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
@@ -60,7 +73,9 @@ end
 	
     #仕入先マスターをビルド
     #デフォルトのIDは２（＝岡田電気）とする
-	@supplier_master = SupplierMaster.find(2)
+	#@supplier_master = SupplierMaster.find(2)
+    #デフォルトのIDは未選択とする
+	@supplier_master = SupplierMaster.find(1)
 	@purchase_order_datum.supplier_master = @supplier_master
 	
 	
