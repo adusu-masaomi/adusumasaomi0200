@@ -16,6 +16,10 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	#ボタン切り分け用
 	attr_accessor :sent_flag
 	
+	#工事画面からの遷移にて使用
+	#attr_accessor :construction_id
+	#attr_accessor :move_flag
+	
 	validates_associated :orders
 	
 	#validates :quantity, presence: true

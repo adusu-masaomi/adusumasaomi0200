@@ -1,5 +1,5 @@
 class QuotationHeader < ActiveRecord::Base
-   paginates_per 50  # 1ページあたり項目表示
+   paginates_per 200  # 1ページあたり項目表示
    belongs_to :ConstructionDatum, :foreign_key => "construction_datum_id"
    
    belongs_to :customer_master, :foreign_key => "customer_id"

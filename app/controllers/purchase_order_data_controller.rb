@@ -13,7 +13,8 @@ class PurchaseOrderDataController < ApplicationController
       'purchase_order_data'
     end
    end
-
+  
+	
   # Userクラスを作成していないので、擬似的なUser構造体を作る
   #MailUser = Struct.new(:name, :email)
 
@@ -81,13 +82,18 @@ end
 	
     @@update_flag =  1
     
+	#工事データの初期値をセット
+    set_construction_default
 	
   end
 
   # GET /purchase_order_data/1/edit
   def edit
     @@update_flag = 2
-   end
+	
+	#工事データの初期値をセット
+    set_construction_default
+ end
  
   # POST /purchase_order_data
   # POST /purchase_order_data.json
@@ -108,8 +114,10 @@ end
 	
     respond_to do |format|
       if @purchase_order_datum.save
-        format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully created.' }
-        format.json { render :show, status: :created, location: @purchase_order_datum }
+        #format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully created.' }
+        #format.json { render :show, status: :created, location: @purchase_order_datum }
+		
+		format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
       else
         format.html { render :new }
         format.json { render json: @purchase_order_datum.errors, status: :unprocessable_entity }
@@ -141,11 +149,16 @@ end
 	end
 	
    
+   #
+   
    respond_to do |format|
    
       if @purchase_order_datum.update(purchase_order_datum_params)
-        format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully updated.' }
-        format.json { render :show, status: :ok, location: @purchase_order_datum }
+        #format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully updated.' }
+	    #format.json { render :show, status: :ok, location: @purchase_order_datum , construction_id: params[:construction_id], move_flag: params[:move_flag]}
+		
+        format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+		
       else
         format.html { render :edit }
         format.json { render json: @purchase_order_datum.errors, status: :unprocessable_entity }
@@ -153,6 +166,19 @@ end
     end
 	
 	
+  end
+  
+  def set_construction_default
+  #工事一覧画面等から遷移した場合に、フォームに初期値をセットさせる    
+	  case params[:move_flag] 
+      when "1"
+	   #工事一覧画面から遷移した場合
+       construction_id = params[:construction_id]
+	   @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+	   
+      else
+       @construction_data = ConstructionDatum.order('construction_code DESC').all
+	  end 
   end
   
   #インスタンスへパラメータを再セットする
@@ -169,7 +195,9 @@ end
   def destroy
     @purchase_order_datum.destroy
     respond_to do |format|
-      format.html { redirect_to purchase_order_data_url, notice: 'Purchase order datum was successfully destroyed.' }
+      #format.html { redirect_to purchase_order_data_url, notice: 'Purchase order datum was successfully destroyed.' }
+	  format.html {redirect_to purchase_order_data_path( :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+	  
       format.json { head :no_content }
     end
   end

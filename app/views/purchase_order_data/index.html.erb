@@ -9,7 +9,7 @@
   <!-- 追加箇所開始 -->
   <%= page_entries_info @purchase_order_data %>
   <!-- 追加箇所終了 -->
-   <%= search_form_for @q do |f| %>
+    <%= search_form_for @q do |f| %>
       <%= f.label :purchase_order_code, '注文No：' %>
 	  
 	  <%= f.select :id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, { style: 'width:220px' , class: "searchablePurchaseOrderCode"}  %>
@@ -28,7 +28,7 @@
 	  <div>
     	  <%= f.submit '検索する', :class => 'btn btn-default' %>
 		  <%= link_to t('.new', :default => t("helpers.links.new")),
-            new_purchase_order_datum_path,
+            new_purchase_order_datum_path(construction_id: params[:construction_id], move_flag: params[:move_flag]),
             :class => 'btn btn-primary' %>
           <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
   	  </div>
@@ -40,7 +40,7 @@
 
 <!--<div class="span11 table-scrollable">-->
 <!--見出し固定用設定追加-->
-<div style="margin-top : -20px;", class="span11 table-scrollable" >
+<div style="margin-top : -20px;", class="span11 table-scrollable">
  
  <style>
    table { }
@@ -49,7 +49,7 @@
 
 <!--<table class="table table-striped">-->
 <!--見出し固定用設定追加-->
-<table id="tablefix", class="table  table-striped", style="width:1920px;">
+<table id="tablefix", class="table  table-striped", style="width:1920px">
 
   <thead>
     <tr>
@@ -69,32 +69,49 @@
     <% @purchase_order_data.order("id desc").each do |purchase_order_datum| %>
       <tr>
         <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum) %></td>
+        <% @purchase_order_code = purchase_order_datum.purchase_order_code %>
         <!--<td><%= purchase_order_datum.purchase_order_code %></td>-->
         <!--仕入画面へ遷移-->
         <td><%= link_to purchase_order_datum.purchase_order_code, purchase_data_path(purchase_order_id: purchase_order_datum.id, 
+          supplier_master_id: purchase_order_datum.supplier_master_id,
           construction_id: params[:construction_id], move_flag: "2"), :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
 		<% if purchase_order_datum.construction_datum.nil? %>
            <td>-</td>
+		   <% @construction_name = "-" %>
         <% else %>
 		  <td><%= purchase_order_datum.construction_datum.construction_name %></td>
+		  <% @construction_name = purchase_order_datum.construction_datum.construction_name %>
         <% end %>
 		<td><%= purchase_order_datum.alias_name %></td>
 		<% if purchase_order_datum.supplier_master.nil? %>
            <td>-</td>
 		   <td>-</td>
 		   <td>-</td>
+		   <% @supplier_name = "-" %>
         <% else %>
 		  <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
 		  <td><%= purchase_order_datum.supplier_master.responsible1 %></td>
 		  <td><%= purchase_order_datum.supplier_master.email1 %></td>
+		  <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
         <% end %>
 		
-		<td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
+	    <td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
+
         <td>
+		  <%= link_to t('.edit', :default => t("作成")),
+                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_history, :id => purchase_order_datum.id, 
+                      construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"), :class => 'btn btn-info btn-xs' %>
+          
+		  <%= link_to "一覧",
+            purchase_order_histories_list_path(purchase_order_datum_id: purchase_order_datum.id, purchase_order_code: @purchase_order_code, 
+            construction_name: @construction_name, supplier_name: @supplier_name , construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"),
+            :class => 'btn btn-xs btn-warning' %>
+
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_purchase_order_datum_path(purchase_order_datum), :class => 'btn btn-default btn-xs' %>
+                      edit_purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+                       :class => 'btn btn-default btn-xs' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      purchase_order_datum_path(purchase_order_datum),
+                      purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
                       :class => 'btn btn-xs btn-danger' %>

@@ -32,7 +32,7 @@ class ApplicationController < ActionController::Base
   
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"
-  #$gengo_alphabet = "H"
+  $GENGO_ALPHABET = "H"
   #$ad = 1988
   $gengo_minus_ad = 1988
   
@@ -52,5 +52,9 @@ class ApplicationController < ActionController::Base
   #add170310
   #見積書などの、見出しコードの仮番
   $HEADER_CODE_MAX = "9999999999"
+  
+  #仕入区分
+  #--出庫
+  $INDEX_DIVISION_SHIPPING = 6
   
 end

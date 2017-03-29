@@ -35,22 +35,47 @@ class PurchaseDataController < ApplicationController
         query ||= eval(cookies[:recent_search_history].to_s)  	
 
         #if params[:move_flag] == "1"
-		#binding.pry
 		
         case params[:move_flag]
 		when "1"
           #工事一覧画面から遷移した場合
           construction_id = params[:construction_id]
 		  query = {"with_construction"=> construction_id }
+		  
+		  #注文番号のパラメータが存在した場合にセットする
+		  if params[:purchase_order_id].present?
+		    purchase_order_id = params[:purchase_order_id]
+            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
+          end
+         
+		  #仕入業者のパラメータが存在した場合にセットする
+		  if params[:supplier_master_id].present?
+		    supplier_master_id = params[:supplier_master_id]
+            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
+                     "supplier_id_eq"=> supplier_master_id}
+          end
+		  
 		when "2"
-          #注文一覧画面から遷移した場合
+          
+		  #注文一覧画面から遷移した場合
 		  if params[:construction_id].present?
 		  #工事→注文→仕入→注文の場合の分岐
 		    params[:move_flag] = "1"
 		  end
 		  
 		  purchase_order_id = params[:purchase_order_id]
-          query = {"purchase_order_datum_id_eq"=> purchase_order_id }
+          #工事番号のパラメータが存在した場合にセットする
+		  query = {"purchase_order_datum_id_eq"=> purchase_order_id }
+		  if params[:construction_id].present?
+		    construction_id = params[:construction_id]
+            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
+          end
+		  #仕入業者のパラメータが存在した場合にセットする
+		  if params[:supplier_master_id].present?
+		    supplier_master_id = params[:supplier_master_id]
+            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
+                     "supplier_id_eq"=> supplier_master_id}
+          end
 		end
 		
 		#@q = PurchaseDatum.ransack(params[:q]) 
@@ -83,6 +108,27 @@ class PurchaseDataController < ApplicationController
 	@unit_masters = UnitMaster.all
 	@purchase_unit_prices = PurchaseUnitPrice.none  
     
+	#global set
+	$purchase_data = @purchase_data
+	
+	#検索用のパラメータがセットされていたら、グローバルにもセットする
+	if params[:q].present?
+      $construction_flag = false
+	  $customer_flag = false
+	  $supplier_flag = false
+	  if params[:q][:with_construction].present?
+        $construction_flag = true
+        $customer_flag = true     #件名があれば得意先もセットする
+      end
+	  if params[:q][:with_customer].present?
+	    $customer_flag = true
+	  end
+	  if params[:q][:supplier_id_eq].present?
+        $supplier_flag = true
+      end
+	end
+	#
+	
 	respond_to do |format|
 	  
 	  format.html
@@ -94,12 +140,19 @@ class PurchaseDataController < ApplicationController
 	  #pdf
 	  
 	  #global set
-	  $purchase_data = @purchase_data
+	  #$purchase_data = @purchase_data
+	  
+	  @print_type = params[:print_type]
 	
 	  format.pdf do
-
-        report = PurchaseListPDF.create @purchase_list 
         
+		
+        case @print_type
+        when "1"
+          report = PurchaseListPDF.create @purchase_list 
+        when "2"
+          report = PurchaseListBySupplierPDF.create @purchase_list_by_supplier
+		end
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
         send_data(
@@ -149,6 +202,10 @@ class PurchaseDataController < ApplicationController
       @purchase_unit_prices = PurchaseUnitPrice.none
       @purchase_datum.build_PurchaseUnitPrice
       @purchase_datum.build_MaterialMaster
+    
+    #工事データ/注文データの初期値をセット
+    set_construction_and_order_default
+
 
        @@new_flag = params[:new_flag]
 
@@ -172,6 +229,9 @@ class PurchaseDataController < ApplicationController
   	@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
     @material_masters = MaterialMaster.where(["id = ?", @purchase_datum.material_id]).pluck(:list_price)
 	@maker_masters = MakerMaster.where(["id = ?", @purchase_datum.material_id])
+	
+	#.pry
+	
   end
 
   # POST /purchase_data
@@ -185,9 +245,14 @@ class PurchaseDataController < ApplicationController
       
     respond_to do |format|
 	  if @purchase_datum.save
-        format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully created.' }
-        format.json { render :show, status: :created, location: @purchase_datum }
-       
+        #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully created.' }
+        #format.json { render :show, status: :created, location: @purchase_datum }
+        
+		#format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+        format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], 
+         :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
+         :move_flag => params[:move_flag])}
+		 
        #仕入単価を更新
        if (params[:purchase_datum][:check_unit] == 'false')
            @purchase_datum.assign_attributes(purchase_unit_prices_params)
@@ -218,10 +283,13 @@ class PurchaseDataController < ApplicationController
    respond_to do |format|
       
       if @purchase_datum.update(purchase_datum_params)
-        format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
-        format.json { render :show, status: :ok, location: @purchase_datum }
-       
-	   
+        #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
+        #format.json { render :show, status: :ok, location: @purchase_datum }
+        
+		
+	    format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], 
+         :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
+         :move_flag => params[:move_flag])}
 		 
         #仕入単価Mも更新する 
         if (params[:purchase_datum][:check_unit] == 'false')
@@ -237,6 +305,33 @@ class PurchaseDataController < ApplicationController
       end
   
     end
+  end
+  
+  def set_construction_and_order_default
+  #工事一覧画面等から遷移した場合に、フォームに初期値をセットさせる    
+	  #.pry
+	 if params[:purchase_order_id].present?
+	   #注文idをセット
+	   purchase_order_id = params[:purchase_order_id]
+	   @purchase_order_data = PurchaseOrderDatum.where("id >= ?", purchase_order_id)
+       
+	   #工事idをセット
+	   construction_id = params[:construction_id]
+	   @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+	   
+	   #仕入idをセット
+	   supplier_master_id = params[:supplier_master_id]
+	   @supplier_master = SupplierMaster.where("id >= ?", supplier_master_id)
+	   
+	 else
+       #工事コードのみの場合。
+       if params[:construction_id].present?
+	     construction_id = params[:construction_id]
+	     @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+	   end
+	 end
+	 
+	 
   end
   
   def update_params_list_price_and_maker
@@ -316,8 +411,13 @@ class PurchaseDataController < ApplicationController
   def destroy
     @purchase_datum.destroy
     respond_to do |format|
-      format.html { redirect_to purchase_data_url, notice: 'Purchase datum was successfully destroyed.' }
-      format.json { head :no_content }
+      #format.html { redirect_to purchase_data_url, notice: 'Purchase datum was successfully destroyed.' }
+      #format.json { head :no_content }
+	  
+	  #format.html {redirect_to purchase_data_path( :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+	  format.html {redirect_to purchase_data_path( :construction_id => params[:construction_id], 
+         :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
+         :move_flag => params[:move_flag])}
     end
   end
   

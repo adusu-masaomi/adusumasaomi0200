@@ -14,7 +14,7 @@
   
   <!--<%= f.input :construction_datum_id %>-->
   <%= f.label :工事コード, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , :tabindex=>"0", style: 'width:440px'} %>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , :tabindex=>"0", style: 'width:440px'} %>
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
   	<%= p.input :construction_name , input_html:{id:"construction_name", :disabled => true} %>
   <% end %>

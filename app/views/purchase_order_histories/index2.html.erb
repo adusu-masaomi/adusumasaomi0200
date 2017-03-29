@@ -1,5 +1,5 @@
 <%- model_class = Order -%>
-<div class="page-header">
+<div class="page-header", style="width:1920px">
   <b>
   </br>
   <h1><%= "注文一覧データ" %></h1>
@@ -24,10 +24,15 @@
    <% end %>
 </div>
 
-<div style="width:1280px;font-size:16px;">
+<div style="width:1920px;font-size:16px;">
 
-<%= link_to t('.cancel', :default => t("前の画面に戻る")),
+<% if params[:move_flag] == "1" %>
+   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-success' %>
+<% else %>
+   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
                 purchase_order_histories_path, :class => 'btn btn-success' %>
+<% end %>
 <%= "注文番号:" %>
 <%= @purchase_order_code %>
 <%= "　" %>

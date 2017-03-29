@@ -70,11 +70,11 @@ class PurchaseDatum < ActiveRecord::Base
 	
     #数量合計（出庫は除く）
     def self.sumQuantity
-      where.not(:division_id => 5).sum(:quantity) 
+      where.not(:division_id => $INDEX_DIVISION_SHIPPING).sum(:quantity) 
     end
     #数量合計（出庫をマイナスで集計する）
     def self.sumShipQuantity
-      where(:division_id => 5).sum(:quantity) * -1
+      where(:division_id => $INDEX_DIVISION_SHIPPING).sum(:quantity) * -1
     end
 	
 	

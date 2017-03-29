@@ -8,7 +8,7 @@
   <div style="margin-left : -0px">
   <%= f.input :delivery_slip_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
   </div>
-  <%= f.input :quotation_date, input_html:{:tabindex=>"1",style: 'width:100px'} %>
+  <%= f.input :quotation_date, :include_blank => true, input_html:{:tabindex=>"1",style: 'width:100px'} %>
   <div class="col-md-6" , style="margin-left : -15px">
    <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{:tabindex=>"1",style: 'width:100px'} %>
   </div>

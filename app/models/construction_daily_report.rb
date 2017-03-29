@@ -9,6 +9,10 @@ class ConstructionDailyReport < ActiveRecord::Base
   #has_many :Staffs
   belongs_to :Staff, :foreign_key => "staff_id"  
   
+  #みなし勤務判定用
+  attr_accessor :regard_one_day
+  attr_accessor :regard_half_day
+  
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true

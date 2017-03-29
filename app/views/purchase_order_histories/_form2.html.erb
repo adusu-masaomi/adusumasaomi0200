@@ -41,15 +41,31 @@
    <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
    <!--<%= f.label :eメール：, {style: 'color:blue', class: 'my-custom-class-l2'} %>-->
    
-   <%= link_to '新規／データ呼出', { id: params[:id] }, :onclick=> "dispDiv()", :class => 'btn btn-warning'  %>
-   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+   <%= link_to '新規／データ呼出', { id: params[:id] , construction_id: params[:construction_id], move_flag: params[:move_flag] }, 
+                                 :onclick=> "dispDiv()", :class => 'btn btn-warning'  %>
+   
+   <% if params[:move_flag] == "1" %>
+   <!--工事画面から遷移した場合-->
+     <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-success' %>
+   <% else %>
+     <%= link_to t('.cancel', :default => t("前の画面に戻る")),
                 purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
+   
+   <% end %>
+
    
          
   
    </br>
    <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
    <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
+   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+   <!--<%= f.hidden_field :construction_id, {:value => params[:construction_id] } %>-->
+   <!--<%= f.hidden_field :move_flag, {:value => params[:move_flag] } %>-->
+   
    </br></br>
 	 <%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
                id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>

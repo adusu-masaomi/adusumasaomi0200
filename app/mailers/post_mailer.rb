@@ -15,7 +15,10 @@ class PostMailer < ApplicationMailer
       @construction = "工事名:" + user.construction_datum.construction_name
     end
     
-
+	#add170317
+    @supplier_name = user.supplier_master.supplier_name
+    @responsible_name = user.supplier_master.responsible1 + "様"
+    
         #本番用
         #mail to: $email_responsible ,
         #cc: "adusu@coda.ocn.ne.jp",

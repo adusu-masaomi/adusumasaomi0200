@@ -19,29 +19,46 @@
   <!--下記だと工事日がうまく更新されないので保留・・・-->
   <!--<%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'}  %>-->
   <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
-         {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px', :tabindex=>"1" } %></br>
+  <% if @construction_data.present? %>
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , 
+           {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px', :tabindex=>"1" } %>
+  <% else %>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
+           {id:"construction_datum_id",  class: "searchableConstructionCode" , style: 'width:400px', :tabindex=>"1" } %>
+  <% end %>
+  </br>
   <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
   <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
       :tabindex=>"2", :onchange=> "getDailyPay(this.form)" }  %>
   <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :disabled => true, :readonly => true } %>
-  <!--<%= f.hidden_field_tag 'staff_pay', @staff_pay, input_html:{id: "daily_pay"} %>-->
   <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :tabindex=>"3", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :tabindex=>"4", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :tabindex=>"5", :onchange => "calcTimeVarious_2(this.form)"} %>
   <%= f.input :end_time_2, default: Time.parse('00:00') , input_html:{id: "end_time_2", :tabindex=>"6", :onchange => "calcTimeVarious_2(this.form)"} %>
+  
+  <div style="margin-left : -10px">
+  <%= f.check_box :regard_one_day, {id: "regard_one_day", :onchange => "calcRegardTimeAs(this.form)"} , "true", "false" %>
+  <%= f.label_tag :regard_one_day, '１日勤務とみなす', {style: 'color: blue'} %>
+  <%= f.check_box :regard_half_day, {id: "regard_half_day", :onchange => "calcRegardTimeAs(this.form)"}, "true", "false" %>
+  <%= f.label_tag :regard_half_day, '半日勤務とみなす', {style: 'color: brown'} %></br>
+  </div>
+  
   <%= f.input :working_times, input_html:{id:"working_times", :tabindex=>"7"} , hint: "*ここは自動計算されますので、通常は入力不要です。" %>
   <%= f.input :man_month, input_html:{id:"man_month", :tabindex=>"8"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
   <%= f.input :labor_cost, input_html:{id:"labor_cost", :tabindex=>"9"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
   
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
-  <%= p.input :construction_start_date , input_html:{id:"construction_start_date"}, as: :date_picker, as: :hidden   %>
-  <%= p.input :construction_end_date , input_html:{id:"construction_end_date"}, as: :date_picker, as: :hidden    %>
+    <%= p.input :construction_start_date , input_html:{id:"construction_start_date"}, as: :date_picker, as: :hidden   %>
+    <%= p.input :construction_end_date , input_html:{id:"construction_end_date"}, as: :date_picker, as: :hidden    %>
   <% end %>
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  <!-- -->
   
   <%= f.button :submit, :class => 'btn-primary', :tabindex => "10" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                construction_daily_reports_path, :class => 'btn btn-default' %>
+                construction_daily_reports_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-default' %>
 
 <% end %>
 
@@ -169,11 +186,13 @@
            //document.getElementById("labor_cost").value = document.getElementById("daily_pay").value ; 
         }
       
+	 //みなし勤務の場合の計算
+	 if (document.getElementById("regard_one_day").checked == true || document.getElementById("regard_half_day").checked == true) {
+	   calcRegardTimeAs(f);
+	 }
    }
  
  
-
-
  function calcTimeVarious_2(f)
    { 
      //calcTimeVariousとほぼ同じ
@@ -225,6 +244,48 @@
    
    };
  
+  //みなし勤務判定
+  function calcRegardTimeAs(f)
+  {
+    if (document.getElementById("regard_one_day").checked == true) {
+      kinmu_time = 27000;
+    } else if (document.getElementById("regard_half_day").checked == true){
+      kinmu_time = 13500;
+    }
+    
+    //終了時間1が１８時以降なら加算。(注！時間２は考慮しないものとする。)
+    obj = document.getElementById("end_time_1");
+    end_time = obj.value;
+	if (end_time != 0) {
+       end_time = ( parseInt(end_time) * 3600 ) + (parseInt(obj.nextElementSibling.value) * 60 );
+	}
+    if (end_time > 64800) {
+	  var add_time = end_time - 64800;
+	  kinmu_time += add_time
+    }
+    
+	
+	//テキストへセット
+    document.getElementById("working_times").value = kinmu_time ;  
+    
+    if (document.getElementById("regard_one_day").checked == false && document.getElementById("regard_half_day").checked == false ){
+      calcTimeVarious(f)
+    }
+	
+    // 工数を算出
+    if (kinmu_time >= 0) {
+      var temp_kinmu_time = 0 ;
+      temp_kinmu_time = (kinmu_time + kinmu_time_2) /27000 ;
+      temp_kinmu_time =  floatFormat(temp_kinmu_time, 3) ; 
+      document.getElementById("man_month").value = temp_kinmu_time;
+            
+      //日給を取得
+      getDailyPay.call({}, f);
+        //document.getElementById("labor_cost").value = document.getElementById("daily_pay").value ; 
+    }
+    
+  }
+ 
   // 日給をajaxで取得
    function getDailyPay(f){
      var staff_id = f.staff_id.value;
@@ -244,17 +305,32 @@
 
   function calcWorkTime(tmp_kinmu_time){
    	   // 勤務時間の計算
+		  
+	  
       if (start_time >= 18000 & start_time <= 32400 & end_time >= 61200 & end_time <= 86400){
          // フルタイム勤務に近ければ、休憩時間を単純にマイナスする。
          tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 7200; 
+		 
+		 //add170328
+		 //終了時間が18時以降なら、勤務時間を３０分マイナス（１日勤務とするため）
+		 //if (end_time == 64800){
+		 //  tmp_kinmu_time -= 1800;
+		 //}
+		 
       //} else if (start_time >= 18000 & start_time <= 32400 & end_time > 57600 & end_time < 61200){
       } else if (start_time >= 18000 & start_time <= 32400 & end_time > 50400 & end_time < 61200){
          // フルタイム勤務に近ければ、休憩時間をマイナスする(但し小休憩は引かない) 161207 end=16:00以降→14:00以降に変更
 		 tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
-       } else if (start_time >= 55800 & start_time <= 86400 & end_time >= 0 & end_time <= 28800){
+      } else if (start_time >= 55800 & start_time <= 86400 & end_time >= 0 & end_time <= 28800){
          //tmp_kinmu_time = tmp_kinmu_time + 86400 - end_time + start_time;
          //upd 170303
-         tmp_kinmu_time = tmp_kinmu_time + 86400 - start_time + end_time ;   
+         tmp_kinmu_time = tmp_kinmu_time + 86400 - start_time + end_time ;  
+      } else if (start_time >= 34200 & start_time <= 37800 & end_time >= 55800 & end_time <= 86400){
+	  //add170328  9:30~10:30 ~ の勤務は、昼と、１５時休憩をマイナスする。
+	     tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 5400; 
+	  //} else if (start_time >= 39600 & start_time <= 43200 & end_time >= 55800 & end_time <= 86400){
+	  //add170328  11:00 ~ の勤務は、昼休憩のみをマイナスする。→しない！！
+	  //   tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
       } else {
          tmp_kinmu_time = tmp_kinmu_time + end_time - start_time;   
   }

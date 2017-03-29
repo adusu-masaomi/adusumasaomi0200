@@ -113,12 +113,7 @@ class ConstructionDailyReportsController < ApplicationController
     @construction_daily_report = ConstructionDailyReport.new
     @staff = Staff.all
 	
-	#@construction_daily_report.construction_datum.build
-	# !!OK
 	@construction_daily_report.build_construction_datum
-	
-	#@construction_daily_report.create_construction_datum
-	
 	@construction_datum = ConstructionDatum.new
 	
 	#‰Šú’l‚ðƒZƒbƒg(show‰æ–Ê‚©‚ç‚Ì‘JˆÚŽž‚Ì‚Ý)
@@ -127,6 +122,15 @@ class ConstructionDailyReportsController < ApplicationController
       @construction_daily_report.working_date = @@construction_working_date
       @construction_daily_report.construction_datum_id = @@construction_datum_id
 	end
+	
+    #HŽ–ˆê——‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡
+    if params[:move_flag] == "1"
+      if params[:construction_id].present?
+        construction_id = params[:construction_id]
+        @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+		
+	  end
+    end
   end
 
   # GET /construction_daily_reports/1/edit
@@ -149,8 +153,12 @@ class ConstructionDailyReportsController < ApplicationController
 	
     respond_to do |format|
       if @construction_daily_report.save 
-        format.html { redirect_to @construction_daily_report, notice: 'Construction daily report was successfully created.' }
-        format.json { render :show, status: :created, location: @construction_daily_report }
+        #format.html { redirect_to @construction_daily_report, notice: 'Construction daily report was successfully created.' }
+        #format.json { render :show, status: :created, location: @construction_daily_report }
+		
+        format.html {redirect_to construction_daily_report_path(@construction_daily_report, :construction_id => params[:construction_id], 
+         :move_flag => params[:move_flag])}
+		 
       else
         format.html { render :new }
         format.json { render json: @construction_daily_report.errors, status: :unprocessable_entity }
@@ -172,8 +180,12 @@ class ConstructionDailyReportsController < ApplicationController
 	  
 	  if @construction_daily_report.update(construction_daily_report_params) 
 	  
-        format.html { redirect_to @construction_daily_report, notice: 'Construction daily report was successfully updated.' }
-        format.json { render :show, status: :ok, location: @construction_daily_report }
+        #format.html { redirect_to @construction_daily_report, notice: 'Construction daily report was successfully updated.' }
+        #format.json { render :show, status: :ok, location: @construction_daily_report }
+
+        format.html {redirect_to construction_daily_report_path(@construction_daily_report, :construction_id => params[:construction_id], 
+         :move_flag => params[:move_flag])}
+		 
       else
         format.html { render :edit }
         format.json { render json: @construction_daily_report.errors, status: :unprocessable_entity }
@@ -191,8 +203,10 @@ class ConstructionDailyReportsController < ApplicationController
   def destroy
     @construction_daily_report.destroy
     respond_to do |format|
-      format.html { redirect_to construction_daily_reports_url, notice: 'Construction daily report was successfully destroyed.' }
-      format.json { head :no_content }
+      #format.html { redirect_to construction_daily_reports_url, notice: 'Construction daily report was successfully destroyed.' }
+      #format.json { head :no_content }
+	  format.html {redirect_to construction_daily_reports_path( :construction_id => params[:construction_id], 
+         :move_flag => params[:move_flag])}
     end
   end
   

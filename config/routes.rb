@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :inventory_histories
+  resources :inventory_histories
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :invoice_detail_middle_classifications
@@ -391,6 +393,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :inventory_histories
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :working_middle_items

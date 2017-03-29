@@ -28,7 +28,7 @@ class PurchaseOrderDatum < ActiveRecord::Base
   
 	
     #validation
-    validates :purchase_order_code, uniqueness: true
+    validates :purchase_order_code, presence: true, uniqueness: true
 	#validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
  
     
@@ -40,7 +40,7 @@ class PurchaseOrderDatum < ActiveRecord::Base
 	    self.purchase_order_code + '<' + self.construction_datum.id.to_s + '>'
       end
     end
-
+    
     def self.header_numbers 
       [*('A'..'Z')]
 	  #[["A", "A"], ["B", "B"], ["C", "C"], ["D", "D"], ["E", "E"], ["F", "F"], ["G", "G"], 

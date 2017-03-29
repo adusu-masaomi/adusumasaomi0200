@@ -68,12 +68,10 @@ class PurchaseOrderHistoriesController < ApplicationController
         end 
      end
      
-	 #binding.pry
-	 
      @q = $orders.ransack(params[:q])   
      @orders  = @q.result(distinct: true)
      @orders  = @orders.page(params[:page])
-    
+     
 	
   end
 
@@ -92,6 +90,10 @@ class PurchaseOrderHistoriesController < ApplicationController
       @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
     end
 	
+	#工事画面からのパラメータ保管
+	#@construction_id = params[:construction_id]
+	#@move_flag = params[:construction_id]
+	#
   end
 
   # GET /purchase_order_histories/1/edit
@@ -100,6 +102,12 @@ class PurchaseOrderHistoriesController < ApplicationController
 	
     set_edit_params
 	
+	#工事画面からのパラメータ保管
+	#$construction_id = params[:construction_id]
+	#$move_flag = params[:move_flag]
+	#binding.pry
+	#
+	 
   end
 
   def set_edit_params
@@ -176,14 +184,22 @@ class PurchaseOrderHistoriesController < ApplicationController
     
     @purchase_order_history = PurchaseOrderHistory.new(purchase_order_history_params)
    
+   
     #パラーメータ補完＆メール送信する
     send_mail_and_params_complement
     
     
     respond_to do |format|
 	  if PurchaseOrderHistory.create(purchase_order_history_params)
-	    format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully created.' }
-        format.json { render :show, status: :created, location: @purchase_order_history }
+	    
+        if params[:move_flag] != "1"
+	      format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully created.' }
+          format.json { render :show, status: :created, location: @purchase_order_history }
+        else
+          #工事画面から遷移した場合→注文Noデータ一覧へ
+		    format.html {redirect_to purchase_order_data_path( 
+                 :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
+        end
       end
     end
   end
@@ -201,10 +217,17 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  
 	  respond_to do |format|
         
+		
 		if @purchase_order_history.update(purchase_order_history_params)
-           format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully updated.' }
-          format.json { render :show, status: :created, location: @purchase_order_history }
-        
+          
+		  if params[:move_flag] != "1"
+            format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully updated.' }
+            format.json { render :show, status: :created, location: @purchase_order_history }
+          else
+		  #工事画面から遷移した場合→注文Noデータ一覧へ
+		    format.html {redirect_to purchase_order_data_path( 
+                 :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
+		  end
 		else
 		  
 		  set_edit_params

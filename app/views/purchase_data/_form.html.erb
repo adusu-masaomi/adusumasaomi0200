@@ -18,8 +18,13 @@
   <%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date", name: "purchase_datum[purchase_date][]" , style: 'width:220px;', :tabindex=>"0"} %>
   <%= f.input :slip_code, label: "伝票番号", input_html: { style: 'width:220px;', :tabindex=>"1" }  %>
   <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", 
+  <% if @purchase_order_data.present? %>
+    <%= f.collection_select :purchase_order_datum_id, @purchase_order_data, :id, :p_num_cd, {} , {id:"purchase_datum", 
+         class: "searchableSubject" , :tabindex=>"2", :onload => "test", style: 'width:220px !important; margin-left: -15px;'} %>
+  <% else %>
+    <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", 
          class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
+  <% end %>
   
   <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
   <%= f.simple_fields_for :@purchase_order_datum do |m| %>
@@ -30,17 +35,27 @@
   <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
   
   <div class="col-xs-5" , style="margin-left : -15px">
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :tabindex=>"3", 
+  <% if @construction_data.present? %>
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , {id:'construction_datum_id', :tabindex=>"3", 
        :class => "searchableConstructionCode",  style: 'width:260px;' } %>
+  <% else %>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :tabindex=>"3", 
+       :class => "searchableConstructionCode",  style: 'width:260px;' } %>
+  <% end %>
   </div>
   <div style="margin-left : -10px">
   <%= f.input :notes, label_html:{style: 'margin-top : -30px;'}, input_html:{id:"notes",  style: 'width:330px;margin-top : -0px;'} %>
   </div>
   
   <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
-  {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %></br>
-
+  <% if @supplier_master.present? %>
+    <%= f.collection_select :supplier_id, @supplier_master, :id, :supplier_name, {},
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+  <% else %>
+    <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+  <% end %>
+  </br>
   <div class="col-xs-5" , style="margin-left : -15px">
   <%= f.label :品番 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , 
@@ -99,12 +114,20 @@
   <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , {id: "division_id", :tabindex=>"17", :class => "my-custom-class"} %></br>
   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:purchase_order_id, params[:purchase_order_id]) %>
+  <%= hidden_field_tag(:supplier_master_id, params[:supplier_master_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  <!-- -->
   
   <%= f.button :submit, :class => 'btn-primary' %>
   
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                purchase_data_path, :class => 'btn btn-default' %>
-				
+                purchase_data_path(construction_id: params[:construction_id], 
+                purchase_order_id: params[:purchase_order_id], 
+                supplier_master_id: params[:supplier_master_id],
+                move_flag: params[:move_flag]), :class => 'btn btn-default' %>
 <% end %>
 
 <script type="text/javascript">
@@ -257,10 +280,6 @@
               //f.list_price.value = obj.options[index].innerText;
         });
 		
-		//}
-		
-        //obj3 = document.getElementById("construction_datum_id");
-        //obj3.selectedIndex = KenId;
      });
      //
      $('#supplier_id').change(function(){
@@ -280,6 +299,11 @@
    window.onload = function(){
   //    $(".searchableSupplier").val(index).trigger("change");
      setSupplierItem();
+   }
+   
+   //注文番号のパラメータがある場合の初期値
+   function test(){
+     debugger;
    }
    
    //村山電気等、外注用の入力自動化

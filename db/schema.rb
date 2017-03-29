@@ -190,6 +190,21 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.datetime "modified"
   end
 
+  create_table "inventory_histories", force: :cascade do |t|
+    t.date     "inventory_date"
+    t.integer  "inventory_division_id", limit: 4
+    t.integer  "construction_datum_id", limit: 4
+    t.integer  "material_master_id",    limit: 4
+    t.integer  "quantity",              limit: 4
+    t.integer  "unit_master_id",        limit: 4
+    t.float    "unit_price",            limit: 24
+    t.integer  "price",                 limit: 4
+    t.integer  "supplier_master_id",    limit: 4
+    t.string   "slip_code",             limit: 255
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
   create_table "invoice_detail_large_classifications", force: :cascade do |t|
     t.integer  "invoice_header_id",             limit: 4
     t.integer  "invoice_items_division_id",     limit: 4
@@ -277,6 +292,10 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.date     "invoice_period_end_date"
     t.integer  "billing_amount",            limit: 4
     t.integer  "execution_amount",          limit: 4
+    t.integer  "deposit_amount",            limit: 4
+    t.integer  "payment_method_id",         limit: 4
+    t.integer  "commission",                limit: 4
+    t.date     "payment_date"
     t.integer  "last_line_number",          limit: 4
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
@@ -323,7 +342,7 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.string   "material_name",           limit: 255
     t.integer  "maker_id",                limit: 4
     t.string   "maker_name",              limit: 255
-    t.integer  "quantity",                limit: 4
+    t.float    "quantity",                limit: 24
     t.integer  "unit_id",                 limit: 4
     t.float    "purchase_unit_price",     limit: 24
     t.integer  "purchase_amount",         limit: 4
