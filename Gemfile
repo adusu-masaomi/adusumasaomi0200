@@ -47,6 +47,8 @@ gem "ransack"
 
 gem 'jquery-ui-rails'
 
+#gem "acts_as_list"
+
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
 # Use mysql as the database for Active Record

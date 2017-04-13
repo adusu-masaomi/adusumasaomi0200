@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170227044736) do
+ActiveRecord::Schema.define(version: 20170401022630) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -190,6 +190,19 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.datetime "modified"
   end
 
+  create_table "inventories", force: :cascade do |t|
+    t.integer  "warehouse_id",       limit: 4
+    t.integer  "location_id",        limit: 4
+    t.integer  "material_master_id", limit: 4
+    t.integer  "inventory_quantity", limit: 4
+    t.integer  "inventory_amount",   limit: 4
+    t.float    "unit_price_1",       limit: 24
+    t.float    "unit_price_2",       limit: 24
+    t.float    "unit_price_3",       limit: 24
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "inventory_histories", force: :cascade do |t|
     t.date     "inventory_date"
     t.integer  "inventory_division_id", limit: 4
@@ -201,6 +214,8 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.integer  "price",                 limit: 4
     t.integer  "supplier_master_id",    limit: 4
     t.string   "slip_code",             limit: 255
+    t.integer  "purchase_datum_id",     limit: 4
+    t.integer  "inventory_update_flag", limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
   end
@@ -343,6 +358,7 @@ ActiveRecord::Schema.define(version: 20170227044736) do
     t.integer  "maker_id",                limit: 4
     t.string   "maker_name",              limit: 255
     t.float    "quantity",                limit: 24
+    t.integer  "actual_quantity",         limit: 4
     t.integer  "unit_id",                 limit: 4
     t.float    "purchase_unit_price",     limit: 24
     t.integer  "purchase_amount",         limit: 4

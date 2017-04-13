@@ -23,24 +23,44 @@ class PurchaseDatum < ActiveRecord::Base
 	attr_accessor :supplier_id_hide
     attr_accessor :unit_price_hide
     attr_accessor :supplier_material_code
-	
+    
+    #外注判定用
+    attr_accessor :outsourcing
 	
     #validation
     validates :material_id, presence: true
+    validates :material_code, presence: true
     validates :maker_id, presence: true
     validates :supplier_id, presence: true
     validates :unit_id, presence: true
     validates :check_unit, acceptance: true 
+    validates :purchase_order_datum_id, presence:true
 
 # scope 
 
 	scope :with_purchase_order, -> (purchase_order_data_construction_datum_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_datum_id = ?", purchase_order_data_construction_datum_id )}
     scope :with_construction, -> (purchase_order_data_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id = ?", purchase_order_data_construction_datum_id )}
 	scope :with_customer, -> (construction_datum_customer_id=1){joins(:construction_datum).where("construction_data.customer_id = ?", construction_datum_customer_id )}
-	scope :with_material, -> (material_id=1) { joins(:material_masters).where("material_masters.id = ?", material_id  ) }
+	scope :with_material, -> (material_id=1) { joins(:MaterialMaster).where("material_masters.id = ?", material_id  ) }
+	
+	scope :with_material_code, -> (material_id=1) { 
+	  if material_id.present?
+	    joins(:MaterialMaster).where("material_masters.id = ?", material_id )
+	  end
+    }
+	scope :with_material_code_include, -> material_code { 
+	  if material_code.present?
+	    joins(:MaterialMaster).where("material_masters.material_code like ?", '%' + material_code + '%' )
+	  end
+    }
+	scope :with_material_name_include, -> material_name { 
+	  if material_name.present?
+	    joins(:MaterialMaster).where("material_masters.material_name like ?", '%' + material_name + '%' )
+	  end
+    }
 	
 	def self.ransackable_scopes(auth_object=nil)
-  		[:with_purchase_order, :with_customer, :with_construction, :with_material]
+  		[:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, :with_material_code_include, :with_material_name_include]
 	end
 	
 	def self.to_csv(options = {})

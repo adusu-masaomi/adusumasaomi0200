@@ -32,7 +32,6 @@ class ConstructionDataController < ApplicationController
 
     @customer_masters = CustomerMaster.all
     
-	#binding.pry
 	
 	$construction_data = @construction_data
 	
@@ -89,8 +88,6 @@ class ConstructionDataController < ApplicationController
     
     @construction_datum = ConstructionDatum.new(construction_datum_params)
 
-    #binding.pry
-    
     #工事開始日・終了日（実績）の初期値をセットする
     @construction_datum.construction_start_date = '3000-01-01'
     @construction_datum.construction_end_date = '2000-01-01'
@@ -99,6 +96,14 @@ class ConstructionDataController < ApplicationController
 
 	
       if @construction_datum.save
+        
+        #工事費集計表データも空で作成
+        #add170330
+        construction_cost_params = {construction_datum_id: @construction_datum.id, purchase_amount: 0, 
+                       execution_amount: 0, purchase_order_amount: ""}
+        @construction_cost = ConstructionCost.create(construction_cost_params)
+        #
+	  
         format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully created.' }
         format.json { render :show, status: :created, location: @construction_datum }
       else
@@ -140,7 +145,20 @@ class ConstructionDataController < ApplicationController
 	
 	  
 	  if @construction_datum.update(construction_datum_params)
-        format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully updated.' }
+        
+        #工事費集計表データも空で作成(データ存在しない場合のみ)
+        #add170330
+        construction_cost = ConstructionCost.where(:construction_datum_id => @construction_datum.id).first
+        if construction_cost.blank?
+            construction_cost_params = {construction_datum_id: @construction_datum.id, purchase_amount: 0, 
+                       execution_amount: 0, purchase_order_amount: ""}
+		
+            @construction_cost = ConstructionCost.create(construction_cost_params)
+        end
+        #
+		
+		
+		format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully updated.' }
 		
 	  	  
 		if params[:directions].present?

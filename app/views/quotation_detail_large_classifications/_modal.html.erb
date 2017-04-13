@@ -9,21 +9,27 @@
   <%= f.input :quotation_header_id, input_html:{id:"quotation_header_id", :value => @quotation_detail_large_classification.quotation_header_id } , as: :hidden %>
   <!--品名／仕様区分(非表示)-->
   <%= f.input :quotation_items_division_id, input_html:{id:"quotation_items_division_id",  :value => 1 } , as: :hidden %>
-  <!---->
+  <!--行番号-->
   <%= f.label :"行番号" , { :class => "my-custom-class-l"} %></br>
   <div class="col-md-7" , style="margin-left : -15px">
-  <!--upd170308-->
-  <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, { id:"line_number", :tabindex=>"0", class: "searchableNumber" , style: 'width:100px' } %>
+  <%= f.select :line_number, QuotationDetailLargeClassification.serial_number, {}, 
+    { id:"line_number", class: "searchableSelect2_1" , style: 'width:100px' } %>
   <%= f.check_box :check_line_insert, {}, "true", "false" %>
   <%= f.label_tag :check_line_insert, '行挿入する　　' %>
   <%= f.label_tag :construction_type, '工事種別：' %>
-  <!--upd170308-->
   <%= f.select :construction_type, WorkingUnit.types, {:selected => @quotation_detail_large_classification.construction_type || 0}, 
-  {id:'construction_type', :class => "my-custom-class", style: 'width:120px;margin-left:8px;font-size:14px;', :onchange => "setLaborType()" } %>
+    {id:'construction_type', :class => "my-custom-class", style: 'width:120px;margin-left:8px;font-size:14px;', :onchange => "setLaborType()" } %>
   </div></br></br>
-  
+  <!--記号-->
+  <%= f.label :working_large_item_short_name , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :working_large_item_short_name, WorkingLargeItem.order('seq').all, :id, :working_large_item_short_name, 
+    {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , {id:'working_large_item_short_name',
+       :class => "searchableSelect2_2",  style: 'width:420px' } %></br>
+  <!--項目名-->
   <%= f.label :"項目名", {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :working_large_item_id, WorkingLargeItem.all, :id, :working_large_item_name, {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , {id:'working_large_item_id', :tabindex=>"2", :class => "searchableWorkingItem",  style: 'width:420px' } %></br>
+  <%= f.collection_select :working_large_item_id, WorkingLargeItem.order('seq').all, :id, :working_large_item_name, 
+     {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , 
+       {id:'working_large_item_id', :class => "searchableSelect2_3",  style: 'width:420px' } %></br>
   <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "3"}  %>
   <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"4" }  %>
   
@@ -34,9 +40,11 @@
   <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"6", style: 'width:120px', :value => @quotation_detail_large_classification.execution_quantity || 1 , :onchange => "changeQuantity()" } %>
   </div>
   
+  <!--単位-->
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
   <%= f.label :"単位" , {} %></br>
-  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, {:prompt => 'どれか一つを選択して下さい', :selected => @quotation_detail_large_classification.working_unit_id || 1 } , {id:'working_unit_id', :tabindex=>"7", :class => "searchableWorkingUnit",  style: 'width:120px' } %></br>
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, {:prompt => 'どれか一つを選択して下さい', 
+  :selected => @quotation_detail_large_classification.working_unit_id || 1 } , {id:'working_unit_id', :class => "searchableSelect2_4",  style: 'width:120px' } %></br>
   </div>
   <div style="margin-left : -50px;margin-top : -15px">
   <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", :tabindex=>"8", style: 'width:120px',  :value => @quotation_detail_large_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name)   }  %>
@@ -99,74 +107,55 @@
   $.fn.modal.Constructor.prototype.enforceFocus = function() {};
   
   $(document).ready(function(){
-    
-	//$('#myModal').on('shown.bs.modal', function () {
-    //   $('#quotation_header_id').focus();
-    //})  
-  　　
-	 
-     //検索可能なリストボックス(注文Noの場合)
-	 //この方法(fn.modal--文を記述せずにdropdownParent加える)もあるが、全てに対策しなければならないのでカットする。
-     //$(".searchableQuotationHeader").select2({ theme: "bootstrap", dropdownParent: $("#myModal") });
-	 $(".searchableQuotationHeader").select2({ theme: "bootstrap" });
-	 
-	 
-	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	 //一覧名の場合
-	 $( ".searchableQuotationHeader" ).on("select2:close", function (e) {
-		setTimeout(function() {
-		    $('[tabindex=1]').focus();
-		}, 0);  
-	 });
-	 
-     //$(".searchableWorkingItem").select2({ theme: "bootstrap"  });
-	 $(".searchableWorkingItem").select2({ theme: "bootstrap"  });
-     $( ".searchableWorkingItem" ).change(function(e) {
-      　  setWorkingLargeItemName();
-	      setWorkingLarageSpecification();
-		  setUnit();
-		  setWorkingUnitPrice();
-		  setExecutionUnitPrice();
-		  //金額も計算
-		  calcTotalPrice();
-		  
-		  obj = document.getElementById("construction_type").value;
-		  if (obj == "0") {
-		  //歩掛りをマスターからセット
-		  //add170223 配管配線・機器取付の集計は除く
-		    setLaborProductivityUnit();
-		    setLaborProductivityUnitTotal();
-		  }
+     //行番号--select2のタブインデックスはここで指定。
+     $(".searchableSelect2_1").select2({ theme: "bootstrap"  }).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+     $( ".searchableSelect2_1" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
      });
-	 $( ".searchableWorkingItem" ).on("select2:close", function (e) {
-	 　setTimeout(function() {
-          $('[tabindex=3]').focus();
-        }, 0);  
+	 //記号（品名（短縮名））--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_2").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',1)}).trigger('load');
+     $( ".searchableSelect2_2" ).change(function(e) {
+    	document.getElementById("working_large_item_id").value = document.getElementById("working_large_item_short_name").value;
+		$(".searchableSelect2_3").trigger("change");
 	 });
- 
-　　 　
-     $(".searchableWorkingUnit").select2({ theme: "bootstrap"});
-	 $( ".searchableWorkingUnit" ).change(function(e) {
-      　  setWorkingUnitName();
-	 });
-	 $( ".searchableWorkingUnit" ).on("select2:close", function (e) {
-	 　setTimeout(function() {
-          $('[tabindex=8]').focus();
-        }, 0);  
+	 $( ".searchableSelect2_2" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 //項目名--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_3").select2({ theme: "bootstrap"  }).on("load", function(e) { 
+        $(this).prop('tabindex',2)}).trigger('load');
+     $( ".searchableSelect2_3" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+     $( ".searchableSelect2_3" ).change(function(e) {
+       setWorkingLargeItemName();
+	   setWorkingLarageSpecification();
+	   setUnit();
+	   setWorkingUnitPrice();
+	   setExecutionUnitPrice();
+	   //金額も計算
+	   calcTotalPrice();
+	   obj = document.getElementById("construction_type").value;
+	   if (obj == "0") {
+	     //歩掛りをマスターからセット
+	     //add170223 配管配線・機器取付の集計は除く
+		 setLaborProductivityUnit();
+		 setLaborProductivityUnitTotal();
+	   }
+     });
+     //単位--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_4").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',7)}).trigger('load');
+     $( ".searchableSelect2_4" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 $( ".searchableSelect2_4" ).change(function(e) {
+         setWorkingUnitName();
 	 });
 	 
-     $(".searchableNumber").select2({ theme: "bootstrap"  });
-     $( ".searchableNumber" ).on("select2:close", function (e) {
-	 　setTimeout(function() {
-          $('[tabindex=2]').focus();
-        }, 0);  
-	 });
-     
-	 //add170223
-	 //歩掛りの集計をデフォルトでセットする
-	 //-->随時更新するのでセットしない（手入力も考慮。）
-	 //();
-	 
+  
      //１つチェックがあれば、他のチェックを外す処理
 	 $('.piping_wiring_flag').on('change', function(){
        if ($(this).is(':checked')) {
@@ -274,7 +263,9 @@
     switch (obj){
       case INDEX_SUBTOTAL:
       //小計
-	    $(".searchableWorkingItem").val(ID_SUBTOTAL).trigger("change");
+	    //アイテム名は自動でセットする。
+	    $(".searchableSelect2_2").val(ID_SUBTOTAL).trigger("change");
+		$(".searchableSelect2_3").val(ID_SUBTOTAL).trigger("change");
         quotation_header_id = document.getElementById("quotation_header_id").value;
 		line_number = document.getElementById("line_number").value;
 	    $.get("<%= quotation_detail_large_classificationz_subtotal_select_path %>",{quotation_header_id: quotation_header_id, line_number: line_number}, 
@@ -295,14 +286,17 @@
         break;
 	  case INDEX_DISCOUNT:
 	  //値引き
-	    $(".searchableWorkingItem").val(ID_DISCOUNT).trigger("change");
+	    //アイテム名は自動でセットする。
+	    $(".searchableSelect2_2").val(ID_DISCOUNT).trigger("change");
+		$(".searchableSelect2_3").val(ID_DISCOUNT).trigger("change");
 	    break;
       //case "1":
 	  case INDEX_PIPING_WIRING_CONSTRUCTION:
       //配管配線工事
-        //アイテム名は自動でセット。
+        //アイテム名は自動でセットする。
         //”配管配線工事”のiDに切り替える。
-        $(".searchableWorkingItem").val(ID_PIPING_WIRING_CONSTRUCTION).trigger("change");
+        $(".searchableSelect2_2").val(ID_PIPING_WIRING_CONSTRUCTION).trigger("change");
+		$(".searchableSelect2_3").val(ID_PIPING_WIRING_CONSTRUCTION).trigger("change");
         //配管配線チェック済みのものから歩掛りを集計する。
         quotation_header_id = document.getElementById("quotation_header_id").value;
         $.get("<%= quotation_detail_large_classificationz_LPU_piping_wiring_select_path %>",{quotation_header_id: quotation_header_id}, 
@@ -311,11 +305,11 @@
             }
         );
         break;
-      //case "2":
       case INDEX_EQUIPMENT_MOUNTING:
       //機器取付
-        //アイテム名は自動でセット。
-        $(".searchableWorkingItem").val(ID_EQUIPMENT_MOUNTING).trigger("change");
+        //アイテム名は自動でセットする。
+        $(".searchableSelect2_2").val(ID_EQUIPMENT_MOUNTING).trigger("change");
+        $(".searchableSelect2_3").val(ID_EQUIPMENT_MOUNTING).trigger("change");
         //機器取付チェック済みのものから歩掛りを集計する。
         quotation_header_id = document.getElementById("quotation_header_id").value;
         $.get("<%= quotation_detail_large_classificationz_LPU_equipment_mounting_select_path %>",{quotation_header_id: quotation_header_id}, 
@@ -324,10 +318,10 @@
 		    }
 	    );
 	    break;
-	  //case "3":
 	  case INDEX_LABOR_COST:
-	    //アイテム名は自動でセット。
-		$(".searchableWorkingItem").val(ID_LABOR_COST).trigger("change");
+	    //アイテム名は自動でセットする。
+		$(".searchableSelect2_2").val(ID_LABOR_COST).trigger("change");
+		$(".searchableSelect2_3").val(ID_LABOR_COST).trigger("change");
 		
 	    //労務費チェック済みのものから歩掛りを集計する。
 		quotation_header_id = document.getElementById("quotation_header_id").value;
@@ -432,7 +426,7 @@
              obj3.value = 0;
 
              //単位をデフォ(１)にセット
-             $(".searchableWorkingUnit").select2("val","1");
+             $(".searchableSelect2_4").select2("val","1");
           }
    }
    //見積・実行金額計算
@@ -473,7 +467,12 @@
 	}
     
   });
-
+  //次のタブへコントロールを移す（select2用)
+  //modalの場合は、共通化ができない（なぜか）
+  function nextControlSelect2(obj){
+    nextIndex = obj.tabIndex + 1;
+    $('[tabindex=' + nextIndex + ']').focus();
+  }
 
 
 </script>

@@ -7,7 +7,7 @@ class QuotationHeader < ActiveRecord::Base
    
    attr_accessor :customer_id_hide
    
-   #見積書コードはユニークのチェックのみ。nullチェックはコピーに失敗するため除外。
+   #見積書コードはユニークのチェックのみ。
    validates :quotation_code, presence:true, uniqueness: true
 	
    scope :with_id, -> (quotation_headers_id=1) { where("quotation_headers.id = ?", quotation_headers_id )}

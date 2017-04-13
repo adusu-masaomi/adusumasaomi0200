@@ -38,9 +38,10 @@
   
   <div style="margin-left : -10px">
   <%= f.check_box :regard_one_day, {id: "regard_one_day", :onchange => "calcRegardTimeAs(this.form)"} , "true", "false" %>
-  <%= f.label_tag :regard_one_day, '１日勤務とみなす', {style: 'color: blue'} %>
-  <%= f.check_box :regard_half_day, {id: "regard_half_day", :onchange => "calcRegardTimeAs(this.form)"}, "true", "false" %>
-  <%= f.label_tag :regard_half_day, '半日勤務とみなす', {style: 'color: brown'} %></br>
+  <%= f.label_tag :regard_one_day, '１日勤務とみなす', {style: 'color: blue'} %></br>
+  <!--半日勤務の判断は難しいため、一旦保留とする-->
+  <%= f.check_box :regard_half_day, {id: "regard_half_day", :onchange => "calcRegardTimeAs(this.form)", :style => "display: none;" }, "true", "false" %>
+  <!-- <%= f.label_tag :regard_half_day, '半日勤務とみなす', {style: 'color: brown'} %></br>-->
   </div>
   
   <%= f.input :working_times, input_html:{id:"working_times", :tabindex=>"7"} , hint: "*ここは自動計算されますので、通常は入力不要です。" %>

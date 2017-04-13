@@ -54,7 +54,12 @@ class ApplicationController < ActionController::Base
   $HEADER_CODE_MAX = "9999999999"
   
   #仕入区分
-  #--出庫
-  $INDEX_DIVISION_SHIPPING = 6
+  $INDEX_DIVISION_STOCK = 5       #入庫
+  $INDEX_DIVISION_SHIPPING = 6    #出庫
+  
+  #在庫の区分
+  $INDEX_INVENTORY_STOCK = 0      #入庫
+  $INDEX_INVENTORY_SHIPPING = 1   #出庫
+  
   
 end

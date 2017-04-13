@@ -73,8 +73,13 @@
         <td><%= link_to construction_daily_report.id, construction_daily_report_path(construction_daily_report) %></td>
         <!--色付き<td><font color="#8F00FE"><b><%= construction_daily_report.working_date %></b></font></td>-->
 		<td><%= construction_daily_report.working_date %></td>
-        <td><%= construction_daily_report.construction_datum.construction_code %></td>
-        <td><%= construction_daily_report.construction_datum.construction_name %></td>
+		<% if construction_daily_report.construction_datum.present? %>
+          <td><%= construction_daily_report.construction_datum.construction_code %></td>
+          <td><%= construction_daily_report.construction_datum.construction_name %></td>
+		<% else %>
+		  <td></td>
+          <td></td>
+		<% end %>
 	    <td><%= @staff[(construction_daily_report.staff_id)-1].staff_name %></td>
         <td><%= construction_daily_report.start_time_1.to_s(:start_time_1) %></td>
         <td><%= construction_daily_report.end_time_1.to_s(:end_time_1) %></td>

@@ -4,9 +4,9 @@
 </div>
 
 <dl class="dl-horizontal">
-  <!--<dt><strong><%= model_class.human_attribute_name(:construction_datum_id) %>:</strong></dt>-->
+  <dt><strong>工事No:</strong></dt>
+  <dd><font color=red><b><%= @construction_daily_report.construction_datum.construction_code %></b></font></dd>
   <dt><strong>工事名:</strong></dt>
-  <!--<dd><%= @construction_daily_report.construction_datum_id %></dd>-->
   <dd><font color=red><b><%= @construction_daily_report.construction_datum.construction_name %></b></font></dd>
   <dt><strong><%= model_class.human_attribute_name(:working_date) %>:</strong></dt>
   <dd><font color=red><b><%= @construction_daily_report.working_date %></b></font></dd>
@@ -25,7 +25,7 @@
   <dt><strong><%= model_class.human_attribute_name(:man_month) %>:</strong></dt>
   <dd><%= @construction_daily_report.man_month %></dd>
   <dt><strong><%= model_class.human_attribute_name(:labor_cost) %>:</strong></dt>
-  <dd><%= @construction_daily_report.labor_cost %></dd>
+  <dd><font color=purple><b><%= @construction_daily_report.labor_cost %></b></font></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

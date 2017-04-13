@@ -130,6 +130,33 @@
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
+	 
+	 $( "#tablefix tbody" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 quotation_header_id = document.getElementById("quotation_header_id").innerText;
+		 
+		 $.post("<%= quotation_detail_large_classificationz_reorder_path %>",
+           { row: row, ajax_quotation_header_id: quotation_header_id },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	   },
+	   //update: function( event, ui ) {
+       //  quotation_header_id = document.getElementById("quotation_header_id").innerText;
+		 //↓本来ならここでIDを直接取れるが、使用しないためコメントアウトする。
+		 //id = ui.item.attr("id");
+	   //},
+	       
+    });
+    $( ".sortable" ).disableSelection();
+	 
+	 
   });
 </script>
 

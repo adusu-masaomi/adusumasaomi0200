@@ -116,6 +116,7 @@ body > .container {
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">在庫管理<b class="caret"></b></a>
                  <ul class="dropdown-menu">
                    <li><a href="/inventory_histories">入出庫管理</a></li>
+				   <li><a href="/inventories">在庫管理</a></li>
 				 </ul>
            </li>
 	       <li class="dropdown">
@@ -253,4 +254,32 @@ body > .container {
 		 }
 	 }
    }
+  
+  //次のタブへコントロールを移す（select2用)
+  function nextControlSelect2(obj){
+    nextIndex = obj.tabIndex + 1;
+    $('[tabindex=' + nextIndex + ']').focus();
+  }
+  //select2をenterキー押下した場合(リストが閉じられた時)に次のコントロールへ移動させる
+  $( ".searchableSelect2_1" ).on("select2:close", function (e) {
+	 nextControlSelect2(this);
+  });
+  $( ".searchableSelect2_2" ).on("select2:close", function (e) {
+	 nextControlSelect2(this);
+  });
+  $( ".searchableSelect2_3" ).on("select2:close", function (e) {
+	 nextControlSelect2(this);
+  });
+  //
+  
+  //
+  // 小数点n位までを残す関数
+  // number=対象の数値
+  // n=残したい小数点以下の桁数
+  function floatFormat( number, n ) {
+    var _pow = Math.pow( 10 , n ) ;
+    return Math.round( number * _pow ) / _pow ;
+  }
+  
+
 </script>

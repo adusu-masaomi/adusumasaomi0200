@@ -122,8 +122,12 @@ class EstimationSheetPDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
-                      #@unit_name = quotation_detail_large_classification.QuotationUnit.quotation_unit_name
-                      @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
+                      
+					  if quotation_detail_large_classification.WorkingUnit.present?
+					    @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
+					  else 
+					    @unit_name = quotation_detail_large_classification.working_unit_name
+					  end
 					  
 					  if @unit_name == "<手入力>"
                         #if quotation_detail_large_classification.quotation_unit_name != "<手入力>"
@@ -277,8 +281,9 @@ class EstimationSheetPDF
                     @quantity = ""
                   end  
                   #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
-                  @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
-                  
+                  if quotation_detail_middle_classification.WorkingUnit.present?
+                     @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
+                  end 
 				  if @unit_name == "<手入力>"
                     #if quotation_detail_middle_classification.quotation_unit_name != "<手入力>"
                     if quotation_detail_middle_classification.working_unit_name != "<手入力>"

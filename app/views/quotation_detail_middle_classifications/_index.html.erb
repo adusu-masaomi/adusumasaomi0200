@@ -1,6 +1,5 @@
  <% @quotation_detail_middle_classifications.order("quotation_header_id desc, quotation_detail_large_classification_id asc, line_number desc").each do |quotation_detail_middle_classification| %>
-      <tr>
-
+      <tr id="<%= quotation_detail_middle_classification.id%>" >
         <!--upd170308-->
         <!--条件によって色を変える処理-->
         <!--種別順の変更時はここも変更する-->
@@ -26,7 +25,11 @@
 		<% end %>
 		<!--add end-->
 		
-        <td style="font-size : 8px;"><%= link_to quotation_detail_middle_classification.id, quotation_detail_middle_classification_path(quotation_detail_middle_classification) %></td>
+		<!--jsパラメータ用に隠しIDをセット-->
+		<td id="quotation_header_id", style="display:none;"><%= quotation_detail_middle_classification.quotation_header_id %></td>
+		<td id="quotation_detail_large_classification_id", style="display:none;"><%= quotation_detail_middle_classification.quotation_detail_large_classification_id %></td>
+        <!---->
+		<td style="font-size : 8px;"><%= link_to quotation_detail_middle_classification.id, quotation_detail_middle_classification_path(quotation_detail_middle_classification) %></td>
         <!--<td><%= quotation_detail_middle_classification.QuotationHeader.construction_name %></td>-->
         <td><%= quotation_detail_middle_classification.line_number %></td>
         <!--upd170223-->

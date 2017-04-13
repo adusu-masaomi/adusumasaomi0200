@@ -51,7 +51,11 @@ class ConstructionCostsController < ApplicationController
       
       
       format.pdf do
-
+        
+        #集計表発行時にデータの初期値をセットする
+        set_default_data
+       
+		
         report = ConstructionCostSummaryPDF.create @construction_costs 
         
         # ブラウザでPDFを表示する
@@ -131,13 +135,53 @@ class ConstructionCostsController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  #集計表発行時にデータの初期値をセットする
+  def set_default_data
+    
+	
+	  #params[:construction_datum_id] = @construction_costs.pluck("construction_datum_id")[0].to_s
+	  params[:construction_datum_id] = @construction_costs.first.construction_datum_id.to_s
+    
+	construction_labor_cost = 0
+	if @construction_costs.first.labor_cost.nil?
+      #労務費をセット
+      #construction_labor_cost_select  #サブルーチンへ
+	  construction_labor_cost = ConstructionDailyReport.where(:construction_datum_id => params[:construction_datum_id]).sum(:labor_cost)
+      if construction_labor_cost.present?
+        @construction_costs[0].labor_cost = construction_labor_cost
+	  end
+    end
+	
+	#仕入金額をセット
+	if @construction_costs[0].purchase_amount == 0
+      purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_datum_id]).sum(:purchase_amount)
+      if purchase_amount.present?
+        @construction_costs[0].purchase_amount = purchase_amount
+      end
+	  #仕入明細をセット
+      purchase_order_amount_select
+      if @purchase_order_amount.present?
+        @construction_costs[0].purchase_order_amount = @purchase_order_amount
+      end
+    end
+    
+    
+	#実行金額をセット
+	if @construction_costs[0].execution_amount == 0
+      execution_amount = construction_labor_cost + purchase_amount
+      @construction_costs[0].execution_amount = execution_amount
+    end
+	
+  end
 
   # ajax
   def construction_name_select
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
   end
   def construction_labor_cost_select
-   
+       
+	   
        @construction_labor_cost_origin = ConstructionDailyReport.where(:construction_datum_id => params[:construction_datum_id]).sum(:labor_cost)
        @construction_labor_cost = ConstructionCost.where(:construction_datum_id => params[:construction_datum_id]).pluck(:labor_cost).flatten.join(" ")
        
@@ -145,7 +189,9 @@ class ConstructionCostsController < ApplicationController
          if @construction_labor_cost.to_i > 0
            @construction_labor_cost = @construction_labor_cost.to_i
          else
-           @construction_labor_cost = @construction_labor_cost_origin.to_i
+		    #upd170330 労務費が故意にゼロの場合もありうる(外注費とするため）
+		    @construction_labor_cost = 0
+           #@construction_labor_cost = @construction_labor_cost_origin.to_i
          end
        else
          @construction_labor_cost = params[:labor_cost]

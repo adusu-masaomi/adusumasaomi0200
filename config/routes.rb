@@ -1,10 +1,16 @@
 Rails.application.routes.draw do
+  resources :inventories
   resources :inventory_histories
   resources :inventory_histories
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :working_middle_items
+  
+  
+  #resources :working_middle_items do
+  #  post :sort, on: :collection
+  #end
   resources :working_large_items
   resources :working_units
   resources :delivery_slip_detail_large_classifications
@@ -21,6 +27,7 @@ Rails.application.routes.draw do
   #    get :send_email
   end
   
+  #map.resources :working_middle_items, :collection => {:reorder => :post}
   
   
   resources :orders
@@ -124,6 +131,18 @@ Rails.application.routes.draw do
   
   get '/purchase_datum' => "purchase_data#index"
   # ajax
+  
+  #インデックスのdrag&dropによるソート用
+  post '/working_middle_itemz/reorder' => 'working_middle_items#reorder'
+  post '/working_large_itemz/reorder' => 'working_large_items#reorder'
+  post '/quotation_detail_large_classificationz/reorder' => 'quotation_detail_large_classifications#reorder'
+  post '/quotation_detail_middle_classificationz/reorder' => 'quotation_detail_middle_classifications#reorder'
+  post '/delivery_slip_detail_large_classificationz/reorder' => 'delivery_slip_detail_large_classifications#reorder'
+  post '/delivery_slip_detail_middle_classificationz/reorder' => 'delivery_slip_detail_middle_classifications#reorder'
+  post '/invoice_detail_large_classificationz/reorder' => 'invoice_detail_large_classifications#reorder'
+  post '/invoice_detail_middle_classificationz/reorder' => 'invoice_detail_middle_classifications#reorder'
+  #
+  
   get '/purchase_datum/unit_price_select' => 'purchase_data#unit_price_select'
   get '/purchase_datum/list_price_select' => 'purchase_data#list_price_select'
   get '/purchase_datum/maker_select' => 'purchase_data#maker_select'
@@ -393,6 +412,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :inventories
   resources :inventory_histories
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications

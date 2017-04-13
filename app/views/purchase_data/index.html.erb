@@ -44,11 +44,17 @@
   
   <%= f.label :material_code, '品番：：' %>
   <!--<%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
-  <%= f.select :material_code_eq, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %></b
+  <!--<%= f.select :with_material, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
+  <%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
   <%= f.label :material_code, '　品番(キーワード)：' %>
-  <%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>
+  <!--<%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>-->
+  <%= f.text_field :with_material_code_include, include_blank: true , id: 'material_code' %>
   <%= f.label :material_code, '品名：' %>
-  <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %></br>
+  <!--<%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %>-->
+  <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:220px', id: 'material_name'  %>
+  <%= f.label :material_code, '品名（手入力）：' %>
+  <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %></br>
+  
       <div>
        <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
        <%= f.button_tag "条件全クリア", :type => 'link', name: "clear",  
@@ -122,17 +128,21 @@
         <% if purchase_datum.purchase_order_datum.nil? %>
            <td>-</td>
         <% else %>
-           <td style="font-size : 12px;"><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>
-        <% end %>
-        <% if purchase_datum.construction_datum_id.nil? %>
+		   <td style="font-size : 12px;"><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>
+		<% end %>
+        <% if purchase_datum.construction_datum_id.nil? || purchase_datum.construction_datum.nil? %>
            <td>-</td>
         <% else %>
 		   <td style="font-size : 12px;"><%= purchase_datum.construction_datum.construction_code %></td>
         <% end %>
         <% if purchase_datum.construction_datum_id.present?  %>
 		   <% if purchase_datum.construction_datum_id!=1 then  %>
-             <td class="col-md-24", style="font-size : 12px;"><%= purchase_datum.construction_datum.construction_name %></td>
-           <% else %>
+		     <% if purchase_datum.construction_datum.present? %>
+               <td class="col-md-24", style="font-size : 12px;"><%= purchase_datum.construction_datum.construction_name %></td>
+             <% else %>
+			   <td></td>
+			 <% end %>
+		   <% else %>
 		      <% if purchase_datum.notes.present?  %>
 			    <td class="col-md-24", style="font-size : 12px;"><%= purchase_datum.notes %></td>
 			  <% else %>
@@ -142,13 +152,25 @@
 		<% else %>
            <td class="col-md-24">-</td>
         <% end %>
-        <% if purchase_datum.construction_datum_id.present? %>
+        <% if purchase_datum.construction_datum_id.present? && purchase_datum.construction_datum.present? %>
            <td align="left", style="font-size : 12px;"><%= purchase_datum.construction_datum.CustomerMaster.customer_name %></td>
         <% else %>
            <td>-</td>
         <% end %>
-        <td style="font-size : 12px;"><%= purchase_datum.material_code %></td>
-	    <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.material_name %></td>
+		<% if purchase_datum.material_code == "＜手入力用＞" %>
+		  <td style="font-size : 12px;">-</td>
+		<% else %>
+		  <% if purchase_datum.material_id != 1 && purchase_datum.MaterialMaster.present? %>
+            <td style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_code %></td>
+		  <% else %>
+            <td style="font-size : 12px;"><%= purchase_datum.material_code %></td>
+		  <% end %>
+		<% end %>
+		<% if purchase_datum.material_id != 1 && purchase_datum.MaterialMaster.present? %>
+		  <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_name %></td>
+		<% else %>
+	      <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.material_name %></td>
+		<% end %>
         <td style="font-size : 12px;"><%= purchase_datum.maker_name %></td>
         <!--<td align="right", style="font-size : 12px;"><%= purchase_datum.quantity %></td>-->
         
@@ -179,8 +201,13 @@
 		<% else %>
            <td align="right">-</td>
         <% end %>
-        <td style="font-size : 12px;"><%= @supplier_masters[(purchase_datum.supplier_id)-1].supplier_name %></td>
-        
+		
+		<% if purchase_datum.SupplierMaster.present? %>
+          <td style="font-size : 12px;"><%= purchase_datum.SupplierMaster.supplier_name %></td>
+		<% else %>
+		  <td style="font-size : 12px;"></td>
+		<% end %>
+		
 		<% if purchase_datum.PurchaseDivision.present? %>
              <td style="font-size : 12px;"><%= purchase_datum.PurchaseDivision.purchase_division_name %></td>
         <% else %>
@@ -260,6 +287,7 @@
     document.getElementById("slip_code").value = "";
 	document.getElementById("material_code").value = "";
 	document.getElementById("material_name").value = "";
+	document.getElementById("material_name_free").value = "";
 	
 	
  }

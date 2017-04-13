@@ -6,9 +6,9 @@
 <dl class="dl-horizontal">
   <dt><strong>仕入日</strong></dt>
   <dd><%= @purchase_datum.purchase_date %></dd>
-  <dt>注文Ｎｏ</strong></dt>
+  <dt><font color=red><b>注文Ｎｏ</strong></b></font></dt>
   <% if @purchase_datum.purchase_order_datum.purchase_order_code.present? %>
-    <dd><%= @purchase_datum.purchase_order_datum.purchase_order_code %></dd>
+    <dd><font color=red><b><%= @purchase_datum.purchase_order_datum.purchase_order_code %></b></font></dd>
   <% else %>
     <dd>-</dd>
   <% end %>

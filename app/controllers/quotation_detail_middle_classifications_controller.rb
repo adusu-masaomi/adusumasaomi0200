@@ -65,6 +65,9 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	#
 
     @quotation_detail_middle_classifications = @q.result(distinct: true)
+	#add170412
+    @quotation_detail_middle_classifications  = @quotation_detail_middle_classifications.order('line_number DESC')
+	
 	#global set
 	$quotation_detail_middle_classifications = @quotation_detail_middle_classifications
 	
@@ -98,7 +101,21 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	
 	
   end
+  
+  #add170412
+  #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
+  def reorder
+  	row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+    #row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:seq => i})}
+	#行番号へセットするため、配列は１から開始させる。
+	row.each_with_index {|row, i| QuotationDetailMiddleClassification.update(row, {:line_number => i + 1})}
+    render :text => "OK"
 
+    #小計を全て再計算する
+    recalc_subtotal_all
+
+  end
+  
   # GET /quotation_detail_middle_classifications/1
   # GET /quotation_detail_middle_classifications/1.json
   def show
@@ -433,6 +450,40 @@ other_cost: @quotation_detail_middle_classification.other_cost
         
      end
   end 
+  
+  def recalc_subtotal_all
+  #すべての小計を再計算する(ajax用)
+    quote_price_sum = 0
+    execution_price_sum = 0
+    labor_productivity_unit_total_sum  = 0
+	
+	@search_records = QuotationDetailMiddleClassification.where("quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+                                                       params[:ajax_quotation_header_id], params[:ajax_quotation_detail_large_classification_id])
+   
+	if @search_records.present?
+      @search_records.order(:line_number).each do |qdmc|
+	    if qdmc.construction_type.to_i != $INDEX_SUBTOTAL
+          if qdmc.construction_type.to_i != $INDEX_DISCOUNT
+            #小計・値引き以外？
+            quote_price_sum += qdmc.quote_price.to_i
+			execution_price_sum += qdmc.execution_price.to_i
+			labor_productivity_unit_total_sum += qdmc.labor_productivity_unit_total.to_f
+		  end
+		else
+		#小計？=>更新
+		    subtotal_params = {quote_price: quote_price_sum, execution_price: execution_price_sum, labor_productivity_unit_total: labor_productivity_unit_total_sum}
+		    qdmc.update(subtotal_params)
+
+			
+			#カウンターを初期化
+		    quote_price_sum = 0
+            execution_price_sum = 0
+            labor_productivity_unit_total_sum  = 0
+        end
+	  end
+    end
+  end
+  
   #add170308
   def recalc_subtotal
   #小計を再計算する
@@ -735,7 +786,11 @@ other_cost: @quotation_detail_middle_classification.other_cost
 	    if (check_flag == true)
 	       quotation_dlc_params = { last_line_number:  @max_line_number}
 		   if @quotation_detail_large_classifiations.present?
-		     @quotation_detail_large_classifiations.update(quotation_dlc_params)
+		     #@quotation_detail_large_classifiations.update(quotation_dlc_params)
+			 #upd170412
+			 @quotation_detail_large_classifiations.attributes = quotation_dlc_params
+             @quotation_detail_large_classifiations.save(:validate => false)
+			 
 		   end 
         end 
     end

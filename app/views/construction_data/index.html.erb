@@ -107,7 +107,7 @@
         <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
 		<% if @search.present? %>
           <td><%= link_to t('.back', :default => t("集計")), construction_costs_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-primary btn-xs'  %></td>
+                                   :class => 'btn btn-primary btn-xs keep-disp'  %></td>
 		<% else %>
 		  <td></td>
 		<% end %>

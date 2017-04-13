@@ -95,7 +95,24 @@ class PurchaseListPDF
 		end
 		 #for i in 0..29   #29行分(for test)
 		    report.list(:default).add_row do |row|
-			           ###数値の様式設定
+			           
+					   #品名のセット
+					   #フリー入力とマスターからの取得を切り分ける
+					   if purchase_datum.material_id == 1
+					     material_name = purchase_datum.material_name
+					   else
+					     material_name = purchase_datum.MaterialMaster.material_name
+					   end
+					   #品番
+					   if purchase_datum.material_code == "＜手入力用＞"
+					     material_code = "-"
+					   else 
+					     material_code = purchase_datum.MaterialMaster.material_code
+					   end
+					   #
+					   
+					   
+					   ###数値の様式設定
 					   #仕入単価
                        @num = purchase_datum.purchase_unit_price
 					   formatNum()
@@ -122,8 +139,8 @@ class PurchaseListPDF
                        #
 					   
 			           row.values purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
-					              material_code: purchase_datum.material_code,
-                                  material_name: purchase_datum.material_name,
+					              material_code: material_code,
+                                  material_name: material_name,
 								  maker_name: purchase_datum.maker_name,
                                   quantity: quantity,
                                   unit_name: purchase_datum.unit_master.unit_name,

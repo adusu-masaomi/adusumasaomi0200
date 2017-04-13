@@ -48,7 +48,9 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	#
 
     @quotation_detail_large_classifications = @q.result(distinct: true)
-    
+	#add170412
+    @quotation_detail_large_classifications  = @quotation_detail_large_classifications.order('line_number DESC')
+	
     #
     #global set
 	$quotation_detail_large_classifications = @quotation_detail_large_classifications
@@ -120,7 +122,22 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	end
     #
   end
+  
+  #add170412
+  #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
+  def reorder
+    
+	row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+    #row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:seq => i})}
+	#行番号へセットするため、配列は１から開始させる。
+	row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:line_number => i + 1})}
+    render :text => "OK"
 
+    #小計を全て再計算する
+    recalc_subtotal_all
+
+  end
+  
   # GET /quotation_detail_large_classifications/1
   # GET /quotation_detail_large_classifications/1.json
   def show
@@ -260,6 +277,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       #####
       #手入力用IDの場合は、単位マスタへも登録する。
       #if @quotation_detail_large_classification.quotation_unit_id == 1
+	  
 	  if @quotation_detail_large_classification.working_unit_id == 1
          #既に登録してないかチェック
          @check_unit = WorkingUnit.find_by(working_unit_name: @quotation_detail_large_classification.working_unit_name)
@@ -287,7 +305,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
          if @check_item.nil?
 		   #全選択の場合
 		   if params[:quotation_detail_large_classification][:check_update_all] == "true" 
-		     large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name, 
+		     large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name,
 		                         working_large_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id,
                                  working_unit_price:  @quotation_detail_large_classification.working_unit_price,
@@ -300,7 +318,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 		     #アイテム,仕様,単位のみ場合
 		     if params[:quotation_detail_large_classification][:check_update_item] == "true" 
 		         large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name, 
-		                         working_large_specification:  @quotation_detail_large_classification.working_large_specification,
+                                 working_large_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id
                                   }
                  @quotation_large_item = WorkingLargeItem.create(large_item_params)
@@ -312,9 +330,6 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       end
 	  #####
 	  
-	 	     
-	  
-      #@quotation_detail_large_classifications = QuotationDetailLargeClassification.all
       @quotation_detail_large_classifications = QuotationDetailLargeClassification.where(:quotation_header_id => $quotation_header_id)
   end
 
@@ -326,7 +341,6 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	
     if params[:quotation_header_id].present?
       $quotation_header_id = params[:quotation_header_id]
-	  #binding.pry
     end
     
   
@@ -391,17 +405,52 @@ class QuotationDetailLargeClassificationsController < ApplicationController
         
      end
   end 
+  
+  def recalc_subtotal_all
+  #すべての小計を再計算する
+    quote_price_sum = 0
+    execution_price_sum = 0
+    labor_productivity_unit_total_sum  = 0
+	
+	@search_records = QuotationDetailLargeClassification.where("quotation_header_id = ?", params[:ajax_quotation_header_id])
+    
+	if @search_records.present?
+      @search_records.order(:line_number).each do |qdlc|
+	    if qdlc.construction_type.to_i != $INDEX_SUBTOTAL
+          if qdlc.construction_type.to_i != $INDEX_DISCOUNT
+            #小計・値引き以外？
+            quote_price_sum += qdlc.quote_price.to_i
+			execution_price_sum += qdlc.execution_price.to_i
+			labor_productivity_unit_total_sum += qdlc.labor_productivity_unit_total.to_f
+		  end
+		else
+		#小計？=>更新
+		    subtotal_params = {quote_price: quote_price_sum, execution_price: execution_price_sum, labor_productivity_unit_total: labor_productivity_unit_total_sum}
+		    qdlc.update(subtotal_params)
+
+			
+			#カウンターを初期化
+		    quote_price_sum = 0
+            execution_price_sum = 0
+            labor_productivity_unit_total_sum  = 0
+        end
+	  end
+    end
+  end
+  
   #add170308
   def recalc_subtotal
   #小計を再計算する
      @search_records = QuotationDetailLargeClassification.where("quotation_header_id = ?", params[:quotation_detail_large_classification][:quotation_header_id])
-     if @search_records.present?
+	 
+	 if @search_records.present?
 		start_line_number = 0
         end_line_number = 0
+	  
         current_line_number = params[:quotation_detail_large_classification][:line_number].to_i
         
-		subtotal_exist = false
-		id_saved = 0
+        subtotal_exist = false
+        id_saved = 0
 		@search_records.order(:line_number).each do |qdlc|
            if qdlc.construction_type.to_i != $INDEX_SUBTOTAL &&
               qdlc.construction_type.to_i != $INDEX_DISCOUNT  
@@ -416,6 +465,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 		       start_line_number = 0   #開始行を初期化
 			 elsif qdlc.line_number > current_line_number
              #小計欄に来たら、処理を抜ける。
+			   #binding.pry
+			 
 			   subtotal_exist = true
 			   id_saved = qdlc.id
                
@@ -427,6 +478,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 		     end_line_number = qdlc.line_number  #終了行をセット
            end
         end
+		
+		
         #範囲内の計を集計
 		if subtotal_exist == true
           subtotal_records = QuotationDetailLargeClassification.find(id_saved)
@@ -549,8 +602,9 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_large_classification_params
       params.require(:quotation_detail_large_classification).permit(:quotation_header_id, :quotation_items_division_id, :working_large_item_id, 
-                     :working_large_item_name, :working_large_specification, :line_number, :quantity, :execution_quantity, :working_unit_id, 
-                     :working_unit_name, :working_unit_price, :execution_unit_price, :quote_price, :execution_price, :labor_productivity_unit, 
+                     :working_large_item_name, :working_large_item_short_name, :working_large_specification, :line_number, :quantity, :execution_quantity,
+                     :working_unit_id, :working_unit_name, :working_unit_price, :execution_unit_price, :quote_price, :execution_price, 
+                     :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, :labor_unit_price, :labor_productivity_unit, 
                      :labor_productivity_unit_total, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag)
     end
    
@@ -575,6 +629,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	#見出しデータへ最終行番号保存用
     def quotation_headers_set_last_line_number
         @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_large_classification.quotation_header_id)
+		
         check_flag = false
 	    if @quotation_headers.last_line_number.nil? 
           check_flag = true
@@ -586,8 +641,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	    if (check_flag == true)
 	       quotation_header_params = { last_line_number:  @max_line_number}
 		   if @quotation_headers.present?
-		      
-			 @quotation_headers.update(quotation_header_params)
+		     #@quotation_headers.update(quotation_header_params,)
+			 #upd170412
+			 @quotation_headers.attributes = quotation_header_params
+             @quotation_headers.save(:validate => false)
 		   end 
         end 
     end
@@ -688,6 +745,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 			   
 		      invoice_detail_large_classification_params = {invoice_header_id: @invoice_header_id, invoice_items_division_id: q_d_l_c.quotation_items_division_id, 
                 working_large_item_id: q_d_l_c.working_large_item_id, working_large_item_name: q_d_l_c.working_large_item_name, 
+                working_large_item_short_name: q_d_l_c.working_large_item_short_name,
                 working_large_specification: q_d_l_c.working_large_specification, line_number: q_d_l_c.line_number, quantity: q_d_l_c.quantity, 
                 execution_quantity: q_d_l_c.execution_quantity, working_unit_id: q_d_l_c.working_unit_id, working_unit_name: q_d_l_c.working_unit_name, 
                 working_unit_price: q_d_l_c.working_unit_price, invoice_price: q_d_l_c.quote_price, execution_unit_price: q_d_l_c.execution_unit_price, 
@@ -823,6 +881,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 			   
 		      delivery_slip_detail_large_classification_params = {delivery_slip_header_id: @delivery_slip_header_id, delivery_slip_items_division_id: q_d_l_c.quotation_items_division_id, 
                 working_large_item_id: q_d_l_c.working_large_item_id, working_large_item_name: q_d_l_c.working_large_item_name, 
+                working_large_item_short_name: q_d_l_c.working_large_item_short_name,
                 working_large_specification: q_d_l_c.working_large_specification, line_number: q_d_l_c.line_number, quantity: q_d_l_c.quantity, 
                 execution_quantity: q_d_l_c.execution_quantity, working_unit_id: q_d_l_c.working_unit_id, working_unit_name: q_d_l_c.working_unit_name, 
                 working_unit_price: q_d_l_c.working_unit_price, delivery_slip_price: q_d_l_c.quote_price, execution_unit_price: q_d_l_c.execution_unit_price, 

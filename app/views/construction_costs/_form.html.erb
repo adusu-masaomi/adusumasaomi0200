@@ -91,6 +91,7 @@
          obj = document.getElementById("construction_datum_id");
          construction_datum_id = parseInt(obj.value);
 		 
+		 var labor_cost = 0;
 		 obj3 = document.getElementById("labor_cost");
 	     if (obj3.value != "") {
            labor_cost = parseInt(obj3.value);
@@ -102,6 +103,7 @@
               function(data){
 	             obj = document.getElementById("labor_cost_origin").textContent;
 	             document.getElementById("labor_cost_origin").value = obj;
+				 
 		      }
             );
 			

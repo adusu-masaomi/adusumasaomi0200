@@ -74,8 +74,9 @@
         <!--仕入画面へ遷移-->
         <td><%= link_to purchase_order_datum.purchase_order_code, purchase_data_path(purchase_order_id: purchase_order_datum.id, 
           supplier_master_id: purchase_order_datum.supplier_master_id,
-          construction_id: params[:construction_id], move_flag: "2"), :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
-		<% if purchase_order_datum.construction_datum.nil? %>
+          construction_id: params[:construction_id] || purchase_order_datum.construction_datum_id, move_flag: "2"), 
+          :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
+        <% if purchase_order_datum.construction_datum.nil? %>
            <td>-</td>
 		   <% @construction_name = "-" %>
         <% else %>

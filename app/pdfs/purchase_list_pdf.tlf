@@ -7,8 +7,8 @@
       "display": true,
       "description": "",
       "x": 10,
-      "y": 60.9,
-      "width": 127.7,
+      "y": 61,
+      "width": 96.9,
       "height": 12.2,
       "style": {
         "font-family": [
@@ -22,7 +22,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -38,9 +38,9 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 229.6,
-      "y": 60,
-      "width": 203.4,
+      "x": 173,
+      "y": 61,
+      "width": 231.3,
       "height": 12.2,
       "style": {
         "font-family": [
@@ -54,7 +54,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -70,15 +70,15 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 793,
-      "y": 61.3,
-      "width": 44.6,
+      "x": 796,
+      "y": 61,
+      "width": 33.9,
       "height": 16,
       "style": {
         "font-family": [
           "Helvetica"
         ],
-        "font-size": 11,
+        "font-size": 10,
         "color": "#000000",
         "text-align": "left",
         "vertical-align": "top",
@@ -96,9 +96,9 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 512,
-      "y": 60.3,
-      "width": 209.8,
+      "x": 535,
+      "y": 61,
+      "width": 240.4,
       "height": 12.2,
       "style": {
         "font-family": [
@@ -112,7 +112,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -128,8 +128,8 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 168,
-      "y": 61.3,
+      "x": 120,
+      "y": 61,
       "width": 56.7,
       "height": 18.3,
       "style": {
@@ -154,9 +154,9 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 462,
-      "y": 61.3,
-      "width": 60.8,
+      "x": 494,
+      "y": 61,
+      "width": 46.5,
       "height": 20,
       "style": {
         "font-family": [
@@ -1227,7 +1227,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 792,
+      "x": 797,
       "y": 45,
       "width": 29.3,
       "height": 10.3,

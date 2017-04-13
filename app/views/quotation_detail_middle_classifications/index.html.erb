@@ -119,7 +119,29 @@
 		  ht -= 108;
 	   }
 	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
-	   //
+	   
+	   $( "#tablefix tbody" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 quotation_header_id = document.getElementById("quotation_header_id").innerText;
+		 quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").innerText;
+		 
+		 $.post("<%= quotation_detail_middle_classificationz_reorder_path %>",
+           { row: row, ajax_quotation_header_id: quotation_header_id,
+             ajax_quotation_detail_large_classification_id: quotation_detail_large_classification_id },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	   },
+	      
+       });
+       $( ".sortable" ).disableSelection();
+	 
   });
   
   function addParam(link){
