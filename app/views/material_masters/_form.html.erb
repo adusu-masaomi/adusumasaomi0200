@@ -25,17 +25,26 @@
   </div>
   <% end -%>-->
 
-  <%= f.input :material_code %>
-  <%= f.input :material_name %>
+  <%= f.input :material_code, input_html:{ :tabindex=>"0" } %>
+  <%= f.input :material_name, input_html:{ :tabindex=>"1" } %>
   <%= f.label :メーカー, {:class => "my-custom-class-l", :id => 'MakerMaster'} %></br>
-  <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , {:id => 'maker_id', class: "searchableMaker",  style: 'width:220px'} %></br>
+  <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name, {:prompt => "どれか一つを選択して下さい",:validate => true} ,
+      {:id => 'maker_id', class: "searchableSelect2_1",  style: 'width:220px'} %></br>
   <!--<%= f.label :単位, {:class => "my-custom-class-l"} %></br>-->
   <!--<%= f.collection_select :unit_id,  UnitMaster.all, :id, :unit_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , { :class => "my-custom-class" } %>-->
-  <%= f.input :list_price %>
-  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので入力不要です。" %>
-  <%= f.input :last_unit_price_update_at, default: Date.strptime("2000/01/01", "%Y/%m/%d"), hint: "*仕入データ登録後に自動反映されるので入力不要です。" %>
+  <%= f.input :list_price, input_html:{ :tabindex=>"3" } %>
+  
+  <%= f.label_tag :inventory_category_id, '在庫品目(*在庫管理する場合のみ登録して下さい。)' , { style: 'margin-left:-15px' }%></br>
+  <%= f.select :inventory_category_id, Inventory.category, {:include_blank => true}, 
+      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"4", 
+       style: 'width:140px;margin-left:-15px;font-size:16px;background-color:#ffffff;' } %>
+	  
+	
+  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので入力不要です。", input_html:{ :readonly => true } %>
+  <%= f.input :last_unit_price_update_at, default: Date.strptime("2000/01/01", "%Y/%m/%d"), 
+     hint: "*仕入データ登録後に自動反映されるので入力不要です。", input_html:{ :readonly => true } %>
 
-  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"5" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 material_masters_path, :class => 'btn btn-default' %>
     
@@ -45,7 +54,11 @@
 
   $(document).ready(function(){
       //検索可能なリストボックス
-       $(".searchableMaker").select2({ theme: "classic" });
+       
+	   //$(".searchableMaker").select2({ theme: "classic" });
+	   //メーカー--select2のタブインデックスはここで指定しておく。
+       $(".searchableSelect2_1").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',2)}).trigger('load');
 
   });
 

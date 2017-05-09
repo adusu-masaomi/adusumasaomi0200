@@ -7,8 +7,14 @@
    <!-- kaminari用追加箇所終了 -->
    
     <%= search_form_for @q do |f| %>
-   <%= f.label :material_code, '資材コード：：' %>
-   <%= f.select :id_eq, options_from_collection_for_select(MaterialMaster.all, "id","material_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
+   <%= f.label :material_code, '品番：：' %>
+   <%= f.select :id_eq, MaterialMaster.all.map{|st| [st.material_code, st.id]},
+           {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode"}  %>
+   <%= f.label :material_code, '　品番(キーワード)：' %>
+   <%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>
+   <%= f.label :material_code, '品名：' %>
+   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %></br>
+  
   	<div>
     	<%= f.submit '検索する', :class => 'btn btn-default' %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
@@ -72,7 +78,7 @@
   
   //検索可能なリストボックス
   $(document).ready(function(){
-        $(".searchableMaterialCode").select2({ theme: "classic" });
+        $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 		//見出し固定用設定追加
 	    var sz = window.parent.screen.width;
 	    var fc = 1;    //デフォルトの固定列数(社長PC基準)

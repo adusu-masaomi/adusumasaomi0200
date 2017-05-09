@@ -48,13 +48,13 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	#
 
     @quotation_detail_large_classifications = @q.result(distinct: true)
-	#add170412
-    @quotation_detail_large_classifications  = @quotation_detail_large_classifications.order('line_number DESC')
-	
-    #
+	#
     #global set
 	$quotation_detail_large_classifications = @quotation_detail_large_classifications
     
+	#add170412
+    #@quotation_detail_large_classifications  = @quotation_detail_large_classifications.order('line_number DESC')
+	
 	#内訳データ見出用
     if params[:quotation_header_name].present?
       $quotation_header_name = params[:quotation_header_name]

@@ -1,3 +1,5 @@
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.1/jquery-ui.min.js"></script>
+
 <%= simple_form_for @construction_daily_report, :html => {id: "report-form" ,  :class => 'well form-horizontal'}  do |f| %>
   
   <% if @construction_daily_report.errors.any? %>
@@ -30,7 +32,7 @@
   <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
   <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
       :tabindex=>"2", :onchange=> "getDailyPay(this.form)" }  %>
-  <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :disabled => true, :readonly => true } %>
+  <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :readonly => true } %>
   <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :tabindex=>"3", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :tabindex=>"4", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :tabindex=>"5", :onchange => "calcTimeVarious_2(this.form)"} %>
@@ -47,6 +49,7 @@
   <%= f.input :working_times, input_html:{id:"working_times", :tabindex=>"7"} , hint: "*ここは自動計算されますので、通常は入力不要です。" %>
   <%= f.input :man_month, input_html:{id:"man_month", :tabindex=>"8"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
   <%= f.input :labor_cost, input_html:{id:"labor_cost", :tabindex=>"9"} , hint: "*ここは自動計算されますので、通常は入力不要です。"  %>
+  <%= f.input :labor_cost_no_add, label: "労務費（加算なし）", input_html:{id:"labor_cost_no_add", :tabindex=>"10", :readonly => true}   %>
   
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
     <%= p.input :construction_start_date , input_html:{id:"construction_start_date"}, as: :date_picker, as: :hidden   %>
@@ -56,6 +59,8 @@
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   <!-- -->
+  
+  <%= f.input :holiday_flag, input_html:{id:'holiday_flag'} , as: :hidden %>
   
   <%= f.button :submit, :class => 'btn-primary', :tabindex => "10" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
@@ -181,6 +186,7 @@
             temp_kinmu_time =  floatFormat(temp_kinmu_time, 3) ; 
             document.getElementById("man_month").value = temp_kinmu_time;
             
+			
             //日給を取得
             getDailyPay.call({}, f);
            // test
@@ -193,6 +199,110 @@
 	 }
    }
  
+ overtime_50 = 0;
+ overtime_25 = 0;
+ pay_50 = 0;
+ pay_25 = 0;
+ //社員IDを切り替えた場合に変数リセット
+  function resetValue(){
+    overtime_50 = 0;
+    overtime_25 = 0;
+    pay_50 = 0;
+    pay_25 = 0;
+  }
+ 
+ function calcTimeVariousOverTime() {
+ //休日・残業時間の加算 170417
+ 
+   //休日処理はまだ・・・！！！
+   
+   //debugger;
+   
+   //早朝(5:00~8:00)の計算
+   if (end_time <= 28800 && end_time >= 18000) {
+   //終了時間が朝５時以降８時までの場合  
+      if (start_time >= 18000) {
+        overtime_25 = end_time - start_time;
+	  } else if(start_time <= 18000 || start_time >= 63000) {
+	    overtime_25 = end_time - 18000;
+	  }
+   }else if (end_time >= 28800 && start_time >= 18000 && start_time <= 28800) {
+     overtime_25 = 28800 - start_time;
+   }else if (end_time >= 28800 && (start_time >= 0 && start_time <= 28800) || (end_time <= 61200 && end_time >= 28800) && start_time >= 61200 ) {
+   //終了時間８時以降かつ開始時間８時前、または、終了時間８時から１７時、開始時間１７時以降の場合
+	overtime_25 = 28800 - 18000;
+   }
+   //
+   
+   //残業時間(18:00~22:00)の計算
+   if (end_time > 64800 && start_time < 79200) {
+     tmp_time = 0;
+	 if (end_time < 79200 && start_time >= 64800) {
+	 //終了時間２２時以前かつ開始時間１８時以降の場合
+       tmp_time = end_time - start_time;
+	 }else if (end_time < 79200 && start_time >= 18000) { 
+	 //終了時間２２時以前かつ開始時間５時以降の場合
+       tmp_time = end_time - 64800;
+	 }else if (end_time < 86400 && end_time >=79200) {
+	 //終了時間２２時以降かつ終了時間２４時前の場合
+	   if (start_time >= 64800) {
+	   //開始時間が１８時以降？
+         tmp_time = 79200 - start_time;
+	   } else {
+	     tmp_time = 79200 - 64800;
+	   }
+	 }else if (start_time >= 18000 && end_time > 0) {
+	 //終了時間０時以降かつ開始時間５時以降の場合
+	   tmp_time = 79200 - 64800;
+	 }
+     
+	 overtime_25 += tmp_time;
+   }
+   
+   //深夜帯(22:00~5:00)の計算
+   if (start_time >=79200 || start_time >= 0 && start_time <= 18000 ||
+       end_time >=79200 ) {
+     if (start_time >=79200 && (end_time >=79200 && end_time <= 89940) ){
+	 //開始２２時以降かつ終了時間２２時以降〜０時59分前
+       overtime_50 = end_time - start_time;
+	   //overtime_50 = overtime_50 / 27000;
+	 }else if (start_time >= 79200 && end_time <= 18000) {
+	 //開始２２時以降かつ終了時間５時前
+      overtime_50 = 86400 - start_time + end_time;
+	 }else if (start_time >= 79200 && end_time > 18000) {
+	 //開始２２時以降かつ終了時間５時以降
+	   overtime_50 = 86400 - start_time + 18000;
+	 }else if (start_time >= 0 && start_time <= 18000 && end_time <= 18000) {
+	 //開始０時以降５時以前
+	   overtime_50 = end_time - start_time;
+	 }else if (start_time >= 0 && start_time <= 18000 && end_time > 18000) {
+	 //開始０時以降５時以降
+	   overtime_50 = 18000 - start_time;
+	 }else if (start_time >= 0 && end_time > 79200) {
+	 //開始０時以降で終了時間が２２時以降
+	   overtime_50 = end_time - 79200;
+	 }
+   }
+   
+   //debugger;
+   
+   //労務費の加算分を算出
+   //daily_pay = document.getElementById("daily_pay").options[0].innerText;
+   tmp_daily_pay = parseInt(daily_pay);
+   if (overtime_25 > 0) {
+     overtime_25 = overtime_25 / 27000;
+	 overtime_25 =  floatFormat(overtime_25, 3);
+	 pay_25 += tmp_daily_pay * overtime_25 * 0.25
+   }
+   if (overtime_50 > 0) {
+     overtime_50 = overtime_50 / 27000;
+	 overtime_50 =  floatFormat(overtime_50, 3);
+	 pay_50 += tmp_daily_pay * overtime_50 * 0.5
+   }
+   
+  
+   //
+ }
  
  function calcTimeVarious_2(f)
    { 
@@ -286,23 +396,157 @@
     }
     
   }
+  
+  FLAG_SATURDAY_HOIDAY = 1;
+  FLAG_SUNDAY_HOLIDAY = 2;
+  
+  holiday_flag = 0;
+  
+  //土日祝、会社休日を求める。
+  function getHoliday(){
+    // 曜日の表記
+    //var weekDayList = [ "日", "月", "火", "水", "木", "金", "土" ] ;
+    
+	var dateObject = document.getElementById("working_date").value;
+    dateObject =  new Date(dateObject);
+	
+    //var weekDay = weekDayList[ dateObj.getDay() ] ;	// 曜日
+	var wday = dateObject.getDay();
+	
+	
+	
+	if (wday == 0){
+	  //日曜？
+	  holiday_flag = FLAG_SUNDAY_HOLIDAY;
+	} else {
+	  //祝日or会社休日ないか判定。
+	   if (getNationalHoliday(dateObject) == "祝日") {
+	      //祝日判定(関数はapplication.htmlにて定義)
+          holiday_flag = FLAG_SATURDAY_HOIDAY;
+	   } else {
+	      //会社休日の判定
+		  var working_date = document.getElementById("working_date").value;
+		  
+		  $.get("<%= business_holidayz_get_business_holiday_path %>",
+            { working_date: working_date },
+            function(data){
+			  obj = document.getElementById("holiday_flag").textContent
+			  if (obj != undefined) {
+			    if (obj == "1") {
+				  if (wday == 6) {
+				    holiday_flag = FLAG_SATURDAY_HOIDAY;
+				  } else {
+				    //土曜以外は日曜と同じ扱い(*0.35)
+				    holiday_flag = FLAG_SUNDAY_HOLIDAY;
+				  }
+				}
+			  }
+			}
+          );
+		  
+	   }
+	   
+	  
+	}
+	//return flag;
+  }
  
+ 
+  var daily_pay = 0;
+  var staff_id = 0;
+  
   // 日給をajaxで取得
    function getDailyPay(f){
+     //if (staff_id > 0 && staff_id != f.staff_id.value ){
+	 //  resetValue();
+	 //}
+   
      var staff_id = f.staff_id.value;
       $.get("<%= construction_daily_reportz_staff_pay_select_path %>",
           { id: staff_id },
           function(data){
             //労務費をセット
-            index = daily_pay.selectedIndex;
-            var tmp_daily_pay  = daily_pay.options[index].innerText;     
-            var num =  tmp_daily_pay * document.getElementById("man_month").value;
+            obj = document.getElementById("daily_pay");
+			index = document.getElementById("daily_pay").selectedIndex;
+			if (index != undefined){
+              daily_pay  = obj.options[index].innerText;
+			}
+            //var tmp_daily_pay  = daily_pay.options[0].innerText;	 
+            var num =  daily_pay * document.getElementById("man_month").value;
+			var num_no_add = num;   //手当加算前のものも保持する
+			
+			//debugger;
+			
+			//休日・深夜帯分を加える
+			//add170417
+			
+			resetValue();
+			obj = document.getElementById("start_time_1");
+            start_time = obj.value;
+			calcStartTime();
+			obj = document.getElementById("end_time_1");
+            end_time = obj.value;
+			calcEndTime();
+	        calcTimeVariousOverTime();
+			
+			obj = document.getElementById("start_time_2");
+            start_time = obj.value;
+			calcStartTime();
+            obj = document.getElementById("end_time_2");
+            end_time = obj.value;
+			calcEndTime();
+	        calcTimeVariousOverTime();
+			
+			num += pay_25 + pay_50;
+			//
+			
+			//休日の判定
+			getHoliday();
+			switch (holiday_flag){
+            case FLAG_SATURDAY_HOIDAY:
+			  var pay_holiday = num_no_add * 0.25
+			  num += pay_holiday
+              break;
+            case FLAG_SUNDAY_HOLIDAY:
+			  var pay_holiday = num_no_add * 0.35
+			  num += pay_holiday
+              break;
+            }
+			
             if (num >= 0) {
                document.getElementById("labor_cost").value = num;
+			   document.getElementById("labor_cost_no_add").value = num_no_add;
             }
           }
         );
    }
+  
+  function calcStartTime(){
+    if (start_time >= 0) {
+      start_time = ( parseInt(start_time) * 3600 ) + ( parseInt(obj.nextElementSibling.value) * 60 );
+    }
+  }
+  function calcEndTime(){
+    if (end_time >= 0) {
+      end_time = ( parseInt(end_time) * 3600 ) + ( parseInt(obj.nextElementSibling.value) * 60 );
+    }
+  }
+  
+  // 日給をajaxで取得(ajax未使用)
+   //function getDailyPay(f){
+     //var tmp_daily_pay  = daily_pay.options[0].innerText;	 
+   //  var num =  daily_pay * document.getElementById("man_month").value;
+			
+	//		//休日・深夜帯分を加える
+	//		//add170417
+	//		calcTimeVariousOverTime();
+	//		num += pay_25 + pay_50;
+	//		//
+	  //      if (num >= 0) {
+        //       document.getElementById("labor_cost").value = num;
+          //  }
+   //};
+
 
   function calcWorkTime(tmp_kinmu_time){
    	   // 勤務時間の計算
@@ -352,5 +596,7 @@
       "/get_value"
     );
   }
+
+
 
 </script>

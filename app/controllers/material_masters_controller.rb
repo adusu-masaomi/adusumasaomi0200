@@ -6,9 +6,22 @@ class MaterialMastersController < ApplicationController
   def index
     # @material_masters = MaterialMaster.all
     # @material_masters = MaterialMaster.page(params[:page])
-
-    @q = MaterialMaster.ransack(params[:q])   
-    @material_masters = @q.result(distinct: true)
+    #ransack保持用コード
+    query = params[:q]
+    query ||= eval(cookies[:recent_search_history].to_s) 
+	
+    #@q = MaterialMaster.ransack(params[:q])
+    @q = MaterialMaster.ransack(query)   
+    
+    #ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 24.hours.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+	
+	@material_masters = @q.result(distinct: true)
     @material_masters = @material_masters.page(params[:page])
 
 
@@ -94,6 +107,7 @@ class MaterialMastersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def material_master_params
-      params.require(:material_master).permit(:material_code, :material_name, :maker_id, :unit_id, :list_price, :last_unit_price, :last_unit_price_update_at)
+      params.require(:material_master).permit(:material_code, :material_name, :maker_id, :unit_id, :list_price, :last_unit_price, 
+                                              :last_unit_price_update_at, :inventory_category_id)
     end
 end

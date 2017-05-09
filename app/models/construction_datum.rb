@@ -28,31 +28,7 @@ class ConstructionDatum < ActiveRecord::Base
 	validates :alias_name, presence: true
 	
 	#scope :with_id, -> { where(id: "purchase_order_data.construction_id")} 
-	#scope :with_customer, -> (ConstructionDatum_customer_id=1) { joins(:ConstructionDatum).where("construction_data.customer_id = ?", ConstructionDatum_customer_id ).merge(ConstructionDatum.with_id)}
-	#scope :with_id, -> (customer_id=1) { where("construction_data.customer_id = ?", customer_id ). where(id: "purchase_order_data.construction_id") }
-	#scope :with_id, -> (customer_id=1) { joins(:purchase_order_datum).where("purchase_order_data.customer_id = ?", customer_id ). joins(:purchase_order_datum).where(id: "purchase_order_data.construction_id") } 
-	#scope :with_id, -> (customer_id=1) { where("customer_id = ?", customer_id ). joins(:purchase_order_datum).where(id: "construction_id") }
-	#scope :with_id, -> (customer_id=1) { where("customer_id = ?", customer_id ). joins(:purchase_order_datum).where(construction_id: "construction_id") }
-	
-	#mouchott_
-	#scope :with_id, -> (customer_id=1) { where("customer_id = ?", customer_id )}
-	scope :with_id, -> { where(id: "purchase_order_data.construction_id")} 
-	
-	#scope :with_id, -> {joins(:purchase_order_datum).where(construction_id: "construction_id") }
-    
-	#scope :with_id, -> {joins(:purchase_order_datum).where(id: "id") .where("construction_data.customer_id = ?", construction_datum_customer_id )}
-	#scope :with_id, -> {joins(:purchase_order_datum).where(id: "id") .where("customer_id = ?", customer_id )}
-	
-	#scope :with_id, ->  (customer_id=1){ joins(:purchase_order_datum).where(id: "purchase_order_data.construction_datum_id").where("customer_id = ?", customer_id )}
-	#scope :with_id,  ->  (purchase_order_datum_construction_datum_id) { where(id: purchase_order_datum_construction_datum_id) }
 	scope :with_id,  -> { joins(:purchase_order_datum) }
-	
-	#scope :with_id, -> (customer_id=1) { where("customer_id = ?", customer_id ). joins(:purchase_order_datum).where(id: "purchase_order_data.construction_datum_id") }
-	#scope :with_id, ->  (customer_id=1){joins(:purchase_order_datum).where(id: "purchase_order_data.construction_datum_id").where("construction_data.customer_id = ?", construction_datum_customer_id )}
-	#scope :with_id, -> (customer_id=1) { joins(:purchase_order_datum).where(id: "purchase_order_data.construction_id") }
-	#scope :with_id, -> (customer_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_id = ?" , purchase_order_datum.construction_id) }
-	#scope :with_purchase_order, -> (purchase_order_data_construction_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_id = ?", purchase_order_data_construction_id )}
-	#scope :with_id, -> (id=1){joins(:purchase_order_datum).where("purchase_order_data.construction_id = " , id) }
 	
 	def self.ransackable_scopes(auth_object=nil)
   		[:with_id]
@@ -78,5 +54,26 @@ class ConstructionDatum < ActiveRecord::Base
 	def self.bills_check_list 
       [["未", 0], ["済", 1]] 
     end
-  
+    
+    #在庫品目によって、工事IDを自動取得する
+    def self.get_construction_on_inventory_category(inventory_category_id)
+      ret_id = 1
+	  
+	  case inventory_category_id
+      when $INVENTORY_CATEGORY_AIR_CONDITIONING_ELEMENT
+      #エアコン部材
+        ret_id = $CUNSTRUCTION_ID_AIR_CONDITIONING_ELEMENT
+      when $INVENTORY_CATEGORY_PIPE_AND_WIRING
+      #配線器具
+        ret_id = $CUNSTRUCTION_ID_PIPE_AND_WIRING
+      when $INVENTORY_CATEGORY_ID_CABLE
+      #ケーブル
+        ret_id =  $CUNSTRUCTION_ID_CABLE
+	  else
+	    ret_id = 1
+      end
+	  
+	  return ret_id
+	end
+
 end

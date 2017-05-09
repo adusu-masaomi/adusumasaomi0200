@@ -14,7 +14,7 @@
 //= require jquery_ujs
 //= require jquery-ui
 // require jquery.ui.sortable
-//= require jquery-ui/sortable
+// require jquery-ui/sortable
 //= require cocoon
 //= require autocomplete-rails
 //= require typehead.js.js

@@ -104,10 +104,14 @@ class PurchaseListPDF
 					     material_name = purchase_datum.MaterialMaster.material_name
 					   end
 					   #品番
-					   if purchase_datum.material_code == "＜手入力用＞"
+					   if purchase_datum.material_code == "＜手入力用＞" || purchase_datum.material_code == "-"
 					     material_code = "-"
-					   else 
-					     material_code = purchase_datum.MaterialMaster.material_code
+					   else
+                                             if purchase_datum.MaterialMaster.material_code != "＜手入力用＞"  
+					       material_code = purchase_datum.MaterialMaster.material_code
+                                             else
+                                               material_code = purchase_datum.material_code
+                                             end  
 					   end
 					   #
 					   

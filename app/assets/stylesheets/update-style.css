@@ -1,11 +1,9 @@
-.sortable-placeholder {
-    margin-left: 0 !important;
-    border: 1px solid #ccc;
-    background-color: yellow;
-    -webkit-box-shadow: 0px 0px 10px #888;
-    -moz-box-shadow: 0px 0px 10px #888;
-    box-shadow: 0px 0px 10px #888;
+.sbc_field { ime-mode: disabled; }
+
+.select2-emphasis{
+  background-color:#F5A9A9 !important;
 }
+
 
 body.dragging, body.dragging * {
   cursor: move !important;

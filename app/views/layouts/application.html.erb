@@ -100,6 +100,7 @@ body > .container {
                <li><a href="/purchase_divisions">仕入区分マスター管理</a></li>
                <li><a href="/staffs">社員マスター管理</a></li>
                <li><a href="/affiliations">所属マスター管理</a></li>
+			   <li><a href="/business_holidays">会社休日マスター管理</a></li>
                <li><a href="/users">ユーザー管理</a></li>
             </ul>
 		   </li>
@@ -117,6 +118,7 @@ body > .container {
                  <ul class="dropdown-menu">
                    <li><a href="/inventory_histories">入出庫管理</a></li>
 				   <li><a href="/inventories">在庫管理</a></li>
+                   <li><a href="/stocktakes">棚卸管理</a></li>
 				 </ul>
            </li>
 	       <li class="dropdown">
@@ -223,10 +225,45 @@ body > .container {
   //
   var MESSAGE_LIST = "指定無し";    //select2のデフォルトのメッセージ
   
+  //add170413
+  //仕入の区分(マスター変更時注意！)
+  var INDEX_DIVISION_PURCHASE = 1;      //仕入
+  var INDEX_DIVISION_OUTSOURCING = 2;   //外注
+  var INDEX_DIVISION_MACHINE_RENTAL = 3; //機材借入
+  var INDEX_DIVISION_SHIPPING = 5;      //出庫
+  //入出庫区分
+  var INDEX_INVENTORY_STOCK = 0;        //入庫
+  var INDEX_INVENTORY_SHIPPING = 1;     //出庫
+  //add end
+  
   $(document).ready(function() {
-    $("a.add_fields").
-      data("association-insertion-position", 'before').
-      data("association-insertion-node", 'this');
+    //del 170427
+	//$("a.add_fields").
+    //  data("association-insertion-position", 'before').
+    //  data("association-insertion-node", 'this');
+	  
+	
+	//imeモードの制御
+	// ime-modeが使えるか
+    var supportIMEMode = ('ime-mode' in document.body.style);
+    // 非ASCII
+    var noSbcRegex = /[^\x00-\x7E]+/g;
+    // 1バイト文字専用フィールド
+    jQuery('.sbc_field')
+    .on('keydown blur paste', function(e) { 
+
+        // ime-modeが使えるならスキップ
+        if (e.type == 'keydown' || e.type == 'blur')
+            if (supportIMEMode) return;
+
+        // 2バイト文字が入力されたら削除
+        var target = jQuery(this);
+        if(!target.val().match(noSbcRegex)) return;
+        window.setTimeout( function() {
+          target.val( target.val().replace(noSbcRegex, '') );
+        }, 1);        
+    });
+	//
   });
   
   //ENTER→TABキーに変換する処理。
@@ -281,5 +318,117 @@ body > .container {
     return Math.round( number * _pow ) / _pow ;
   }
   
+  
+
+function getNationalHoliday(dateobj) {
+    //祝日を判定する関数。
+    //祝日ならばその名称、祝日でなければ空文字を返す。
+    var nen, tsuki, hi, yobi;
+    var HOLIDAY = "祝日";
+	
+	if(dateobj.getFullYear() < 2007) {
+        throw new Error("2007年以上にしてください。");
+    }
+    nen = dateobj.getFullYear();
+    tsuki = dateobj.getMonth() + 1;
+    hi = dateobj.getDate();
+    yobi = dateobj.getDay();
+
+    if(tsuki == 1 && hi == 1) {
+        //return "元日";
+		return HOLIDAY;
+    }
+    if(tsuki == 2 && hi == 11) {
+        //return "建国記念の日";
+		return HOLIDAY;
+    }
+    if(tsuki == 4 && hi == 29) {
+        //return "昭和の日";
+		return HOLIDAY;
+    }
+    if(tsuki == 5 && hi == 3) {
+        //return "憲法記念日";
+		return HOLIDAY;
+    }
+    if(tsuki == 5 && hi == 4) {
+        //return "みどりの日";
+		return HOLIDAY;
+    }
+    if(tsuki == 5 && hi == 5) {
+        //return "こどもの日";
+		return HOLIDAY;
+    }
+    if(nen >= 2016 && tsuki == 8 && hi == 11) {
+        //return "山の日"; //2016-8-11から実施。
+		return HOLIDAY;
+    }
+    if(tsuki == 11 && hi == 3) {
+        //return "文化の日";
+		return HOLIDAY;
+		
+    }
+    if(tsuki == 11 && hi == 23) {
+        //return "勤労感謝の日";
+		return HOLIDAY;
+    }
+    if(tsuki == 12 && hi == 23) {
+        //return "天皇誕生日";
+		return HOLIDAY;
+    }
+    if(tsuki == 1 && yobi == 1 && 7 < hi && hi < 15) {
+        //return "成人の日"; //1月第2月曜日;
+		return HOLIDAY;
+    }
+    if(tsuki == 7 && yobi == 1 && 14 < hi && hi < 22) {
+        //return "海の日"; //7月第3月曜日
+		return HOLIDAY;
+    }
+    if(tsuki == 9 && yobi == 1 && 14 < hi && hi < 22) {
+        //return "敬老の日"; //9月第3月曜日
+		return HOLIDAY;
+    }
+    if(tsuki == 10 && yobi == 1 && 7 < hi && hi < 15) {
+        //return "体育の日"; //10月第2月曜日
+		return HOLIDAY;
+    }
+    if(tsuki == 3 && hi == shunbun(nen)) {
+        //return "春分の日";
+		return HOLIDAY;
+    }
+    if(tsuki == 9 && hi == shubun(nen)) {
+        //return "秋分の日";
+		return HOLIDAY;
+    }
+    return "";
+}
+function shunbun(nen) {//春分の日
+    if(nen < 1900 || nen > 2099) {
+        return 0;
+    }
+    if(nen % 4 === 0) {
+        return nen <= 1956 ? 21 : (nen <= 2088 ? 20 : 19);
+    } else if(nen % 4 == 1) {
+        return nen <= 1989 ? 21 : 20;
+    } else if(nen % 4 == 2) {
+        return nen <= 2022 ? 21 : 20;
+    } else {
+        return nen <= 1923 ? 22 : (nen <= 2055 ? 21 : 20);
+    }
+}
+function shubun(nen) {//秋分の日
+    if(nen < 1900 || nen > 2099) {
+        return 0;
+    }
+    if(nen % 4 === 0) {
+        return nen <= 2008 ? 23 : 22;
+    } else if(nen % 4 == 1) {
+        return nen <= 1917 ? 24 : (nen <= 2041 ? 23 : 22);
+    } else if(nen % 4 == 2) {
+        return nen <= 1946 ? 24 : (nen <= 2074 ? 23 : 22);
+    } else {
+        return nen <= 1979 ? 24 : 23;
+    }
+}
+
 
 </script>

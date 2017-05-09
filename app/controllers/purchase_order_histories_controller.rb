@@ -111,9 +111,24 @@ class PurchaseOrderHistoriesController < ApplicationController
   end
 
   def set_edit_params
-     #ここでは例外的に、newをする
-    if $purchase_order_history.nil?
-        @purchase_order_history = PurchaseOrderHistory.new
+    
+    flag_nil = false
+	
+	if $purchase_order_history.nil?
+      flag_nil = true
+	else
+      if $purchase_order_history .purchase_order_datum_id != params[:id].to_i
+	    flag_nil = true
+		
+	  end
+    end
+    
+	
+    #ここでは例外的に、newをする
+    #if $purchase_order_history.nil?
+	if flag_nil == true
+	    
+		@purchase_order_history = PurchaseOrderHistory.new
         #NoデータのIDと工事IDをセット。
 		if params[:id].present?
 	      @purchase_order_data  = PurchaseOrderDatum.find(params[:id])
@@ -138,6 +153,7 @@ class PurchaseOrderHistoriesController < ApplicationController
     else
         @purchase_order_history = $purchase_order_history 
         @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
+		
 		
 	#@purchase_order_history.build_orders
 		
@@ -319,14 +335,20 @@ class PurchaseOrderHistoriesController < ApplicationController
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
 			  
-                #仕入単価マスターへも登録。
+                #仕入先単価マスターへも登録。
                 @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
 			    if @material_master.present?
 			      material_id = @material_master.id
 				  supplier_id = params[:purchase_order_history][:supplier_master_id]
 				  
+				  supplier_material_code = params[:material_code][i]
+				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
+				  #岡田電気の場合のみ、品番のハイフンは抹消する
+				      supplier_material_code = supplier_material_code.delete!('-')
+				  end
+				  
                   purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
-                                        supplier_material_code: params[:material_code][i], unit_price: 0 ,
+                                        supplier_material_code: supplier_material_code, unit_price: 0 ,
                                         unit_id: item[:unit_master_id]}
 			      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
                 

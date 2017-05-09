@@ -6,6 +6,8 @@ class MaterialMaster < ActiveRecord::Base
 	belongs_to :MakerMaster, :foreign_key => "maker_id"
 	has_many :UnitMaster
 	
+	has_many :inventories
+	
 	#バリデーション
 	#validates :maker_id, presence: true
 	#validates :material_code, presence: true
@@ -38,6 +40,8 @@ class MaterialMaster < ActiveRecord::Base
    #scope :search_faster, lambda { |query| where('material_name LIKE ?', "%#{query}%").limit(100) }
 	 
    scope :with_maker, -> (id=1){joins(:MakerMaster).where("maker_masters.id = material_masters.maker_id" )}
+   #在庫品目のみリストにあげたい場合に利用
+   scope :with_inventory_item, -> { where.not(:inventory_category_id => nil).where("inventory_category_id > ?", 0) }
    
    def self.ransackable_scopes(auth_object=nil)
        [:with_maker]
@@ -47,8 +51,8 @@ class MaterialMaster < ActiveRecord::Base
    def maker_existing
      errors.add(MakerMaster, :missing) if MakerMaster.blank?
    end
-
-
+   
+   
    #リスト表示用(CD/名称)
 	def p_material_code_name
       if self.material_code.nil?

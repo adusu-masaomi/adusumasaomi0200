@@ -16,8 +16,6 @@
   <dd><%= @purchase_datum.material_code %></dd>
   <dt><strong>品名</strong></dt>
   <dd><%= @purchase_datum.material_name %></dd>
-  <dt><strong>メーカーID</strong></dt>
-  <dd><%= @purchase_datum.maker_id %></dd>
   <dt><strong>メーカー名</strong></dt>
   <dd><%= @purchase_datum.maker_name %></dd>
   <dt><strong>数量</strong></dt>
@@ -36,8 +34,18 @@
   <dd><%= @purchase_datum.list_price %></dd>
   <dt><strong>仕入業者</strong></dt>
   <dd><%= @supplier_masters[(@purchase_datum.supplier_id)-1].supplier_name %></dd>
+  <dt><strong>伝票番号</strong></dt>
+  <dd><%= @purchase_datum.slip_code %></dd>
   <dt><strong>仕入区分</strong></dt>
   <dd><%= @purchase_divisions[(@purchase_datum.division_id)-1].purchase_division_name %></dd>
+  <dt><strong>入出庫区分</strong></dt>
+  <% if @purchase_datum.inventory_division_id.present? %>
+  <dd><%= InventoryHistory.inventory_division[@purchase_datum.inventory_division_id][0] %></dd>
+  <% else %>
+  <dd>-</dd>
+  <% end %>
+  
+  
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

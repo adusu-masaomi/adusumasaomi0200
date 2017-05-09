@@ -22,7 +22,6 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_division_id = []
   
   @@new_flag = []
-  #binding.pry
   
   # GET /purchase_data
   # GET /purchase_data.json
@@ -34,8 +33,6 @@ class PurchaseDataController < ApplicationController
 
         query ||= eval(cookies[:recent_search_history].to_s)  	
 
-        #if params[:move_flag] == "1"
-		
         case params[:move_flag]
 		when "1"
           #工事一覧画面から遷移した場合
@@ -279,8 +276,8 @@ class PurchaseDataController < ApplicationController
        
        
        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
-       #170404 一旦作業中断中！！！！
-       #set_inventory_history
+       #takano
+	   InventoriesController.set_inventory_history(params, @purchase_datum)
 
       else
         format.html { render :new }
@@ -330,19 +327,10 @@ class PurchaseDataController < ApplicationController
 	    format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], 
          :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
          :move_flag => params[:move_flag])}
-		
-		
-        #仕入単価Mも更新する 
-        #if (params[:purchase_datum][:check_unit] == 'false')
-        #  @purchase_datum.update(purchase_unit_prices_params)
-          
-        #  update_params_list_price_and_maker
-        #  @purchase_datum.update(material_masters_params)         
-        #end 
-        
-		#入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
-        #170404 一旦作業中断中！！！！
-        #set_inventory_history
+
+        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
+        #takano
+		InventoriesController.set_inventory_history(params, @purchase_datum)
 		
       else
         format.html { render :edit }
@@ -489,196 +477,12 @@ class PurchaseDataController < ApplicationController
   
   end
   
-  
-  #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
-  def set_inventory_history
-    
-	#仕入データIDをセット
-	if params[:id].present?
-      purchase_datum_id = params[:id]
-    else
-      #新規の場合のID取得
-      purchase_datum_id = @purchase_datum.id
-	end
-	
-	
-	division_id =  params[:purchase_datum][:division_id]
-    if division_id.present?
-	  division_id = division_id.to_i
-      if (division_id == $INDEX_DIVISION_STOCK) || (division_id == $INDEX_DIVISION_SHIPPING)
-	    
-		####
-		#在庫履歴データの更新
-        #在庫区分をセット
-        @inventory_division_id = 0
-		
-		if division_id == $INDEX_DIVISION_STOCK 
-          @inventory_division_id = $INDEX_INVENTORY_STOCK
-        elsif division_id == $INDEX_DIVISION_SHIPPING
-          @inventory_division_id = $INDEX_INVENTORY_SHIPPING
-		end
-		#
-        inventory_history_params = {inventory_date: params[:purchase_datum][:purchase_date], inventory_division_id: @inventory_division_id,
-                                    construction_datum_id: params[:purchase_datum][:construction_datum_id], material_master_id: params[:purchase_datum][:material_id],
-									quantity: params[:purchase_datum][:quantity], unit_master_id: params[:purchase_datum][:unit_id],
-									unit_price: params[:purchase_datum][:purchase_unit_price], price: params[:purchase_datum][:purchase_amount],
-									supplier_master_id: params[:purchase_datum][:supplier_id], slip_code: params[:purchase_datum][:slip_code],
-								    purchase_datum_id: purchase_datum_id
-                                   }
-		
-        #在庫マスターへ更新用の数・金額
-		@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i
-		@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i
-		#
-		
-		
-		@inventory_history = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
-        if @inventory_history.blank?
-        #既存データなしの場合は新規
-		   
-		  @inventory_history = InventoryHistory.new(inventory_history_params)
-		  @inventory_history.save!
-		else
-		#更新
-		  if params[:purchase_datum][:quantity].to_i != @inventory_history.quantity then
-             @differ_inventory_quantity = params[:purchase_datum][:quantity].to_i - @inventory_history.quantity
-		  end
-		  if params[:purchase_datum][:price].to_i != @inventory_history.price then
-             @differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i - @inventory_history.price
-		  end
-		
-		  @inventory_history.update(inventory_history_params)
-		end
-        
-        #在庫データの更新
-        set_inventory
-
-      end
-    end
-    
-    
-  end
-  
-  def set_inventory
-    
-    
-    #倉庫・ロケーションはひとまず１とする（将来活用？）
-    warehouse_id = 1
-    location_id = 1
-          
-    @inventory = Inventory.where(material_master_id: @inventory_history.material_master_id, warehouse_id: warehouse_id, 
-                              location_id: location_id ).first
-    current_unit_price = 0
-    
-    if @inventory.blank?
-    #新規
-      inventory_quantity = @inventory_history.quantity
-      inventory_amount = @inventory_history.price
-	  current_unit_price = @inventory_history.unit_price 
-      #current_purchase_datum_id = @inventory_history.purchase_datum_id
-	  #
-    else
-    #更新
-      
-	  #binding.pry
-	  
-      inventory_quantity = @inventory.inventory_quantity + @differ_inventory_quantity
-      inventory_amount = @inventory.inventory_amount + @differ_inventory_price
-	  
-	  if @inventory_division_id == $INDEX_INVENTORY_STOCK
-      #入庫
-	    inventory_quantity = @inventory.inventory_quantity + @differ_inventory_quantity
-	    inventory_amount = @inventory.inventory_amount + @differ_inventory_price
-	  elsif @inventory_division_id == $INDEX_INVENTORY_SHIPPING
-	  #出庫
-	    inventory_quantity = @inventory.inventory_quantity - @differ_inventory_quantity
-	    inventory_amount = @inventory.inventory_amount - @differ_inventory_price
-	  end
-      
-	  #if @inventory.current_purchase_datum_id == @inventory_history.purchase_datum_id
-	  if @inventory.current_history_id == @inventory_history.id
-	    #同一仕入IDの場合のみ、単価を更新。
-	    current_unit_price = @inventory_history.unit_price
-		current_quantity = @inventory_history.quantity
-	  else
-	    
-		
-		if @inventory.current_unit_price ==  @inventory_history.unit_price
-	      #IDが異なる場合は、そのままとする（未使用のロットと考える）
-		  current_history_id = @inventory.current_history_id  #履歴IDはそのまま。
-		  
-	      current_unit_price = @inventory.current_unit_price
-		  current_quantity = @inventory.current_quantity
-		else
-		  
-		  current_history_id = @inventory_history.id
-		  
-		  #単価が異なる場合は、新たにID、単価、数量をセット
-		  #次の履歴ID1が既存なら、次の履歴ID2へセット。
-          if @inventory.next_history_id_1.present?
-		     @inventory.next_history_id_2 = @inventory.next_history_id_1
-		  end
-		  #次の履歴IDへ現在の履歴IDをセット
-		  next_history_id_1 = current_history_id
-		  
-		  current_history_id = @inventory_history.id
-		  current_unit_price = @inventory_history.unit_price
-		  current_quantity = @inventory_history.quantity
-		  
-		end
-	  end
-	  ##単価の更新
-      #if @inventory.unit_price1  != @inventory_history.unit_price 
-      #end
-	end
-    
-	#current_purchase_datum_id = @inventory_history.purchase_datum_id
-	
-    inventory_params = {warehouse_id: warehouse_id, location_id: location_id, material_master_id: @inventory_history.material_master_id, 
-                        inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, current_unit_price: current_unit_price, 
-                                    current_history_id: current_history_id, current_quantity: current_quantity}
-#                                   current_purchase_datum_id: current_purchase_datum_id}
-    
-    if @inventory.blank?
-    #新規
-      @inventory = Inventory.new(inventory_params)
-      @inventory.save!
-    else
-    #更新
-      @inventory.update(inventory_params)
-    end
-    
-	#現在作業中・・・・・・・・
-    #binding.pry
-  
-  end
-  
-  #入出庫履歴マスターを削除
-  def destroy_inventory_history
-    division_id =  @purchase_datum.division_id
-    if division_id.present?
-	  division_id = division_id.to_i
-      if (division_id == $INDEX_DIVISION_STOCK) || (division_id == $INDEX_DIVISION_SHIPPING)
-        if @purchase_datum.present?
-           purchase_datum_id = @purchase_datum
-        end
-        @inventory_history = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
-        if @inventory_history.present?
-		  @inventory_history.destroy
-        end
-		
-        #在庫マスターもここで直接更新?????
-	  end
-	end
-  end
-  
-  
-  
   # DELETE /purchase_data/1
   # DELETE /purchase_data/1.json
   def destroy
     #入出庫履歴マスターを削除
-    destroy_inventory_history
+    #takano
+	InventoriesController.destroy_inventory_history(@purchase_datum)
 	
 	#
 	@purchase_datum.destroy
@@ -733,9 +537,26 @@ class PurchaseDataController < ApplicationController
   #add170226
   def supplier_select
    @supplier_id  = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("supplier_master_id")
-	#binding.pry
   end
   
+  #入庫の場合、件名（工事No.）を自動取得する
+  #add170428
+  def construction_select_on_stocked
+    #@construction_datum_id = 1  #デフォルト
+	
+	material_master = MaterialMaster.find(params[:material_id])
+	if material_master.present?
+      
+	  if material_master.inventory_category_id.present?
+	    
+		inventory_category_id = material_master.inventory_category_id
+		#モデルから取得
+		@construction_datum_id = ConstructionDatum.get_construction_on_inventory_category(inventory_category_id)
+  
+	  end
+	end
+	
+  end
   
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -748,7 +569,7 @@ class PurchaseDataController < ApplicationController
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
                      :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
-                     :purchase_amount, :list_price, :supplier_id, :division_id, :notes )
+                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :notes )
     end
     
     def purchase_unit_prices_params

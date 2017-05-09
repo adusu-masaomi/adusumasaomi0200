@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170401022630) do
+ActiveRecord::Schema.define(version: 20170421062948) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -23,6 +23,13 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.string   "name",     limit: 8
     t.datetime "created"
     t.datetime "modified"
+  end
+
+  create_table "business_holidays", force: :cascade do |t|
+    t.date     "working_date"
+    t.integer  "holiday_flag", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "construction_costs", force: :cascade do |t|
@@ -96,6 +103,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "delivery_slip_items_division_id", limit: 4
     t.integer  "working_large_item_id",           limit: 4
     t.string   "working_large_item_name",         limit: 255
+    t.string   "working_large_item_short_name",   limit: 255
     t.string   "working_large_specification",     limit: 255
     t.integer  "line_number",                     limit: 4
     t.integer  "quantity",                        limit: 4
@@ -191,16 +199,26 @@ ActiveRecord::Schema.define(version: 20170401022630) do
   end
 
   create_table "inventories", force: :cascade do |t|
-    t.integer  "warehouse_id",       limit: 4
-    t.integer  "location_id",        limit: 4
-    t.integer  "material_master_id", limit: 4
-    t.integer  "inventory_quantity", limit: 4
-    t.integer  "inventory_amount",   limit: 4
-    t.float    "unit_price_1",       limit: 24
-    t.float    "unit_price_2",       limit: 24
-    t.float    "unit_price_3",       limit: 24
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.integer  "warehouse_id",             limit: 4
+    t.integer  "location_id",              limit: 4
+    t.integer  "material_master_id",       limit: 4
+    t.integer  "inventory_quantity",       limit: 4
+    t.integer  "unit_master_id",           limit: 4
+    t.integer  "inventory_amount",         limit: 4
+    t.integer  "current_history_id",       limit: 4
+    t.date     "current_warehousing_date"
+    t.integer  "current_quantity",         limit: 4
+    t.float    "current_unit_price",       limit: 24
+    t.integer  "next_history_id_1",        limit: 4
+    t.date     "next_warehousing_date_1"
+    t.integer  "next_quantity_1",          limit: 4
+    t.float    "next_unit_price_1",        limit: 24
+    t.integer  "next_history_id_2",        limit: 4
+    t.date     "next_warehousing_date_2"
+    t.integer  "next_quantity_2",          limit: 4
+    t.float    "next_unit_price_2",        limit: 24
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "inventory_histories", force: :cascade do |t|
@@ -209,13 +227,15 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "construction_datum_id", limit: 4
     t.integer  "material_master_id",    limit: 4
     t.integer  "quantity",              limit: 4
+    t.integer  "inventory_quantity",    limit: 4
     t.integer  "unit_master_id",        limit: 4
     t.float    "unit_price",            limit: 24
     t.integer  "price",                 limit: 4
     t.integer  "supplier_master_id",    limit: 4
     t.string   "slip_code",             limit: 255
     t.integer  "purchase_datum_id",     limit: 4
-    t.integer  "inventory_update_flag", limit: 4
+    t.integer  "previous_quantity",     limit: 4
+    t.float    "previous_unit_price",   limit: 24
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
   end
@@ -225,6 +245,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "invoice_items_division_id",     limit: 4
     t.integer  "working_large_item_id",         limit: 4
     t.string   "working_large_item_name",       limit: 255
+    t.string   "working_large_item_short_name", limit: 255
     t.string   "working_large_specification",   limit: 255
     t.integer  "line_number",                   limit: 4
     t.integer  "quantity",                      limit: 4
@@ -366,6 +387,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "purchase_id",             limit: 4
     t.integer  "division_id",             limit: 4
     t.integer  "supplier_id",             limit: 4
+    t.integer  "inventory_division_id",   limit: 4
     t.string   "notes",                   limit: 255
     t.datetime "created_at",                          null: false
     t.datetime "update_at",                           null: false
@@ -414,6 +436,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "quotation_items_division_id",   limit: 4
     t.integer  "working_large_item_id",         limit: 4
     t.string   "working_large_item_name",       limit: 255
+    t.string   "working_large_item_short_name", limit: 255
     t.string   "working_large_specification",   limit: 255
     t.integer  "line_number",                   limit: 4
     t.integer  "quantity",                      limit: 4
@@ -559,6 +582,17 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.datetime "update_at",                  null: false
   end
 
+  create_table "stocktakes", force: :cascade do |t|
+    t.date     "stocktake_date"
+    t.integer  "material_master_id", limit: 4
+    t.integer  "physical_quantity",  limit: 4
+    t.float    "unit_price",         limit: 24
+    t.integer  "physical_amount",    limit: 4
+    t.integer  "book_quantity",      limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "supplier_masters", force: :cascade do |t|
     t.string   "supplier_name", limit: 255
     t.string   "tel_main",      limit: 255
@@ -597,12 +631,18 @@ ActiveRecord::Schema.define(version: 20170401022630) do
 
   create_table "working_large_items", force: :cascade do |t|
     t.string   "working_large_item_name",       limit: 255
+    t.string   "working_large_item_short_name", limit: 255
     t.string   "working_large_specification",   limit: 255
     t.integer  "working_unit_id",               limit: 4
     t.integer  "working_unit_price",            limit: 4
     t.integer  "execution_unit_price",          limit: 4
+    t.float    "execution_material_unit_price", limit: 24
+    t.float    "material_unit_price",           limit: 24
+    t.float    "execution_labor_unit_price",    limit: 24
+    t.float    "labor_unit_price",              limit: 24
     t.float    "labor_productivity_unit",       limit: 24
     t.float    "labor_productivity_unit_total", limit: 24
+    t.integer  "seq",                           limit: 4
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
   end
@@ -612,11 +652,13 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.string   "working_middle_item_short_name", limit: 255
     t.string   "working_middle_specification",   limit: 255
     t.integer  "working_unit_id",                limit: 4
-    t.integer  "working_unit_price",             limit: 4
+    t.float    "working_unit_price",             limit: 24
     t.integer  "execution_unit_price",           limit: 4
     t.integer  "material_id",                    limit: 4
     t.string   "working_material_name",          limit: 255
-    t.integer  "material_unit_price",            limit: 4
+    t.float    "execution_material_unit_price",  limit: 24
+    t.float    "material_unit_price",            limit: 24
+    t.float    "execution_labor_unit_price",     limit: 24
     t.float    "labor_unit_price",               limit: 24
     t.float    "labor_productivity_unit",        limit: 24
     t.float    "labor_productivity_unit_total",  limit: 24
@@ -625,6 +667,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
     t.integer  "material_cost_total",            limit: 4
     t.integer  "labor_cost_total",               limit: 4
     t.integer  "other_cost",                     limit: 4
+    t.integer  "seq",                            limit: 4
     t.datetime "created_at",                                 null: false
     t.datetime "updated_at",                                 null: false
   end
@@ -689,6 +732,7 @@ ActiveRecord::Schema.define(version: 20170401022630) do
 
   create_table "working_units", force: :cascade do |t|
     t.string   "working_unit_name", limit: 255
+    t.integer  "seq",               limit: 4
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
   end

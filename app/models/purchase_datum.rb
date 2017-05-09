@@ -27,6 +27,8 @@ class PurchaseDatum < ActiveRecord::Base
     #外注判定用
     attr_accessor :outsourcing
 	
+	attr_accessor :construction_datum_id_hide
+	
     #validation
     validates :material_id, presence: true
     validates :material_code, presence: true

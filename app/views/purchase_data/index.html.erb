@@ -32,8 +32,8 @@
   
   <%= f.label :division_id, '仕入区分' %>
   <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true}, { id: 'division_id', style: 'width:220px' , class: "searchablePurchaseDivision"}  %>
-  <!--<%= f.label :construction_code, '件名コード：：' %>-->
-  <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") ,{ include_blank: true }, {style: 'width:220px' , class: "searchableConstructionCode" } %></br>-->
+  <%= f.label :division_id, '入出庫区分' %>
+  <%= f.select :inventory_division_id_eq, InventoryHistory.inventory_division.map{ |value, key| [value, key] }, {include_blank: true}, { id: 'inventory_division_id', style: 'width:150px'} %>
   <%= f.label :construction_code, '件名：：' %>
   <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
   <%= f.select :with_construction, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
@@ -284,6 +284,7 @@
     $(".searchableSupplierName").val(null).trigger("change"); 
     
     document.getElementById("division_id").value = 0;
+    document.getElementById("inventory_division_id").value = "";
     document.getElementById("slip_code").value = "";
 	document.getElementById("material_code").value = "";
 	document.getElementById("material_name").value = "";

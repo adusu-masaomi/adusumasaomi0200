@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :stocktakes
+  resources :business_holidays
   resources :inventories
   resources :inventory_histories
   resources :inventory_histories
@@ -135,6 +137,8 @@ Rails.application.routes.draw do
   #インデックスのdrag&dropによるソート用
   post '/working_middle_itemz/reorder' => 'working_middle_items#reorder'
   post '/working_large_itemz/reorder' => 'working_large_items#reorder'
+  #add170421
+  post '/working_unitz/reorder' => 'working_units#reorder'
   post '/quotation_detail_large_classificationz/reorder' => 'quotation_detail_large_classifications#reorder'
   post '/quotation_detail_middle_classificationz/reorder' => 'quotation_detail_middle_classifications#reorder'
   post '/delivery_slip_detail_large_classificationz/reorder' => 'delivery_slip_detail_large_classifications#reorder'
@@ -152,6 +156,8 @@ Rails.application.routes.draw do
   
   #add170226
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
+  #add170428
+  get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
   
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   #161212
@@ -169,7 +175,7 @@ Rails.application.routes.draw do
   #add161207
   get '/purchase_order_datum/get_alias_name' => 'purchase_order_data#get_alias_name'
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
-  
+
   #add170218
   get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
   
@@ -392,6 +398,13 @@ Rails.application.routes.draw do
   get '/working_middle_itemz/working_material_name_select' => 'working_middle_items#working_material_name_select'
   get '/working_middle_itemz/material_unit_price_select' => 'working_middle_items#material_unit_price_select'
   
+  #会社休日取得用
+  get '/business_holidayz/get_business_holiday' => 'business_holidays#get_business_holiday'
+  
+  #在庫単価取得用 170419
+  get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
+  get '/inventoriez/get_quantity' => 'inventories#get_quantity'
+  
   # うまくいかない・・・
   get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
   
@@ -412,6 +425,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :stocktakes
+  resources :business_holidays
   resources :inventories
   resources :inventory_histories
   resources :delivery_slip_detail_middle_classifications

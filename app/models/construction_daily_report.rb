@@ -13,6 +13,12 @@ class ConstructionDailyReport < ActiveRecord::Base
   attr_accessor :regard_one_day
   attr_accessor :regard_half_day
   
+  #休日フラグ
+  attr_accessor :holiday_flag
+  
+  #労務費（加算なしのもの--後で消す？）
+  attr_accessor :labor_cost_no_add
+  
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true

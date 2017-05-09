@@ -66,7 +66,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
     @quotation_detail_middle_classifications = @q.result(distinct: true)
 	#add170412
-    @quotation_detail_middle_classifications  = @quotation_detail_middle_classifications.order('line_number DESC')
+    #@quotation_detail_middle_classifications  = @quotation_detail_middle_classifications.order('line_number DESC')
 	
 	#global set
 	$quotation_detail_middle_classifications = @quotation_detail_middle_classifications
