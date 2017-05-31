@@ -53,14 +53,22 @@ class ConstructionDailyReportsController < ApplicationController
       $construction_daily_reports = @construction_daily_reports
       
 	  format.pdf do
-        
-        if confirm_outsourcing == false
+        case params[:pdf_flag] 
+		  when "1"
+          #˜J–±”ïWŒv•\
+		    if confirm_outsourcing == false
             #cŒ^PDF
-            report = LaborCostSummaryPDF.create @construction_daily_reports 
-        else
+              report = LaborCostSummaryPDF.create @construction_daily_reports 
+            else
             #‰¡Œ^PDF
-            report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
+              report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
+		    end
+		  when "2"
+          #ì‹Æ“ú•ñ
+		    report = DailyWorkReportPDF.create @daily_work_report
 		end
+		
+        
 		
 		#case params[:pdf_flag] 
 		#  when "1"
@@ -105,7 +113,7 @@ class ConstructionDailyReportsController < ApplicationController
 	#binding.pry
     @@construction_working_date = @construction_daily_report.working_date
     @@construction_datum_id = @construction_daily_report.construction_datum_id
-  
+    @@working_details = @construction_daily_report.working_details
   end
 
   # GET /construction_daily_reports/new
@@ -121,6 +129,7 @@ class ConstructionDailyReportsController < ApplicationController
 	if @@new_flag == "1"
       @construction_daily_report.working_date = @@construction_working_date
       @construction_daily_report.construction_datum_id = @@construction_datum_id
+      @construction_daily_report.working_details = @@working_details
 	end
 	
     #HŽ–ˆê——‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡
@@ -233,7 +242,7 @@ class ConstructionDailyReportsController < ApplicationController
 	# Never trust parameters from the scary internet, only allow the white list through.
     def construction_daily_report_params
         params.require(:construction_daily_report).permit(:working_date, :construction_datum_id, :staff_id, :start_time_1, :end_time_1, 
-	                 :start_time_2, :end_time_2, :working_times, :man_month, :labor_cost)
+	                 :start_time_2, :end_time_2, :working_times, :man_month, :labor_cost, :working_details )
     end
     def construction_data_params
     	# params.require(:construction_daily_report).permit(construction_datum_attributes: [:id, :construction_start_date])

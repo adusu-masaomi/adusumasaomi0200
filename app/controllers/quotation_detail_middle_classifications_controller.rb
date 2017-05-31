@@ -381,20 +381,32 @@ other_cost: @quotation_detail_middle_classification.other_cost
  
   #見積金額トータル
   def quote_total_price
-     @execution_total_price = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceQuote
+    #@execution_total_price = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceQuote
+    #upd170511
+    @execution_total_price = QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+               @quotation_detail_middle_classification.quotation_header_id, @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceQuote
   end 
   #実行金額トータル
   def execution_total_price
-     @execution_total_price = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceExecution
+    #@execution_total_price = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceExecution
+    #upd170511
+    @execution_total_price = QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+              @quotation_detail_middle_classification.quotation_header_id, @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumpriceExecution
   end
 
   #歩掛りトータル
   def labor_total
-     @labor_total = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnit 
+    #@labor_total = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnit
+    #upd170511
+    @labor_total = QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+              @quotation_detail_middle_classification.quotation_header_id, @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnit 
   end
   #歩掛計トータル
   def labor_all_total
-     @labor_all_total = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnitTotal 
+    #@labor_all_total = QuotationDetailMiddleClassification.where(["quotation_detail_large_classification_id = ?", @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnitTotal 
+    #upd170511
+    @labor_all_total = QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ?", 
+              @quotation_detail_middle_classification.quotation_header_id, @quotation_detail_middle_classification.quotation_detail_large_classification_id]).sumLaborProductivityUnitTotal 
   end
   
   #トータル(品目→見出保存用)
@@ -732,7 +744,8 @@ other_cost: @quotation_detail_middle_classification.other_cost
     #見積品目データへ合計保存用　
     def save_price_to_large_classifications
         #@quotation_detail_large_classification = QuotationDetailLargeClassification.where(:quotation_header_id => params[:quotation_header_id]).where(:quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id])
-        @quotation_detail_large_classification = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
+        @quotation_detail_large_classification = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", 
+                @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
 
      if @quotation_detail_large_classification.present?
 

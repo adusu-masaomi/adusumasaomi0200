@@ -70,17 +70,20 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       respond_to do |format|
         format.html # index.html.erb
         format.pdf do
-
+          
+		  $print_type = @print_type
+		  
     	  case @print_type
 		  when "1"
 		  #見積書
-            report = EstimationSheetPDF.create @estimation_sheet 
+		    report = EstimationSheetPDF.create @estimation_sheet 
           when "2"
 		  #見積書(横)
             report = EstimationSheetLandscapePDF.create @estimation_sheet_landscape
           when "3"
-		  #請求書
-            report = InvoicePDF.create @invoice
+		  #見積書(印あり）
+		    report = EstimationSheetPDF.create @estimation_sheet 
+            #report = InvoicePDF.create @invoice
 		  when "4"
 		  #請求書(横)
 		     report = InvoiceLandscapePDF.create @invoice_landscape
@@ -91,11 +94,16 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 		  #納品書(横)
 		     report = DeliverySlipLandscapePDF.create @delivery_slip_landscape
 		  end 	
-	
+         
+          #現在時刻をセットする
+          require "date"
+          d = DateTime.now
+          now_date_time = d.strftime("%Y%m%d%H%M%S")
+
           # ブラウザでPDFを表示する
           # disposition: "inline" によりダウンロードではなく表示させている
           send_data report.generate,
-		    filename:    "hoge.pdf",
+		    filename:    "見積書-" + now_date_time + ".pdf",
             type:        "application/pdf",
             disposition: "inline"
         end

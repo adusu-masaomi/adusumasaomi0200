@@ -98,8 +98,11 @@ class ConstructionCostsController < ApplicationController
     respond_to do |format|
       
       if @construction_cost.save
-        format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully created.' }
-        format.json { render :show, status: :created, location: @construction_cost }
+        #format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully created.' }
+        #format.json { render :show, status: :created, location: @construction_cost }
+		
+		 format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
+         :move_flag => params[:move_flag])}
       else
         format.html { render :new }
         format.json { render json: @construction_cost.errors, status: :unprocessable_entity }
@@ -117,8 +120,11 @@ class ConstructionCostsController < ApplicationController
     
     respond_to do |format|
       if @construction_cost.update(construction_cost_params)
-        format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully updated.' }
-        format.json { render :show, status: :ok, location: @construction_cost }
+        #format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully updated.' }
+        #format.json { render :show, status: :ok, location: @construction_cost }
+		
+		format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
+         :move_flag => params[:move_flag])}
       else
         format.html { render :edit }
         format.json { render json: @construction_cost.errors, status: :unprocessable_entity }

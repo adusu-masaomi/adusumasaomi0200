@@ -72,8 +72,10 @@
                 
 	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" %>
+	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <font color="purple"><b>*Ｅｎｔｅｒキーによるカーソル移動を行わないようにお願いします。（動作保証外のため）</b></font>
       </br></br>
-       <div id="filter" >
+       <div id="filter" style="position: fixed; top: 400px; left:1200px;" >
 	      <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
 	   </div>
 	   
@@ -214,7 +216,6 @@ function dispDiv() {
 	   
 	   //３秒待つ（描写されないことがあるため）
 	   setTimeout("reloadDiv()", 3000);
-	   //setTimeout("reloadDiv()", 5000);
 	   
 	   //隠れていたボタンをここで表示させる
        //$('#filter').removeClass('hide');

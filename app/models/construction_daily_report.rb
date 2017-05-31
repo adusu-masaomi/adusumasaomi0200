@@ -22,6 +22,10 @@ class ConstructionDailyReport < ActiveRecord::Base
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true
+  
+  #upd170529
+  validates :working_details, presence: true
+  
   #validates :construction_datum_id, presence: true
   # 数値であり、0以上の場合有効
   validates :working_times, numericality: {

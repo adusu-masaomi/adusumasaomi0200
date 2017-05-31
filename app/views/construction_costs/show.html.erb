@@ -20,9 +20,12 @@
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
-              construction_costs_path, :class => 'btn btn-default'  %>
+              construction_costs_path(construction_id: params[:construction_id], 
+                        move_flag: params[:move_flag]), :class => 'btn btn-default'  %>  
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_construction_cost_path(@construction_cost), :class => 'btn btn-default' %>
+              edit_construction_cost_path(@construction_cost, construction_id: params[:construction_id], 
+                    move_flag: params[:move_flag]), :class => 'btn btn-default' %>
+
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
               construction_cost_path(@construction_cost),
               :method => 'delete',

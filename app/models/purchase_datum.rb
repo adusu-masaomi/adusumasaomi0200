@@ -37,7 +37,10 @@ class PurchaseDatum < ActiveRecord::Base
     validates :unit_id, presence: true
     validates :check_unit, acceptance: true 
     validates :purchase_order_datum_id, presence:true
-
+    
+	validates_numericality_of :purchase_amount, :only_integer => true, :allow_nil => false
+    #validates: purchase_amount, numericality: { only_integer: true }
+	
 # scope 
 
 	scope :with_purchase_order, -> (purchase_order_data_construction_datum_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_datum_id = ?", purchase_order_data_construction_datum_id )}

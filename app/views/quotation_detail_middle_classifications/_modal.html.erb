@@ -37,10 +37,10 @@
   <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"4" }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
-  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"5", :onchange => "calcMoneyforQuantity()"}  %>
+  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"5", :onchange => "calcMoneyforQuantity(0)"}  %>
   </div>
   <div style="margin-left : -50px">
-  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"6", :onchange => "calcMoneyforQuantity()"}  %>
+  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"6", :onchange => "calcMoneyforQuantity(1)"}  %>
   </div>
   
   <!--単位-->
@@ -623,20 +623,22 @@
 //	 document.getElementById("working_middle_item_short_name").value = obj.value;
   // }
    
-  //実行→見積数量の自動変更
+  //見積→実行数量の自動変更
   function changeQuantity()
   {  
-     //if (document.getElementById("execution_quantity").value > 0) {
-     //  document.getElementById("quantity").value = document.getElementById("execution_quantity").value;
+     //upd170524
+	 document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
+     
+     //if (document.getElementById("quantity").value > 0 && document.getElementById("execution_quantity").value == "" ) {
+     //  document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
      //}
-     if (document.getElementById("quantity").value > 0 && document.getElementById("execution_quantity").value == "" ) {
-       document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
-     }
-	 
   }
   //実行数量変更時のバージョン(ファンクション複数)
-  function calcMoneyforQuantity(){
-     changeQuantity();
+  function calcMoneyforQuantity(flag){
+     if (flag==0){
+	 //実行数量へ自動反映
+	   changeQuantity();
+	 }
 	 calcTotalPrice();
 	 
 	 //歩掛り計

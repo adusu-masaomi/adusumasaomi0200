@@ -204,6 +204,9 @@ class PurchaseOrderHistoriesController < ApplicationController
     #パラーメータ補完＆メール送信する
     send_mail_and_params_complement
     
+    #メール送信済みフラグをセット
+    set_mail_sent_flag
+  
     
     respond_to do |format|
 	  if PurchaseOrderHistory.create(purchase_order_history_params)
@@ -230,6 +233,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #パラーメータ補完＆メール送信する
       send_mail_and_params_complement
 	  
+	  #メール送信済みフラグをセット
+	  set_mail_sent_flag
 	  
 	  respond_to do |format|
         
@@ -267,6 +272,17 @@ class PurchaseOrderHistoriesController < ApplicationController
 	Order.where(purchase_order_history_id: purchase_order_history_id).destroy_all
   end
   
+  def set_mail_sent_flag
+  #add170529 レコード毎にメール送信済みフラグをセットする
+     if params[:purchase_order_history][:sent_flag] == "1" 
+      if params[:purchase_order_history][:orders_attributes].present?
+        params[:purchase_order_history][:orders_attributes].values.each do |item|
+          item[:mail_sent_flag] = 1
+        end
+      end
+    end
+  end
+  
   def send_mail_and_params_complement
     
 	
@@ -275,6 +291,9 @@ class PurchaseOrderHistoriesController < ApplicationController
     if params[:purchase_order_history][:orders_attributes].present?
 	
 	    params[:purchase_order_history][:orders_attributes].values.each do |item|
+		
+		 
+		
 		
 		  ######
           #varidate用のために、本来の箇所から離れたパラメータを再セットする
@@ -286,9 +305,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  item[:material_name] = params[:material_name][i]
 		  item[:maker_name] = params[:maker_name][i]
 		  item[:list_price] = params[:list_price][i]
-		  #
-		  
 		  ######
+		 
 		  
 		  id = item[:material_id].to_i
            
@@ -344,7 +362,9 @@ class PurchaseOrderHistoriesController < ApplicationController
 				  supplier_material_code = params[:material_code][i]
 				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
 				  #岡田電気の場合のみ、品番のハイフンは抹消する
-				      supplier_material_code = supplier_material_code.delete!('-')
+				      if supplier_material_code.delete!('-').present?  #add170510
+				        supplier_material_code = supplier_material_code.delete!('-')
+                      end
 				  end
 				  
                   purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
@@ -374,7 +394,7 @@ class PurchaseOrderHistoriesController < ApplicationController
           $email_responsible = params[:purchase_order_history][:email_responsible]
           PostMailer.send_purchase_order(@purchase_order_history).deliver
           #メール送信フラグをセット
-          params[:purchase_order_history][:mail_sent_flag] = 1
+          #params[:purchase_order_history][:mail_sent_flag] = 1
         end
 
     end
@@ -420,7 +440,8 @@ class PurchaseOrderHistoriesController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_history_params
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
-	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, :maker_name, :list_price, :_destroy])
+	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
+                     :maker_name, :list_price, :mail_sent_flag, :_destroy])
 	  
        #params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
 	   #               orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 

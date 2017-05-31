@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170421062948) do
+ActiveRecord::Schema.define(version: 20170505235045) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -205,10 +205,13 @@ ActiveRecord::Schema.define(version: 20170421062948) do
     t.integer  "inventory_quantity",       limit: 4
     t.integer  "unit_master_id",           limit: 4
     t.integer  "inventory_amount",         limit: 4
+    t.integer  "supplier_master_id",       limit: 4
     t.integer  "current_history_id",       limit: 4
     t.date     "current_warehousing_date"
     t.integer  "current_quantity",         limit: 4
     t.float    "current_unit_price",       limit: 24
+    t.date     "last_warehousing_date"
+    t.float    "last_unit_price",          limit: 24
     t.integer  "next_history_id_1",        limit: 4
     t.date     "next_warehousing_date_1"
     t.integer  "next_quantity_1",          limit: 4
@@ -351,6 +354,7 @@ ActiveRecord::Schema.define(version: 20170421062948) do
     t.integer  "list_price",                limit: 4
     t.float    "last_unit_price",           limit: 24
     t.date     "last_unit_price_update_at"
+    t.integer  "inventory_category_id",     limit: 4
     t.datetime "created_at",                            null: false
     t.datetime "update_at",                             null: false
   end
@@ -379,7 +383,6 @@ ActiveRecord::Schema.define(version: 20170421062948) do
     t.integer  "maker_id",                limit: 4
     t.string   "maker_name",              limit: 255
     t.float    "quantity",                limit: 24
-    t.integer  "actual_quantity",         limit: 4
     t.integer  "unit_id",                 limit: 4
     t.float    "purchase_unit_price",     limit: 24
     t.integer  "purchase_amount",         limit: 4
@@ -584,13 +587,16 @@ ActiveRecord::Schema.define(version: 20170421062948) do
 
   create_table "stocktakes", force: :cascade do |t|
     t.date     "stocktake_date"
-    t.integer  "material_master_id", limit: 4
-    t.integer  "physical_quantity",  limit: 4
-    t.float    "unit_price",         limit: 24
-    t.integer  "physical_amount",    limit: 4
-    t.integer  "book_quantity",      limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.integer  "material_master_id",    limit: 4
+    t.integer  "inventory_id",          limit: 4
+    t.integer  "physical_quantity",     limit: 4
+    t.float    "unit_price",            limit: 24
+    t.integer  "physical_amount",       limit: 4
+    t.integer  "book_quantity",         limit: 4
+    t.integer  "book_amount",           limit: 4
+    t.integer  "inventory_update_flag", limit: 4
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "supplier_masters", force: :cascade do |t|

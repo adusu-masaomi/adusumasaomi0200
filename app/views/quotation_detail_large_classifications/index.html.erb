@@ -27,6 +27,9 @@
 <%= link_to "見積書(提出用)PDF",
             quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
             :class => 'btn btn-success' , :target=>["_blank"] %>
+<%= link_to "見積書(提出／印付)PDF",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
+            :class => 'btn btn-danger' , :target=>["_blank"] %>
 <%= link_to "見積書(控え)PDF",
             quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
             :class => 'btn btn-success' , :target=>["_blank"] %>

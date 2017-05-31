@@ -20,10 +20,10 @@
         <%= link_to "労務費集計表",
             construction_daily_reports_path(@construction_daily_reports, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], pdf_flag: "1" ),
             :class => 'btn  btn-info', :target=>["_blank"] %>
-        <!--<%= link_to "労務費集計表(横)",
+        <%= link_to "作業日報",
             construction_daily_reports_path(@construction_daily_reports, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], pdf_flag: "2" ),
-            :class => 'btn  btn-warning', :target=>["_blank"] %>-->
-        <%= link_to t('.new', :default => t("helpers.links.new")),
+            :class => 'btn  btn-warning', :target=>["_blank"] %>
+		<%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_daily_report_path(:new_flag => "0", construction_id: params[:construction_id], move_flag: params[:move_flag] ),
             :class => 'btn btn-primary' %>
         <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-success'  %>
@@ -53,8 +53,9 @@
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
       <!--<th><%= model_class.human_attribute_name(:working_date) %></th>-->
       <th><%= sort_link(@q, :working_date, model_class.human_attribute_name(:working_date), default_order: :desc) %></th>
-      <th><%= model_class.human_attribute_name(:construction_code) %></th>
-      <th><%= model_class.human_attribute_name(:construction_name) %></th>
+      <!--<th><%= model_class.human_attribute_name(:construction_code) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:construction_name) %></th>-->
+	  <th><%= model_class.human_attribute_name(:working_details) %></th>
       <th><%= model_class.human_attribute_name(:staff_id) %></th>
       <th><%= model_class.human_attribute_name(:start_time_1) %></th>
       <th><%= model_class.human_attribute_name(:end_time_1) %></th>
@@ -73,13 +74,17 @@
         <td><%= link_to construction_daily_report.id, construction_daily_report_path(construction_daily_report) %></td>
         <!--色付き<td><font color="#8F00FE"><b><%= construction_daily_report.working_date %></b></font></td>-->
 		<td><%= construction_daily_report.working_date %></td>
-		<% if construction_daily_report.construction_datum.present? %>
-          <td><%= construction_daily_report.construction_datum.construction_code %></td>
-          <td><%= construction_daily_report.construction_datum.construction_name %></td>
-		<% else %>
-		  <td></td>
-          <td></td>
-		<% end %>
+		
+		<td><%= construction_daily_report.working_details %></td>
+		
+		<!--<% if construction_daily_report.construction_datum.present? %> -->
+        <!--  <td><%= construction_daily_report.construction_datum.construction_code %></td> -->
+        <!--  <td><%= construction_daily_report.construction_datum.construction_name %></td> -->
+		<!--<% else %> -->
+		<!--  <td></td> -->
+        <!--  <td></td> -->
+		<!--<% end %> -->
+		
 	    <td><%= @staff[(construction_daily_report.staff_id)-1].staff_name %></td>
         <td><%= construction_daily_report.start_time_1.to_s(:start_time_1) %></td>
         <td><%= construction_daily_report.end_time_1.to_s(:end_time_1) %></td>
@@ -130,7 +135,8 @@
 		
 		if (sz != 1920) {
 		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
-          fc = 3;  //固定列数
+          //fc = 3;  //固定列数
+		  fc = 2;  //固定列数
 		  ht -= 70;
 		}
 		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});

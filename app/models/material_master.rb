@@ -41,7 +41,8 @@ class MaterialMaster < ActiveRecord::Base
 	 
    scope :with_maker, -> (id=1){joins(:MakerMaster).where("maker_masters.id = material_masters.maker_id" )}
    #在庫品目のみリストにあげたい場合に利用
-   scope :with_inventory_item, -> { where.not(:inventory_category_id => nil).where("inventory_category_id > ?", 0) }
+   #scope :with_inventory_item, -> { where.not(:inventory_category_id => nil).where("inventory_category_id > ?", 0) }
+   scope :with_inventory_item, -> { where.not(:inventory_category_id => nil) }
    
    def self.ransackable_scopes(auth_object=nil)
        [:with_maker]

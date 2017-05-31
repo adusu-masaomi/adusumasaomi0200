@@ -4,10 +4,14 @@ class EstimationSheetPDF
   def self.create estimation_sheet	
 	#見積書PDF発行
  
-       # tlfファイルを読み込む
-       #@report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_pdf.tlf")
-	   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
-		
+        # tlfファイルを読み込む
+        if $print_type == "1"
+          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
+        else
+        #押印付バージョン
+          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
+        end
+	   
 		# 1ページ目を開始
         @report.start_new_page
 	    

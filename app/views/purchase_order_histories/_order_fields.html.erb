@@ -3,6 +3,7 @@
   <%= f.label :品番選択, {style: 'width:770px'}  %>
   <!--<%= f.label :数量, {style: 'width:100px'}  %>-->
   <%= f.label :単位, {style: 'width:50px'}  %>
+  <%= f.label :メール送信フラグ, {style: 'width:120px'}  %>
   </br>
   <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
        {id:"material_id", name:"material_id[]",  class: "searchableMaterial" , style: 'width:650px'  } %>-->
@@ -13,8 +14,14 @@
   <%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>
   <td>&nbsp;&nbsp;</td>
   <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px' } %>
+  
+  <!--<%= f.label :メール, {:class => "my-custom-class-l"}  %></br>-->
+  <%= f.select :mail_sent_flag, Order.mail_flag, {:include_blank => true}, 
+       {id:'mail_sent_flag', :class => "my-custom-class", style: 'width:120px;margin-left:0px;font-size:16px;font-weight:bold;color:red;' } %>
+  
   <!--以下スペースあり-->
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
   <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;
@@ -44,8 +51,7 @@
   //$(document).on('turbolinks:load', function(){
       
 	  
-      //$(".sortThese").sortable();
-	  
+      
 	  //検索可能なリストボックス(品名の場合)
        $(".searchableMaterial").select2({ theme: "classic" });
       

@@ -213,6 +213,10 @@ Rails.application.routes.draw do
   #歩掛計
   get '/quotation_detail_large_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_large_classifications#labor_productivity_unit_total_select'
   
+  #add170524
+  #納品書番号用
+  get '/invoice_detail_large_classificationz/deliery_slip_header_id_select' => 'invoice_detail_large_classifications#deliery_slip_header_id_select'
+  
   #add170308
   #小計用
   get '/quotation_detail_large_classificationz/subtotal_select' => 'quotation_detail_large_classifications#subtotal_select'

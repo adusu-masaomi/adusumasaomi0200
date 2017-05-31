@@ -44,16 +44,22 @@
   </div>
   
   <%= f.input :differense, input_html:{id:"differense", style: 'width:130px', :readonly => true } %>
-   
-   
   <%= f.input :purchase_order_amount,
  input_html:{id:"purchase_order_amount", :readonly => true } %>
-  <!--<%= f.button :submit, :class => 'btn-primary' %>-->
-  <%= f.button_tag :登録する, :type => 'button', :class => "btn btn-primary", 
-               :onclick => "submitAfterValidation()" , :tabindex=>"5"  %>
-			   
+ 
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  <!-- -->
+
+  <%= f.button :submit, :class => 'btn-primary' , :tabindex=>"5" %>
+  <!--<%= f.button_tag :登録する, :type => 'button', :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" , :tabindex=>"5"  %>-->
+  <!--<%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                construction_costs_path, :class => 'btn btn-default' %>-->
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                construction_costs_path, :class => 'btn btn-default' %>
+                construction_costs_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-default' %>
+
 <% end %>
 
 <script type="text/javascript">
@@ -340,16 +346,14 @@
 	 };
 
     //入力チェック後の、更新処理
-   function submitAfterValidation() {
-
+   //function submitAfterValidation() {
 	   //if (window.confirm('更新しますか？')) {
 	  	 //if (datasetflag == 0) {
   	     //  setLaborCost();
 		 //  setPurchaseOrderAmount();
         // }
-		 
-		 document.forms[0].submit();
+	//	 document.forms[0].submit();
        //}
- }
+   //}
 
 </script>
