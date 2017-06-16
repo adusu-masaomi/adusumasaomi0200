@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170505235045) do
+ActiveRecord::Schema.define(version: 20170613005119) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -54,13 +54,14 @@ ActiveRecord::Schema.define(version: 20170505235045) do
     t.time     "start_time_2"
     t.time     "end_time_2"
     t.integer  "working_times",         limit: 4
-    t.decimal  "man_month",                       precision: 6, scale: 3
+    t.decimal  "man_month",                         precision: 6, scale: 3
     t.integer  "labor_cost",            limit: 4
-    t.datetime "created_at",                                              null: false
-    t.datetime "update_at",                                               null: false
+    t.string   "working_details",       limit: 255
+    t.datetime "created_at",                                                null: false
+    t.datetime "update_at",                                                 null: false
   end
 
-  add_index "construction_daily_reports", ["construction_datum_id", "working_date", "staff_id", "start_time_1", "end_time_1"], name: "idx_working_hours", unique: true, using: :btree
+  add_index "construction_daily_reports", ["construction_datum_id", "working_date", "staff_id", "start_time_1", "end_time_1"], name: "idx_staff_working_hours", unique: true, using: :btree
 
   create_table "construction_data", force: :cascade do |t|
     t.string   "construction_code",          limit: 255
@@ -80,6 +81,20 @@ ActiveRecord::Schema.define(version: 20170505235045) do
     t.integer  "billed_flag",                limit: 4
     t.datetime "created_at",                             null: false
     t.datetime "update_at",                              null: false
+  end
+
+  create_table "contacts", force: :cascade do |t|
+    t.string   "name",                limit: 255
+    t.string   "company_name",        limit: 255
+    t.string   "post",                limit: 255
+    t.string   "address",             limit: 255
+    t.string   "tel",                 limit: 255
+    t.string   "fax",                 limit: 255
+    t.string   "email",               limit: 255
+    t.string   "url",                 limit: 255
+    t.integer  "partner_division_id", limit: 4,   default: 0
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   create_table "customer_masters", force: :cascade do |t|
@@ -263,6 +278,7 @@ ActiveRecord::Schema.define(version: 20170505235045) do
     t.float    "labor_productivity_unit_total", limit: 24
     t.integer  "last_line_number",              limit: 4
     t.string   "remarks",                       limit: 255
+    t.integer  "delivery_slip_header_id",       limit: 4
     t.integer  "construction_type",             limit: 4
     t.integer  "piping_wiring_flag",            limit: 4
     t.integer  "equipment_mounting_flag",       limit: 4
@@ -368,6 +384,7 @@ ActiveRecord::Schema.define(version: 20170505235045) do
     t.integer  "quantity",                  limit: 4
     t.integer  "unit_master_id",            limit: 4
     t.integer  "list_price",                limit: 4
+    t.integer  "mail_sent_flag",            limit: 4
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
   end

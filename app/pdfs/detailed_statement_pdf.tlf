@@ -43,7 +43,7 @@
       "x": 50.1,
       "y": 108.2,
       "width": 536.1,
-      "height": 697.6,
+      "height": 677.2,
       "header": {
         "enabled": true,
         "height": 20.4,
@@ -280,7 +280,7 @@
         },
         "items": []
       },
-      "content-height": 677.2,
+      "content-height": 656.8000000000001,
       "auto-page-break": true
     },
     {
@@ -849,7 +849,7 @@
       "x": 344.2,
       "y": 50.4,
       "width": 111.6,
-      "height": 14,
+      "height": 14.9,
       "style": {
         "font-family": [
           "IPAMincho"

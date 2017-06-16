@@ -41,7 +41,8 @@ class WorkingDirectionsPDF
 		 
 		 #if @flag.nil? 
 		   #@flag = "1"
-		   report.page.item(:issue_date).value(Date.today)
+		   #report.page.item(:issue_date).value(Date.today)
+		   report.page.item(:issue_date).value($issue_date)
 		   report.page.item(:construction_code).value(construction_datum.construction_code)
 		   report.page.item(:construction_name).value(construction_datum.construction_name)
 		   report.page.item(:customer_name).value(construction_datum.CustomerMaster.customer_name)

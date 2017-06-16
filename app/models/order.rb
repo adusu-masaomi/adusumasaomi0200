@@ -11,6 +11,9 @@ class Order < ActiveRecord::Base
   #          only_integer: true, greater_than: 0
   #        }
   
+  #メーカーID用
+  attr_accessor :maker_id_hide
+  
    validate :check_link_count
    def check_link_count
       if self.quantity.nil?

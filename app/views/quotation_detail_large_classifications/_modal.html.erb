@@ -22,12 +22,12 @@
   </div></br></br>
   <!--記号-->
   <%= f.label :working_large_item_short_name , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :working_large_item_short_name, WorkingLargeItem.order('seq').all, :id, :working_large_item_short_name, 
+  <%= f.collection_select :working_large_item_short_name, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name, 
     {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , {id:'working_large_item_short_name',
        :class => "searchableSelect2_2",  style: 'width:420px' } %></br>
   <!--項目名-->
   <%= f.label :"項目名", {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :working_large_item_id, WorkingLargeItem.order('seq').all, :id, :working_large_item_name, 
+  <%= f.collection_select :working_large_item_id, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name, 
      {:selected => @quotation_detail_large_classification.working_large_item_id || 1} , 
        {id:'working_large_item_id', :class => "searchableSelect2_3",  style: 'width:420px' } %></br>
   <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "3"}  %>

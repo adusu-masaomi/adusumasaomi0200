@@ -26,7 +26,9 @@
   <!--<%= f.input :construction_start_date, default: Date.strptime("3000/01/01", "%Y/%m/%d"), hint: "*工事日報の登録後に反映されます。このまま未入力にして下さい。", input_html:{:tabindex=>"5"} %>-->
   <!--<%= f.input :construction_end_date, default: Date.strptime("2000/01/01", "%Y/%m/%d"), hint: "*工事日報の登録後に反映されます。このまま未入力にして下さい。",  input_html:{:tabindex=>"6"} %>-->
   
-  <%= f.input :construction_place , input_html:{:tabindex=>"7"} %>
+  <%= f.input :post , hint: "＊数値のみ（ハイフンなし）で入力して下さい。" ,  
+                       input_html:{id:"post",  :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','addressX','addressX');", :tabindex=>"7"} %>
+  <%= f.input :construction_place , input_html:{id:"address", name:"addressX", :tabindex=>"8"} %>
   
   <%= f.check_box :billed_flag %> 
   <%= f.label :billed_flag, "請求済み", {style: 'color: blue'} %></br></br>
@@ -38,7 +40,7 @@
 <% end %>
 
 
-
+<script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 <script type="text/javascript">
 
   $(document).ready(function(){

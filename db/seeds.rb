@@ -8,6 +8,11 @@
 
 require "csv"
 
+CSV.foreach('db/contact.csv') do |row|
+ Contact.create(:name => row[0], :company_name => row[1], :affiliation => row[2], :department => row[3], :post => row[4], :address => row[5], 
+ :tel => row[6], :fax => row[7], :email => row[8], :url => row[9], :partner_division_id => row[10].to_i )
+end
+
 #CSV.foreach('db/purchase.csv') do |row|
 # PurchaseDatum.create(:purchase_date => row[0], :slip_code => row[1], :purchase_order_datum_id => row[2], :construction_datum_id => row[3], :material_id => row[4], :material_name => row[5], :maker_id => row[6], :maker_name => row[7], :quantity => row[8], :unit_id => row[9], :purchase_unit_price => row[10], :purchase_amount => row[11], :list_price => row[12], :purchase_id => row[13], :division_id => row[14], :supplier_id => row[15]  )
 #end

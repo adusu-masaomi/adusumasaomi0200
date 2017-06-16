@@ -73,11 +73,11 @@
 	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" %>
 	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-       <font color="purple"><b>*Ｅｎｔｅｒキーによるカーソル移動を行わないようにお願いします。（動作保証外のため）</b></font>
+       ※２回目の登録以降は、Ｅｎｔｅｒ押下による移動はお勧めできません（動作不安定により）
       </br></br>
-       <div id="filter" style="position: fixed; top: 400px; left:1200px;" >
-	      <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
-	   </div>
+       <!--<div id="filter" style="position: fixed; top: 400px; left:1200px;" >-->
+	   <!--   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>-->
+	   <!--</div>-->
 	   
    <hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
        
@@ -87,9 +87,9 @@
 	        <% end %>
            </div>
 
-	   <!--<div id="filter" >-->
-	   <!--   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>-->
-	   <!--</div>-->
+	   <div id="filter" >
+	     <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>
+	   </div>
 <% end %>
 
   </div>  
@@ -133,14 +133,15 @@
  });  
 
 window.onload = function(){
-         
-          $(".sortDone").sortable();
+     
+     //170605ソート機能は不安定のため、一旦保留に  
+     //     $(".sortDone").sortable();
 
-	  $("#filter").on("cocoon:after-insert", function() {
-	     $(".sortThese").parent().sortable();
-         });
+	 // $("#filter").on("cocoon:after-insert", function() {
+	 //    $(".sortThese").parent().sortable();
+     //    });
 	  
-	 //$(".sortCocoon").parent().sortable();
+	 
 	 
 	 var visibled = sessionStorage.getItem('onvisible');
 	 

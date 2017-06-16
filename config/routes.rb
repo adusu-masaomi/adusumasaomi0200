@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :contacts
   resources :stocktakes
   resources :business_holidays
   resources :inventories
@@ -429,6 +430,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :contacts
   resources :stocktakes
   resources :business_holidays
   resources :inventories

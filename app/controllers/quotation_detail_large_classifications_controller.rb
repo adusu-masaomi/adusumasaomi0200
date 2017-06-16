@@ -221,29 +221,29 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  
       #同様に手入力用IDの場合、内訳(大分類)マスターへ登録する。
       if @quotation_detail_large_classification.working_large_item_id == 1
-         @check_item = WorkingLargeItem.find_by(working_large_item_name: @quotation_detail_large_classification.working_large_item_name , 
-                                                  working_large_specification: @quotation_detail_large_classification.working_large_specification)
+         @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @quotation_detail_large_classification.working_large_item_name , 
+                                                  working_middle_specification: @quotation_detail_large_classification.working_large_specification)
          if @check_item.nil?
            
 		   #全選択の場合
 		   if params[:quotation_detail_large_classification][:check_update_all] == "true" 
-		     large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name, 
-		                         working_large_specification:  @quotation_detail_large_classification.working_large_specification,
+		     large_item_params = { working_middle_item_name:  @quotation_detail_large_classification.working_large_item_name, 
+		                         working_middle_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id,
                                  working_unit_price:  @quotation_detail_large_classification.working_unit_price,
                                  execution_unit_price:  @quotation_detail_large_classification.execution_unit_price,
                                  labor_productivity_unit:  @quotation_detail_large_classification.labor_productivity_unit,
                                  labor_productivity_unit_total:  @quotation_detail_large_classification.labor_productivity_unit_total }
 			
-			 @quotation_large_item = WorkingLargeItem.create(large_item_params)
+			 @quotation_large_item = WorkingMiddleItem.create(large_item_params)
 		   else
 		      #アイテム,仕様,単位のみ場合
 		     if params[:quotation_detail_large_classification][:check_update_item] == "true" 
-		         large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name, 
-		                         working_large_specification:  @quotation_detail_large_classification.working_large_specification,
+		         large_item_params = { working_middle_item_name:  @quotation_detail_large_classification.working_large_item_name, 
+		                         working_middle_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id
                                   }
-                 @quotation_large_item = WorkingLargeItem.create(large_item_params)
+                 @quotation_large_item = WorkingMiddleItem.create(large_item_params)
 		     end
 		   end
          end
@@ -309,27 +309,28 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  
       #同様に手入力用IDの場合、内訳(大分類)マスターへ登録する。
       if @quotation_detail_large_classification.working_large_item_id == 1
-         @check_item = WorkingLargeItem.find_by(working_large_item_name: @quotation_detail_large_classification.working_large_item_name , working_large_specification: @quotation_detail_large_classification.working_large_specification)
+         @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @quotation_detail_large_classification.working_large_item_name , 
+		                      working_middle_specification: @quotation_detail_large_classification.working_large_specification)
          if @check_item.nil?
 		   #全選択の場合
 		   if params[:quotation_detail_large_classification][:check_update_all] == "true" 
-		     large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name,
-		                         working_large_specification:  @quotation_detail_large_classification.working_large_specification,
+		     large_item_params = { working_middle_item_name:  @quotation_detail_large_classification.working_large_item_name,
+		                         working_middle_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id,
                                  working_unit_price:  @quotation_detail_large_classification.working_unit_price,
                                  execution_unit_price:  @quotation_detail_large_classification.execution_unit_price,
                                  labor_productivity_unit:  @quotation_detail_large_classification.labor_productivity_unit,
                                  labor_productivity_unit_total:  @quotation_detail_large_classification.labor_productivity_unit_total }
                
-               @quotation_large_item = WorkingLargeItem.create(large_item_params)
+               @quotation_large_item = WorkingMiddleItem.create(large_item_params)
 		   else
 		     #アイテム,仕様,単位のみ場合
 		     if params[:quotation_detail_large_classification][:check_update_item] == "true" 
-		         large_item_params = { working_large_item_name:  @quotation_detail_large_classification.working_large_item_name, 
-                                 working_large_specification:  @quotation_detail_large_classification.working_large_specification,
+		         large_item_params = { working_middle_item_name:  @quotation_detail_large_classification.working_large_item_name, 
+                                 working_middle_specification:  @quotation_detail_large_classification.working_large_specification,
                                  working_unit_id:  unit_id
                                   }
-                 @quotation_large_item = WorkingLargeItem.create(large_item_params)
+                 @quotation_large_item = WorkingMiddleItem.create(large_item_params)
 				 
 				 
 		     end
@@ -505,10 +506,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   end 
  
   def working_large_item_select
-     @working_large_item_name = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_large_item_name).flatten.join(" ")
+     @working_large_item_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_name).flatten.join(" ")
   end
   def working_large_specification_select
-     @working_large_specification = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_large_specification).flatten.join(" ")
+     @working_large_specification = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_specification).flatten.join(" ")
   end
   def working_unit_name_select
      #@quotation_unit_name = QuotationUnit.where(:id => params[:id]).where("id is NOT NULL").pluck(:quotation_unit_name).flatten.join(" ")
@@ -516,31 +517,31 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   end
   #単位(未使用？)
   def working_unit_id_select
-     @working_unit_id  = WorkingLargeItem.with_unit.where(:id => params[:id]).pluck("working_units.working_unit_name, working_units.id")
+     @working_unit_id  = WorkingMiddleItem.with_unit.where(:id => params[:id]).pluck("working_units.working_unit_name, working_units.id")
 	 #登録済み単位と異なるケースもあるので、任意で変更もできるように全ての単位をセット
      unit_all = WorkingUnit.all.pluck("working_units.working_unit_name, working_units.id")
      @working_unit_id = @working_unit_id + unit_all
 	 
-	 #@quotation_unit_id  = WorkingLargeItem.with_unit.where(:id => params[:id]).pluck("quotation_units.quotation_unit_name, quotation_units.id")
+	 #@quotation_unit_id  = WorkingMiddleItem.with_unit.where(:id => params[:id]).pluck("quotation_units.quotation_unit_name, quotation_units.id")
 	 #登録済み単位と異なるケースもあるので、任意で変更もできるように全ての単位をセット
      #unit_all = QuotationUnit.all.pluck("quotation_units.quotation_unit_name, quotation_units.id")
      #@quotation_unit_id = @quotation_unit_id + unit_all
   end
   #見積単価
   def working_unit_price_select
-     @working_unit_price = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_unit_price).flatten.join(" ")
+     @working_unit_price = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_unit_price).flatten.join(" ")
   end
   #実行単価
   def execution_unit_price_select
-     @execution_unit_price = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:execution_unit_price).flatten.join(" ")
+     @execution_unit_price = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:execution_unit_price).flatten.join(" ")
   end
   #歩掛り
   def labor_productivity_unit_select
-     @labor_productivity_unit = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit).flatten.join(" ")
+     @labor_productivity_unit = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit).flatten.join(" ")
   end
   #歩掛計
   def labor_productivity_unit_total_select
-     @labor_productivity_unit_total = WorkingLargeItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit_total).flatten.join(" ")
+     @labor_productivity_unit_total = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit_total).flatten.join(" ")
   end
   
   #add170223

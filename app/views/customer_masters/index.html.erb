@@ -61,7 +61,7 @@
         <td><%= customer_master.address %></td>
         <td><%= customer_master.tel_main %></td>
         <td><%= customer_master.fax_main %></td>
-        <td><%= customer_master.email_main %></td>
+		<td><%= mail_to(customer_master.email_main, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <!--<td><%= customer_master.closing_date %></td>-->
 		<% if customer_master.closing_date.present? && customer_master.closing_date != 0 then %>
 		　　<td align="center"><%= customer_master.closing_date %></td>

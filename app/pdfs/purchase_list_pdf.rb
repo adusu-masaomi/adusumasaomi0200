@@ -142,7 +142,8 @@ class PurchaseListPDF
                        end
                        #
 					   
-			           row.values purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
+			           row.values purchase_date: purchase_datum.purchase_date,
+                                  purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              material_code: material_code,
                                   material_name: material_name,
 								  maker_name: purchase_datum.maker_name,

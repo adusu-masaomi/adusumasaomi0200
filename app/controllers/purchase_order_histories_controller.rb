@@ -293,7 +293,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	    params[:purchase_order_history][:orders_attributes].values.each do |item|
 		
 		 
-		
+		  #binding.pry
 		
 		  ######
           #varidate用のために、本来の箇所から離れたパラメータを再セットする
@@ -303,8 +303,19 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  ##add170213
 		  item[:material_code] = params[:material_code][i]
 		  item[:material_name] = params[:material_name][i]
-		  item[:maker_name] = params[:maker_name][i]
+		  #item[:maker_name] = params[:maker_name][i]
 		  item[:list_price] = params[:list_price][i]
+		  
+		  #メーカーの処理(upd170616)
+		  item[:maker_id] = params[:maker_id][i]
+          @maker_master = MakerMaster.find(params[:maker_id][i])
+		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
+		  
+		  #binding.pry
+		  
+          if @maker_master.present?
+            item[:maker_name] = @maker_master.maker_name
+          end
 		  ######
 		 
 		  
@@ -321,12 +332,13 @@ class PurchaseOrderHistoriesController < ApplicationController
                 item[:list_price] = @material_master.list_price
 			  end
 			  
-			  @maker_master = MakerMaster.find(@material_master.maker_id)
-			  if @maker_master.maker_name != "-"  #upd170310
-			  #資材マスターのメーカー名をセット
-			  #(マスター側未登録を考慮。但しアプデは考慮していない）
-                item[:maker_name] = @maker_master.maker_name
-			  end
+			  #del170616
+			  #@maker_master = MakerMaster.find(@material_master.maker_id)
+			  #if @maker_master.maker_name != "-"  #upd170310
+			  ##資材マスターのメーカー名をセット
+			  ##(マスター側未登録を考慮。但しアプデは考慮していない）
+              #  item[:maker_name] = @maker_master.maker_name
+			  #end
 			  
 			  if params[:material_name][i] != @material_master.material_name
 			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
@@ -339,17 +351,22 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
 			  if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
-			    @maker_master = MakerMaster.find_by(maker_name: params[:maker_name][i])
-			    maker_id = 1
-			    if @maker_master.present?
-                  maker_id = @maker_master.id
-			    end
+			    
+				#del170616
+				#@maker_master = MakerMaster.find_by(maker_name: params[:maker_name][i])
+			    #maker_id = 1
+			    #if @maker_master.present?
+                #  maker_id = @maker_master.id
+			    #end
 			  
 			    @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-			      material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
-                                        maker_id: maker_id, list_price: params[:list_price][i] }
+			      #material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+                  #                      maker_id: maker_id, list_price: params[:list_price][i] }
+                  #upd 170616 for maker 
+                  material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+                                        maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
 			  
@@ -424,9 +441,10 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
 	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
   
-     maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
-	 @maker_name = MakerMaster.where(:id => maker_id).where("id is NOT NULL").pluck(:maker_name).flatten.join(" ")
+     #maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+	 #@maker_name = MakerMaster.where(:id => maker_id).where("id is NOT NULL").pluck(:maker_name).flatten.join(" ")
 	 
+     @maker_id_hide = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
 	 
   end
   
@@ -439,17 +457,13 @@ class PurchaseOrderHistoriesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_history_params
+	  #params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
+	  #                orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
+      #               :maker_id, :maker_name, :list_price, :mail_sent_flag, :_destroy])
+	  #upd170616 メーカー名は抹消
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
 	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
-                     :maker_name, :list_price, :mail_sent_flag, :_destroy])
-	  
-       #params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
-	   #               orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
-        #              :maker_name, :list_price, :_destroy], material_masters_attributes: [:id, :material_name])
+                     :maker_id, :list_price, :mail_sent_flag, :_destroy])
     end
-
-    #def material_masters_params
-    #     params.require(:purchase_order_history).permit(MaterialMaster_attributes: [:id,  :material_name ])
-    #end
 
 end

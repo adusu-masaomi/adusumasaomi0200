@@ -301,7 +301,8 @@ class EstimationSheetPDF
 				  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
 				  case quotation_detail_middle_classification.construction_type.to_i
 				  when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
-                    item_name = ""
+                    
+					item_name = ""
 					unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
 					@quantity = ""
 					@unit_name = ""
@@ -340,7 +341,8 @@ class EstimationSheetPDF
                   # working_unit_name: @unit_name,
                   # working_unit_price: quotation_detail_middle_classification.working_unit_price,
                   # quote_price: quotation_detail_middle_classification.quote_price
-		    
+		          
+				  
     	  end
 		  
           #頁番号
@@ -376,6 +378,9 @@ class EstimationSheetPDF
 		   #end
     end	
       
+	   #add170609 小計の前は１行空行を入れる
+	   #@report.list(:default).add_row working_middle_item_name: ""
+		   
 	   @report.page.item(:message_sum).value("計")
 	   #カッコを消す
 		@report.page.item(:blackets1).value(" ")

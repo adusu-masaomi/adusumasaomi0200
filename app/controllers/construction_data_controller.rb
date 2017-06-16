@@ -85,10 +85,12 @@ class ConstructionDataController < ApplicationController
   # POST /construction_data.json
   def create
   
-    
+    #住所のパラメータ変換
+    params[:construction_datum][:construction_place] = params[:addressX]
+	
     @construction_datum = ConstructionDatum.new(construction_datum_params)
-
-    #工事開始日・終了日（実績）の初期値をセットする
+    
+        #工事開始日・終了日（実績）の初期値をセットする
     @construction_datum.construction_start_date = '3000-01-01'
     @construction_datum.construction_end_date = '2000-01-01'
 	
@@ -118,6 +120,9 @@ class ConstructionDataController < ApplicationController
   # PATCH/PUT /construction_data/1.json
   def update
    
+    
+    #住所のパラメータ変換
+    params[:construction_datum][:construction_place] = params[:addressX]
     
     if params[:directions].present?
 	  
@@ -173,6 +178,9 @@ class ConstructionDataController < ApplicationController
 		  $working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
                           params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
 		  
+		  #add170601
+		  #発行日をグローバルへセット
+          $issue_date = params[:construction_datum][:issue_date]
 		
 		  #作業者をグローバルへセット
 		  staff_id = params[:construction_datum][:staff_id]
@@ -280,7 +288,7 @@ class ConstructionDataController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
-      :construction_end_date, :construction_period_start, :construction_period_end, :construction_place, :construction_detail, :attention_matter, 
+      :construction_end_date, :construction_period_start, :construction_period_end, :post, :construction_place, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :billed_flag)
     end
 end

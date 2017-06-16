@@ -61,13 +61,15 @@
         <td><%= supplier_master.supplier_name %></td>
         <td><%= supplier_master.tel_main %></td>
         <td><%= supplier_master.fax_main %></td>
-        <td><%= supplier_master.email_main %></td>
+        <!--<td><%= supplier_master.email_main %></td>-->
+        <td><%= mail_to(supplier_master.email_main, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%= supplier_master.responsible1 %></td>
-        <td><%= supplier_master.email1 %></td>
+        <td><%= mail_to(supplier_master.email1, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%= supplier_master.responsible2 %></td>
-        <td><%= supplier_master.email2 %></td>
+        <td><%= mail_to(supplier_master.email2, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%= supplier_master.responsible3 %></td>
-        <td><%= supplier_master.email3 %></td>
+        <!--<td><%= supplier_master.email3 %></td>-->
+        <td><%= mail_to(supplier_master.email3, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%=l supplier_master.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

@@ -32,9 +32,9 @@ class CustomerMastersController < ApplicationController
   def create
     
     #住所のパラメータ変換
-    @customer_master = CustomerMaster.new(customer_master_params)
-
     params[:customer_master][:address] = params[:addressX]
+    
+    @customer_master = CustomerMaster.new(customer_master_params)
 
     respond_to do |format|
       if @customer_master.save

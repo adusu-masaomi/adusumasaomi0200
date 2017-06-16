@@ -12,6 +12,8 @@
   <%= f.label :安全事項名（手入力用）, {:class => "my-custom-class-l", style: 'color: blue' }  %></br>
   <%= f.input :working_safety_matter_name , label: false, input_html:{id:"working_safety_matter_name", name:"construction_datum[working_safety_matter_name]", :tabindex=>"4", style: 'width:600px; color: blue' } %>
   
+  <%= f.input :construction_place , input_html:{id:"address", name:"addressX"}, as: :hidden %>
+  
   <div class="col-md-6" , style="margin-left : -15px">
   <!--<%= f.input :working_date, label: "作業日" , input_html:{ id:"working_date", style: 'width:220px;', :tabindex=>"5" }, as: :date_picker %>-->
   <%= f.input :working_date, label: "作業日" , input_html:{ id:"working_date", style: 'width:100px;', :tabindex=>"5" }, as: :date %>

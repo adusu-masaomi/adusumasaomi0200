@@ -85,6 +85,11 @@
 	 	 
 	 //検索可能なリストボックス(顧客名の場合)
      $(".searchableCustomerName").select2({ theme: "bootstrap" });
+	
+	 //$( ".searchableCustomerName" ).on("select2:open", function (e) {
+	 //  $('.searchableCustomerName').select2().trigger('change');
+     //});
+	 
 	 $( ".searchableCustomerName" ).change(function(e) {
 	  　  setCustomerInfoDefault();
      });
