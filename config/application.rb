@@ -48,7 +48,7 @@ module Adusu
     #config.assets.paths << "#{Rails}/app/assets/fonts"
     #config.assets.precompile << /\.(?:svg|eot|woff|ttf)$/ 
     
-    config.assets.precompile += %w(*.woff *.eot *.svg *.ttf cocoon.js jquery.tablefix.js ) 
+    config.assets.precompile += %w(*.woff *.eot *.svg *.ttf cocoon.js jquery.tablefix.js cb-materialbtn.min.css) 
 
     #config.action_controller.relative_url_root = '/sub'
     # for backup

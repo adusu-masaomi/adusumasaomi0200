@@ -30,10 +30,10 @@
 	<%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {style: 'width:150px'} %>
 	
 	<div>
-        <%= f.submit '検索する', :class => 'btn btn-default' %>
+        <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
         <%= link_to "一覧表",
             construction_data_path(@construction_data, action:"index", format: "pdf"),
-            :class => 'btn  btn-success', :target=>["_blank"] %>
+            :class => 'btn  btn-orange200_ftg', :target=>["_blank"] %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_datum_path,
             :class => 'btn btn-primary' %> 
@@ -97,17 +97,17 @@
       <% end %>
 	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
         <td><%= link_to t('.edit', :default => t("指示書")),
-                      edit2_construction_datum_path(construction_datum),  :class => 'btn btn-info btn-xs keep-disp' %></td>
+                      edit2_construction_datum_path(construction_datum),  :class => 'btn btn-pink300_ftg btn-xs keep-disp' , :style => "width: 50px; height: 10px;" %></td>
         <td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-warning btn-xs keep-disp'  %></td>
+                                   :class => 'btn btn-lightgreen500_rsd btn-xs keep-disp'  %></td>
         <td><%= link_to t('.back', :default => t("注文")), purchase_order_data_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-danger btn-xs keep-disp'  %></td>
+                                   :class => 'btn btn-purple200_rsd btn-xs keep-disp'  %></td>
         <td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-success btn-xs keep-disp'  %></td>
+                                   :class => 'btn btn-blue500_rsd btn-xs keep-disp'  %></td>
         <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
 		<% if @search.present? %>
           <td><%= link_to t('.back', :default => t("集計")), construction_costs_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-primary btn-xs keep-disp'  %></td>
+                                   :class => 'btn btn-lime500_rsd btn-xs keep-disp'  %></td>
 		<% else %>
 		  <td></td>
 		<% end %>
@@ -134,7 +134,7 @@
         <td><%=l construction_datum.created_at.in_time_zone('Tokyo') %></td>
         <td>
          <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_construction_datum_path(construction_datum),  :class => 'btn btn-default btn-xs' %>
+                      edit_construction_datum_path(construction_datum),  :class => 'btn btn-white_rsd btn-xs' %>
 		 
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       construction_datum_path(construction_datum),

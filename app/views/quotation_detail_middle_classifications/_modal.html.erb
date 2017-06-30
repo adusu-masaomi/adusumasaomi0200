@@ -103,9 +103,12 @@
 
   <%= f.button :submit, :class => 'btn-primary' %>
   <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
+  <!--upd170626 parameter added-->
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 quotation_detail_middle_classifications_path(quotation_header_id: params[:quotation_header_id],
-                               quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1"), :class => 'btn btn-default' %>
+                               quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], quotation_header_name: params[:quotation_header_name], 
+                               working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] , new_flag: "1" ), 
+                               :class => 'btn btn-white_rsd' %>
 <% end %>
 </div>
  </div>
@@ -300,9 +303,13 @@
   //各値の自動セット-ajax
   function setWorkingMiddleItemName()
   {  
-    obj = document.getElementById("working_middle_item_id");
+     obj = document.getElementById("working_middle_item_id");
      working_middle_item_id = parseInt(obj.value);
      
+	 //add170626
+	 obj = parseInt(document.getElementById("construction_type").value);
+	 var construction_type = obj
+	 
       //項目名
       $.get("<%= quotation_detail_middle_classificationz_working_middle_item_select_path %>",
        {id: working_middle_item_id },
@@ -389,14 +396,18 @@
           document.getElementById("labor_productivity_unit").value = obj;
 		  }
       );      
+	  
 	  //歩掛り計
-      $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_total_select_path %>",
-       {id: working_middle_item_id },
-        function(data){
-          obj = document.getElementById("labor_productivity_unit_total").textContent;
-          document.getElementById("labor_productivity_unit_total").value = obj;
+	  //add170626
+	  if (construction_type == 0) {
+        $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_total_select_path %>",
+         {id: working_middle_item_id },
+          function(data){
+            obj = document.getElementById("labor_productivity_unit_total").textContent;
+            document.getElementById("labor_productivity_unit_total").value = obj;
 		  }
-      );      
+        );      
+	  }
 	  
       //170112一旦保留
 	  //使用材料数

@@ -12,33 +12,49 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     
     @number = 1
 	
+	
+	
     #ransack保持用コード
     if params[:quotation_header_id].present?
-      $quotation_header_id = params[:quotation_header_id]
+      #$quotation_header_id = params[:quotation_header_id]
+	  #upd170626
+	  @quotation_header_id = params[:quotation_header_id]
       if params[:working_large_item_name].present?
          #$working_large_item_name = params[:working_large_item_name]
 		  #upd170308
-		  $working_large_item_name = [params[:working_large_item_name], params[:working_large_specification]]
+		  #$working_large_item_name = [params[:working_large_item_name], params[:working_large_specification]]
+		  #upd170626
+		  @working_large_item_name = [params[:working_large_item_name], params[:working_large_specification]]
       end
 	  if params[:quotation_detail_large_classification_id].present?
-          $quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
+          #$quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
+		  #upd170626
+		  @quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
 	  end
 	end
     
   
     #明細データ見出用
     if params[:quotation_header_name].present?
-      $quotation_header_name = params[:quotation_header_name]
+      #$quotation_header_name = params[:quotation_header_name]
+	  #upd170626
+	  @quotation_header_name = params[:quotation_header_name]
     end
     #
-	
-    if $quotation_header_id.present?
+	#upd170626
+    #if $quotation_header_id.present?
+	if @quotation_header_id.present?
     
-      query = {"quotation_header_id_eq"=>"", "with_header_id"=> $quotation_header_id, "with_large_item"=> $working_large_item_name , 
+      #query = {"quotation_header_id_eq"=>"", "with_header_id"=> $quotation_header_id, "with_large_item"=> $working_large_item_name , 
+      #       "working_middle_item_name_eq"=>""}
+	  #upd170626
+	  query = {"quotation_header_id_eq"=>"", "with_header_id"=> @quotation_header_id, "with_large_item"=> @working_large_item_name , 
              "working_middle_item_name_eq"=>""}
 
       @null_flag = "1"
     end 
+
+    #binding.pry
 
     #if query.nil?
     if @null_flag == "" 
@@ -69,34 +85,36 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #@quotation_detail_middle_classifications  = @quotation_detail_middle_classifications.order('line_number DESC')
 	
 	#global set
-	$quotation_detail_middle_classifications = @quotation_detail_middle_classifications
+	#del170626
+	#$quotation_detail_middle_classifications = @quotation_detail_middle_classifications
 	
-    @print_type = params[:print_type]
+	#del170626
+	#@print_type = params[:print_type]
     
     #デフォルトの頁番号→グローバルに格納
-    $default_page_number = params[:default_page_number].to_i
-    #binding.pry
+    #del170626
+	#$default_page_number = params[:default_page_number].to_i
+    
 	
+	#del170626
     #内訳書PDF発行
-    respond_to do |format|
-      format.html # index.html.erb
-      format.pdf do
-         #binding.pry
-         
-         if @print_type == "1"
-          report = DetailedStatementPDF.create @detailed_statement
-         else
-          report = DetailedStatementLandscapePDF.create @detailed_statement_landscape
-         end 
-        # ブラウザでPDFを表示する
-        # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "detailed_statatement.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
-        end
-    end
+    #respond_to do |format|
+    #  format.html # index.html.erb
+    #  format.pdf do
+    #     if @print_type == "1"
+    #      report = DetailedStatementPDF.create @detailed_statement
+    #     else
+    #      report = DetailedStatementLandscapePDF.create @detailed_statement_landscape
+    #     end 
+    #    # ブラウザでPDFを表示する
+    #    # disposition: "inline" によりダウンロードではなく表示させている
+    #    send_data(
+    #      report.generate,
+    #      filename:  "detailed_statatement.pdf",
+    #      type:        "application/pdf",
+    #      disposition: "inline")
+    #    end
+    #end
     #
 	
 	
@@ -132,14 +150,20 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #初期値をセット(見出画面からの遷移時のみ)
     @@new_flag = params[:new_flag]
 	
-	#binding.pry
+	#add170626
+	if params[:quotation_header_id].present?
+      @quotation_header_id = params[:quotation_header_id]
+    end
 	
     if @@new_flag == "1"
-       @quotation_detail_middle_classification.quotation_header_id ||= $quotation_header_id
+       #@quotation_detail_middle_classification.quotation_header_id ||= $quotation_header_id
+	   @quotation_detail_middle_classification.quotation_header_id ||= @quotation_header_id
 	   if params[:quotation_detail_large_classification_id].present?
          @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= params[:quotation_detail_large_classification_id]
 	   else
-         @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= $quotation_detail_large_classification_id
+         #@quotation_detail_middle_classification.quotation_detail_large_classification_id ||= $quotation_detail_large_classification_id
+		 #upd170626
+		 @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= @quotation_detail_large_classification_id
        end
     end 
     
@@ -199,9 +223,9 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		 
           
 		  # 全選択の場合
+		  #upd170626 short_name抹消(無駄に１が入るため)
 		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
 		      large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
-working_middle_item_short_name: @quotation_detail_middle_classification.working_middle_item_short_name, 
 working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification, 
 working_unit_id: @working_unit_id_params, 
 working_unit_price: @quotation_detail_middle_classification.working_unit_price,
@@ -221,9 +245,9 @@ other_cost: @quotation_detail_middle_classification.other_cost
                @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
           else
 		     # アイテムのみ更新の場合
+			 #upd170626 short_name抹消(無駄に１が入るため)
 		     if params[:quotation_detail_middle_classification][:check_update_item] == "true" 
 		         large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
-                 working_middle_item_short_name: @quotation_detail_middle_classification.working_middle_item_short_name, 
                  working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification,
                  working_unit_id: @working_unit_id_params } 
 		   
@@ -249,7 +273,10 @@ other_cost: @quotation_detail_middle_classification.other_cost
     #行番号の最終を書き込む
     quotation_dlc_set_last_line_number
 	  
-    @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => $quotation_header_id).where(:quotation_detail_large_classification_id => $quotation_detail_large_classification_id)
+    #@quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => $quotation_header_id).where(:quotation_detail_large_classification_id => $quotation_detail_large_classification_id)
+	@quotation_detail_middle_classifications = 
+        QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_header_id).
+             where(:quotation_detail_large_classification_id => @quotation_detail_large_classification_id)
     ###
   end
   
@@ -313,9 +340,9 @@ other_cost: @quotation_detail_middle_classification.other_cost
          if @check_item.nil?
 		   
 		  # 全選択の場合
+          #upd170626 short_name抹消(無駄に１が入るため)
 		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
 		      large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
-working_middle_item_short_name: @quotation_detail_middle_classification.working_middle_item_short_name, 
 working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification, 
 working_unit_id: @working_unit_id_params, 
 working_unit_price: @quotation_detail_middle_classification.working_unit_price,
@@ -336,9 +363,9 @@ other_cost: @quotation_detail_middle_classification.other_cost
                @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
           else
 		     # アイテムのみ更新の場合
+			 #upd170626 short_name抹消(無駄に１が入るため)
 		     if params[:quotation_detail_middle_classification][:check_update_item] == "true"
 		       large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
-                 working_middle_item_short_name: @quotation_detail_middle_classification.working_middle_item_short_name, 
                  working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification,
                  working_unit_id: @working_unit_id_params } 
 			   
@@ -352,7 +379,8 @@ other_cost: @quotation_detail_middle_classification.other_cost
     ######################
     
     
-    @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => $quotation_header_id).where(:quotation_detail_large_classification_id => $quotation_detail_large_classification_id)
+    @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_header_id).
+            where(:quotation_detail_large_classification_id => @quotation_detail_large_classification_id)
   end
 
   # DELETE /quotation_detail_middle_classifications/1
@@ -361,17 +389,24 @@ other_cost: @quotation_detail_middle_classification.other_cost
     #binding.pry
 	if params[:quotation_header_id].present?
 	
-      $quotation_header_id = params[:quotation_header_id]
+      @quotation_header_id = params[:quotation_header_id]
       if params[:quotation_detail_large_classification_id].present?
-          $quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
+          @quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
 		  #$working_large_item_name = params[:working_large_item_name]
       end
 	end
   
     @quotation_detail_middle_classification.destroy
     respond_to do |format|
-      format.html { redirect_to quotation_detail_middle_classifications_url, notice: 'Quotation detail middle classification was successfully destroyed.' }
-      format.json { head :no_content }
+      #format.html { redirect_to quotation_detail_middle_classifications_url, notice: 'Quotation detail middle classification was successfully destroyed.' }
+      #format.json { head :no_content }
+	  
+	  #upd170626
+	  format.html {redirect_to quotation_detail_middle_classifications_path( :quotation_header_id => params[:quotation_header_id],
+                    :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id], 
+	                :quotation_header_name => params[:quotation_header_name],
+                    :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
+                   )}
 	  
 	  #品目データの金額を更新
       save_price_to_large_classifications
@@ -787,6 +822,8 @@ other_cost: @quotation_detail_middle_classification.other_cost
    #見出しデータへ最終行番号保存用
     def quotation_dlc_set_last_line_number
         @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
+		
+		#binding.pry
 		
         check_flag = false
 	    if @quotation_detail_large_classifiations.last_line_number.nil? 

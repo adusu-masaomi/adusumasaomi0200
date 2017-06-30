@@ -34,7 +34,13 @@ body > .container {
     <title><%= content_for?(:title) ? yield(:title) : "Adusu" %></title>
     <%= csrf_meta_tags %>
 
+    <!--読み込む順番注意！-->
+    <%= stylesheet_link_tag "https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css", :media => "all" %>
+    <%= stylesheet_link_tag "https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css", :media => "all" %>
     <%= stylesheet_link_tag "application", :media => "all" %>
+    <%= stylesheet_link_tag "cb-materialbtn.min", :media => "all" %>
+
+    
 
     <!-- For third-generation iPad with high-resolution Retina display: -->
     <!-- Size should be 144 x 144 pixels -->
@@ -64,13 +70,7 @@ body > .container {
     <![endif]-->
   </head>
   
-   <% flash.each do |name, msg| %>
-    <div class="alert alert-<%= name == "notice" ? "success" : "error" %>">
-      <a class="close" data-dismiss="alert">×</a> <!-- アラートダイアログに×ボタンをつける -->
-      <%= msg %>
-    </div>
-  <% end %>
-
+ 
   
   <body>
    
@@ -172,8 +172,9 @@ body > .container {
     <div class="container" >
       <div class="row" >
         <div class="col-lg-9" style="margin-top : -50px">
-          <%= bootstrap_flash %>
-              
+          </br>
+		  <%= bootstrap_flash %>
+          
           <%= yield %>
          </div>
          
@@ -194,11 +195,7 @@ body > .container {
 
   </body>
     
-    <!-- 追記部分 開始 -->
-    <% flash.each do |key, value| %>
-      <%= content_tag(:div, value, class: "#{key}") %>
-    <% end %>
-    <!-- 追記部分 終了-->
+   
 
 </html>
 

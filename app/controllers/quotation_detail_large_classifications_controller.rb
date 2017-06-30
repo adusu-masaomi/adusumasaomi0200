@@ -11,13 +11,18 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     #ransack保持用コード
     @null_flag = ""
     
+	
 	if params[:quotation_header_id].present?
-      $quotation_header_id = params[:quotation_header_id]
+      #$quotation_header_id = params[:quotation_header_id]
+	  #upd170626
+	  @quotation_header_id = params[:quotation_header_id]
     end
   
   
-    if $quotation_header_id.present?
-	  query = {"quotation_header_id_eq"=>"", "with_header_id"=> $quotation_header_id, "working_large_item_name_eq"=>""}
+    #if $quotation_header_id.present?
+    #upd170626
+    if @quotation_header_id.present?
+	  query = {"quotation_header_id_eq"=>"", "with_header_id"=> @quotation_header_id, "working_large_item_name_eq"=>""}
 	  
 	  @null_flag = "1"
 	end
@@ -48,18 +53,22 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	#
 
     @quotation_detail_large_classifications = @q.result(distinct: true)
+	
 	#
     #global set
-	$quotation_detail_large_classifications = @quotation_detail_large_classifications
+	#del170626
+	#$quotation_detail_large_classifications = @quotation_detail_large_classifications
     
-	#add170412
-    #@quotation_detail_large_classifications  = @quotation_detail_large_classifications.order('line_number DESC')
-	
 	#内訳データ見出用
     if params[:quotation_header_name].present?
-      $quotation_header_name = params[:quotation_header_name]
+      #$quotation_header_name = params[:quotation_header_name]
+	  #upd170626
+	  @quotation_header_name = params[:quotation_header_name]
     end
     #
+	
+	###履歴へ保存させる処理追加
+	#flash[:notice] = "履歴データへ保存しますか？（保存すると、後から復元させることができます。）"
 	
     @print_type = params[:print_type]
 	
@@ -76,23 +85,19 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     	  case @print_type
 		  when "1"
 		  #見積書
-		    report = EstimationSheetPDF.create @estimation_sheet 
+		    #report = EstimationSheetPDF.create @estimation_sheet
+            #upd170626
+			report = EstimationSheetPDF.create @quotation_detail_large_classifications
           when "2"
 		  #見積書(横)
-            report = EstimationSheetLandscapePDF.create @estimation_sheet_landscape
+            #report = EstimationSheetLandscapePDF.create @estimation_sheet_landscape
+            #upd170626
+			report = EstimationSheetLandscapePDF.create @quotation_detail_large_classifications
           when "3"
 		  #見積書(印あり）
-		    report = EstimationSheetPDF.create @estimation_sheet 
-            #report = InvoicePDF.create @invoice
-		  when "4"
-		  #請求書(横)
-		     report = InvoiceLandscapePDF.create @invoice_landscape
-		  when "5"
-		  #納品書
-            report = DeliverySlipPDF.create @delivery_slip
-		  when "6"
-		  #納品書(横)
-		     report = DeliverySlipLandscapePDF.create @delivery_slip_landscape
+		    #report = EstimationSheetPDF.create @estimation_sheet 
+            #upd170626
+            report = EstimationSheetPDF.create @quotation_detail_large_classifications
 		  end 	
          
           #現在時刻をセットする
@@ -155,13 +160,21 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   def new
     @quotation_detail_large_classification = QuotationDetailLargeClassification.new
     
+	#add170626
+	if params[:quotation_header_id].present?
+      @quotation_header_id = params[:quotation_header_id]
+    end
+	
     #初期値をセット(見出画面からの遷移時のみ)
     @@new_flag = params[:new_flag]
     if @@new_flag == "1"
-       @quotation_detail_large_classification.quotation_header_id ||= $quotation_header_id
+       #@quotation_detail_large_classification.quotation_header_id ||= $quotation_header_id
+	   #upd170626
+       @quotation_detail_large_classification.quotation_header_id ||= @quotation_header_id
 	   
 	end 
-    
+	
+	
 	#行番号を取得する
 	get_line_number
     
@@ -253,7 +266,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
    
    #add
    #@quotation_detail_large_classifications = QuotationDetailLargeClassification.all
-   @quotation_detail_large_classifications = QuotationDetailLargeClassification.where(:quotation_header_id => $quotation_header_id)
+   #upd170626
+   @quotation_detail_large_classifications = QuotationDetailLargeClassification.where(:quotation_header_id => @quotation_header_id)
    
   end
 
@@ -339,7 +353,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       end
 	  #####
 	  
-      @quotation_detail_large_classifications = QuotationDetailLargeClassification.where(:quotation_header_id => $quotation_header_id)
+	  
+      @quotation_detail_large_classifications = QuotationDetailLargeClassification.where(:quotation_header_id => @quotation_header_id)
   end
 
   # DELETE /quotation_detail_large_classifications/1
@@ -349,18 +364,21 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     #binding.pry
 	
     if params[:quotation_header_id].present?
-      $quotation_header_id = params[:quotation_header_id]
+      @quotation_header_id = params[:quotation_header_id]
     end
     
   
     @quotation_detail_large_classification.destroy
     respond_to do |format|
-      format.html { redirect_to quotation_detail_large_classifications_url, notice: 'Quotation detail large classification was successfully destroyed.' }
-      format.json { head :no_content }
-    
+      #format.html { redirect_to quotation_detail_large_classifications_url, notice: 'Quotation detail large classification was successfully destroyed.' }
+      #format.json { head :no_content }
+      
+	  #upd170626
+	  format.html {redirect_to quotation_detail_large_classifications_path( :quotation_header_id => params[:quotation_header_id], :quotation_header_name => params[:quotation_header_name] )}
+	  
       # 見出データを保存 
       save_price_to_headers
-    end
+   end
 	
 	
   end
@@ -725,6 +743,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
           #上記、見積日は移行しないものとする。
           @invoice_header = InvoiceHeader.new(invoice_header_params)
           if @invoice_header.save!(:validate => false)
+		    #add170629
+		    @success_flag = true
 		  else
 		    @success_flag = false
 		  end
@@ -759,7 +779,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                 execution_quantity: q_d_l_c.execution_quantity, working_unit_id: q_d_l_c.working_unit_id, working_unit_name: q_d_l_c.working_unit_name, 
                 working_unit_price: q_d_l_c.working_unit_price, invoice_price: q_d_l_c.quote_price, execution_unit_price: q_d_l_c.execution_unit_price, 
                 execution_price: q_d_l_c.execution_price, labor_productivity_unit: q_d_l_c.labor_productivity_unit, 
-                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.remarks, last_line_number: q_d_l_c.remarks,
+                labor_productivity_unit_total: q_d_l_c.labor_productivity_unit_total, last_line_number: q_d_l_c.last_line_number, remarks: q_d_l_c.remarks,
                 construction_type: q_d_l_c.construction_type , piping_wiring_flag: q_d_l_c.piping_wiring_flag , equipment_mounting_flag: q_d_l_c.equipment_mounting_flag , 
                 labor_cost_flag: q_d_l_c.labor_cost_flag }
             
@@ -767,8 +787,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
               if @invoice_detail_large_classification.save!(:validate => false)
 		      
                  #IDをここでセットしておく（明細で参照するため）
-			     @invoice_detail_large_classification_id = InvoiceDetailLargeClassification.maximum("id")
-		       
+			     #@invoice_detail_large_classification_id = InvoiceDetailLargeClassification.maximum("id")
+		         #upd170629
+				 @invoice_detail_large_classification_id = @invoice_detail_large_classification.id
+				 
 			     #明細データのコピー(サブルーチン)
 			     create_invoice_detail
 		      else
@@ -805,6 +827,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
           	
           @invoice_detail_middle_classification = InvoiceDetailMiddleClassification.new(invoice_detail_middle_classification_params)
           if @invoice_detail_middle_classification.save!(:validate => false)
+		    #add170629
+		    @success_flag = true
 		  else
 		    @success_flag = false
 			flash[:notice] = "データ作成に失敗しました！再度行ってください。"
@@ -903,8 +927,11 @@ class QuotationDetailLargeClassificationsController < ApplicationController
               if @delivery_slip_detail_large_classification.save!(:validate => false)
 		      
                  #IDをここでセットしておく（明細で参照するため）
-			     @delivery_slip_detail_large_classification_id = DeliverySlipDetailLargeClassification.maximum("id")
-		         #明細データのコピー(サブルーチン)
+			     #@delivery_slip_detail_large_classification_id = DeliverySlipDetailLargeClassification.maximum("id")
+		         #upd170629
+				 @delivery_slip_detail_large_classification_id = @delivery_slip_detail_large_classification.id
+				 
+				 #明細データのコピー(サブルーチン)
 			     create_delivery_slip_detail
 		      else
 		        @success_flag = false

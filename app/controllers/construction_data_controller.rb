@@ -86,7 +86,7 @@ class ConstructionDataController < ApplicationController
   def create
   
     #住所のパラメータ変換
-    params[:construction_datum][:construction_place] = params[:addressX]
+    params[:construction_datum][:address] = params[:addressX]
 	
     @construction_datum = ConstructionDatum.new(construction_datum_params)
     
@@ -122,7 +122,7 @@ class ConstructionDataController < ApplicationController
    
     
     #住所のパラメータ変換
-    params[:construction_datum][:construction_place] = params[:addressX]
+    params[:construction_datum][:address] = params[:addressX]
     
     if params[:directions].present?
 	  
@@ -288,7 +288,7 @@ class ConstructionDataController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
-      :construction_end_date, :construction_period_start, :construction_period_end, :post, :construction_place, :construction_detail, :attention_matter, 
+      :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :billed_flag)
     end
 end

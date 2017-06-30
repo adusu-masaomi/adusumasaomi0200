@@ -3,16 +3,18 @@
   <%= f.input :construction_code , input_html:{name: "construction_code", :tabindex=>"0", style: 'width:110px' , :disabled => true} %>
   <%= f.input :construction_name , input_html:{:tabindex=>"1", style: 'width:430px', :disabled => true} %>
   <%= f.label :得意先, {:class => "my-custom-class-l" }  %></br>
-  <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:prompt => "どれか一つを選択して下さい"} , {id:"customer_id", :tabindex=>"3", class: "searchableCustomerName" , style: 'width:330px' , :disabled => true} %></br>
-  <%= f.input :issue_date, label: "発行日" , input_html:{ id:"issue_date", style: 'width:220px;', :tabindex=>"0" }, as: :date_picker %>
+  <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:prompt => "どれか一つを選択して下さい"} , {id:"customer_id", :tabindex=>"0", class: "searchableCustomerName" , style: 'width:330px' , :disabled => true} %></br>
+  <!--<%= f.input :issue_date, label: "発行日" , input_html:{ id:"issue_date", style: 'width:220px;', :tabindex=>"0" }, as: :date_picker %>-->
   <%= f.input :construction_detail , :as => :text, :input_html => { 'rows' => 2, :tabindex=>"1"} %>
   <%= f.input :attention_matter , input_html:{:tabindex=>"2"} %>
   <%= f.label :安全事項, {:class => "my-custom-class-l" }  %></br>
-  <%= f.collection_select :working_safety_matter_id, WorkingSafetyMatter.all, :id, :working_safety_matter_name,  {:prompt => "どれか一つを選択して下さい", :selected => @construction_datum.working_safety_matter_id || 1} , {id:"working_safety_matter_id", id:"working_safety_matter_id",  class: "searchableSafety" , style: 'width:600px', :tabindex=>"3"} %></br></br>
+  <%= f.collection_select :working_safety_matter_id, WorkingSafetyMatter.all, :id, :working_safety_matter_name,  
+    {:prompt => "どれか一つを選択して下さい", :selected => @construction_datum.working_safety_matter_id || 1} , 
+    {id:"working_safety_matter_id", id:"working_safety_matter_id",  class: "searchableSafety" , style: 'width:600px', :tabindex=>"3"} %></br></br>
   <%= f.label :安全事項名（手入力用）, {:class => "my-custom-class-l", style: 'color: blue' }  %></br>
   <%= f.input :working_safety_matter_name , label: false, input_html:{id:"working_safety_matter_name", name:"construction_datum[working_safety_matter_name]", :tabindex=>"4", style: 'width:600px; color: blue' } %>
   
-  <%= f.input :construction_place , input_html:{id:"address", name:"addressX"}, as: :hidden %>
+  <%= f.input :address , input_html:{id:"address", name:"addressX"}, as: :hidden %>
   
   <div class="col-md-6" , style="margin-left : -15px">
   <!--<%= f.input :working_date, label: "作業日" , input_html:{ id:"working_date", style: 'width:220px;', :tabindex=>"5" }, as: :date_picker %>-->
@@ -20,7 +22,8 @@
   </div>
   <div style="margin-left : -0px; margin-top : 30px; ">
   <%= f.label :作業者, {:class => "my-custom-class-l", :style => "margin-top: -5px;"}  %></br>
-  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "作業者を選択して下さい" } , {id:"staff_id", class: "my-custom-class" , style: 'width:250px;margin-top: 0px;' }  %>
+  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "作業者を選択して下さい" } ,
+         {id:"staff_id", class: "my-custom-class" , style: 'width:250px;margin-top: 0px;' }  %>
   </br></br>
   </div></br>
   
@@ -28,10 +31,10 @@
   <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
   
   <div>
-  <%= f.submit "指示書発行",name: "directions", class: "btn btn-primary",  :tabindex => "5"  %>
+  <%= f.submit "指示書発行",name: "directions", class: "btn btn-pink300_ftg",  :tabindex => "6"  %>
 	 
   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
-                construction_data_path, :class => 'btn btn-default' %>
+                construction_data_path, :class => 'btn btn-white_rsd' %>
   </div>
 
 
@@ -55,7 +58,7 @@
 	   $(".searchableSafety").select2({ theme: "bootstrap" });
 	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
 	   $( ".searchableSafety" ).on("select2:close", function (e) {
-	     $('[tabindex=2]').focus(); 
+	     $('[tabindex=4]').focus(); 
 	   });
 	   
        $(".searchableSafety").change(function(e) {

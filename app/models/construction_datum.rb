@@ -26,6 +26,11 @@ class ConstructionDatum < ActiveRecord::Base
 	validates :customer_id, presence: true
     validates :construction_code, presence: true, uniqueness: true
 	validates :alias_name, presence: true
+    
+	#緯度経度の自動登録
+	#add170620
+    geocoded_by :address
+    after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
 	#scope :with_id, -> { where(id: "purchase_order_data.construction_id")} 
 	scope :with_id,  -> { joins(:purchase_order_datum) }

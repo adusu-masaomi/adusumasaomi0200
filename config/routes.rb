@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :quotation_details_histories
+  resources :quotation_details_histories
+  resources :quotation_breakdown_histories
+  resources :quotation_header_histories
   resources :contacts
   resources :stocktakes
   resources :business_holidays
@@ -141,7 +145,9 @@ Rails.application.routes.draw do
   #add170421
   post '/working_unitz/reorder' => 'working_units#reorder'
   post '/quotation_detail_large_classificationz/reorder' => 'quotation_detail_large_classifications#reorder'
+  post '/quotation_breakdown_historiez/reorder' => 'quotation_breakdown_histories#reorder'
   post '/quotation_detail_middle_classificationz/reorder' => 'quotation_detail_middle_classifications#reorder'
+  post '/quotation_details_historiez/reorder' => 'quotation_details_histories#reorder'
   post '/delivery_slip_detail_large_classificationz/reorder' => 'delivery_slip_detail_large_classifications#reorder'
   post '/delivery_slip_detail_middle_classificationz/reorder' => 'delivery_slip_detail_middle_classifications#reorder'
   post '/invoice_detail_large_classificationz/reorder' => 'invoice_detail_large_classifications#reorder'
@@ -165,6 +171,11 @@ Rails.application.routes.draw do
   #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
   
   get '/purchase_order_histories_list' => "purchase_order_histories#index2"
+  
+  #add170624
+  #見積履歴一覧への遷移用
+  get '/quotation_header_histories_list' => "quotation_header_histories#index"
+  
   #add161128
   get "/purchase_order_historiez/email_select" => 'purchase_order_histories#email_select'
   #add170212
@@ -191,6 +202,10 @@ Rails.application.routes.draw do
   #add170210
   get '/construction_costz/purchase_amount_etc_select' => 'construction_costs#purchase_amount_etc_select'
   get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
+
+  #add170621
+  #見積書履歴保存処理
+  get "/quotation_header_historiez/set_history" => 'quotation_header_histories#set_history'
 
   #get '/quotation_headerz/customer_name_select' => 'quotation_headers#customer_name_select'
   #upd161028
@@ -226,6 +241,11 @@ Rails.application.routes.draw do
   get '/invoice_detail_middle_classificationz/subtotal_select' => 'invoice_detail_middle_classifications#subtotal_select'
   get '/delivery_slip_detail_large_classificationz/subtotal_select' => 'delivery_slip_detail_large_classifications#subtotal_select'
   get '/delivery_slip_detail_middle_classificationz/subtotal_select' => 'delivery_slip_detail_middle_classifications#subtotal_select'
+  
+  #add170626
+  get '/quotation_breakdown_historiez/subtotal_select' => 'quotation_breakdown_histories#subtotal_select'
+  get '/quotation_details_historiez/subtotal_select' => 'quotation_details_histories#subtotal_select'
+  
   #add end
   
   #
@@ -237,6 +257,11 @@ Rails.application.routes.draw do
   get '/invoice_detail_middle_classificationz/LPU_piping_wiring_select' => 'invoice_detail_middle_classifications#LPU_piping_wiring_select'
   get '/delivery_slip_detail_large_classificationz/LPU_piping_wiring_select' => 'delivery_slip_detail_large_classifications#LPU_piping_wiring_select'
   get '/delivery_slip_detail_middle_classificationz/LPU_piping_wiring_select' => 'delivery_slip_detail_middle_classifications#LPU_piping_wiring_select'
+  
+  #add170626
+  get '/quotation_breakdown_historiez/LPU_piping_wiring_select' => 'quotation_breakdown_histories#LPU_piping_wiring_select'
+  get '/quotation_details_historiez/LPU_piping_wiring_select' => 'quotation_details_histories#LPU_piping_wiring_select'
+  
   #歩掛-機器取付用
   get '/quotation_detail_large_classificationz/LPU_equipment_mounting_select' => 'quotation_detail_large_classifications#LPU_equipment_mounting_select'
   get '/quotation_detail_middle_classificationz/LPU_equipment_mounting_select' => 'quotation_detail_middle_classifications#LPU_equipment_mounting_select'
@@ -244,6 +269,10 @@ Rails.application.routes.draw do
   get '/invoice_detail_middle_classificationz/LPU_equipment_mounting_select' => 'invoice_detail_middle_classifications#LPU_equipment_mounting_select'
   get '/delivery_slip_detail_large_classificationz/LPU_equipment_mounting_select' => 'delivery_slip_detail_large_classifications#LPU_equipment_mounting_select'
   get '/delivery_slip_detail_middle_classificationz/LPU_equipment_mounting_select' => 'delivery_slip_detail_middle_classifications#LPU_equipment_mounting_select'
+  
+  #add170626
+  get '/quotation_breakdown_historiez/LPU_equipment_mounting_select' => 'quotation_breakdown_histories#LPU_equipment_mounting_select'
+  get '/quotation_details_historiez/LPU_equipment_mounting_select' => 'quotation_details_histories#LPU_equipment_mounting_select'
   
   #歩掛-労務費用
   get '/quotation_detail_large_classificationz/LPU_labor_cost_select' => 'quotation_detail_large_classifications#LPU_labor_cost_select'
@@ -253,6 +282,10 @@ Rails.application.routes.draw do
   get '/delivery_slip_detail_large_classificationz/LPU_labor_cost_select' => 'delivery_slip_detail_large_classifications#LPU_labor_cost_select'
   get '/delivery_slip_detail_middle_classificationz/LPU_labor_cost_select' => 'delivery_slip_detail_middle_classifications#LPU_labor_cost_select'
   #add end
+  
+  #add170626
+  get '/quotation_breakdown_historiez/LPU_labor_cost_select' => 'quotation_breakdown_histories#LPU_labor_cost_select'
+  get '/quotation_details_historiez/LPU_labor_cost_select' => 'quotation_details_histories#LPU_labor_cost_select'
   
   ###
   #請求書見出D関連
@@ -305,6 +338,8 @@ Rails.application.routes.draw do
   get '/quotation_detail_middle_classificationz/labor_productivity_unit_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_select'
   #歩掛計
   get '/quotation_detail_middle_classificationz/labor_productivity_unit_total_select' => 'quotation_detail_middle_classifications#labor_productivity_unit_total_select'
+  #add170626
+  get '/quotation_details_historiez/labor_productivity_unit_total_select' => 'quotation_details_histories#labor_productivity_unit_total_select'
   #使用材料数
   get '/quotation_detail_middle_classificationz/material_quantity_select' => 'quotation_detail_middle_classifications#material_quantity_select'
   #付属品等
@@ -430,6 +465,9 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :quotation_details_histories
+  resources :quotation_breakdown_histories
+  resources :quotation_header_histories
   resources :contacts
   resources :stocktakes
   resources :business_holidays

@@ -1,6 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailLargeClassification -%>
-<div class="page-header">
+<div class="page-header", style="width:1920px">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 
    <%= search_form_for @q do |f| %>
@@ -17,57 +17,46 @@
    <% end %>
 
 </div>
-<div style="width:1280px;">
+<div style="width:1980px;">
 <%= link_to t('.new', :default => t("新規作成")),
-            new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], new_flag: "1"), remote: true,
+            new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], quotation_header_name: params[:quotation_header_name],
+			   new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
 <%= link_to "一覧へ",
             quotation_headers_path(),
             :class => 'btn btn-info' %>
 <%= link_to "見積書(提出用)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
-            :class => 'btn btn-success' , :target=>["_blank"] %>
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
+            :class => 'btn btn-green500_ftg' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>
 <%= link_to "見積書(提出／印付)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
-            :class => 'btn btn-danger' , :target=>["_blank"] %>
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
+            :class => 'btn btn btn-red500_ftg' , :target=>["_blank"], id: 'quotation_print_2', :onclick => "submitAfterValidation()" %>
 <%= link_to "見積書(控え)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
-            :class => 'btn btn-success' , :target=>["_blank"] %>
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
+            :class => 'btn btn-lime700_ftg' , :target=>["_blank"] %>
 <%= link_to "請求書データ作成",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], 
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
             quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
             data_type: "1" ),
-            :class => 'btn btn-default' , :data => {:confirm => '請求書データを作成しますか？'}  %>
+            :class => 'btn btn-grey300_rsd' , :data => {:confirm => '請求書データを作成しますか？'}  %>
 <%= link_to "納品書データ作成",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id],
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id],
             quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
             data_type: "2" ),
             :class => 'btn btn-warning' , :data => {:confirm => '納品書データを作成しますか？'} %>
 
-<!--以下は復活する可能性があるので残しておく-->
-<!--<%= link_to "請求書(提出用)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
-            :class => 'btn btn-default' , :target=>["_blank"] %>
-<%= link_to "請求書(控え)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "4",  format: "pdf" ),
-            :class => 'btn btn-default' , :target=>["_blank"] %>
-<%= link_to "納品書(提出用)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "5",  format: "pdf" ),
-            :class => 'btn btn-warning' , :target=>["_blank"] %>
-<%= link_to "納品書(控え)PDF",
-            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_id: params[:quotation_header_id], print_type: "6",  format: "pdf" ),
-            :class => 'btn btn-warning' , :target=>["_blank"] %>-->
 </br>
 <font size="3";><b>
 <%= "件名:" %>
-<%= $quotation_header_name %>
+<%= @quotation_header_name %>
 </b></font>
+</div>
 
 <td>見積金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceQuote,  precision: 0 ) %>
 &nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>
 &nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @quotation_detail_large_classifications.sumLaborProductivityUnitTotal.to_s + "人" %>
 </td>
-</div>
+
 
 <div id="quotation_detail_large_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
@@ -161,5 +150,40 @@
 	 
 	 
   });
+  
+  
+  //入力チェック後の、更新処理
+ function submitAfterValidation() {
+    if (window.confirm('履歴データへ保存しますか？（保存すると、後から復元させることができます。）')) {
+	  //ここでajax発動しコントローラで履歴保存する
+	  
+	  var id = 0;
+	  
+	  quotation_header_id = document.getElementById("quotation_header_id").innerText;
+	  
+	  $.get("<%= quotation_header_historiez_set_history_path %>",
+         { quotation_header_id: quotation_header_id },
+           function(data){
+           }
+      );
+	  
+	//     document.forms[0].submit();
+    }
+ }
+ 
+  //履歴へ保存させる処理(ajax)
+  //$('#quotation_print_1').on('confirm:complete', function(e, answer) {
+  //$('.quotation_print').on('confirm:complete', function(e, answer) {
+  //  if (answer) {
+	   
+  //    $('button.submit').attr('disabled', 'disabled');
+  //    return $('.spinner').show();
+  //}else{
+  //  }
+  //});
+ 
+
+
+  
 </script>
 

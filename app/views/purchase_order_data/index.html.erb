@@ -26,7 +26,7 @@
 	  
       <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
 	  <div>
-    	  <%= f.submit '検索する', :class => 'btn btn-default' %>
+    	  <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
 		  <%= link_to t('.new', :default => t("helpers.links.new")),
             new_purchase_order_datum_path(construction_id: params[:construction_id], move_flag: params[:move_flag]),
             :class => 'btn btn-primary' %>
@@ -69,7 +69,7 @@
   <tbody>
     <% @purchase_order_data.order("id desc").each do |purchase_order_datum| %>
       <tr>
-        <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum) %></td>
+        <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]) %></td>
         <% @purchase_order_code = purchase_order_datum.purchase_order_code %>
         <!--<td><%= purchase_order_datum.purchase_order_code %></td>-->
         <!--仕入画面へ遷移-->
@@ -111,7 +111,7 @@
 
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]), 
-                       :class => 'btn btn-default btn-xs' %>
+                       :class => 'btn btn-white_rsd btn-xs' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]),
                       :method => :delete,

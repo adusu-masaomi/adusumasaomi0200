@@ -1,21 +1,24 @@
 class EstimationSheetLandscapePDF
     
   
-  def self.create estimation_sheet	
+  #def self.create estimation_sheet
+  def self.create quotation_detail_large_classifications
 	#見積書PDF発行
- 
+       
        # tlfファイルを読み込む
-	   #変数reportはインスタンス変数に変更
-       #@report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/quotation_landscape_pdf.tlf")
 	   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_landscape_pdf.tlf")
 
-     @@labor_amount = 0
-	 @@labor_amount_total = 0
-         
+       @@labor_amount = 0
+	   @@labor_amount_total = 0
+       
+	   #履歴データの判定
+	   @history =false
+	   if $print_type == "53"
+         @history = true
+	   end 
 
 		# 1ページ目を開始
         @report.start_new_page
-        #r.start_new_page
 		
 	    
 		# テーブルの値を設定
@@ -26,7 +29,8 @@ class EstimationSheetLandscapePDF
 	  @flag = nil
 		 
 		
-      $quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
+      #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+      quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
 	  	 
 		   
 		 #歩掛り合計
@@ -52,66 +56,26 @@ class EstimationSheetLandscapePDF
 		 
 		    @flag = "1"
 		   
-		   @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+		   #@quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+		   
+		   #upd170626
+		   if @history == false
+			 @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+	       else
+		   #履歴用
+		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_large_classification.quotation_header_history_id)
+		   end
+		   
 		   @construction_data = ConstructionDatum.find(@quotation_headers.construction_datum_id)
 		   @customer_masters = CustomerMaster.find(@quotation_headers.customer_id)
 		   
 		   #郵便番号
            #@report.page.item(:post).value(@quotation_headers.post) 
-		 
-		   #住所
-           #@report.page.item(:address).value(@quotation_headers.address) 
-		 
-		   #得意先名
-		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
-		   
-		   #敬称
-		   #honorific_name = CustomerMaster.honorific[0].find{0}  #"様"
-		   
-		   #if @quotation_headers.honorific_id == 1   #"御中?
-		   #  id = @quotation_headers.honorific_id
-           #  honorific_name = CustomerMaster.honorific[id].find{id} #"御中"
-		   #end
-		   #@report.page.item(:honorific).value(honorific_name) 
-		   
-		   #担当1
-           #if @quotation_headers.responsible1.present?
-		   #  responsible = @quotation_headers.responsible1 + "  様"
-		   #  @report.page.item(:responsible1).value(responsible)
-		   #end
-		   #担当2
-		   #if @quotation_headers.responsible2.present?
-		   #  responsible = @quotation_headers.responsible2 + "  様"
-		   #  @report.page.item(:responsible2).value(responsible)
-		   #end
-		   
-		   #件名
-		   #@report.page.item(:construction_name).value(@quotation_headers.construction_name) 
-		 
-		   #見積No
-		   #@report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
-		 
-           #税込見積合計金額	 
-		   #if @quotation_headers.quote_price.present?
-           #  @quote_price_tax_in = @quotation_headers.quote_price * consumption_tax_in  #増税時は変更すること。
-		   #  @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
-		   #end
 		   
 		   #消費税
 		   if @quotation_headers.quote_price.present?
 		     @quote_price_tax_only = @quotation_headers.quote_price * consumption_tax  
-		   #  @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
 		   end
-		 
-		   #工事期間
-		   #@report.page.item(:construction_period).value(@quotation_headers.construction_period) 
-		 
-		   #工事場所
-		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
-		   #取引方法
-		   #@report.page.item(:trading_method).value(@quotation_headers.trading_method) 
-		   #有効期間
-		   #@report.page.item(:effective_period).value(@quotation_headers.effective_period) 
 		   
 		   #元号変わったらここも要変更
 		   if @quotation_headers.quotation_date.present?
@@ -119,8 +83,6 @@ class EstimationSheetLandscapePDF
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		   end
 		  
-           #@report.page.item(:quotation_date).value(@gengou) 
-		   
 		   #NET金額
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
 		   if @quotation_headers.net_amount.present?
@@ -219,18 +181,14 @@ class EstimationSheetLandscapePDF
 					  end 
 
                       if @unit_name == "<手入力>"
-					    #170112
-						#if quotation_detail_large_classification.quotation_unit_name != "<手入力>"
-						if quotation_detail_large_classification.working_unit_name != "<手入力>"
-                          #@unit_name = quotation_detail_large_classification.quotation_unit_name
-						  @unit_name = quotation_detail_large_classification.working_unit_name
+					    if quotation_detail_large_classification.working_unit_name != "<手入力>"
+                          @unit_name = quotation_detail_large_classification.working_unit_name
                         else
 						  @unit_name = ""
 						end
 					  end 
                       #  
-                      #add170308
-					  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+                      #小計、値引きの場合は項目を単価欄に表示させる為の分岐
 					  case quotation_detail_large_classification.construction_type.to_i
 					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
                           item_name = ""
@@ -262,19 +220,7 @@ class EstimationSheetLandscapePDF
 					   labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total,
 					   remarks: quotation_detail_large_classification.remarks
 					  
-                      #row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
-                      # working_large_specification: quotation_detail_large_classification.working_large_specification,
-                      # quantity: @quantity,
-		              # working_unit_name: @unit_name,
-                      # working_unit_price: quotation_detail_large_classification.working_unit_price,
-					  # execution_unit_price: quotation_detail_large_classification.execution_unit_price,
-					  # quote_price: quotation_detail_large_classification.quote_price,
-                      # execution_quantity: @execution_quantity,
-                      # working_unit_name2: @unit_name,
-                      # execution_price: quotation_detail_large_classification.execution_price,
-                      # labor_productivity_unit: quotation_detail_large_classification.labor_productivity_unit,
-					  # labor_productivity_unit_total: quotation_detail_large_classification.labor_productivity_unit_total,
-					  # remarks: quotation_detail_large_classification.remarks
+          
            end 
 		 #end
     end	
@@ -288,6 +234,9 @@ class EstimationSheetLandscapePDF
 #end 
 		 
 	   #内訳のデータも取得・出力
+	   #add170626
+       @quotation_detail_large_classifications = quotation_detail_large_classifications  
+		
 	   set_detail_data
 	   
 	  
@@ -304,15 +253,28 @@ class EstimationSheetLandscapePDF
 	 @estimation_sheet_pages = @report.page_count 
 	 
 	 #内訳データでループ
-	 $quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
-	   quotation_header_id = quotation_detail_large_classification.quotation_header_id
+	 @quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+	   
+	   #upd170626
+	   if @history == false
+	     quotation_header_id = quotation_detail_large_classification.quotation_header_id
+	   else
+	     quotation_header_id = quotation_detail_large_classification.quotation_header_history_id
+	   end
+	   
 	   quotation_detail_large_classification_id =  quotation_detail_large_classification.id
 	    
-       $quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
+	   #upd170626
+	   if @history == false
+         @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
                                                  where(:quotation_detail_large_classification_id => quotation_detail_large_classification_id).where("id is NOT NULL")
-        
+       else
+	     @quotation_detail_middle_classifications = QuotationDetailsHistory.where(:quotation_header_history_id => quotation_header_id).
+                                                 where(:quotation_breakdown_history_id => quotation_detail_large_classification_id).where("id is NOT NULL")
+	   end
+		
 	   #内訳書PDF発行(A4横ver)
-	   if $quotation_detail_middle_classifications.present?
+	   if @quotation_detail_middle_classifications.present?
 	     self.detailed_statement_landscape
 	   end
 	 end
@@ -350,8 +312,8 @@ class EstimationSheetLandscapePDF
 	  #@page_number = @report.page_count - @estimation_sheet_pages
 	  
 	  
-      $quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
-          
+      #$quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
+      @quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
 	   
 	  	 
 				
@@ -363,10 +325,13 @@ class EstimationSheetLandscapePDF
 		   
 		   @flag = "1"
 		   
-		   @quotation_headers = QuotationHeader.find(quotation_detail_middle_classification.quotation_header_id)
-	       #得意先名
-		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
-		  
+		   #upd170626
+		   if @history == false
+		     @quotation_headers = QuotationHeader.find(quotation_detail_middle_classification.quotation_header_id)
+	       else
+		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_middle_classification.quotation_header_history_id)
+		   end
+		   
 		   #件名
 		   @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
 		 
@@ -380,14 +345,19 @@ class EstimationSheetLandscapePDF
 		     @report.page.item(:quotation_date).value(@gengou) 
 		  end
 		 
-           #品目名
-           @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
-           #判定用変数へセット
-           #@@working_large_item_name = quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name
-           
-           #add170308
-           #仕様名
-           @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
+		  #upd170626
+		  if @history == false
+            #品目名
+            @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
+            #仕様名
+            @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
+		  else
+		    #品目名
+            @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationBreakdownHistory.working_large_item_name)
+            #仕様名
+            @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationBreakdownHistory.working_large_specification)
+		  
+		  end
 		   
 		 end
 		 

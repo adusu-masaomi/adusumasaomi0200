@@ -42,13 +42,23 @@ class WorkingDirectionsPDF
 		 #if @flag.nil? 
 		   #@flag = "1"
 		   #report.page.item(:issue_date).value(Date.today)
-		   report.page.item(:issue_date).value($issue_date)
+		   if construction_datum.address2.present?
+		     construction_place = construction_datum.address + "　" + construction_datum.address2
+		   else
+             construction_place = construction_datum.address
+           end
+		   
+		   #report.page.item(:issue_date).value($issue_date)
+		   #upd170629 発行日＝作業日とする（間違い防止のため）
+		   report.page.item(:issue_date).value($working_date)
 		   report.page.item(:construction_code).value(construction_datum.construction_code)
 		   report.page.item(:construction_name).value(construction_datum.construction_name)
 		   report.page.item(:customer_name).value(construction_datum.CustomerMaster.customer_name)
            report.page.item(:construction_period_start).value(period_start)
            report.page.item(:construction_period_end).value(period_end)
-           report.page.item(:construction_place).value(construction_datum.construction_place)
+           #report.page.item(:construction_place).value(construction_datum.construction_place)
+		   #report.page.item(:construction_place).value(construction_datum.address)
+		   report.page.item(:construction_place).value(construction_place)
            report.page.item(:construction_detail).value(construction_datum.construction_detail)
            report.page.item(:attention_matter).value(construction_datum.attention_matter)
 		   report.page.item(:working_safety_matter_name).value(construction_datum.working_safety_matter_name)

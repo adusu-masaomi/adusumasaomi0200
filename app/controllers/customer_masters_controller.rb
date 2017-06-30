@@ -36,6 +36,14 @@ class CustomerMastersController < ApplicationController
     
     @customer_master = CustomerMaster.new(customer_master_params)
 
+    ###連絡先マスターへも追加する
+	create_or_update_contact
+	
+    if @contact_new.present?
+      @customer_master.contact_id = @contact_new.id
+    end
+    ###
+
     respond_to do |format|
       if @customer_master.save
         format.html { redirect_to @customer_master, notice: 'Customer master was successfully created.' }
@@ -51,12 +59,15 @@ class CustomerMastersController < ApplicationController
   # PATCH/PUT /customer_masters/1.json
   def update
     
-	#binding.pry
     #住所のパラメータ変換
     params[:customer_master][:address] = params[:addressX]
 	
     respond_to do |format|
       if @customer_master.update(customer_master_params)
+	  
+	    #連絡先マスターも更新する
+		create_or_update_contact
+	  
         format.html { redirect_to @customer_master, notice: 'Customer master was successfully updated.' }
         format.json { render :show, status: :ok, location: @customer_master }
       else
@@ -76,6 +87,29 @@ class CustomerMastersController < ApplicationController
     end
   end
 
+  #連絡先マスターへの追加・更新
+  def create_or_update_contact
+    contact_id =  params[:customer_master][:contact_id]
+
+    contact_params = { name: params[:customer_master][:responsible1], search_character: params[:customer_master][:search_character],
+                         company_name: params[:customer_master][:customer_name], post: params[:customer_master][:post], 
+                         address: params[:customer_master][:address], tel: params[:customer_master][:tel_main], fax: params[:customer_master][:fax_main],
+                         email: params[:customer_master][:email_main], partner_division_id: 1 }
+    
+	if contact_id.present?
+
+      @contact = Contact.find(contact_id)
+      
+	  if @contact.present?
+	  #更新
+	    @contact.update(contact_params)
+      end
+	else
+	  #登録
+	  @contact_new = Contact.create(contact_params)
+	end
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_customer_master
@@ -84,6 +118,7 @@ class CustomerMastersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def customer_master_params
-      params.require(:customer_master).permit(:customer_name, :post, :address, :tel_main, :fax_main, :email_main, :closing_date, :due_date, :responsible1, :responsible2)
+      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :tel_main, :fax_main, :email_main, :closing_date, 
+                     :due_date, :responsible1, :responsible2, :contact_id)
     end
 end

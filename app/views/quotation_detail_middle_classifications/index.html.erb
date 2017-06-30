@@ -25,32 +25,28 @@
 
 <div style="width:1280px;">
 <%= link_to t('.new', :default => t("新規作成")),
-            new_quotation_detail_middle_classification_path(quotation_header_id: params[:quotation_header_id], quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1"), remote: true,
+            new_quotation_detail_middle_classification_path(quotation_header_id: params[:quotation_header_id], 
+                      quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1", 
+					  quotation_header_name: params[:quotation_header_name],
+					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]), remote: true,
             :class => 'btn btn-primary' %>
 <td><%= link_to "内訳へ",
-            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id]),
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
+                                       quotation_header_name: params[:quotation_header_name]),
             :class => 'btn btn-warning' %>
-<!--<%= link_to "内訳書(縦)PDF",
-            quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], 
-            default_page_number: params[:default_page_number], print_type: "1", format: "pdf") ,
-            :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
-<%= link_to "内訳書(横)PDF",
-            quotation_detail_middle_classifications_path($quotation_detail_middle_classifications, quotation_header_id: params[:quotation_header_id], print_type: "2", format: "pdf"),
-            :onclick => 'return addParam(this);', :class => 'btn btn-info' , :target=>["_blank"]  %>
-  <%= label :label_page_number, '開始頁：' %>
-  <%= text_field :number,:default_page_number,  :value => 1  , :size=>"2", :id=>'default_page_number'  %>-->
+</br>
+<!--upd170626 global valiable erased-->
 <font size="3";><b>
 <%= "件名:" %>
-<%= $quotation_header_name %>
+<%= @quotation_header_name %>
 <%= "　　" %>
 <%= "項目:" %>
-<%= $working_large_item_name[0] %>
+<%= @working_large_item_name[0] %>
 <%= "　　" %>
 <%= "仕様:" %>
-<%= $working_large_item_name[1] %>  
+<%= @working_large_item_name[1] %>  
 </b></font>
 </div>
-</br>
 
 <td>見積金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceQuote,  precision: 0 ) %>
 &nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_detail_middle_classifications.sumpriceExecution,  precision: 0 ) %>

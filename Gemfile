@@ -4,6 +4,9 @@ source 'https://rubygems.org'
 #    gem 'bootstrap-scrolltable-rails'
 #end
 
+# geocoder
+gem 'geocoder'
+
 gem "cocoon"
 gem "nested_form"
 

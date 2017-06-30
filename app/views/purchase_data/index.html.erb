@@ -56,15 +56,15 @@
   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %></br>
   
       <div>
-       <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
+       <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
        <%= f.button_tag "条件全クリア", :type => 'link', name: "clear",  
                :onclick => "clearAllConditions()" %>
        <%= link_to "仕入表(様式１)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "1"),
-            :class => 'btn  btn-success btn-xs', :target=>["_blank"] %>
+            :class => 'btn  btn-lightgreen500_ftg', :target=>["_blank"] %>
       <%= link_to "仕入表(様式２)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "2"),
-            :class => 'btn  btn-danger btn-xs', :target=>["_blank"] %>
+            :class => 'btn  btn-pink300_ftg', :target=>["_blank"] %>
        <%= link_to '新規作成',
             new_purchase_datum_path(:new_flag => "0", construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
             supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag] ),
@@ -123,7 +123,8 @@
   <tbody >
     <% @purchase_data.order("id desc").each  do  |purchase_datum| %>
       <tr>
-        <td style="font-size : 12px;"><%= link_to purchase_datum.id, purchase_datum_path(purchase_datum) %></td>
+        <td style="font-size : 12px;"><%= link_to purchase_datum.id, purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]) %></td>
         <td style="font-size : 12px;"><%= purchase_datum.purchase_date %></td>
         <% if purchase_datum.purchase_order_datum.nil? %>
            <td>-</td>
@@ -217,7 +218,7 @@
         <td>
           <%= link_to '編集',
                       edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
-                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-default btn-xs' %>
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs' %>
           <%= link_to '削除',
                       purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
                       supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),

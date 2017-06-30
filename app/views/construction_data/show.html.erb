@@ -16,12 +16,20 @@
   <dd><%= @construction_datum.construction_period_start %></dd>
   <dt><strong><%= model_class.human_attribute_name(:construction_period_end) %>:</strong></dt>
   <dd><%= @construction_datum.construction_period_end %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address) %>:</strong></dt>
+  <dd><%= @construction_datum.address %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address2) %>:</strong></dt>
+  <dd><%= @construction_datum.address2 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:latitude) %>:</strong></dt>
+  <dd><%= @construction_datum.latitude %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:longitude) %>:</strong></dt>
+  <dd><%= @construction_datum.longitude %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),
-              construction_data_path, :class => 'btn btn-default'  %>
+              construction_data_path, :class => 'btn btn-white_rsd'  %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
-              edit_construction_datum_path(@construction_datum), :class => 'btn btn-default' %>
+              edit_construction_datum_path(@construction_datum), :class => 'btn btn-white_rsd' %>
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
               construction_datum_path(@construction_datum),
               :method => 'delete',

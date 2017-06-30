@@ -1,11 +1,21 @@
 class EstimationSheetPDF
     
   
-  def self.create estimation_sheet	
+  #def self.create estimation_sheet	
+  #upd170626
+  def self.create quotation_detail_large_classifications
 	#見積書PDF発行
- 
+        
+		#履歴データの判定
+		@history =false
+	    if $print_type == "51" || $print_type == "52"
+          @history = true
+		end 
+		
         # tlfファイルを読み込む
-        if $print_type == "1"
+        ##if $print_type == "1"
+		#upd170626
+		if $print_type == "1" || $print_type == "51"
           @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
         else
         #押印付バージョン
@@ -21,9 +31,11 @@ class EstimationSheetPDF
         # ブロック内のrow.valuesで値を設定する
 	  
        @flag = nil
-		 
+	
 		
-       $quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
+       #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
+	   #upd170626
+	   quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
 	  	 
 		 #---見出し---
 		 
@@ -31,8 +43,14 @@ class EstimationSheetPDF
 		 
 		    @flag = "1"
 		   
-		   @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
-	     
+		   if @history == false
+			 @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+	       else
+		   #履歴用
+		     #add170626
+		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_large_classification.quotation_header_history_id)
+		   end
+		 
 		   #binding.pry
 		 
 		   #郵便番号
@@ -118,7 +136,6 @@ class EstimationSheetPDF
 		   
 		 end
 		 
-		 #for i in 0..29   #29行分(for test)
 		   @report.list(:default).add_row do |row|
 		  
                       #仕様の場合に数値・単位をnullにする
@@ -134,17 +151,14 @@ class EstimationSheetPDF
 					  end
 					  
 					  if @unit_name == "<手入力>"
-                        #if quotation_detail_large_classification.quotation_unit_name != "<手入力>"
-						if quotation_detail_large_classification.working_unit_name != "<手入力>"
-                          #@unit_name = quotation_detail_large_classification.quotation_unit_name
-						  @unit_name = quotation_detail_large_classification.working_unit_name
+                        if quotation_detail_large_classification.working_unit_name != "<手入力>"
+                          @unit_name = quotation_detail_large_classification.working_unit_name
 					    else 
 					      @unit_name = ""
 					    end
                       end 
                       #  
-                      #add170310
-					  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+                      #小計、値引きの場合は項目を単価欄に表示させる為の分岐
 					  case quotation_detail_large_classification.construction_type.to_i
 					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
                           item_name = ""
@@ -158,7 +172,6 @@ class EstimationSheetPDF
 					  #
 					  
                       #明細欄出力
-                      #upd170308
                       row.values working_large_item_name: item_name,
                        working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
@@ -166,19 +179,16 @@ class EstimationSheetPDF
 					   working_unit_price: unit_price_or_notices,
                        quote_price: quotation_detail_large_classification.quote_price
 					   
-                      #row.values working_large_item_name: quotation_detail_large_classification.working_large_item_name,
-                      # working_large_specification: quotation_detail_large_classification.working_large_specification,
-                      # quantity: @quantity,
-		              # working_unit_name: @unit_name,
-					  # working_unit_price: quotation_detail_large_classification.working_unit_price,
-                      # quote_price: quotation_detail_large_classification.quote_price
-           end 
-		 #end
-    end	
-#end 
+            end 
+	end	
+ 
 
         #内訳のデータも取得・出力
-        set_detail_data
+        
+        #add170626
+        @quotation_detail_large_classifications = quotation_detail_large_classifications  
+        
+		set_detail_data
        
         # Thin@reports::@reportを返す
         return @report
@@ -192,15 +202,32 @@ class EstimationSheetPDF
 	 @estimation_sheet_pages = @report.page_count 
 	 
 	 #内訳データでループ
-	 $quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
-	   quotation_header_id = quotation_detail_large_classification.quotation_header_id
+	 #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+	 #upd170626
+	 @quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+	   #upd170626
+	   if @history == false
+         quotation_header_id = quotation_detail_large_classification.quotation_header_id
+	   else
+	     quotation_header_id = quotation_detail_large_classification.quotation_header_history_id
+	   end 
 	   quotation_detail_large_classification_id =  quotation_detail_large_classification.id
 	    
-       $quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
+       #$quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
+       #                                          where(:quotation_detail_large_classification_id => quotation_detail_large_classification_id).where("id is NOT NULL")
+	   #upd170626
+	   if @history == false
+	      @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
                                                  where(:quotation_detail_large_classification_id => quotation_detail_large_classification_id).where("id is NOT NULL")
-        
-	   #内訳書PDF発行(A4横ver)
-	   if $quotation_detail_middle_classifications.present?
+       else
+	     @quotation_detail_middle_classifications = QuotationDetailsHistory.where(:quotation_header_history_id => quotation_header_id).
+                                                 where(:quotation_breakdown_history_id => quotation_detail_large_classification_id).where("id is NOT NULL")
+	   end
+		
+	   #内訳書PDF発行
+	   #if $quotation_detail_middle_classifications.present?
+	   #upd170626
+	   if @quotation_detail_middle_classifications.present?
 	     self.detailed_statement
 	   end
 	 end
@@ -212,20 +239,16 @@ class EstimationSheetPDF
       @@quote_price = 0
     
 	  #(＊単独モジュールと違う箇所)
-	  #変数@reportはインスタンス変数に変更
-      # tlfファイルを読み込む
-      #@report = Thin@reports::@report.new(layout: "#{Rails.root}/app/pdfs/detailed_statement_pdf.tlf")
-
-	  #(＊単独モジュールと違う箇所)
 	  # 1ページ目を開始
-      #@@report.start_new_page
-	  @report.start_new_page layout: "#{Rails.root}/app/pdfs/detailed_statement_pdf.tlf"
+      @report.start_new_page layout: "#{Rails.root}/app/pdfs/detailed_statement_pdf.tlf"
 	   
 	   
 	  @flag = nil
 	
 	 
-      $quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
+      #$quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
+      #upd170626
+	  @quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
       
       	 #---見出し---
 		 
@@ -233,8 +256,14 @@ class EstimationSheetPDF
 		   
 		   @flag = "1"
 		   
-		   @quotation_headers = QuotationHeader.find(quotation_detail_middle_classification.quotation_header_id)
-	       #得意先名
+		   #upd170626
+	       if @history == false
+		     @quotation_headers = QuotationHeader.find(quotation_detail_middle_classification.quotation_header_id)
+	       else
+		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_middle_classification.quotation_header_history_id)
+		   end
+		   
+		   #得意先名
 		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
 		 
 		   #件名
@@ -248,22 +277,26 @@ class EstimationSheetPDF
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		     @report.page.item(:quotation_date).value(@gengou) 
 		   end
-		 
-		   #品目名
-		   @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
 		   
-		   #add170308
-		   #仕様名
-		   @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
-		   
+		   if @history == false
+		     #品目名
+		     @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_item_name)
+		     #仕様名
+		     @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
+		   else
+		   #履歴の場合
+		     #品目名
+		     @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationBreakdownHistory.working_large_item_name)
+		     #仕様名
+		     @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationBreakdownHistory.working_large_specification)
+		   end
 		 end
 		 
 		
 		 
 		 @report.list(:default).add_row do |row|
 		          
-	       #170112start
-		   if @page_number != (@report.page_count - @estimation_sheet_pages) then
+	       if @page_number != (@report.page_count - @estimation_sheet_pages) then
 		      #保持用
 			  @quote_price_save = @@quote_price
 			  
@@ -275,21 +308,17 @@ class EstimationSheetPDF
 			  end 
 		   end 
 		   @page_number = @report.page_count - @estimation_sheet_pages
-		   #170112end
-				  
-				  
+		   	  
 				  
 				  #仕様の場合に数値・単位をnullにする
                   @quantity = quotation_detail_middle_classification.quantity
                   if @quantity == 0 
                     @quantity = ""
                   end  
-                  #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
                   if quotation_detail_middle_classification.WorkingUnit.present?
                      @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
                   end 
 				  if @unit_name == "<手入力>"
-                    #if quotation_detail_middle_classification.quotation_unit_name != "<手入力>"
                     if quotation_detail_middle_classification.working_unit_name != "<手入力>"
                       @unit_name = quotation_detail_middle_classification.working_unit_name
 					else 
@@ -327,7 +356,6 @@ class EstimationSheetPDF
                   end
                   
                    #明細欄出力
-                  #upd170308
                   row.values working_middle_item_name: item_name,
                    working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
@@ -335,14 +363,7 @@ class EstimationSheetPDF
                    working_unit_price: unit_price_or_notices,
                    quote_price: quotation_detail_middle_classification.quote_price
 				   
-                  #row.values working_middle_item_name: quotation_detail_middle_classification.working_middle_item_name,
-                  # working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
-                  # quantity: @quantity,
-                  # working_unit_name: @unit_name,
-                  # working_unit_price: quotation_detail_middle_classification.working_unit_price,
-                  # quote_price: quotation_detail_middle_classification.quote_price
-		          
-				  
+         		  
     	  end
 		  
           #頁番号
@@ -371,7 +392,6 @@ class EstimationSheetPDF
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
 		   @report.page.item(:subtotal).value(@@quote_price )
 		   
-		   #170112start
 		   @report.page.item(:blackets1).value("(")
 		   @report.page.item(:blackets2).value(")")
 		   
