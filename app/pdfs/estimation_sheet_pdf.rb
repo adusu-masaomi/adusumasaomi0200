@@ -326,8 +326,7 @@ class EstimationSheetPDF
 					end
                   end
                   #  
-                  #add170308
-				  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+                  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
 				  case quotation_detail_middle_classification.construction_type.to_i
 				  when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
                     

@@ -272,11 +272,22 @@ other_cost: @quotation_detail_middle_classification.other_cost
     
     #行番号の最終を書き込む
     quotation_dlc_set_last_line_number
-	  
+	
+	
+	#add170626
+	if params[:quotation_detail_middle_classification][:quotation_header_id].present?
+      @quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
+    end
+	if params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id].present?
+      @quotation_detail_large_classification_id = params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id]
+    end
+	#
+	
     #@quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => $quotation_header_id).where(:quotation_detail_large_classification_id => $quotation_detail_large_classification_id)
 	@quotation_detail_middle_classifications = 
         QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_header_id).
              where(:quotation_detail_large_classification_id => @quotation_detail_large_classification_id)
+
     ###
   end
   
@@ -378,6 +389,14 @@ other_cost: @quotation_detail_middle_classification.other_cost
     end
     ######################
     
+	#add170626
+	if params[:quotation_detail_middle_classification][:quotation_header_id].present?
+      @quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
+    end
+	if params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id].present?
+      @quotation_detail_large_classification_id = params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id]
+    end
+	#
     
     @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_header_id).
             where(:quotation_detail_large_classification_id => @quotation_detail_large_classification_id)

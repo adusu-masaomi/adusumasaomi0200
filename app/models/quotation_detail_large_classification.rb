@@ -1,6 +1,5 @@
 class QuotationDetailLargeClassification < ActiveRecord::Base
   belongs_to :QuotationHeader, :foreign_key => "quotation_header_id"
-  #belongs_to :QuotationUnit, :foreign_key => "quotation_unit_id"
   belongs_to :WorkingUnit, :foreign_key => "working_unit_id"
   has_many :quotation_detail_middle_classifications
 
@@ -8,16 +7,10 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
     [["項目", 1], ["備考", 2]] 
   end
   
-  #del170308 
-  #def self.types 
-    #[["通常", 0], ["配管配線工事", 1], ["機器取付工事", 2], ["労務費", 3]] 
-  #end
-
-  #enum serial_number: {1: 1, 2: 2, 3: 3 }
   def self.serial_number
-    #[["1",1],["2",2],["3",3],["4",4],["5",5]]
-    #[[("1".."100").to_a , (1..100).to_a ]]
-    [[("<行選択>").to_s , (1..100).to_a ]]
+    #[[("<行選択>").to_s , (1..100).to_a ]]
+    #upd170704
+    [[("<行選択>").to_s , (1..999).to_a ]]
   end 
   
   #行挿入用
@@ -28,15 +21,11 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   
   #金額合計(見積)
   def self.sumpriceQuote  
-    #sum(:quote_price)
-    #upd170308
     #工事種別が通常かまたは値引の場合のみ合算。
     where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
   end
   #金額合計(実行)
   def self.sumpriceExecution  
-    #sum(:execution_price)
-    #upd170308
     #工事種別が通常かまたは値引の場合のみ合算。
     where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
   end
@@ -47,8 +36,6 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   end
   #合計(歩掛り計)
   def self.sumLaborProductivityUnitTotal  
-    #where(:construction_type => "0").sum(:labor_productivity_unit_total)
-    #upd170308
     #工事種別が通常かまたは値引の場合のみ合算。
     where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total)
   end
