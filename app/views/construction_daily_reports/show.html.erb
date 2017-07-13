@@ -4,12 +4,12 @@
 </div>
 
 <dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:working_date) %>:</strong></dt>
+  <dd><font color=red><b><%= @construction_daily_report.working_date %></b></font></dd>
   <dt><strong>工事No:</strong></dt>
   <dd><font color=red><b><%= @construction_daily_report.construction_datum.construction_code %></b></font></dd>
   <dt><strong>工事名:</strong></dt>
   <dd><font color=red><b><%= @construction_daily_report.construction_datum.construction_name %></b></font></dd>
-  <dt><strong><%= model_class.human_attribute_name(:working_date) %>:</strong></dt>
-  <dd><font color=red><b><%= @construction_daily_report.working_date %></b></font></dd>
   <dt><strong><%= model_class.human_attribute_name(:staff_id) %>:</strong></dt>
   <dd><font color=red><b><%= @construction_daily_report.Staff.staff_name %></b></font></dd>
   <dt><strong><%= model_class.human_attribute_name(:start_time_1) %>:</strong></dt>

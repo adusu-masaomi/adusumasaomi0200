@@ -105,7 +105,6 @@ class PurchaseOrderHistoriesController < ApplicationController
 	#工事画面からのパラメータ保管
 	#$construction_id = params[:construction_id]
 	#$move_flag = params[:move_flag]
-	#binding.pry
 	#
 	 
   end
@@ -148,8 +147,7 @@ class PurchaseOrderHistoriesController < ApplicationController
           @purchase_order_history.purchase_order_date = $purchase_order_date
         end
         
-		#binding.pry
-        
+	    
     else
         @purchase_order_history = $purchase_order_history 
         @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
@@ -175,7 +173,6 @@ class PurchaseOrderHistoriesController < ApplicationController
      $purchase_order_history = PurchaseOrderHistory.where(purchase_order_datum_id: params[:purchase_order_datum_id],
        purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id]).first
 	 
-	 #binding.pry 
 	  
      if $purchase_order_history.nil?
 	    $purchase_order_date = params[:purchase_order_date]
@@ -293,8 +290,6 @@ class PurchaseOrderHistoriesController < ApplicationController
 	    params[:purchase_order_history][:orders_attributes].values.each do |item|
 		
 		 
-		  #binding.pry
-		
 		  ######
           #varidate用のために、本来の箇所から離れたパラメータを再セットする
 		  item[:quantity] = params[:quantity][i]
@@ -311,7 +306,6 @@ class PurchaseOrderHistoriesController < ApplicationController
           @maker_master = MakerMaster.find(params[:maker_id][i])
 		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
 		  
-		  #binding.pry
 		  
           if @maker_master.present?
             item[:maker_name] = @maker_master.maker_name
@@ -350,6 +344,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  else
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
+			
+			  
 			  if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
 			    
 				#del170616
@@ -377,11 +373,18 @@ class PurchaseOrderHistoriesController < ApplicationController
 				  supplier_id = params[:purchase_order_history][:supplier_master_id]
 				  
 				  supplier_material_code = params[:material_code][i]
+				  
 				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
 				  #岡田電気の場合のみ、品番のハイフンは抹消する
-				      if supplier_material_code.delete!('-').present?  #add170510
-				        supplier_material_code = supplier_material_code.delete!('-')
-                      end
+				      
+					  #upd170710
+					  no_hyphen_code = supplier_material_code.delete('-')  
+					  
+					  #if supplier_material_code.delete!('-').present?  #add170510
+					  if no_hyphen_code.present?
+				        supplier_material_code = no_hyphen_code
+					  end
+					  
 				  end
 				  
                   purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 

@@ -1,4 +1,4 @@
-<!--左に余白を開けない為のCSS設定。外部化は何故か上手くいかないのでここで設定。--!>
+<!--左に余白を開けない為のCSS設定。外部化は何故か上手くいかないのでここで設定。-->
 <style>
 body > .container {
   padding-top: 0px;
@@ -231,6 +231,9 @@ body > .container {
   var INDEX_INVENTORY_SHIPPING = 1;     //出庫
   //add end
   
+  //社員所属
+  var AFFILIATION_OUTSOURCING = 4;      //外注
+  
   $(document).ready(function() {
     //del 170427
 	//$("a.add_fields").
@@ -259,6 +262,8 @@ body > .container {
         }, 1);        
     });
 	//
+	
+	
   });
   
   //ENTER→TABキーに変換する処理。
@@ -424,6 +429,7 @@ function shubun(nen) {//秋分の日
         return nen <= 1979 ? 24 : 23;
     }
 }
+
 
 
 </script>

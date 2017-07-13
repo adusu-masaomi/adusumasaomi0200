@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170624011747) do
+ActiveRecord::Schema.define(version: 20170710044738) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -372,16 +372,18 @@ ActiveRecord::Schema.define(version: 20170624011747) do
   end
 
   create_table "material_masters", force: :cascade do |t|
-    t.string   "material_code",             limit: 255
-    t.string   "material_name",             limit: 255
-    t.integer  "maker_id",                  limit: 4
-    t.integer  "unit_id",                   limit: 4
-    t.integer  "list_price",                limit: 4
-    t.float    "last_unit_price",           limit: 24
+    t.string   "material_code",                    limit: 255
+    t.string   "material_name",                    limit: 255
+    t.integer  "maker_id",                         limit: 4
+    t.integer  "unit_id",                          limit: 4
+    t.integer  "list_price",                       limit: 4
+    t.integer  "standard_quantity",                limit: 4
+    t.float    "standard_labor_productivity_unit", limit: 24
+    t.float    "last_unit_price",                  limit: 24
     t.date     "last_unit_price_update_at"
-    t.integer  "inventory_category_id",     limit: 4
-    t.datetime "created_at",                            null: false
-    t.datetime "update_at",                             null: false
+    t.integer  "inventory_category_id",            limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "update_at",                                    null: false
   end
 
   create_table "orders", force: :cascade do |t|
@@ -462,7 +464,7 @@ ActiveRecord::Schema.define(version: 20170624011747) do
   end
 
   create_table "quotation_breakdown_histories", force: :cascade do |t|
-    t.integer  "quotation_header_hisory_id",    limit: 4
+    t.integer  "quotation_header_history_id",   limit: 4
     t.integer  "quotation_items_division_id",   limit: 4
     t.integer  "working_large_item_id",         limit: 4
     t.string   "working_large_item_name",       limit: 255
@@ -474,7 +476,7 @@ ActiveRecord::Schema.define(version: 20170624011747) do
     t.integer  "working_unit_id",               limit: 4
     t.integer  "working_unit_name",             limit: 4
     t.integer  "working_unit_price",            limit: 4
-    t.integer  "quote_price",                   limit: 4
+    t.string   "quote_price",                   limit: 255
     t.integer  "execution_unit_price",          limit: 4
     t.string   "execution_price",               limit: 255
     t.float    "labor_productivity_unit",       limit: 24
@@ -563,12 +565,13 @@ ActiveRecord::Schema.define(version: 20170624011747) do
     t.integer  "line_number",                    limit: 4
     t.string   "working_middle_specification",   limit: 255
     t.integer  "quantity",                       limit: 4
-    t.integer  "execution_quontity",             limit: 4
+    t.integer  "execution_quantity",             limit: 4
     t.integer  "working_unit_id",                limit: 4
+    t.string   "working_unit_name",              limit: 255
     t.integer  "working_unit_price",             limit: 4
-    t.integer  "quote_price",                    limit: 4
+    t.string   "quote_price",                    limit: 255
     t.integer  "execution_unit_price",           limit: 4
-    t.integer  "execution_price",                limit: 4
+    t.string   "execution_price",                limit: 255
     t.float    "labor_productivity_unit",        limit: 24
     t.float    "labor_productivity_unit_total",  limit: 24
     t.string   "remarks",                        limit: 255
@@ -582,13 +585,32 @@ ActiveRecord::Schema.define(version: 20170624011747) do
 
   create_table "quotation_header_histories", force: :cascade do |t|
     t.datetime "issue_date"
-    t.integer  "quotation_header_id", limit: 4
-    t.integer  "quote_price",         limit: 4
-    t.integer  "execution_price",     limit: 4
-    t.integer  "net_amount",          limit: 4
-    t.integer  "last_line_number",    limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.integer  "quotation_header_id",   limit: 4
+    t.string   "quotation_code",        limit: 255
+    t.string   "invoice_code",          limit: 255
+    t.string   "delivery_slip_code",    limit: 255
+    t.date     "quotation_date"
+    t.integer  "construction_datum_id", limit: 4
+    t.string   "construction_name",     limit: 255
+    t.integer  "customer_id",           limit: 4
+    t.string   "customer_name",         limit: 255
+    t.integer  "honorific_id",          limit: 4
+    t.string   "responsible1",          limit: 255
+    t.string   "responsible2",          limit: 255
+    t.string   "post",                  limit: 255
+    t.string   "address",               limit: 255
+    t.string   "tel",                   limit: 255
+    t.string   "fax",                   limit: 255
+    t.string   "construction_period",   limit: 255
+    t.string   "construction_place",    limit: 255
+    t.string   "trading_method",        limit: 255
+    t.string   "effective_period",      limit: 255
+    t.integer  "quote_price",           limit: 4
+    t.integer  "execution_amount",      limit: 4
+    t.integer  "net_amount",            limit: 4
+    t.integer  "last_line_number",      limit: 4
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   create_table "quotation_headers", force: :cascade do |t|
@@ -774,6 +796,17 @@ ActiveRecord::Schema.define(version: 20170624011747) do
     t.string   "working_safety_matter_name", limit: 255
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
+  end
+
+  create_table "working_small_items", force: :cascade do |t|
+    t.integer  "working_middle_item_id",  limit: 4
+    t.string   "working_small_item_code", limit: 255
+    t.string   "working_small_item_name", limit: 255
+    t.float    "unit_price",              limit: 24
+    t.integer  "quantity",                limit: 4
+    t.float    "labor_productivity_unit", limit: 24
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "working_times_detail_data", force: :cascade do |t|

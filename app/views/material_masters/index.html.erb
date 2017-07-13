@@ -16,7 +16,7 @@
    <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %></br>
   
   	<div>
-    	<%= f.submit '検索する', :class => 'btn btn-default' %>
+    	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
             new_material_master_path,
             :class => 'btn btn-primary' %>
@@ -58,7 +58,7 @@
         <td><%=l material_master.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_material_master_path(material_master), :class => 'btn btn-default btn-xs' %>
+                      edit_material_master_path(material_master), :class => 'btn btn-white_rsd btn-xs' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       material_master_path(material_master),
                       :method => :delete,

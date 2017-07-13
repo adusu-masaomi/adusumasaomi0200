@@ -149,6 +149,12 @@ class ConstructionDailyReportsController < ApplicationController
 	
 	@construction_data = ConstructionDatum.where(["id = ?", @construction_daily_report.construction_datum_id])
 	
+    #HŽ–‚m‚‚Ì’ù³‰Â”\‚É‚·‚é
+    #upd170707
+    construction_all = ConstructionDatum.all
+    @construction_data += construction_all
+	#
+	
 	@construction_date = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_start_date, :id)
 	
   end
@@ -228,8 +234,16 @@ class ConstructionDailyReportsController < ApplicationController
   end
   
   # ajax
-  def staff_pay_select
+  
+  #del170707
+  #def staff_pay_select
+  #   @staff_pay = Staff.where(:id => params[:id]).where("id is NOT NULL").pluck(:daily_pay, :id)
+  #end
+  
+  #upd170707
+  def staff_information_select
      @staff_pay = Staff.where(:id => params[:id]).where("id is NOT NULL").pluck(:daily_pay, :id)
+     @staff_affiliation = Staff.where(:id => params[:id]).where("id is NOT NULL").pluck(:affiliation_id).flatten.join(" ")
   end
  
 

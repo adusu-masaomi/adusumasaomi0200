@@ -19,6 +19,10 @@ class ConstructionDailyReport < ActiveRecord::Base
   #労務費（加算なしのもの--後で消す？）
   attr_accessor :labor_cost_no_add
   
+  #add170707
+  #所属
+  attr_accessor :affiliation
+  
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true

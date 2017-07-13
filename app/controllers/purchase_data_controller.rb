@@ -459,7 +459,10 @@ class PurchaseDataController < ApplicationController
 	   if @material_master.present?
 	     material_id = @material_master.id
 		 supplier_id = params[:purchase_datum][:supplier_id]
-         if params[:purchase_datum][:supplier_material_code].present?
+		 
+		# binding.pry
+		 
+		 if params[:purchase_datum][:supplier_material_code].present?
 		   supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
 		 else
 		   #仕入先品番が未入力の場合は、品番をそのままセットする
@@ -507,9 +510,15 @@ class PurchaseDataController < ApplicationController
   end
   def maker_select
      @maker_masters = MaterialMaster.with_maker.where(:id => params[:material_id]).pluck("maker_masters.maker_name, maker_masters.id")
-     #未登録(-)の場合はセットしない。
-     if @maker_masters == [["-",1]]
-        @maker_masters = MaterialMaster.all.pluck("maker_masters.maker_name, maker_masters.id")
+     
+	 #binding.pry
+	 
+	 #未登録(-)の場合はセットしない。
+     #if @maker_masters == [["-",1]]
+     #upd170707
+     if @maker_masters == [["-",1]] || @maker_masters.blank?
+        #@maker_masters = MaterialMaster.all.pluck("maker_masters.maker_name, maker_masters.id")
+		@maker_masters = MakerMaster.all.pluck("maker_masters.maker_name, maker_masters.id")
      end 
   end
   def unit_select

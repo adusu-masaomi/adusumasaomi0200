@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :working_small_items
   resources :quotation_details_histories
   resources :quotation_details_histories
   resources :quotation_breakdown_histories
@@ -438,16 +439,21 @@ Rails.application.routes.draw do
   get '/working_middle_itemz/working_material_name_select' => 'working_middle_items#working_material_name_select'
   get '/working_middle_itemz/material_unit_price_select' => 'working_middle_items#material_unit_price_select'
   
-  #会社休日取得用
+  
+  #add170712
+  get '/working_small_itemz/material_standard_select' => 'working_small_items#material_standard_select'
+  
+   #会社休日取得用
   get '/business_holidayz/get_business_holiday' => 'business_holidays#get_business_holiday'
   
   #在庫単価取得用 170419
   get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
   get '/inventoriez/get_quantity' => 'inventories#get_quantity'
   
-  # うまくいかない・・・
-  get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
-  
+  #del170707
+  #get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
+  #add170707
+  get '/construction_daily_reportz/staff_information_select' => 'construction_daily_reports#staff_information_select'
   # Example resource route (maps HTTP verbs to controller actions automatically):
   #   resources :products
 
@@ -465,6 +471,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :working_small_items
   resources :quotation_details_histories
   resources :quotation_breakdown_histories
   resources :quotation_header_histories

@@ -12,6 +12,16 @@
   <% else %>
     <dd>-</dd>
   <% end %>
+  <dt><b>件名Ｎｏ</strong></b></dt>
+  <% if @purchase_datum.construction_datum.present? %>
+    <dd><%= @purchase_datum.construction_datum.construction_code %></dd>
+    <dt><b>件名</strong></b></dt>
+	<dd><%= @purchase_datum.construction_datum.construction_name %></dd>
+  <% else %>
+    <dd>-</dd>
+	<dt><b>件名</strong></b></dt>
+    <dd>-</dd>
+  <% end %>
   <dt><strong>品番</strong></dt>
   <dd><%= @purchase_datum.material_code %></dd>
   <dt><strong>品名</strong></dt>

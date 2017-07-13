@@ -107,7 +107,7 @@ class MaterialMastersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def material_master_params
-      params.require(:material_master).permit(:material_code, :material_name, :maker_id, :unit_id, :list_price, :last_unit_price, 
-                                              :last_unit_price_update_at, :inventory_category_id)
+      params.require(:material_master).permit(:material_code, :material_name, :maker_id, :unit_id, :list_price, :standard_quantity, :standard_labor_productivity_unit, 
+                                              :last_unit_price, :last_unit_price_update_at, :inventory_category_id)
     end
 end

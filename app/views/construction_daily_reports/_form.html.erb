@@ -33,6 +33,13 @@
   <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
       :tabindex=>"2", :onchange=> "getDailyPay(this.form)" }  %>
   <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :readonly => true } %>
+  
+  <!--所属 add170707 -->
+  <!--<%= f.collection_select :affiliation_id, Staff.all, :id, :affiliation_id, 
+         {:selected => @construction_daily_report.staff_id} , { id:"affiliation_id" }%>-->
+  <%= f.input :affiliation , input_html:{id:"affiliation"}, as: :hidden  %>
+  
+  
   <%= f.input :start_time_1, default: Time.parse('00:00'), input_html:{id: "start_time_1" , :tabindex=>"3", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :end_time_1, default: Time.parse('00:00'), input_html:{id: "end_time_1", :tabindex=>"4", :onchange => "calcTimeVarious(this.form)"} %>
   <%= f.input :start_time_2, default: Time.parse('00:00') , input_html:{id: "start_time_2", :tabindex=>"5", :onchange => "calcTimeVarious_2(this.form)"} %>
@@ -215,12 +222,7 @@
   }
  
  function calcTimeVariousOverTime() {
- //休日・残業時間の加算 170417
- 
-   //休日処理はまだ・・・！！！
-   
-   //debugger;
-   
+ //休日・残業時間の加算 
    //早朝(5:00~8:00)の計算
    if (end_time <= 28800 && end_time >= 18000) {
    //終了時間が朝５時以降８時までの場合  
@@ -286,8 +288,6 @@
 	   overtime_50 = end_time - 79200;
 	 }
    }
-   
-   //debugger;
    
    //労務費の加算分を算出
    //daily_pay = document.getElementById("daily_pay").options[0].innerText;
@@ -460,12 +460,9 @@
   
   // 日給をajaxで取得
    function getDailyPay(f){
-     //if (staff_id > 0 && staff_id != f.staff_id.value ){
-	 //  resetValue();
-	 //}
-   
+     
      var staff_id = f.staff_id.value;
-      $.get("<%= construction_daily_reportz_staff_pay_select_path %>",
+      $.get("<%= construction_daily_reportz_staff_information_select_path %>",
           { id: staff_id },
           function(data){
             //労務費をセット
@@ -474,11 +471,23 @@
 			if (index != undefined){
               daily_pay  = obj.options[index].innerText;
 			}
+			
+			//add170707
+			//所属をセットし、社内か外注か判定する
+			obj = document.getElementById("affiliation").textContent;
+			document.getElementById("affiliation").value = obj;
+			var in_house = false;
+			if (obj != null) {
+			  var affiliation = parseInt(obj);
+			  if (affiliation != AFFILIATION_OUTSOURCING) {
+			    in_house = true;
+			  }
+			}
+			//
+			
             //var tmp_daily_pay  = daily_pay.options[0].innerText;	 
             var num =  daily_pay * document.getElementById("man_month").value;
 			var num_no_add = num;   //手当加算前のものも保持する
-			
-			//debugger;
 			
 			//休日・深夜帯分を加える
 			//add170417
@@ -502,19 +511,23 @@
 			
 			num += pay_25 + pay_50;
 			//
-			
+
 			//休日の判定
-			getHoliday();
-			switch (holiday_flag){
-            case FLAG_SATURDAY_HOIDAY:
-			  var pay_holiday = num_no_add * 0.25
-			  num += pay_holiday
-              break;
-            case FLAG_SUNDAY_HOLIDAY:
-			  var pay_holiday = num_no_add * 0.35
-			  num += pay_holiday
-              break;
-            }
+			if (in_house == true) {
+			//add170707 休日加算があるのは社内の人のみとする。
+			
+			  getHoliday();
+			  switch (holiday_flag){
+              case FLAG_SATURDAY_HOIDAY:
+			    var pay_holiday = num_no_add * 0.25
+			    num += pay_holiday
+                break;
+              case FLAG_SUNDAY_HOLIDAY:
+			    var pay_holiday = num_no_add * 0.35
+			    num += pay_holiday
+                break;
+              }
+			}
 			
             if (num >= 0) {
                document.getElementById("labor_cost").value = num;
@@ -522,7 +535,8 @@
             }
           }
         );
-   }
+  }
+  
   
   function calcStartTime(){
     if (start_time >= 0) {
