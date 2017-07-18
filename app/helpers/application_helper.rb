@@ -19,19 +19,7 @@ module ApplicationHelper
     end
     link_to(name, '#', class: "add_fields btn btn-cyan700_rsd ", data: {id: id, fields: fields.gsub("\n", "")})
   end
-  def autotab(index)
-    #@current_tab ||= 0
-	str = index.to_s
-	str.slice!(0, 6)
-	
-	index  = str.to_i
-	
-	@current_tab ||= index
-    @current_tab += 1
-	#binding.pry
-	
-	#@current_tab = index + 1
-  end
+ 
   
   #def my_color_for(condition)
   #   if condition == 1 then

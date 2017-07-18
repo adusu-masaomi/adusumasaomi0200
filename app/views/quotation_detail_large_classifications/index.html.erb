@@ -22,6 +22,9 @@
             new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], quotation_header_name: params[:quotation_header_name],
 			   new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
+<%= link_to t('.new', :default => t("新規(マスター)")),
+            new_working_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
+            :class => 'btn btn-teal500_rsd' %>
 <%= link_to "一覧へ",
             quotation_headers_path(),
             :class => 'btn btn-info' %>

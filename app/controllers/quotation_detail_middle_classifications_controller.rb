@@ -206,11 +206,16 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		  @working_unit = @check_unit
 	   end
     end
-    #同様に手入力用IDの場合、明細(中分類)マスターへ登録する。
-    if @quotation_detail_middle_classification.working_middle_item_id == 1
+      
+	  #同様に手入力用IDの場合、明細(中分類)マスターへ登録する。
+      if @quotation_detail_middle_classification.working_middle_item_id == 1
          
 		 @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @quotation_detail_middle_classification.working_middle_item_name , working_middle_specification: @quotation_detail_middle_classification.working_middle_specification)
-         
+      else
+	    #手入力以外の場合   #add170714
+		 @check_item = WorkingMiddleItem.find(@quotation_detail_middle_classification.working_middle_item_id)
+      end
+		
 		 @working_unit_id_params = @quotation_detail_middle_classification.working_unit_id
 		 
 		
@@ -219,9 +224,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		   @working_unit_id_params = @working_unit_all_params.id
 		 end 
  
-         if @check_item.nil?
-		 
-          
+         #if @check_item.nil?
+		  
+          large_item_params = nil   #add170714
+		  
 		  # 全選択の場合
 		  #upd170626 short_name抹消(無駄に１が入るため)
 		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
@@ -242,7 +248,8 @@ material_cost_total: @quotation_detail_middle_classification.material_cost_total
 labor_cost_total: @quotation_detail_middle_classification.labor_cost_total,
 other_cost: @quotation_detail_middle_classification.other_cost
  }
-               @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+               #del170714 
+               #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
           else
 		     # アイテムのみ更新の場合
 			 #upd170626 short_name抹消(無駄に１が入るため)
@@ -251,14 +258,24 @@ other_cost: @quotation_detail_middle_classification.other_cost
                  working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification,
                  working_unit_id: @working_unit_id_params } 
 		   
-		          @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+		          #del170714 
+		          #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
 		     end
 		   
           end
 
-         
-         end
-    end
+          #upd170714
+		  if large_item_params.present?
+		     if @check_item.nil?
+		       @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+		     else
+			 
+			   @quotation_middle_item = @check_item.update(large_item_params)
+		     end
+		  end
+		   
+         #end
+     #end
 
 
 
@@ -335,11 +352,13 @@ other_cost: @quotation_detail_middle_classification.other_cost
     end
 	
 	
-    #同様に手入力用IDの場合、明細(中分類)マスターへ登録する。
-    if @quotation_detail_middle_classification.working_middle_item_id == 1
-         
+      #同様に手入力用IDの場合、明細(中分類)マスターへ登録する。
+      if @quotation_detail_middle_classification.working_middle_item_id == 1
 		 @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @quotation_detail_middle_classification.working_middle_item_name , working_middle_specification: @quotation_detail_middle_classification.working_middle_specification)
-         
+      else
+	     #手入力以外の場合   #add170714
+		 @check_item = WorkingMiddleItem.find(@quotation_detail_middle_classification.working_middle_item_id)
+	  end 
 		 @working_unit_id_params = @quotation_detail_middle_classification.working_unit_id
 		 
          if @working_unit.present?
@@ -348,8 +367,10 @@ other_cost: @quotation_detail_middle_classification.other_cost
 		   @working_unit_id_params = @working_unit_all_params.id
 		 end 
  
-         if @check_item.nil?
-		   
+         #if @check_item.nil?   del170714
+ 		   
+		  large_item_params = nil   #add170714
+			
 		  # 全選択の場合
           #upd170626 short_name抹消(無駄に１が入るため)
 		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
@@ -371,7 +392,7 @@ labor_cost_total: @quotation_detail_middle_classification.labor_cost_total,
 other_cost: @quotation_detail_middle_classification.other_cost
  }
             
-               @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+               #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
           else
 		     # アイテムのみ更新の場合
 			 #upd170626 short_name抹消(無駄に１が入るため)
@@ -380,13 +401,21 @@ other_cost: @quotation_detail_middle_classification.other_cost
                  working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification,
                  working_unit_id: @working_unit_id_params } 
 			   
-			     @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+			     #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
 		     end
           end
 		 
-          
-         end
-    end
+          #upd170714
+		  if large_item_params.present?
+		     if @check_item.nil?
+		       @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
+		     else
+			 
+			   @quotation_middle_item = @check_item.update(large_item_params)
+		     end
+		  end
+         #end del170714
+    #end del170714
     ######################
     
 	#add170626
