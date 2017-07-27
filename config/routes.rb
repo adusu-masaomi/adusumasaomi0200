@@ -182,6 +182,9 @@ Rails.application.routes.draw do
   #add170212
   get "/purchase_order_historiez/material_select" => 'purchase_order_histories#material_select'
   
+  #add170722
+  get "/purchase_order_historiez/set_sequence" => 'purchase_order_histories#set_sequence'
+  
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
   get '/purchase_order_datum/get_last_number_select' => 'purchase_order_data#get_last_number_select'

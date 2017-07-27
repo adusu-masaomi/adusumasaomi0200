@@ -1,38 +1,35 @@
 <div class="sortThese">
 <div class="nested-fields well form-inline">
+  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  <!--<%= f.input :purchase_order_history_id,  input_html:{ id: "purchase_order_history_id" }, as: :hidden %>-->
   <%= f.label :品番選択, {style: 'width:770px'}  %>
-  <!--<%= f.label :数量, {style: 'width:100px'}  %>-->
-  <%= f.label :単位, {style: 'width:50px'}  %>
-  <%= f.label :メール送信フラグ, {style: 'width:120px'}  %>
+  <%= f.label :単位, {style: 'width:50px;margin-left:-85px;'}  %>
+  <%= f.label :メール送信フラグ, {style: 'width:120px;margin-left:-5px;'}  %>
   </br>
-  <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
-       {id:"material_id", name:"material_id[]",  class: "searchableMaterial" , style: 'width:650px'  } %>-->
-  <%= f.collection_select :material_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
-  {class: "searchableMaterial form-control" , id: "material_id" , name:"material_id[]",  style: 'width:650px' } %>
+  <!--upd170720マスター類はあらかじめセットされた変数から取得-->
+  <%= f.collection_select :material_id, @material_masters.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
+  {class: "searchableSelect2_1 form-control" , id: "material_id" , name:"material_id[]",  style: 'width:650px' } %>
   
   <%= f.label :数量, {style: 'width:28px'}  %>
   <%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>
   <td>&nbsp;&nbsp;</td>
-  <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px' } %>
+  <%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , {class: "searchableUnit" , style: 'width:50px' } %>
   
-  <!--<%= f.label :メール, {:class => "my-custom-class-l"}  %></br>-->
   <%= f.select :mail_sent_flag, Order.mail_flag, {:include_blank => true}, 
        {id:'mail_sent_flag', :class => "my-custom-class", style: 'width:120px;margin-left:0px;font-size:16px;font-weight:bold;color:red;' } %>
   
   <!--以下スペースあり-->
-  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
   <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <%= fa_icon('sort-alpha-asc 3x') %>
+ 
   </br>
   <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onkeydown => "setMaterialCode($(this).val())" } %>
   <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
-  <!--<%= f.input :maker_id,  input_html:{ id: "maker_id", name: "maker_id[]", style: 'width:150px' , :tabindex=>"3" } %>-->
    <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
+  <%= f.collection_select :maker_id, @maker_masters.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
       {class: "searchableMaker form-control" , id: "maker_id" , name:"maker_id[]",  style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>
   
   <%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px' , :tabindex=>"4" } %>
@@ -40,7 +37,7 @@
   <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %></br>
   <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %></br>
 
-  <!--<hr style="border-top:2px outset #c0c0c0;width: 100%;height:2;">-->
+  
 </div>
 </div>
  
@@ -49,78 +46,14 @@
   //cIndex = 0;
   //var i = 0;
   
-  gSelectedIndex = 0;
-  gMaterial_id = 0;
-  gMaterial_code = "";
-  gControl_id = 0;
-  gTop = 0;
-
-  $(document).ready(function(){
+  
+  //$(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
+  
       
 	  
-      
-	  //検索可能なリストボックス(品名の場合)
-       $(".searchableMaterial").select2({ theme: "classic" });
-      
-        
-       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	   //$( ".searchableMaterial" ).on("select2:close", function (e) {  
-	   //↓これだとchangeの後に走る！
-	   $( ".searchableMaterial" ).on("select2:select", function (e) {
-	        
-			//動作不安定のため、保留とする・・・
-			//setTimeout(function() {
-			//$('[tabindex=0]')[gSelectedIndex].focus();
-			
-		  //}, 0);  
-	   });　　　　　	   
-
-         
-	   $( ".searchableMaterial" ).change(function(e) {
-	    
-		  gMaterial_id = $(this).val();
-	      selectedIndex  = getSelectedChildIndex(gMaterial_id);
-		  setItem(gMaterial_id, selectedIndex);
-		  
-		  //手入力以外はグローバルへセット
-		  if (gMaterial_id != 0) {
-		    gSelectedIndex = selectedIndex;
-		  }else{
-		    gSelectedIndex = 0;
-		  }
-		  
-		  //$('[tabindex=0]')[selectedIndex].focus();
-		
-		  
-	   });
-	   
-	   
-	   $( ".searchableMaterial" ).on("select2:open",(function(e) {
-      　 //i = 0;
-	    cIndex = 0;
-	   }));
-	   
-	   $(".searchableUnit").select2({ theme: "classic" });
-	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	   $( ".searchableUnit" ).on("select2:close", function (e) {
-	   //     setTimeout(function() {
-		//    $('[tabindex=2]').focus();
-	//	}, 0);  
-	   });   
-      
 	  
-	   $(".searchableMaker").select2({ theme: "classic" });
-	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	   $( ".searchableMaker" ).on("select2:select", function (e) {
-	        
-			//メーカー選択後のフォーカス移動は、動作不安定のため、保留とする・・・・
-			//setTimeout(function() {
-			//$('[tabindex=4]')[gSelectedIndex].focus();
-		    //}, 0);  
-	   });
-	  
- });  
+ //});  
   
   //選択した行のインデックスを取得
   function getSelectedChildIndex(id){
@@ -215,6 +148,7 @@
              {id: id },
               function(data){
 		        
+				
 				//商品コードをセット
 				obj = document.getElementById("material_code").textContent;
 				document.getElementsByName("material_code[]")[selected_index].value = obj;

@@ -3,7 +3,7 @@
 </style>
 
 <%- model_class = PurchaseOrderHistory -%>  
-<!--<%= javascript_include_tag 'cocoon' %>-->
+
 
 
 <%= simple_form_for @purchase_order_history, :html => { :class => 'well form-inline', :style => "width: 1880px;"} do |f| %>
@@ -19,6 +19,12 @@
     </ul>
   </div>
  <% end %>
+
+<!--ローカル（テスト環境）-->
+<img src="/images/gif-load.gif" id="loading-indicator" style="display:none" />
+
+<!--本番環境の場合-->
+<!--<img src="/rails/images/gif-load.gif" id="loading-indicator" style="display:none" />-->
 	
 	
    <div class = "form-inputs">
@@ -27,8 +33,11 @@
    
    <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
      <%= m.label :工事名：, {style: 'color:blue'} %>
-     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %></br></br>
+     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
    <% end %>
+   
+   ※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行うようにお願いします！
+   </br></br>
    
    <%= f.label :注文先：, {style: 'color:blue'} %>
    <!--<%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>-->
@@ -47,7 +56,7 @@
    <% if params[:move_flag] == "1" %>
    <!--工事画面から遷移した場合-->
      <%= link_to t('.cancel', :default => t("前の画面に戻る")),
-                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-success' %>
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :onclick => "reset_value()", :class => 'btn btn-success' %>
    <% else %>
      <%= link_to t('.cancel', :default => t("前の画面に戻る")),
                 purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
@@ -94,24 +103,13 @@
 	  
       </br></br>
 	  
-	   
-	  
-	  
-       <!--<div id="filter" style="position: fixed; top: 400px; left:1200px;" >-->
-	   <!--   <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %>-->
-	   <!--</div>-->
-	   
-   <!--<hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">-->
-       
-           <div id="subForms" class="sortDone" >
-           	<%= f.simple_fields_for :orders, :include_id => false  do |orders| %>
-                       <%= render 'order_fields', f: orders %>
-	        <% end %>
+	       <div id="subForms" class="sortDone" >
+           	<%= f.simple_fields_for :orders, @purchase_order_history.orders.order("sequential_id DESC"), :include_id => false  do |orders| %>
+		        
+               <%= render 'order_fields', f: orders, cache: true %>
+        <% end %> 
            </div>
 
-	   <!--<div id="filter" > -->
-	   <!--  <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %> -->
-	   <!--</div> -->
 <% end %>
 
   </div>  
@@ -120,8 +118,10 @@
 
   var disp_flag = 0;
 
+  
+
   $(document).ready(function(){
-  //$(document).on('turbolinks:load', function(){
+  //(document).on('turbolinks:load', function(){
       
 	  
 	  //$(".sortThese").sortable();
@@ -143,6 +143,7 @@
 	     document.getElementById("mail_sent_button").disabled = true;
 	   }
 	   
+	   
 	   //
 	   //var visibled = sessionStorage.getItem('onvisible');
 	   //if (visibled == "true") {
@@ -152,16 +153,86 @@
 	   //デフォルトのメアド取得
 	   setEmail();
 	   
+	   ///////
+	  
+	   ///////
+	   
+	   
  });  
+
+
+gSelectedIndex = 0;
+gMaterial_id = 0;
+gMaterial_code = "";
+gControl_id = 0;
+gTop = 0;
+
+$(document).bind('cocoon:after-insert', function(e,inserted_item) {
+   
+   
+    //連番をセットする
+    $.get("<%= purchase_order_historiez_set_sequence_path %>",
+    {},
+     function(data){
+       obj = document.getElementById("sequential_id").textContent;
+       document.getElementById("sequential_id").value = obj;
+     });
+   
+    ///////
+    //明細フォーム用(追加時のみ、ここが使用されるらしい。)
+	//検索可能なリストボックス(品名の場合)
+    $(".searchableSelect2_1").select2({ theme: "classic" });
+    
+	 $( ".searchableSelect2_1" ).change(function(e) {
+        
+          gMaterial_id = $(this).val();
+          selectedIndex  = getSelectedChildIndex(gMaterial_id);
+         setItem(gMaterial_id, selectedIndex);
+     
+          //手入力以外はグローバルへセット
+          if (gMaterial_id != 0) {
+            gSelectedIndex = selectedIndex;
+          }else{
+            gSelectedIndex = 0;
+          }
+          //$('[tabindex=0]')[selectedIndex].focus();
+       });
+       
+       $( ".searchableSelect2_1" ).on("select2:open",(function(e) {
+        //i = 0;
+        cIndex = 0;
+       }));
+       $(".searchableUnit").select2({ theme: "classic" });
+       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+       $( ".searchableUnit" ).on("select2:close", function (e) {
+       //     setTimeout(function() {
+       //    $('[tabindex=2]').focus();
+       // }, 0);  
+       });   
+      
+       $(".searchableMaker").select2({ theme: "classic" });
+       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+       $( ".searchableMaker" ).on("select2:select", function (e) {
+            
+            //メーカー選択後のフォーカス移動は、動作不安定のため、保留とする・・・・
+            //setTimeout(function() {
+            //$('[tabindex=4]')[gSelectedIndex].focus();
+            //}, 0);  
+       });
+
+	///////
+	
+   // alert('Inserted!');
+});
 
 window.onload = function(){
      
-     //170605ソート機能は不安定のため、一旦保留に  
-          $(".sortDone").sortable();
+      //170719ソート機能は不安定のため、一旦保留に  
+      //$(".sortDone").sortable();
 
-	  $("#filter").on("cocoon:after-insert", function() {
-	     $(".sortThese").parent().sortable();
-         });
+	  //$("#filter").on("cocoon:after-insert", function() {
+	  //   $(".sortThese").parent().sortable();
+      //});
 	  
 	 
 	 
@@ -231,34 +302,52 @@ function dispDiv() {
   purchase_order_date = document.getElementById("purchase_order_date").value;
   supplier_master_id = document.getElementById("supplier_master_id").value;
   
+  
   $.get("<%= purchase_order_historiez_get_data_path %>",
     {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, supplier_master_id: supplier_master_id},
      function(data){
 	   // マウスカーソルの形を変える
        $("body").css("cursor", "progress");
 	   
-	   //３秒待つ（描写されないことがあるため）
-	   setTimeout("reloadDiv()", 3000);
+	   // Loadingイメージ表示
+       $('#loading-indicator').show();
 	   
+	   
+	   //5秒待つ（描写されないことがあるため）
+	   //centOS上では必須なようである！
+	   setTimeout("reloadDiv()", 5000);
+        
+	
+		//setTimeout(reloadDiv(), 30000);  
+           
+           //reloadDiv();   	   
+
 	   //隠れていたボタンをここで表示させる
        //$('#filter').removeClass('hide');
        //セッション用のパラメータへセットする
        sessionStorage.setItem('onvisible', 'true');
   
-	   // マウスカーソルの形を変える
-       //$("body").css("cursor", "default");
-  
+	    
+       // Loadingイメージを消す
+      // $('#loading-indicator').hide();
+
      }
    );
 };
 
 function reloadDiv(){
   //画面再ロードする
+  // debugger;
+
+  
   window.location.reload();
   event.preventDefault();
        
+  $("body").css("cursor", "default");
 }
-  
+
+
+
 </script>
 
   

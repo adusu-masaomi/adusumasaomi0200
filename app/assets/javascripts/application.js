@@ -15,7 +15,7 @@
 //= require jquery-ui
 // require jquery.ui.sortable
 // require jquery-ui/sortable
-//= require cocoon
+// require cocoon
 //= require autocomplete-rails
 //= require typehead.js.js
 //= require twitter/bootstrap
@@ -30,6 +30,8 @@
 //= require pickers
 
 // require turbolinks 
+
+//cocoonは２行追加になるので（どこかで宣言されている？）現在削除している。
 
 //$(document).on('turbolinks:load', function(){
 //    $("input.datepicker").datepicker();

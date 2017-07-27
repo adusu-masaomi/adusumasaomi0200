@@ -4,17 +4,19 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	belongs_to :supplier_master
 	
 	has_many :orders
-    #accepts_nested_attributes_for :orders, :allow_destroy => true
-	accepts_nested_attributes_for :orders, allow_destroy: true
+    accepts_nested_attributes_for :orders, allow_destroy: true
     
-	#has_many :material_maters
-    #accepts_nested_attributes_for :material_maters
-	
 	#eメール取得用
     attr_accessor :email_responsible
 	
 	#ボタン切り分け用
 	attr_accessor :sent_flag
+	
+	#画面見出し用
+	attr_accessor :purchase_order_code
+	attr_accessor :construction_name
+	attr_accessor :supplier_name
+	
 	
 	#工事画面からの遷移にて使用
 	#attr_accessor :construction_id

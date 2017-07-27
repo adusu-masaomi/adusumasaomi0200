@@ -2,14 +2,21 @@ class PurchaseOrderHistoriesController < ApplicationController
   #before_action :set_purchase_order_history, only: [:show, :edit, :update, :destroy]
   before_action :set_purchase_order_history, only: [:show, :update, :destroy]
   
+  #サブフォームの描写速度を上げるため、メモリへ貯める
+  before_action :set_masters
 
+  
   # GET /purchase_order_histories
   # GET /purchase_order_histories.json
   def index
     
-    @purchase_order_histories = PurchaseOrderHistory.all
+	$seq  = 0
+	
+	@purchase_order_histories = PurchaseOrderHistory.all
 	#
 	@purchase_order_data = PurchaseOrderDatum.all
+	
+	
     #@q = PurchaseOrderDatum.ransack(params[:q])   
     
 	###
@@ -23,7 +30,7 @@ class PurchaseOrderHistoriesController < ApplicationController
     #ransack保持用コード
     search_history = {
     value: params[:q],
-    expires: 30.minutes.from_now
+    expires: 24.hours.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     ###
@@ -39,8 +46,8 @@ class PurchaseOrderHistoriesController < ApplicationController
   
   def index2
   #一覧用
-    
-      purchase_order_datum_id = params[:purchase_order_datum_id].to_i
+     
+	   purchase_order_datum_id = params[:purchase_order_datum_id].to_i
 	  if params[:purchase_order_datum_id].present?
 	    $purchase_order_datum_id = purchase_order_datum_id
       end
@@ -110,19 +117,26 @@ class PurchaseOrderHistoriesController < ApplicationController
   end
 
   def set_edit_params
-    
+   
+    #
+    #画面の連番用
+	#@seq = 0
+	
+	
     flag_nil = false
 	
 	if $purchase_order_history.nil?
-      flag_nil = true
-	else
-      if $purchase_order_history .purchase_order_datum_id != params[:id].to_i
+      #if @purchase_order_history_saved.nil?
+          flag_nil = true
+    else
+          if $purchase_order_history .purchase_order_datum_id != params[:id].to_i
+          #if @purchase_order_history_saved.purchase_order_datum_id != params[:id].to_i
 	    flag_nil = true
 		
 	  end
     end
+
     
-	
     #ここでは例外的に、newをする
     #if $purchase_order_history.nil?
 	if flag_nil == true
@@ -147,33 +161,99 @@ class PurchaseOrderHistoriesController < ApplicationController
           @purchase_order_history.purchase_order_date = $purchase_order_date
         end
         
-	    
-    else
+		#add170721
+		@supplier_master = SupplierMaster.find(@purchase_order_data.supplier_master_id)
+	else
         @purchase_order_history = $purchase_order_history 
+        #@purchase_order_history = @purchase_order_history_saved  
+        
+		#add170721
         @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
+		@supplier_master = SupplierMaster.find($purchase_order_history.supplier_master_id)
 		
+		#add170719 呼び出さない不具合対応
+	    #@purchase_order_history.orders.build
 		
-	#@purchase_order_history.build_orders
+		#binding.pry
+		#@purchase_order_history.build_orders
+		
+		#@purchase_order_history.assign_attributes(purchase_order_history_params)
+		
 		
 	end
     
+	#add170721
+	if @purchase_order_history.present?
+	    
+		
+	    #kaminariは更新でうまくいかないので一旦保留・・・
+	    #@orders = Order.where( purchase_order_history_id: @purchase_order_history.id)
+		#@orders  = @orders.page(params[:page])
+		
+#うまく行かないので（データが被ってしまう）一旦保留
+		##
+		#連番を割り振る処理
+		@orders = nil
+		if @purchase_order_history.orders.present?
+		  
+		  @orders = @purchase_order_history.orders
+		end
+		
+		if  @orders.present?
+		  if @orders.maximum(:sequential_id).present?
+		    $seq = @orders.maximum(:sequential_id)
+		  end
+		  #SEQが逆になっているのでみやすいよう再び逆にする
+		  reverse_seq
+		end
+		##
+		
+		#
+	end
+	
+	
 	if @purchase_order_history.supplier_master.present?
       @purchase_order_history.email_responsible = @purchase_order_history.supplier_master.email1
     end
 	
-	#add170221
-	#@purchase_order_history.assign_attributes(material_master_params)
+    #add170721
+	if @purchase_order_data.present?
+	  @construction_data = ConstructionDatum.find(@purchase_order_data.construction_datum_id)
+	end
 	
+
+  end
+
+  #連番が登録と逆順になっているので、みやすいように正しい順に（逆に）する
+  def reverse_seq
+  
+    if $max.present?
+	  
+	  max = $seq 
+	  reverse_num = max 
+	  
+	  for num in 0..max do
+	    
+		if @orders.present?
+		  if @orders[num].present?
+			@orders[num][:sequential_id] = reverse_num
+		    reverse_num -= 1
+		  end
+		end
+		
+	  end
+      
+    end
   end
 
    #既存のデータを取得する(日付・仕入先指定後。)
   def get_data
- 
-	 #$purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
-     $purchase_order_history = PurchaseOrderHistory.where(purchase_order_datum_id: params[:purchase_order_datum_id],
-       purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id]).first
-	 
-	  
+    
+     #
+	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
+	    purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
+	
+	 	  
      if $purchase_order_history.nil?
 	    $purchase_order_date = params[:purchase_order_date]
 		$supplier_master_id = params[:supplier_master_id]
@@ -181,8 +261,15 @@ class PurchaseOrderHistoriesController < ApplicationController
         $purchase_order_date = nil
         $supplier_master_id = nil
 
+    
+	    #add170719 呼び出さない不具合対応
+	    #@purchase_order_history_saved.orders.build
+		
+       #obj.assign_attributes(params[:model])
+		
      end
-
+    
+	
   end
 
   # POST /purchase_order_histories
@@ -224,6 +311,7 @@ class PurchaseOrderHistoriesController < ApplicationController
   # PATCH/PUT /purchase_order_histories/1.json
   def update
       
+	  #del170724 
 	  #すでに登録していた注文データは一旦抹消する。
 	  destroy_before_update
 	  
@@ -235,6 +323,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  
 	  respond_to do |format|
         
+		#binding.pry
 		
 		if @purchase_order_history.update(purchase_order_history_params)
           
@@ -279,6 +368,8 @@ class PurchaseOrderHistoriesController < ApplicationController
       end
     end
   end
+  
+  
   
   def send_mail_and_params_complement
     
@@ -348,20 +439,10 @@ class PurchaseOrderHistoriesController < ApplicationController
 			  
 			  if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
 			    
-				#del170616
-				#@maker_master = MakerMaster.find_by(maker_name: params[:maker_name][i])
-			    #maker_id = 1
-			    #if @maker_master.present?
-                #  maker_id = @maker_master.id
-			    #end
-			  
-			    @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
+				@material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-			      #material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
-                  #                      maker_id: maker_id, list_price: params[:list_price][i] }
-                  #upd 170616 for maker 
-                  material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+			      material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
                                         maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
@@ -377,10 +458,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
 				  #岡田電気の場合のみ、品番のハイフンは抹消する
 				      
-					  #upd170710
 					  no_hyphen_code = supplier_material_code.delete('-')  
 					  
-					  #if supplier_material_code.delete!('-').present?  #add170510
 					  if no_hyphen_code.present?
 				        supplier_material_code = no_hyphen_code
 					  end
@@ -406,6 +485,7 @@ class PurchaseOrderHistoriesController < ApplicationController
     
 	    #メール送信する(メール送信ボタン押した場合)
         if params[:purchase_order_history][:sent_flag] == "1" then
+	
 	
       	  #set to global
 	      $order_parameters = params[:purchase_order_history][:orders_attributes]
@@ -443,20 +523,39 @@ class PurchaseOrderHistoriesController < ApplicationController
      @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
 	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
 	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
-  
-     #maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
-	 #@maker_name = MakerMaster.where(:id => maker_id).where("id is NOT NULL").pluck(:maker_name).flatten.join(" ")
-	 
      @maker_id_hide = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+	 
+	 #binding.pry
 	 
   end
   
+  #add170721
+  def set_sequence
+    if $seq.blank?
+      $seq = 0
+	end
+	
+	
+	$seq += 1
+
+  end
 
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase_order_history
       @purchase_order_history = PurchaseOrderHistory.find(params[:id])
+
+      #@purchase_order_history_saved = nil
     end
+ 
+    #サブフォームの描写速度を上げるため、メモリへ貯める
+    def set_masters
+      @material_masters = MaterialMaster.all
+	  @unit_masters = UnitMaster.all
+	  @maker_masters = MakerMaster.all
+	  
+	  #@seq = 0 #画面の連番用
+	end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_history_params
@@ -465,7 +564,7 @@ class PurchaseOrderHistoriesController < ApplicationController
       #               :maker_id, :maker_name, :list_price, :mail_sent_flag, :_destroy])
 	  #upd170616 メーカー名は抹消
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
-	                  orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
+	                  orders_attributes: [:id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
                      :maker_id, :list_price, :mail_sent_flag, :_destroy])
     end
 

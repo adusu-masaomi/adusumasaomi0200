@@ -297,6 +297,10 @@ body > .container {
     nextIndex = obj.tabIndex + 1;
     $('[tabindex=' + nextIndex + ']').focus();
   }
+  
+  //add170725 ロード時間短縮のため、ここに追記。
+  $(".searchableSelect2_1").select2({ theme: "classic" });
+  
   //select2をenterキー押下した場合(リストが閉じられた時)に次のコントロールへ移動させる
   $( ".searchableSelect2_1" ).on("select2:close", function (e) {
 	 nextControlSelect2(this);

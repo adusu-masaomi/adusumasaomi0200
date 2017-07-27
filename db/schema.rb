@@ -397,9 +397,12 @@ ActiveRecord::Schema.define(version: 20170710044738) do
     t.integer  "unit_master_id",            limit: 4
     t.integer  "list_price",                limit: 4
     t.integer  "mail_sent_flag",            limit: 4
+    t.integer  "sequential_id",             limit: 4,   null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
   end
+
+  add_index "orders", ["purchase_order_history_id", "sequential_id"], name: "uk_name", unique: true, using: :btree
 
   create_table "purchase_data", force: :cascade do |t|
     t.date     "purchase_date"
@@ -780,6 +783,7 @@ ActiveRecord::Schema.define(version: 20170710044738) do
     t.float    "material_unit_price",            limit: 24
     t.float    "execution_labor_unit_price",     limit: 24
     t.float    "labor_unit_price",               limit: 24
+    t.integer  "labor_unit_price_standard",      limit: 4
     t.float    "labor_productivity_unit",        limit: 24
     t.float    "labor_productivity_unit_total",  limit: 24
     t.integer  "material_quantity",              limit: 4
@@ -800,6 +804,7 @@ ActiveRecord::Schema.define(version: 20170710044738) do
 
   create_table "working_small_items", force: :cascade do |t|
     t.integer  "working_middle_item_id",  limit: 4
+    t.integer  "working_small_item_id",   limit: 4
     t.string   "working_small_item_code", limit: 255
     t.string   "working_small_item_name", limit: 255
     t.float    "unit_price",              limit: 24

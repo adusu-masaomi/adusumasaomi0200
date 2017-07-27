@@ -1,7 +1,10 @@
 class Order < ActiveRecord::Base
-  #has_many :entries
+  
+  paginates_per 10  # 1ページあたり項目表示
+  
   #has_many :purchase_order_data
-  ##belongs_to :purchase_order_datum
+  #belongs_to :purchase_order_datum
+  
   belongs_to :material_master,  :foreign_key => "material_id"
   belongs_to :unit_master
   belongs_to :purchase_order_history
@@ -13,6 +16,9 @@ class Order < ActiveRecord::Base
   
   #メーカーID用
   attr_accessor :maker_id_hide
+  
+  # sequential(gem)用 '1707xx
+  acts_as_sequenced scope: :purchase_order_history_id
   
    validate :check_link_count
    def check_link_count

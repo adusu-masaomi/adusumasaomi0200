@@ -406,7 +406,7 @@
   holiday_flag = 0;
   
   //土日祝、会社休日を求める。
-  function getHoliday(){
+  function getHoliday(in_house){
     // 曜日の表記
     //var weekDayList = [ "日", "月", "火", "水", "木", "金", "土" ] ;
     
@@ -427,26 +427,28 @@
 	      //祝日判定(関数はapplication.htmlにて定義)
           holiday_flag = FLAG_SATURDAY_HOIDAY;
 	   } else {
-	      //会社休日の判定
-		  var working_date = document.getElementById("working_date").value;
+	     //upd170718 会社休日加算があるのは社内の人のみとする。
+	     if (in_house == true) {
+	        //会社休日の判定
+		    var working_date = document.getElementById("working_date").value;
 		  
-		  $.get("<%= business_holidayz_get_business_holiday_path %>",
-            { working_date: working_date },
-            function(data){
-			  obj = document.getElementById("holiday_flag").textContent
-			  if (obj != undefined) {
-			    if (obj == "1") {
-				  if (wday == 6) {
-				    holiday_flag = FLAG_SATURDAY_HOIDAY;
-				  } else {
-				    //土曜以外は日曜と同じ扱い(*0.35)
-				    holiday_flag = FLAG_SUNDAY_HOLIDAY;
+		    $.get("<%= business_holidayz_get_business_holiday_path %>",
+              { working_date: working_date },
+              function(data){
+			    obj = document.getElementById("holiday_flag").textContent
+			    if (obj != undefined) {
+			      if (obj == "1") {
+				    if (wday == 6) {
+				      holiday_flag = FLAG_SATURDAY_HOIDAY;
+				    } else {
+				      //土曜以外は日曜と同じ扱い(*0.35)
+				      holiday_flag = FLAG_SUNDAY_HOLIDAY;
+				    }
 				  }
-				}
+			    }
 			  }
-			}
-          );
-		  
+            );
+		  }
 	   }
 	   
 	  
@@ -479,8 +481,12 @@
 			var in_house = false;
 			if (obj != null) {
 			  var affiliation = parseInt(obj);
-			  if (affiliation != AFFILIATION_OUTSOURCING) {
-			    in_house = true;
+			  
+			  //debugger;
+			  
+			  //upd170719 村山さんも原則的に社員扱い
+			  if (affiliation != AFFILIATION_OUTSOURCING || staff_id == 3) {
+			      in_house = true;
 			  }
 			}
 			//
@@ -513,10 +519,10 @@
 			//
 
 			//休日の判定
-			if (in_house == true) {
-			//add170707 休日加算があるのは社内の人のみとする。
+			//if (in_house == true) {
 			
-			  getHoliday();
+			  //getHoliday();
+			  getHoliday(in_house);   //upd170718
 			  switch (holiday_flag){
               case FLAG_SATURDAY_HOIDAY:
 			    var pay_holiday = num_no_add * 0.25
@@ -527,7 +533,7 @@
 			    num += pay_holiday
                 break;
               }
-			}
+		    //}
 			
             if (num >= 0) {
                document.getElementById("labor_cost").value = num;

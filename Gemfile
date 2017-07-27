@@ -4,6 +4,12 @@ source 'https://rubygems.org'
 #    gem 'bootstrap-scrolltable-rails'
 #end
 
+#明細の連番を降る
+gem 'sequenced'
+
+#cacheスピードアップ
+gem 'multi_fetch_fragments'
+
 # geocoder
 gem 'geocoder'
 

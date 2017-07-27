@@ -1,3 +1,10 @@
+/*待ち画面用*/
+#loading-indicator {
+  position: absolute;
+  left: 500px;
+  top: 400px;
+}
+
 .sbc_field { ime-mode: disabled; }
 
 .select2-emphasis{
