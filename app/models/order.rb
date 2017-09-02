@@ -17,6 +17,10 @@ class Order < ActiveRecord::Base
   #メーカーID用
   attr_accessor :maker_id_hide
   
+  #単位
+  #add170804
+  attr_accessor :unit_id_hide
+  
   # sequential(gem)用 '1707xx
   acts_as_sequenced scope: :purchase_order_history_id
   

@@ -78,7 +78,12 @@
         <td><%= link_to quotation_header.id, quotation_header_path(quotation_header) %></td>
         <td><%= quotation_header.quotation_code %></td>
         <td><%= quotation_header.quotation_date %></td>
-        <td><%= quotation_header.customer_name %></td>
+        <% if quotation_header.customer_master.present? %>
+		  <td><%= quotation_header.customer_master.customer_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+		
         <td><%= quotation_header.construction_name %></td>
         <!--<td><%= quotation_header.post %></td>-->
         <!--<td><%= quotation_header.address %></td>-->

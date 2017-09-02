@@ -121,7 +121,9 @@ class EstimationSheetLandscapePDF
 		   @report.page.item(:fax).value(@quotation_headers.fax) 
 		   
 		   #得意先名
-		   @report.page.item(:customer_name2).value(@quotation_headers.customer_name) 
+		   #@report.page.item(:customer_name2).value(@quotation_headers.customer_name)
+		   #update 170809
+           @report.page.item(:customer_name2).value(@quotation_headers.customer_master.customer_name) 
 		 
 		   #件名
 		   @report.page.item(:construction_name2).value(@quotation_headers.construction_name) 

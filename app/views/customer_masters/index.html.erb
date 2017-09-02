@@ -8,8 +8,16 @@
   <%= search_form_for @q do |f| %>
     <%= f.label :customer_name, '得意先名：' %>
     <%= f.select :id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
+    <%= f.label :search_character, '検索文字：' %>
+    
+	
+	<%= f.select :search_character_eq, CustomerMaster.syllabary.map{|st| [st,st]}, {include_blank: true}, { style: 'width:100px' , class: "searchableSelect2_1"}  %>
+	
+	<!--<%= f.select :search_character_eq, options_from_collection_for_select(CustomerMaster.all, "search_character", "search_character") , 
+	{include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
+
   	<div>
-    	<%= f.submit '検索する', :class => 'btn btn-default' %>
+    	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
 		<%= link_to t('.new', :default => t("helpers.links.new")),
             new_customer_master_path,
             :class => 'btn btn-primary' %>
@@ -46,7 +54,8 @@
       <th><%= model_class.human_attribute_name(:email_main) %></th>
       <th><%= model_class.human_attribute_name(:closing_date) %></th>
       <th><%= model_class.human_attribute_name(:due_date) %></th>
-      <th><%= model_class.human_attribute_name(:responsible1) %></th>
+      <th></th>
+	  <th><%= model_class.human_attribute_name(:responsible1) %></th>
       <th><%= model_class.human_attribute_name(:responsible2) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
@@ -64,14 +73,32 @@
 		<td><%= mail_to(customer_master.email_main, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <!--<td><%= customer_master.closing_date %></td>-->
 		<% if customer_master.closing_date.present? && customer_master.closing_date != 0 then %>
-		　　<td align="center"><%= customer_master.closing_date %></td>
+		  <% closing_division_str = nil %>
+		  
+		  <% if [customer_master.closing_date_division][0].present? && [customer_master.closing_date_division][0] == 1 %>
+		    <% closing_division_str = CustomerMaster.closing_division[customer_master.closing_date_division][0] %>
+		  <% end %>
+		  
+		  <% if closing_division_str.blank? %>
+		    <td align="center"><%= customer_master.closing_date %></td>
+		  <% else %>
+		    <td align="center"><%= closing_division_str %></td>
+		  <% end %>
 		<% else %>
 		   <td align="center">-</td>
 		<% end %>
 		<!--<td><%= customer_master.due_date %></td>-->
         <% if customer_master.due_date.present? && customer_master.due_date != 0 then %>
-		　　<td align="center"><%= customer_master.due_date %></td>
+		  <% if [customer_master.due_date_division][0].present? %>
+		    <% @due_date_division = CustomerMaster.due_division[customer_master.due_date_division][0] %>
+          <% else %>
+            <%  @due_date_division = "-" %>
+		  <% end %>
+		  
+		  <td align="center"><%= @due_date_division %></td>
+		  <td align="center"><%= customer_master.due_date %></td>
 		<% else %>
+		   <td align="center">-</td>
 		   <td align="center">-</td>
 		<% end %>
 		<td><%= customer_master.responsible1 %></td>
@@ -103,7 +130,9 @@
   //検索可能なリストボックス
   $(document).ready(function(){
 
-        $(".searchableCustomerName").select2({ theme: "classic" });
+     $(".searchableCustomerName").select2({ theme: "classic" });
+	 
+	 $(".searchableSelect2_1").select2({ theme: "classic", allowClear: true, placeholder: "" });
 	 
 	 
 	 //見出し固定用設定追加

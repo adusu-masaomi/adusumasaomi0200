@@ -19,6 +19,9 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   attr_accessor :check_update_item
   attr_accessor :check_update_all
   
+  #短縮名手入力用(add170822)
+  attr_accessor :working_large_item_short_name_manual
+  
   #金額合計(見積)
   def self.sumpriceQuote  
     #工事種別が通常かまたは値引の場合のみ合算。

@@ -6,6 +6,7 @@ class QuotationHeader < ActiveRecord::Base
    accepts_nested_attributes_for :customer_master, update_only: true
    
    attr_accessor :customer_id_hide
+   #attr_accessor :quotation_date_hide
    
    #見積書コードはユニークのチェックのみ。
    validates :quotation_code, presence:true, uniqueness: true

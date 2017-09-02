@@ -192,8 +192,10 @@ Rails.application.routes.draw do
   get '/purchase_order_datum/get_alias_name' => 'purchase_order_data#get_alias_name'
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
 
-  #add170218
   get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
+  #add170830
+  get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
+  get '/construction_dataz/delivery_slip_header_select' => 'construction_data#delivery_slip_header_select'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -215,6 +217,9 @@ Rails.application.routes.draw do
   #upd161028
   #見積書一覧D顧客情報
   get '/quotation_headerz/customer_info_select' => 'quotation_headers#customer_info_select'
+  
+  #add170831
+  get '/quotation_headerz/duplicate_quotation_header' => 'quotation_headers#duplicate_quotation_header'
 
   #  add161003
   # upd170131

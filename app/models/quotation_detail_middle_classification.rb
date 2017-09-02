@@ -12,6 +12,9 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   attr_accessor :check_update_item
   attr_accessor :check_update_all
   
+  #短縮名手入力用(add170822)
+  attr_accessor :working_middle_item_short_name_manual
+  
   def self.serial_number
     #upd170704 100to999
     [[("<行選択>").to_s , (1..999).to_a ]]

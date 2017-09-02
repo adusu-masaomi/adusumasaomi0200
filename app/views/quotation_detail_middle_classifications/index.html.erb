@@ -31,12 +31,11 @@
 					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]), remote: true,
             :class => 'btn btn-primary' %>
 <!--マスター画面へ遷移-->
-<%= link_to t('.new', :default => t("新規(マスター)")),
+<!--<%= link_to t('.new', :default => t("新規(マスター)")),
             new_working_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
 			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
 			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
-            :class => 'btn btn-teal500_rsd' %>
-			
+            :class => 'btn btn-teal500_rsd' %>-->
 <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
                                        quotation_header_name: params[:quotation_header_name]),
@@ -91,7 +90,7 @@
       <th style="width:20px;">機</th>
       <th style="width:20px;">労</th>
       <th style="width:250px;"><%= model_class.human_attribute_name(:remarks) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th ><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody class="quotation_detail_middle_classification-index">

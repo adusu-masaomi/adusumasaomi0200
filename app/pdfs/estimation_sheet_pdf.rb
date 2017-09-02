@@ -60,7 +60,9 @@ class EstimationSheetPDF
 		   @report.page.item(:address).value(@quotation_headers.address) 
 		 
 		   #得意先名
-		   @report.page.item(:customer_name).value(@quotation_headers.customer_name) 
+		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
+		   #update 170809
+		   @report.page.item(:customer_name).value(@quotation_headers.customer_master.customer_name) 
            
 		   ###add161227
 		   #敬称

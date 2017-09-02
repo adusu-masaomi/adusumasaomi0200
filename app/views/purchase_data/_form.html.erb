@@ -169,6 +169,7 @@
 	 });
 	  
      //検索可能なリストボックス(品名の場合)
+	 //色がピンクにしたいが、Macだと変わらない？？
      $(".searchableItem").select2({ theme: "bootstrap", allowClear: true , placeholder: "どれか一つを選択して下さい。", style: 'font-color:red;'
                                    })
 								   .data("select2").$container.find(".select2-selection").css('background-color', '#F5A9A9');
@@ -213,8 +214,8 @@
 		 
 		 
 		 //資材Mのインデックスも変更
-		 //debugger;
 		 //document.getElementById("material_id").options[index].selected = true;
+		 
          $(".searchableItem").val(index).trigger("change");
 		 
 		//品番・品名をセット
@@ -460,11 +461,28 @@
    //手入力の仕入先品番→通常の仕入先品番へセット
      if (document.getElementById("supplier_material_code").value != ""){
 	   
-	   //品番は手入力用とみなし、１をセット。
-	   $(".searchableItem").val(1).trigger("change");
+	   //add170807 仕入先品番のみ新たに追加する場合を考慮
+	   var blnSame = false;
+	   if (document.getElementById("material_code").value == 
+	      document.getElementById("supplier_material_code").value) {
+		  blnSame = true;
+	   } else {
+	     
+		 var code = document.getElementById("material_code").value;
+		 var no_hyphen_code = code.replace( /-/g , "" ) ;
+		 if (no_hyphen_code == document.getElementById("supplier_material_code").value){
+		   blnSame = true;
+		 }
+	   }
+	   // 
+		  
+	     if (blnSame == false){
+	       //品番は手入力用とみなし、１をセット。
+	       $(".searchableItem").val(1).trigger("change");
 	   
-       document.getElementById("material_code").value = 
-          document.getElementById("supplier_material_code").value;
+           document.getElementById("material_code").value = 
+            document.getElementById("supplier_material_code").value;
+	    }
       }
    }
    
@@ -590,8 +608,10 @@
             index = obj.selectedIndex;
             
             if (material_id != 1) {
-              f.list_price.value = obj.options[index].innerText;
-			  //document.getElementById("list_price").value = obj.options[index].innerText;
+			  
+			  if (obj.options[index] != undefined){
+                f.list_price.value = obj.options[index].innerText;
+			  }
             }
      }
         );

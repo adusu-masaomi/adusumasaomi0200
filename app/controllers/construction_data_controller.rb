@@ -275,8 +275,57 @@ class ConstructionDataController < ApplicationController
   def construction_and_customer_select
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+	 
+	 #add170830
+	 #郵便番号・住所
+	 @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
+	 add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+	 add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+	 
+	 @address = ""
+	 if add1.present?
+	   @address = add1 
+	 end
+	 if add2.present?
+	   @address += add2 
+	 end
+	 #add end
+	 
   end
+  
+  #見積書をもとに、初期情報をセットする
+  def quotation_header_select
     
+	 @construction_name = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+	 
+	 customer = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+     @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
+	 
+	 #郵便番号（*工事場所）
+     @post = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
+	 
+	 #住所（*工事場所）
+	 @address = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
+ 
+  end
+  
+  #納品書をもとに、初期情報をセットする
+  def delivery_slip_header_select
+    
+	 @construction_name = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+	 
+	 customer = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+     @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
+	 
+	 #郵便番号（*工事場所）
+     @post = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
+	 
+	 #住所（*工事場所）
+	 @address = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
+ 
+  end
+  
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_construction_datum
@@ -289,6 +338,6 @@ class ConstructionDataController < ApplicationController
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
-      :working_safety_matter_id, :working_safety_matter_name, :billed_flag)
+      :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag)
     end
 end

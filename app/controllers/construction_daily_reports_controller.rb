@@ -58,7 +58,11 @@ class ConstructionDailyReportsController < ApplicationController
           #労務費集計表
 		    if confirm_outsourcing == false
             #縦型PDF
-              report = LaborCostSummaryPDF.create @construction_daily_reports 
+			  if exist_takano == false
+                report = LaborCostSummaryPDF.create @construction_daily_reports 
+			  else
+			    report = LaborCostSummaryMasaomiPDF.create @construction_daily_reports
+			  end
             else
             #横型PDF
               report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
@@ -91,6 +95,20 @@ class ConstructionDailyReportsController < ApplicationController
 	end
   	
   end
+  
+  
+  #高野（応援？）がいる場合のチェク
+  def exist_takano
+    takano = @construction_daily_reports.where('staff_id= ?', '4')
+    
+    if takano.present?
+       return true
+	else   
+	   return false
+    end
+  
+  end
+  
   
   def confirm_outsourcing
   #外注さんが作業に関わっているかどうかのチェック(PDF用)

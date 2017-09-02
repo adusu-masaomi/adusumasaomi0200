@@ -202,17 +202,20 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
         //i = 0;
         cIndex = 0;
        }));
-       $(".searchableUnit").select2({ theme: "classic" });
+	   
+	   //単位
+       $(".searchableSelect2_2").select2({ theme: "classic" });
        //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-       $( ".searchableUnit" ).on("select2:close", function (e) {
+       $( ".searchableSelect2_2" ).on("select2:close", function (e) {
        //     setTimeout(function() {
        //    $('[tabindex=2]').focus();
        // }, 0);  
        });   
-      
-       $(".searchableMaker").select2({ theme: "classic" });
+        
+	   //メーカー
+       $(".searchableSelect2_3").select2({ theme: "classic" });
        //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-       $( ".searchableMaker" ).on("select2:select", function (e) {
+       $( ".searchableSelect2_3" ).on("select2:select", function (e) {
             
             //メーカー選択後のフォーカス移動は、動作不安定のため、保留とする・・・・
             //setTimeout(function() {

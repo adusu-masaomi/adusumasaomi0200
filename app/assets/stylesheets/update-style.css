@@ -1,3 +1,4 @@
+
 /*待ち画面用*/
 #loading-indicator {
   position: absolute;
@@ -5,12 +6,21 @@
   top: 400px;
 }
 
-.sbc_field { ime-mode: disabled; }
-
-.select2-emphasis{
-  background-color:#F5A9A9 !important;
+/*select2の背景色*/
+/*Macのみ有効？のようだ。*/
+.select2-selection{
+   background-color: #fff !important;
 }
 
+.select2-emphasis{
+   background-color: #00f !important;
+}
+
+/*.select2-emphasis{
+  
+}*/
+
+.sbc_field { ime-mode: disabled; }
 
 body.dragging, body.dragging * {
   cursor: move !important;
@@ -50,10 +60,13 @@ ol.example li.placeholder:before {
   zoom: 1;
   *display: inline;
   vertical-align: middle;
+  
+ 
 }
 
 .select2-container--open .select2-dropdown {
   left: 15px;
+  
 }
 
 

@@ -23,24 +23,34 @@
   </div></br></br>
   
   <!--記号-->
+  
+  <div class="col-xs-3" , style="margin-left : -15px">
   <%= f.label :working_middle_item_short_name , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :working_middle_item_short_name, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name,
      {:selected => @quotation_detail_middle_classification.working_middle_item_id || 1} , 
-    {id:'working_middle_item_short_name', :tabindex=>"1", :class => "searchableSelect2_2",  style: 'width:420px' } %></br>
+    {id:'working_middle_item_short_name', :tabindex=>"1", :class => "searchableSelect2_2",  style: 'width:190px' } %>
+  
+  </div>
+  
+  <%= f.input :working_middle_item_short_name_manual, label: "記号(手入力可)", label_html:{style:'margin-top:-5px;'}, 
+                    input_html:{id:"working_middle_item_short_name_manual", style: 'width:210px;margin-top:0px;', :tabindex=>"2" }  %>
+  
+  
+  
   <!--品名-->
   <%= f.label :"品名" , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :working_middle_item_id, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name, 
     {:selected => @quotation_detail_middle_classification.working_middle_item_id || 1} , 
     {id:'working_middle_item_id', :class => "searchableSelect2_3",  style: 'width:420px' } %></br>
   
-  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"3" }  %>
-  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"4" }  %>
+  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"4" }  %>
+  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"5" }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
-  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"5", :onchange => "calcMoneyforQuantity(0)"}  %>
+  <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"6", :onchange => "calcMoneyforQuantity(0)"}  %>
   </div>
   <div style="margin-left : -50px">
-  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"6", :onchange => "calcMoneyforQuantity(1)"}  %>
+  <%= f.input :execution_quantity, input_html:{id:"execution_quantity", style: 'width:120px', :tabindex=>"7", :onchange => "calcMoneyforQuantity(1)"}  %>
   </div>
   
   <!--単位-->
@@ -51,28 +61,28 @@
       {id:'working_unit_id', :class => "searchableSelect2_4",  style: 'width:120px' } %></br>
   </div>
   <div style="margin-left : -50px;margin-top : -27.5px;">
-  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", style: 'width:120px', :tabindex=>"8", :value => @quotation_detail_middle_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name) }  %>
+  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", style: 'width:120px', :tabindex=>"9", :value => @quotation_detail_middle_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name) }  %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"9", :onchange => "calcTotalPrice()" } %>
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"10", :onchange => "calcTotalPrice()" } %>
   </div>
   <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"10", :onchange => "calcTotalPrice()"} %>
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"11", :onchange => "calcTotalPrice()"} %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"11"} %>
+  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"12"} %>
   </div>
   <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"12"} %>
+  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"13"} %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", style: 'width:120px', :tabindex=>"13", :onchange => "calcLaborTotal()"}  %>
+  <%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", style: 'width:120px', :tabindex=>"14", :onchange => "calcLaborTotal()"}  %>
   </div>
   <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :labor_productivity_unit_total, input_html:{id:"labor_productivity_unit_total", style: 'width:120px', :tabindex=>"14"}  %>
+  <%= f.input :labor_productivity_unit_total, input_html:{id:"labor_productivity_unit_total", style: 'width:120px', :tabindex=>"15"}  %>
   </div>
   
   <%= f.check_box :piping_wiring_flag, :class => "piping_wiring_flag" %>
@@ -83,7 +93,7 @@
   <%= f.label_tag :labor_cost_flag, '労務費' %>
   <!--add end-->
   
-  <%= f.input :remarks,  :input_html => {:tabindex=>"15", style: 'width:420px'}  %>
+  <%= f.input :remarks,  :input_html => {:tabindex=>"16", style: 'width:420px'}  %>
   
   <%= f.check_box :check_update_item, {}, "true", "false" %>
   <%= f.label_tag :check_update_item, '品名・仕様・単位のみマスター反映　　　' %> 
@@ -143,10 +153,14 @@
      $( ".searchableSelect2_2" ).change(function(e) {
     	document.getElementById("working_middle_item_id").value = document.getElementById("working_middle_item_short_name").value;
 		$(".searchableSelect2_3").trigger("change");
+		
+		//add170822
+        //記号(短縮)名をテキストへセット
+		setShortName();
 	 });
 	 //品名--select2のタブインデックスはここで指定。
 	 $(".searchableSelect2_3").select2({ theme: "bootstrap" }).on("load", function(e) { 
-        $(this).prop('tabindex',2)}).trigger('load');
+        $(this).prop('tabindex',3)}).trigger('load');
      $( ".searchableSelect2_3" ).on("select2:close", function (e) {
 	    nextControlSelect2(this);
      });
@@ -155,7 +169,7 @@
      });
 	 //単位--select2のタブインデックスはここで指定。
      $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
-        $(this).prop('tabindex',7)}).trigger('load');
+        $(this).prop('tabindex',8)}).trigger('load');
      $( ".searchableSelect2_4" ).on("select2:close", function (e) {
 	    nextControlSelect2(this);
      });
@@ -184,7 +198,32 @@
        }
      });
 	 //add end
+	 
+	
+    //add170822
+    //記号(短縮)名を最新の情報にする
+	setShortName();
+	//var index = document.getElementById("working_middle_item_short_name").selectedIndex;
+	//document.getElementById("working_middle_item_short_name_manual").value = 
+	//  document.getElementById("working_middle_item_short_name").options[index].innerText;
+	
   });
+  
+  
+  //add170822
+  //短縮名をテキストへセット
+  function setShortName(){
+    var index = document.getElementById("working_middle_item_short_name").selectedIndex;
+	document.getElementById("working_middle_item_short_name_manual").value = 
+	  document.getElementById("working_middle_item_short_name").options[index].innerText;
+    
+  }
+  
+  
+  //フォームロード時のイベント(モーダルでは機能しない模様)
+  //window.onload = function(){
+  //}
+  
   
   //add170223
   //upd170308

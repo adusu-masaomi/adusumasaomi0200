@@ -1,6 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailLargeClassification -%>
-<div class="page-header", style="width:1920px">
+<div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 
    <%= search_form_for @q do |f| %>
@@ -17,14 +17,14 @@
    <% end %>
 
 </div>
-<div style="width:1980px;">
+<div style="width:1280px;">
 <%= link_to t('.new', :default => t("新規作成")),
             new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], quotation_header_name: params[:quotation_header_name],
 			   new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
-<%= link_to t('.new', :default => t("新規(マスター)")),
+<!--<%= link_to t('.new', :default => t("新規(マスター)")),
             new_working_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
-            :class => 'btn btn-teal500_rsd' %>
+            :class => 'btn btn-teal500_rsd' %>-->
 <%= link_to "一覧へ",
             quotation_headers_path(),
             :class => 'btn btn-info' %>
@@ -126,13 +126,19 @@
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
 	 
+
+    //upd170802 下記設定から変更（改行がおかしい？現象発生しているため）
+	//      start: function(event, ui) {ui.item.css("background-color", "orange");},
+	//-->>  start: function(event, ui) {ui.helper.css("display", "table");},
+ 
 	 $( "#tablefix tbody" ).sortable({
         cursor: 'move',
-	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   start: function(event, ui) {ui.helper.css("display", "table");},
 	   stop: function(event, ui) {
 	     ui.item.css("background-color", "white");
 		 var row = $(this).sortable('toArray').toString();
 		 quotation_header_id = document.getElementById("quotation_header_id").innerText;
+		 
 		 
 		 $.post("<%= quotation_detail_large_classificationz_reorder_path %>",
            { row: row, ajax_quotation_header_id: quotation_header_id },

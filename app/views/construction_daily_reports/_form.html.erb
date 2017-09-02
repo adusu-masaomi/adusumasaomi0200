@@ -16,8 +16,9 @@
   
   <!--スマホ対応 datepicker使う場合は多めに上余白を空ける--> 
   <!--</br></br></br></br>-->
+  <!--<%= f.input :working_date , input_html:{id: "working_date" , class: "test", style: 'width:220px' , :tabindex=>"0" } , as: :date_picker %>-->
   
-  <%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px' , :tabindex=>"0" } , as: :date_picker %>
+  <%= f.input :working_date , as: :string, input_html:{id: "working_date" , class: "datepicker", style: 'width:120px' , :tabindex=>"0" }  %>
   <!--下記だと工事日がうまく更新されないので保留・・・-->
   <!--<%= f.input :working_date , input_html:{id: "working_date" , style: 'width:220px'}  %>-->
   <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
@@ -94,7 +95,15 @@
        $( ".searchableConstructionCode" ).on("select2:close", function (e) {
          $('[tabindex=2]').focus(); 
        });
-
+      
+	  
+	  $(".datepicker").on("dp.change", function(e) {
+	    //debugger;
+	    getDailyPay.call({}, this.form);
+	  });
+	  
+	    
+	  
    //工事日のセット(デフォルト)
    function setConstructionDateDefault()
    {  
@@ -119,7 +128,10 @@
           }
         );
     };
+    
+	 
 
+	
   });
   
   
@@ -406,7 +418,7 @@
   holiday_flag = 0;
   
   //土日祝、会社休日を求める。
-  function getHoliday(in_house){
+  function getHoliday(in_house, num_no_add,num){
     // 曜日の表記
     //var weekDayList = [ "日", "月", "火", "水", "木", "金", "土" ] ;
     
@@ -415,17 +427,20 @@
 	
     //var weekDay = weekDayList[ dateObj.getDay() ] ;	// 曜日
 	var wday = dateObject.getDay();
-	
-	
-	
+		
 	if (wday == 0){
 	  //日曜？
 	  holiday_flag = FLAG_SUNDAY_HOLIDAY;
+	  //休日の判定＆労務費へのセット(必須！)
+	  addHoliday(holiday_flag, num_no_add,num);
 	} else {
 	  //祝日or会社休日ないか判定。
 	   if (getNationalHoliday(dateObject) == "祝日") {
 	      //祝日判定(関数はapplication.htmlにて定義)
           holiday_flag = FLAG_SATURDAY_HOIDAY;
+		  
+		  //休日の判定＆労務費へのセット(必須！)
+		  addHoliday(holiday_flag, num_no_add,num);
 	   } else {
 	     //upd170718 会社休日加算があるのは社内の人のみとする。
 	     if (in_house == true) {
@@ -435,6 +450,9 @@
 		    $.get("<%= business_holidayz_get_business_holiday_path %>",
               { working_date: working_date },
               function(data){
+			    
+				//jsの動き注意・・・（以下に繋がってjs発動するようにする必要あり!!）
+				
 			    obj = document.getElementById("holiday_flag").textContent
 			    if (obj != undefined) {
 			      if (obj == "1") {
@@ -444,17 +462,54 @@
 				      //土曜以外は日曜と同じ扱い(*0.35)
 				      holiday_flag = FLAG_SUNDAY_HOLIDAY;
 				    }
+					//addHoliday(holiday_flag, num_no_add,num);
+				  }else{
+				    holiday_flag = 0;
 				  }
 			    }
+				//休日の判定＆労務費へのセット(必須！)
+				addHoliday(holiday_flag, num_no_add,num);
 			  }
             );
+		  } else {
+		  //外注の場合
+		    holiday_flag = 0;
+			//休日の判定＆労務費へのセット(必須！)
+			addHoliday(holiday_flag, num_no_add,num);
 		  }
 	   }
-	   
 	  
 	}
+	
 	//return flag;
+	
+	
   }
+ 
+ //休日の判定＆労務費へのセット(必須！)
+ function addHoliday(holiday_flag, num_no_add,num){
+   //add170801
+   pay_holiday = 0;
+	
+   switch (holiday_flag){
+   case FLAG_SATURDAY_HOIDAY:
+	 pay_holiday = num_no_add * 0.25
+	 num += pay_holiday
+     break;
+   case FLAG_SUNDAY_HOLIDAY:
+	 pay_holiday = num_no_add * 0.35
+	 num += pay_holiday
+     break;
+   }
+     	    
+   if (num >= 0) {
+      document.getElementById("labor_cost").value = num;
+	  document.getElementById("labor_cost_no_add").value = num_no_add;
+   }
+	//return pay_holiday;
+	//
+ 
+ }
  
  
   var daily_pay = 0;
@@ -463,7 +518,7 @@
   // 日給をajaxで取得
    function getDailyPay(f){
      
-     var staff_id = f.staff_id.value;
+	 var staff_id = f.staff_id.value;
       $.get("<%= construction_daily_reportz_staff_information_select_path %>",
           { id: staff_id },
           function(data){
@@ -471,7 +526,9 @@
             obj = document.getElementById("daily_pay");
 			index = document.getElementById("daily_pay").selectedIndex;
 			if (index != undefined){
-              daily_pay  = obj.options[index].innerText;
+			  if (obj.options[index] != undefined){
+			    daily_pay  = obj.options[index].innerText;
+			  }
 			}
 			
 			//add170707
@@ -481,8 +538,6 @@
 			var in_house = false;
 			if (obj != null) {
 			  var affiliation = parseInt(obj);
-			  
-			  //debugger;
 			  
 			  //upd170719 村山さんも原則的に社員扱い
 			  if (affiliation != AFFILIATION_OUTSOURCING || staff_id == 3) {
@@ -518,27 +573,12 @@
 			num += pay_25 + pay_50;
 			//
 
-			//休日の判定
-			//if (in_house == true) {
+			//休日の判定&労務費加算
 			
-			  //getHoliday();
-			  getHoliday(in_house);   //upd170718
-			  switch (holiday_flag){
-              case FLAG_SATURDAY_HOIDAY:
-			    var pay_holiday = num_no_add * 0.25
-			    num += pay_holiday
-                break;
-              case FLAG_SUNDAY_HOLIDAY:
-			    var pay_holiday = num_no_add * 0.35
-			    num += pay_holiday
-                break;
-              }
-		    //}
+			//getHoliday(in_house);   //upd170718
+			getHoliday(in_house, num_no_add,num);
+			  
 			
-            if (num >= 0) {
-               document.getElementById("labor_cost").value = num;
-			   document.getElementById("labor_cost_no_add").value = num_no_add;
-            }
           }
         );
   }

@@ -5,9 +5,25 @@ class CustomerMastersController < ApplicationController
   # GET /customer_masters.json
   def index
     #@customer_masters = CustomerMaster.all
-    #@customer_masters = CustomerMaster.page(params[:page])
+   #@customer_masters = CustomerMaster.page(params[:page])
    
-    @q = CustomerMaster.ransack(params[:q])   
+   #ransack保持用コード
+   query = params[:q]
+   query ||= eval(cookies[:recent_search_history].to_s)  	
+   
+   
+    #@q = CustomerMaster.ransack(params[:q])   
+	#ransack保持用--上記はこれに置き換える
+    @q = CustomerMaster.ransack(query)
+	
+	#ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 24.hours.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+	
     @customer_masters  = @q.result(distinct: true)
     @customer_masters  = @customer_masters.page(params[:page])
 
@@ -118,7 +134,7 @@ class CustomerMastersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def customer_master_params
-      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :tel_main, :fax_main, :email_main, :closing_date, 
-                     :due_date, :responsible1, :responsible2, :contact_id)
+      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :tel_main, :fax_main, :email_main, :closing_date, :closing_date_division,
+                     :due_date, :due_date_division, :responsible1, :responsible2, :contact_id)
     end
 end

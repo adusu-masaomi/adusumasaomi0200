@@ -429,9 +429,25 @@ class PurchaseOrderHistoriesController < ApplicationController
 			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  materials.update_attributes!(:material_name => params[:material_name][i])
+                  materials.update_attributes!(:material_name => params[:material_name][i] )
                 end 
 			  end
+			  
+			  #######
+			  #add170804
+			  #仕入単価マスターの単位も更新する
+			  purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+                 params[:purchase_order_history][:supplier_master_id], params[:material_id][i] ]).first
+			  
+			  if purchase_unit_price.present?
+			     if item[:unit_master_id].present?
+			       purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+				                                  unit_id: item[:unit_master_id]}
+				   purchase_unit_price.update(purchase_unit_price_params)
+				 end
+			  end
+			  
+			  #######
 		  else
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
@@ -442,7 +458,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 				@material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-			      material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+				  material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
                                         maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
@@ -525,8 +541,11 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
      @maker_id_hide = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
 	 
-	 #binding.pry
+	 #add170804
+	 @unit_id_hide = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+                 params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
 	 
+	
   end
   
   #add170721

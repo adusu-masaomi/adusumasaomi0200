@@ -22,13 +22,28 @@
   <%= f.input :tel_main , input_html:{:tabindex=>"4"} %>
   <%= f.input :fax_main , input_html:{:tabindex=>"5"} %>
   <%= f.input :email_main, input_html:{:tabindex=>"6"} %>
-  <%= f.input :closing_date, as: :integer , hint: "*日にちのみを数字で入力して下さい。(未定なら０)" , input_html:{:tabindex=>"7", value: f.object.closing_date || 0 } %>
-  <%= f.input :due_date, as: :integer , hint: "*日にちのみを数字で入力して下さい。(未定なら０)" , input_html:{:tabindex=>"8", value: f.object.due_date || 0} %>
-  <%= f.input :responsible1 , input_html:{:tabindex=>"9"} %>
-  <%= f.input :responsible2 , input_html:{:tabindex=>"10"} %>
+  <div class="col-lg-2" , style="margin-left : -15px">
+  <%= f.input :closing_date, as: :integer , hint: "*数字を入力　　(未定は０)" , input_html:{id:'closing_date', :tabindex=>"7", style: 'width:70px;', value: f.object.closing_date || 0 } %>
+   </div>
+  <%= f.label :締日区分：, {:class => "my-custom-class-l" , style: 'width:80px;' }  %>
+  <%= f.select :closing_date_division, CustomerMaster.closing_division, {}, 
+       {id:'searchableSelect2_1', :onchange => "changeDueDate()", :class => "my-custom-class", 
+            style: 'width:120px;height:30px;margin-left:-10px;margin-top:30px;font-size:14px;', :tabindex=>"8" } %>
+   </br></br></br></br></br>
+  
+  <div class="col-lg-2" , style="margin-left : -15px">
+  <%= f.input :due_date, as: :integer , label_html:{style: 'margin-top:-35px;'}, hint: "*数字を入力　　(未定は０)" ,  
+       input_html:{ style: 'width:70px;height:30px;margin-top:-10px;', :tabindex=>"9", value: f.object.due_date || 0} %>
+  </div>
+  <%= f.label :支払月区分：, {:class => "my-custom-class-l" , style: 'width:90px;' }  %>
+  <%= f.select :due_date_division, CustomerMaster.due_division, {}, 
+       {id:'searchableSelect2_2', :class => "my-custom-class", style: 'width:80px;height:30px;margin-left:-0px;margin-top:-30px;font-size:14px;', :tabindex=>"10" } %>
+  </br></br></br></br></br>
+  <%= f.input :responsible1 , input_html:{:tabindex=>"11"} %>
+  <%= f.input :responsible2 , input_html:{:tabindex=>"12"} %>
   
   <!-- 連絡先データ移行時特設用 -->
-  <%= f.input :contact_id , input_html:{:tabindex=>"11"} , as: :hidden %>
+  <%= f.input :contact_id , input_html:{:tabindex=>"13"} , as: :hidden %>
   
   <!--<%= f.button :submit, :class => 'btn-primary' %>-->
   <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />
@@ -40,5 +55,14 @@
 
 <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 <script type="text/javascript">
+ 
+//締め日を３１日に変更する。 
+function changeDueDate(){
+  if (document.getElementById("searchableSelect2_1").value == 1) {
+    document.getElementById("closing_date").value = 31;
+  }else{
+    document.getElementById("closing_date").value = 0;
+  }
+}
   
 </script>

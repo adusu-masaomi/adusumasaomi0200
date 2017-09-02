@@ -7,7 +7,7 @@ class PurchaseListPDF
        #@@page_number = 0
  
        # tlfファイルを読み込む
-       report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/purchase_list_pdf.tlf")
+       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/purchase_list_pdf.tlf")
        
 	
 	

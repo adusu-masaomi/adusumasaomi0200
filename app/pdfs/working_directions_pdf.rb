@@ -5,7 +5,7 @@ class WorkingDirectionsPDF
 	#作業指示書PDF発行
  
        # tlfファイルを読み込む
-       report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/working_directions_pdf.tlf")
+       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/working_directions_pdf.tlf")
        
 		# 1ページ目を開始
         report.start_new_page
