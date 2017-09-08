@@ -26,8 +26,10 @@
 		<%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_daily_report_path(:new_flag => "0", construction_id: params[:construction_id], move_flag: params[:move_flag] ),
             :class => 'btn btn-primary' %>
-        <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
-        <!--<%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default'%>
+        <!--<%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>-->
+        <%= link_to t('.back', :default => t("工事費集計へ")), construction_costs_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+                                   :class => 'btn btn-lime500_rsd keep-disp'  %>
+		<!--<%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default'%>
         <td><font size="3">合計金額:<%=number_to_currency(@construction_daily_reports.sumprice,  precision: 0 ) %></font></td>-->
 
   	</div>

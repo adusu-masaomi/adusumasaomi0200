@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resources :quotation_material_details
+  resources :quotation_material_headers
+  
   resources :working_small_items
   resources :quotation_details_histories
   resources :quotation_details_histories
@@ -168,6 +171,14 @@ Rails.application.routes.draw do
   get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
   
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
+  
+  #add170904
+  get "/quotation_material_headerz/get_data" => 'quotation_material_headers#get_data'
+  get "/quotation_material_headerz/email_select" => 'quotation_material_headers#email_select'
+  
+  #add170906
+  get "/quotation_material_headerz/set_sequence" => 'quotation_material_headers#set_sequence'
+  
   #161212
   #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
   
@@ -479,6 +490,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :quotation_material_details
+  resources :quotation_material_headers
   resources :working_small_items
   resources :quotation_details_histories
   resources :quotation_breakdown_histories

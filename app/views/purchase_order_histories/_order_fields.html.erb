@@ -25,7 +25,8 @@
   &nbsp;&nbsp;&nbsp;&nbsp;
  
   </br>
-  <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onkeydown => "setMaterialCode($(this).val())" } %>
+  <!--<%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onkeydown => "setMaterialCode($(this).val())" } %>-->
+  <%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onchange => "setMaterialCode($(this).val())" } %>
   <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
    <!--以下スペースあり-->
   &nbsp;&nbsp;&nbsp;&nbsp;
@@ -104,6 +105,8 @@
   function setMaterialCode(thisValue){
     gMaterial_code = thisValue;
 	
+	//debugger;
+	
   }
   
   //更新前に数量をチェックする
@@ -161,8 +164,14 @@
 				
 				//単位をセット
 				obj = document.getElementById("unit_id_hide").textContent;
-			    if (obj != null){
+			    
+				//add170907
+				//単位未登録の場合は、”個”にする
+				if (obj == ""){ obj = "3" };
+				
+				if (obj != null){
 		          var index = parseInt(obj);
+				  
                   $(".searchableSelect2_2")[selected_index].value = index; 
 				  
 				  $(".searchableSelect2_2").trigger("change"); 

@@ -9,6 +9,10 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	#eメール取得用
     attr_accessor :email_responsible
 	
+    #担当者
+    #add170907
+    attr_accessor :responsible
+    
 	#ボタン切り分け用
 	attr_accessor :sent_flag
 	

@@ -398,29 +398,30 @@ class PurchaseDataController < ApplicationController
   
   def update_params_list_price_and_maker
   #資材Mの定価・メーカーを更新する(未登録の場合)
-    if params[:purchase_datum][:MaterialMaster_attributes].present?
-      #params[:purchase_datum][:MaterialMaster_attributes].values.each do |item|
-      id = params[:purchase_datum][:material_id].to_i
-      
+	if params[:purchase_datum][:MaterialMaster_attributes].present?
+      if params[:purchase_datum][:material_id].present?   #add170904__
 	  
-	  if id != 1   #手入力以外
-        @material_masters = MaterialMaster.find(id)
-        if @material_masters.present?
-          #定価
-          #if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
-            params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
-          #end
-          #メーカー
-          if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
-             params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
-          end
+	    id = params[:purchase_datum][:material_id].to_i
+      
+	    if id != 1  #手入力以外
+          @material_masters = MaterialMaster.find(id)
+          if @material_masters.present?
+            #定価
+            #if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
+              params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
+            #end
+            #メーカー
+            if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
+               params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
+            end
 		  
-		  #資材マスターへ品名などを反映させる処理(手入力以外)
-		  #update_material_master
-        end
-      else 
+		    #資材マスターへ品名などを反映させる処理(手入力以外)
+		    #update_material_master
+          end
+        else 
 	      #手入力をマスター反映させる
 	      add_manual_input_to_masters
+	    end
 	  end
 	end
   end

@@ -65,9 +65,15 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 else
          if $orders.present?
 	       temp_id = $orders.pluck('purchase_order_history_id').first
-	       @tmp_purchase_order_history = PurchaseOrderHistory.find(temp_id)
+               
+               if temp_id.present?
+                  @tmp_purchase_order_history = PurchaseOrderHistory.find(temp_id)
+               else
+                  @tmp_purchase_order_history = nil
+               end 
 	           #グローバルを適応するのはあくまでも検索時のみとしたいための処理
-	      if @tmp_purchase_order_history.purchase_order_datum_id != $purchase_order_datum_id then
+	      if @tmp_purchase_order_history.nil? ||
+                  @tmp_purchase_order_history.purchase_order_datum_id != $purchase_order_datum_id then
 	        $orders = Order.none
 	      end
         else
@@ -253,6 +259,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
 	    purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
 	
+	#binding.pry
 	 	  
      if $purchase_order_history.nil?
 	    $purchase_order_date = params[:purchase_order_date]
@@ -373,9 +380,42 @@ class PurchaseOrderHistoriesController < ApplicationController
   
   def send_mail_and_params_complement
     
-	
 	i = 0
    
+    #仕入先を画面で変更している場合があるので、その場合に差し替える
+	#add170907
+	if @purchase_order_history.supplier_master_id != params[:purchase_order_history][:supplier_master_id]
+	  @purchase_order_history.supplier_master_id = params[:purchase_order_history][:supplier_master_id]
+	  
+	  #注文データの仕入先も更新する
+	  purchase_order_data = PurchaseOrderDatum.find(@purchase_order_history.purchase_order_datum_id)
+	  if purchase_order_data.present?
+		 purchase_order_data_params = {supplier_master_id: params[:purchase_order_history][:supplier_master_id]}
+		 purchase_order_data.update(purchase_order_data_params)
+	  end
+	end
+    ###
+	
+	#仕入先の担当者・メアドも変更されていたらマスター反映させる
+	if @purchase_order_history.supplier_master.present?
+	 
+       if @purchase_order_history.supplier_master.email1 != params[:purchase_order_history][:email_responsible]   ||
+		 @purchase_order_history.supplier_master.responsible1 != params[:purchase_order_history][:responsible]
+		
+		supplier_master = SupplierMaster.find(@purchase_order_history.supplier_master_id)
+		if supplier_master.present?
+		   supplier_master_params = {email1: params[:purchase_order_history][:email_responsible], 
+                                     responsible1: params[:purchase_order_history][:responsible]}
+		   supplier_master.update(supplier_master_params)
+	    end
+		#binding.pry
+		 
+	  end
+	end
+	#
+	
+	
+	
     if params[:purchase_order_history][:orders_attributes].present?
 	
 	    params[:purchase_order_history][:orders_attributes].values.each do |item|
@@ -383,7 +423,14 @@ class PurchaseOrderHistoriesController < ApplicationController
 		 
 		  ######
           #varidate用のために、本来の箇所から離れたパラメータを再セットする
-		  item[:quantity] = params[:quantity][i]
+		  #item[:quantity] = params[:quantity][i]
+		  #upd170906 数値は全角入力の場合、半角に変換する
+		  if  params[:quantity][i].to_i == 0
+		    params[:quantity][i] = params[:quantity][i].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
+		  end
+		  item[:quantity] = params[:quantity][i].to_i
+		  ###
+		  
 		  item[:material_id] = params[:material_id][i]
 		  
 		  ##add170213
@@ -508,6 +555,9 @@ class PurchaseOrderHistoriesController < ApplicationController
       
           #画面のメアドをグローバルへセット
           $email_responsible = params[:purchase_order_history][:email_responsible]
+		  $responsible = params[:purchase_order_history][:responsible]
+		  
+		  
           PostMailer.send_purchase_order(@purchase_order_history).deliver
           #メール送信フラグをセット
           #params[:purchase_order_history][:mail_sent_flag] = 1
@@ -531,6 +581,9 @@ class PurchaseOrderHistoriesController < ApplicationController
   # ajax
   def email_select
      @email_responsible = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
+	 #担当者
+	 #add170907
+	 @responsible = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
   end
   
   #商品名などを取得

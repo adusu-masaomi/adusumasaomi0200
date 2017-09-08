@@ -83,8 +83,12 @@
 		<td><%= orders.material_name %></td>
 		<td><%= orders.material_master.MakerMaster.maker_name %></td>
 		<td><%= orders.quantity %></td>
-        <td><%= orders.unit_master.unit_name %></td>
-		<td><%= orders.created_at.in_time_zone('Tokyo') %></td>
+                <% if orders.unit_master.present? %> 
+                  <td><%= orders.unit_master.unit_name %></td>
+		<% else %>
+                  <td>-</td>
+                <% end %>
+                <td><%= orders.created_at.in_time_zone('Tokyo') %></td>
      
       </tr>
     <% end %>

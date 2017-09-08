@@ -66,9 +66,10 @@
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
       <!--<th><%= model_class.human_attribute_name(:construction_code) %></th>-->
       <th></th>
+      <!--<th></th>-->
       <th></th>
       <th></th>
-	  <th></th>
+	  <!--<th></th>-->
 	  <th></th>
       <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
@@ -98,12 +99,17 @@
 	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
         <td><%= link_to t('.edit', :default => t("指示書")),
                       edit2_construction_datum_path(construction_datum),  :class => 'btn btn-pink300_ftg btn-xs keep-disp' , :style => "width: 50px; height: 10px;" %></td>
-        <td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-lightgreen500_rsd btn-xs keep-disp'  %></td>
+        <!--<td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-lightgreen500_rsd btn-xs keep-disp'  %></td>-->
+
+        <td><%= link_to t('.back', :default => t("見積")), quotation_material_headers_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-green200_rsd btn-xs keep-disp'  %></td>
+
+
         <td><%= link_to t('.back', :default => t("注文")), purchase_order_data_path(construction_id: construction_datum.id, move_flag: "1"), 
                                    :class => 'btn btn-purple200_rsd btn-xs keep-disp'  %></td>
-        <td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: construction_datum.id, move_flag: "1"), 
-                                   :class => 'btn btn-blue500_rsd btn-xs keep-disp'  %></td>
+        <!--<td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: construction_datum.id, move_flag: "1"), 
+                                   :class => 'btn btn-blue500_rsd btn-xs keep-disp'  %></td>-->
         <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
 		<% if @search.present? %>
           <td><%= link_to t('.back', :default => t("集計")), construction_costs_path(construction_id: construction_datum.id, move_flag: "1"), 

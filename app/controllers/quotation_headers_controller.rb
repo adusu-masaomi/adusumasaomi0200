@@ -5,9 +5,23 @@ class QuotationHeadersController < ApplicationController
   # GET /quotation_headers.json
   def index
     #@quotation_headers = QuotationHeader.all
-
-    @q = QuotationHeader.ransack(params[:q])  
-    @quotation_headers = @q.result(distinct: true)
+    #ransack保持用コード
+    query = params[:q]
+    query ||= eval(cookies[:recent_search_history].to_s)  	
+	
+    #@q = QuotationHeader.ransack(params[:q])  
+     #ransack保持用--上記はこれに置き換える
+    @q = QuotationHeader.ransack(query)
+	
+	#ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 24.hours.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+	
+	@quotation_headers = @q.result(distinct: true)
     @quotation_headers  = @quotation_headers.page(params[:page])
 	
   end
