@@ -246,6 +246,7 @@ class PurchaseDataController < ApplicationController
 	   
 	@purchase_datum = PurchaseDatum.new(purchase_datum_params)
     
+	
     #仕入単価を更新
     if (params[:purchase_datum][:check_unit] == 'false')
       @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
@@ -255,9 +256,14 @@ class PurchaseDataController < ApplicationController
         @purchase_unit_prices.update(purchase_unit_prices_create_params)
 	  end
 	
-      #資材Mも更新
+	    #資材Mも更新
       update_params_list_price_and_maker
 	  @purchase_datum.update_attributes(material_masters_params)
+	else
+	  #資材マスターのみへの更新
+	  #手入力のマスター反映(資材マスターのみ)
+      add_manual_input_except_unit_price
+
     end    
     
 	#資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
@@ -297,21 +303,24 @@ class PurchaseDataController < ApplicationController
    
    #仕入単価Mも更新する 
    if (params[:purchase_datum][:check_unit] == 'false')
-	 #@purchase_datum.update(purchase_unit_prices_params)
-	 #params[:purchase_datum][:PurchaseUnitPrice_attributes][:unit_price] = params[:purchase_datum][:purchase_unit_price]
-
-       @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+	
+     @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
               params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
-       if @purchase_unit_prices.present?
+     if @purchase_unit_prices.present?
 
-	 purchase_unit_prices_update_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
-	 #@purchase_datum.update(purchase_unit_prices_update_params)
-         @purchase_unit_prices.update(purchase_unit_prices_update_params)
-       end     
+	   purchase_unit_prices_update_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
+	     @purchase_unit_prices.update(purchase_unit_prices_update_params)
+     end     
 
-	 #定価・メーカーID、品番品名も更新
+     #定価・メーカーID、品番品名も更新
      update_params_list_price_and_maker
-	 @purchase_datum.update(material_masters_params)         
+	 @purchase_datum.update(material_masters_params)  
+   
+   else
+   #資材マスターのみへの更新
+	 #手入力のマスター反映(資材マスターのみ)
+     add_manual_input_except_unit_price
+	   
    end 
    
    #資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
@@ -431,6 +440,56 @@ class PurchaseDataController < ApplicationController
     params[:purchase_datum][:purchase_date] = params[:purchase_datum][:purchase_date][0] + "/" + 
                                                   params[:purchase_datum][:purchase_date][1] + "/" + 
                                                   params[:purchase_datum][:purchase_date][2]
+  end
+  
+  #手入力のマスター反映(資材単価マスターの単価のみ更新しないVer)
+  def add_manual_input_except_unit_price
+    if params[:purchase_datum][:MaterialMaster_attributes].present?
+      if params[:purchase_datum][:material_id].present?   #add170904__
+	    id = params[:purchase_datum][:material_id].to_i
+      
+	    if id == 1  #手入力の場合のみ
+		
+	      if params[:purchase_datum][:material_id] == "1" && 
+             params[:purchase_datum][:material_code] != "" && 
+		     params[:purchase_datum][:material_code] != "＜手入力用＞" &&
+             params[:purchase_datum][:material_code] != "-"
+            #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+            @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
+	        #商品マスターへセット(商品コード存在しない場合)
+	         if @material_master.nil?
+		       material_master_params = {material_code: params[:purchase_datum][:material_code], 
+		                             material_name: params[:purchase_datum][:material_name], 
+                                     maker_id: params[:purchase_datum][:maker_id],
+									 list_price: params[:purchase_datum][:list_price] }
+		       @material_master = MaterialMaster.create(material_master_params)
+		   
+		       #仕入データのマスターIDも更新する  add170405
+		       @purchase_datum.material_id = @material_master.id
+	         
+			 end
+             
+			 if @material_master.id.present?
+	           material_id = @material_master.id
+		       supplier_id = params[:purchase_datum][:supplier_id]
+		 
+	   	       if params[:purchase_datum][:supplier_material_code].present?
+		         supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+		       else
+		       #仕入先品番が未入力の場合は、品番をそのままセットする
+		         supplier_masterial_code = params[:purchase_datum][:material_code]
+		       end
+		       #単価は登録しないため、ゼロにする（必要ないかもだが・・）
+			   purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
+                  supplier_material_code: supplier_masterial_code, 
+                  unit_price: 0 ,
+                  unit_id: params[:purchase_datum][:unit_id]}
+	           @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
+             end 
+	      end
+		end
+	  end
+	end
   end
   
   #手入力のマスター反映

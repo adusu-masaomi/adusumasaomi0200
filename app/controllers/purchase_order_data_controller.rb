@@ -108,6 +108,7 @@ end
    
       #メール送信フラグをセット
       params[:purchase_order_datum][:mail_sent_flag] = 1
+	  @purchase_order_datum = PurchaseOrderDatum.new(purchase_order_datum_params)  #add170922
    
 	  PostMailer.send_when_update(@purchase_order_datum).deliver
 	end

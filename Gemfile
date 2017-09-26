@@ -1,5 +1,10 @@
 source 'https://rubygems.org'
 
+#gem 'rails-assets-sweetalert2', source: 'https://rails-assets.org'
+#メッセージをリッチにする→メール送信など動作異常が出るので解除！
+#gem 'sweetalert-rails'
+#gem 'sweet-alert-confirm'
+
 #group :assets do
 #    gem 'bootstrap-scrolltable-rails'
 #end

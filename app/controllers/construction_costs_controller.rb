@@ -1,6 +1,7 @@
 class ConstructionCostsController < ApplicationController
   before_action :set_construction_cost, only: [:show, :edit, :update, :destroy]
-
+  
+  
   # GET /construction_costs
   # GET /construction_costs.json
   def index
@@ -49,23 +50,19 @@ class ConstructionCostsController < ApplicationController
         $construction_costs = @construction_costs
       end
       
-      
-      format.pdf do
-        
-        #集計表発行時にデータの初期値をセットする
-        set_default_data
-       
-		
-        report = ConstructionCostSummaryPDF.create @construction_costs 
-        
-        # ブラウザでPDFを表示する
-        # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "construction_cost_summary.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
-      end
+      #moved170925 
+      #format.pdf do
+      #  #集計表発行時にデータの初期値をセットする
+      #  set_default_data
+      #    report = ConstructionCostSummaryPDF.create @construction_costs 
+      #  # ブラウザでPDFを表示する
+      #  # disposition: "inline" によりダウンロードではなく表示させている
+      #  send_data(
+      #    report.generate,
+      #    filename:  "construction_cost_summary.pdf",
+      #    type:        "application/pdf",
+      #    disposition: "inline")
+      #end
       #
     end
   end
@@ -101,8 +98,18 @@ class ConstructionCostsController < ApplicationController
         #format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully created.' }
         #format.json { render :show, status: :created, location: @construction_cost }
 		
-		 format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
-         :move_flag => params[:move_flag])}
+		#if params[:costs_pdf].present?  
+		if params[:format] == "pdf"
+  
+		  #更新後に集計表を出すようにする
+		  set_pdf(format)
+		 
+		else
+		#通常の更新の場合。
+		
+		  format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
+          :move_flag => params[:move_flag])}
+		end
       else
         format.html { render :new }
         format.json { render json: @construction_cost.errors, status: :unprocessable_entity }
@@ -117,15 +124,26 @@ class ConstructionCostsController < ApplicationController
     #仕入金額・実行金額をセットする
     #upd170209 入力時に反映することにした。
     #set_amount
-    
+   
     respond_to do |format|
+	
       if @construction_cost.update(construction_cost_params)
         #format.html { redirect_to @construction_cost, notice: 'Construction cost was successfully updated.' }
         #format.json { render :show, status: :ok, location: @construction_cost }
 		
-		format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
-         :move_flag => params[:move_flag])}
-      else
+		if params[:format] == "pdf"  
+		  
+		  #更新後に集計表を出すようにする
+		  set_pdf(format)
+		 
+		else
+		#通常の更新の場合。
+		   
+		  format.html {redirect_to construction_cost_path(@construction_cost, :construction_id => params[:construction_id], 
+           :move_flag => params[:move_flag])}
+		end
+		 
+	  else
         format.html { render :edit }
         format.json { render json: @construction_cost.errors, status: :unprocessable_entity }
       end
@@ -141,6 +159,32 @@ class ConstructionCostsController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  #工事集計表の発行
+  def set_pdf(format)
+    
+	#集計表発行時にデータの初期値をセットする
+    $construction_costs = @construction_cost 
+
+
+    format.html { render :edit }
+    format.pdf do
+      	
+      report = ConstructionCostSummaryPDF.create @construction_costs 
+        
+      # ブラウザでPDFを表示する
+      # disposition: "inline" によりダウンロードではなく表示させている
+      send_data(
+         report.generate,
+         filename:  "construction_cost_summary.pdf",
+         type:        "application/pdf",
+         disposition: "inline")
+    end
+	
+	#集計済みフラグ（工事データ）をセットする
+	set_caluculated_flag
+  end
+  
   
   #集計表発行時にデータの初期値をセットする
   def set_default_data
@@ -240,6 +284,22 @@ class ConstructionCostsController < ApplicationController
     #仕入金額を取得
     @purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:construction_datum_id]).sum(:purchase_amount)
   end
+  
+  #集計済みフラグ（工事データ）をセットする
+  def set_caluculated_flag
+     #construction_data = ConstructionDatum.find(params[:construction_datum_id])
+	 construction_data = ConstructionDatum.find(@construction_cost.construction_datum_id)
+	 
+	 if construction_data.present?
+	 
+	   construction_data_params = { calculated_flag: 1 }
+	   
+	   #工事データを更新
+	   construction_data.update(construction_data_params)
+	   
+	 end
+  end
+  
    
   private
     # Use callbacks to share common setup or constraints between actions.

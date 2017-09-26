@@ -9,8 +9,10 @@ class PurchaseOrderHistoriesController < ApplicationController
   # GET /purchase_order_histories
   # GET /purchase_order_histories.json
   def index
-    
-	$seq  = 0
+    #フォーム連番用
+	$seq  = 0        #フォーム用(追加時)
+	$seq_exists = 0  #フォーム用
+	$seq_max = 0  #最大値取得用
 	
 	@purchase_order_histories = PurchaseOrderHistory.all
 	#
@@ -103,6 +105,9 @@ class PurchaseOrderHistoriesController < ApplicationController
       @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
     end
 	
+	#連番の最大値を取る(フォーム用)
+    get_max_seq
+  
 	#工事画面からのパラメータ保管
 	#@construction_id = params[:construction_id]
 	#@move_flag = params[:construction_id]
@@ -113,13 +118,40 @@ class PurchaseOrderHistoriesController < ApplicationController
   def edit
     $quantity_nothing = false
 	
-    set_edit_params
+	set_edit_params
+	
+	
+	#連番の最大値を取る(フォーム用)
+	get_max_seq
+	
 	
 	#工事画面からのパラメータ保管
 	#$construction_id = params[:construction_id]
 	#$move_flag = params[:move_flag]
 	#
 	 
+  end
+
+   def get_max_seq
+        
+		@details = nil
+		if @purchase_order_history.orders.present?
+		  
+		  @details = @purchase_order_history.orders
+		end
+		
+		if  @details.present?
+		  if @details.maximum(:sequential_id).present?
+		    $seq_exists = @details.maximum(:sequential_id)
+		    
+			$seq_max = $seq_exists
+		  
+		  end
+		  #SEQが逆になっているのでみやすいよう再び逆にする
+		  #reverse_seq
+		end
+		##
+  
   end
 
   def set_edit_params
@@ -158,10 +190,13 @@ class PurchaseOrderHistoriesController < ApplicationController
         #デフォルトの仕入業者をセット
         @purchase_order_history.supplier_master_id = @purchase_order_data.supplier_master_id
 
+       
 		#リロード用（注文業者をセット）
-        if $supplier_master_id.present?
-          @purchase_order_history.supplier_master_id = $supplier_master_id
-        end
+		if @purchase_order_history.supplier_master_id.blank?   #addd170914
+          if $supplier_master_id.present?
+            @purchase_order_history.supplier_master_id = $supplier_master_id
+          end
+		end
         #リロード用（注文日をセット）
         if $purchase_order_date.present?
           @purchase_order_history.purchase_order_date = $purchase_order_date
@@ -259,9 +294,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
 	    purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
 	
-	#binding.pry
-	 	  
-     if $purchase_order_history.nil?
+	 if $purchase_order_history.nil?
 	    $purchase_order_date = params[:purchase_order_date]
 		$supplier_master_id = params[:supplier_master_id]
      else 
@@ -283,25 +316,28 @@ class PurchaseOrderHistoriesController < ApplicationController
   # POST /purchase_order_histories.json
   def create
   
-  	  
-	#パラーメータ補完＆メール送信する
-    #send_mail_and_params_complement
-    
+  	
 	$id = params[:purchase_order_history][:purchase_order_datum_id]
     
     @purchase_order_history = PurchaseOrderHistory.new(purchase_order_history_params)
-   
-   
-    #パラーメータ補完＆メール送信する
-    send_mail_and_params_complement
+	
+    #パラーメータ補完する
+    set_params_complement
     
-    #メール送信済みフラグをセット
-    set_mail_sent_flag
+	#add170911
+	@purchase_order_history = PurchaseOrderHistory.new(purchase_order_history_params)
+	
+	#メール送信済みフラグをセット
+    #set_mail_sent_flag
   
     
     respond_to do |format|
-	  if PurchaseOrderHistory.create(purchase_order_history_params)
+	  #if PurchaseOrderHistory.create(purchase_order_history_params)
+	  if @purchase_order_history.save!(:validate => false)   #upd170911
 	    
+		#メール送信する
+		send_email
+		
         if params[:move_flag] != "1"
 	      format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully created.' }
           format.json { render :show, status: :created, location: @purchase_order_history }
@@ -322,11 +358,12 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #すでに登録していた注文データは一旦抹消する。
 	  destroy_before_update
 	  
-	  #パラーメータ補完＆メール送信する
-      send_mail_and_params_complement
+	  #パラーメータ補完する
+      set_params_complement
 	  
+	  #170911 moved
 	  #メール送信済みフラグをセット
-	  set_mail_sent_flag
+	  #set_mail_sent_flag
 	  
 	  respond_to do |format|
         
@@ -334,6 +371,11 @@ class PurchaseOrderHistoriesController < ApplicationController
 		
 		if @purchase_order_history.update(purchase_order_history_params)
           
+		  #binding.pry
+		  
+		  #メール送信する
+		  send_email
+		  
 		  if params[:move_flag] != "1"
             format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully updated.' }
             format.json { render :show, status: :created, location: @purchase_order_history }
@@ -365,20 +407,10 @@ class PurchaseOrderHistoriesController < ApplicationController
 	Order.where(purchase_order_history_id: purchase_order_history_id).destroy_all
   end
   
-  def set_mail_sent_flag
-  #add170529 レコード毎にメール送信済みフラグをセットする
-     if params[:purchase_order_history][:sent_flag] == "1" 
-      if params[:purchase_order_history][:orders_attributes].present?
-        params[:purchase_order_history][:orders_attributes].values.each do |item|
-          item[:mail_sent_flag] = 1
-        end
-      end
-    end
-  end
+ 
   
   
-  
-  def send_mail_and_params_complement
+  def set_params_complement
     
 	i = 0
    
@@ -480,21 +512,23 @@ class PurchaseOrderHistoriesController < ApplicationController
                 end 
 			  end
 			  
-			  #######
-			  #add170804
 			  #仕入単価マスターの単位も更新する
 			  purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:purchase_order_history][:supplier_master_id], params[:material_id][i] ]).first
 			  
-			  if purchase_unit_price.present?
-			     if item[:unit_master_id].present?
-			       purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
-				                                  unit_id: item[:unit_master_id]}
-				   purchase_unit_price.update(purchase_unit_price_params)
-				 end
+			  #if purchase_unit_price.present?
+			  if item[:unit_master_id].present?
+			    purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+				                               unit_id: item[:unit_master_id]}
+				if purchase_unit_price.present?
+				  purchase_unit_price.update(purchase_unit_price_params)
+				else
+				  #add170914
+				  #新規登録も考慮する。
+			      purchase_unit_price = PurchaseUnitPrice.create(purchase_unit_price_params)
+				end
 			  end
-			  
-			  #######
+		
 		  else
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
@@ -546,23 +580,53 @@ class PurchaseOrderHistoriesController < ApplicationController
 		   
 		end 
     
-	    #メール送信する(メール送信ボタン押した場合)
-        if params[:purchase_order_history][:sent_flag] == "1" then
-	
-	
-      	  #set to global
-	      $order_parameters = params[:purchase_order_history][:orders_attributes]
-      
-          #画面のメアドをグローバルへセット
-          $email_responsible = params[:purchase_order_history][:email_responsible]
-		  $responsible = params[:purchase_order_history][:responsible]
-		  
-		  
-          PostMailer.send_purchase_order(@purchase_order_history).deliver
-          #メール送信フラグをセット
-          #params[:purchase_order_history][:mail_sent_flag] = 1
-        end
+	    #170911 moved
+	    ##メール送信する(メール送信ボタン押した場合)
+        #if params[:purchase_order_history][:sent_flag] == "1" then
+	  	#  #set to global
+	    #  $order_parameters = params[:purchase_order_history][:orders_attributes]
+        #  #画面のメアドをグローバルへセット
+        #  $email_responsible = params[:purchase_order_history][:email_responsible]
+		#  $responsible = params[:purchase_order_history][:responsible]
+	    #  PostMailer.send_purchase_order(@purchase_order_history).deliver
+        #  #メール送信フラグをセット
+        #  #params[:purchase_order_history][:mail_sent_flag] = 1
+        #end
 
+    end
+  end
+  
+  def send_email
+     #メール送信する(メール送信ボタン押した場合)
+     if params[:purchase_order_history][:sent_flag] == "1" then
+       #set to global
+	   $order_parameters = params[:purchase_order_history][:orders_attributes]
+      
+       #画面のメアドをグローバルへセット
+       $email_responsible = params[:purchase_order_history][:email_responsible]
+	   $responsible = params[:purchase_order_history][:responsible]
+       PostMailer.send_purchase_order(@purchase_order_history).deliver
+       
+	   
+	   #メール送信フラグをセット＆データ更新
+       set_mail_sent_flag
+     end
+  end
+  
+  #レコード毎にメール送信済みフラグをセットする
+  def set_mail_sent_flag
+  
+     if params[:purchase_order_history][:sent_flag] == "1" 
+      if params[:purchase_order_history][:orders_attributes].present?
+        params[:purchase_order_history][:orders_attributes].values.each do |item|
+          item[:mail_sent_flag] = 1
+        end
+		
+		#再度ここで更新をかける(削除後)
+		destroy_before_update
+		@purchase_order_history.update(purchase_order_history_params)
+		
+      end
     end
   end
   
@@ -597,7 +661,10 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 #add170804
 	 @unit_id_hide = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
-	 
+	 #add170914 該当なければひとまず”個”にする
+	 if @unit_id_hide.blank?
+	   @unit_id_hide = "3"
+	 end
 	
   end
   

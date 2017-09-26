@@ -66,14 +66,16 @@ class ApplicationController < ActionController::Base
   #仕入先業者
   $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO = 2
   
-  #工事ID
+  #工事ID(170915~未使用？)
   $CUNSTRUCTION_ID_AIR_CONDITIONING_ELEMENT = 976 #エアコン部材
   $CUNSTRUCTION_ID_PIPE_AND_WIRING = 977          #配管配線
   $CUNSTRUCTION_ID_CABLE = 978                    #ケーブル
+  #$CONSTRUCTION_ID_LIGHTING_EQUIPMENT = 1083      #照明器具 add170915
   
-  #在庫品目
+  #在庫品目(170915~未使用？)
   $INVENTORY_CATEGORY_AIR_CONDITIONING_ELEMENT = 0
   $INVENTORY_CATEGORY_PIPE_AND_WIRING = 1
   $INVENTORY_CATEGORY_ID_CABLE = 2
+  #$INVENTORY_LIGHTING_EQUIPMENT = 3               #照明器具 add170915
   
 end

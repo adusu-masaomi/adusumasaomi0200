@@ -14,6 +14,9 @@ class ConstructionCost < ActiveRecord::Base
   #小計2
   attr_accessor :subtotal_2
   
+  #PDF切り分け用
+  #attr_accessor :random_param_name
+  
   #バリデーション
   validates :construction_datum_id, uniqueness: true # 値がユニークであれば検証成功
   

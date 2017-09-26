@@ -1,6 +1,11 @@
 <div class="sortThese">
 <div class="nested-fields well form-inline">
-  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , value: $seq_exists, style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  
+  <% if f.object.sequential_id.present? %>
+    <% $seq_exists -=  1 %>
+  <% end %>
+  
   <!--<%= f.input :purchase_order_history_id,  input_html:{ id: "purchase_order_history_id" }, as: :hidden %>-->
   <%= f.label :品番選択, {style: 'width:770px'}  %>
   <%= f.label :単位, {style: 'width:50px;margin-left:-85px;'}  %>

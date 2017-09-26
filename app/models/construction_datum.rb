@@ -15,6 +15,10 @@ class ConstructionDatum < ActiveRecord::Base
 	has_many :purchase_order_datum
 	has_many :construction_daily_reports
 	
+	#add170912
+	has_many :construction_costs, :foreign_key => "construction_datum_id"
+	#belongs_to :construction_costs
+	
 	#発行日用
     attr_accessor :issue_date
 	

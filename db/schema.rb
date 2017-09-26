@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170904011432) do
+ActiveRecord::Schema.define(version: 20170905071300) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -85,6 +85,7 @@ ActiveRecord::Schema.define(version: 20170904011432) do
     t.integer  "quotation_header_id",        limit: 4
     t.integer  "delivery_slip_header_id",    limit: 4
     t.integer  "billed_flag",                limit: 4
+    t.integer  "calculated_flag",            limit: 4
     t.datetime "created_at",                                                     null: false
     t.datetime "update_at",                                                      null: false
   end
@@ -682,19 +683,42 @@ ActiveRecord::Schema.define(version: 20170904011432) do
     t.integer  "quantity",                     limit: 4
     t.integer  "unit_master_id",               limit: 4
     t.integer  "list_price",                   limit: 4
+    t.integer  "quotation_price_1",            limit: 4
+    t.integer  "quotation_price_2",            limit: 4
+    t.integer  "quotation_price_3",            limit: 4
+    t.integer  "bid_flag_1",                   limit: 4
+    t.integer  "bid_flag_2",                   limit: 4
+    t.integer  "bid_flag_3",                   limit: 4
     t.integer  "mail_sent_flag",               limit: 4
+    t.integer  "sequential_id",                limit: 4,   null: false
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
   end
 
+  add_index "quotation_material_details", ["quotation_material_header_id", "sequential_id"], name: "uq_seq", unique: true, using: :btree
+
   create_table "quotation_material_headers", force: :cascade do |t|
-    t.string   "quotation_code",        limit: 255
+    t.string   "quotation_code",             limit: 255
     t.date     "requested_date"
-    t.integer  "construction_datum_id", limit: 4
-    t.integer  "supplier_master_id",    limit: 4
-    t.string   "responsible",           limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.integer  "construction_datum_id",      limit: 4
+    t.integer  "supplier_master_id",         limit: 4
+    t.string   "responsible",                limit: 255
+    t.string   "email",                      limit: 255
+    t.integer  "quotation_header_origin_id", limit: 4
+    t.integer  "supplier_id_1",              limit: 4
+    t.integer  "supplier_id_2",              limit: 4
+    t.integer  "supplier_id_3",              limit: 4
+    t.integer  "quotation_email_flag_1",     limit: 4
+    t.integer  "quotation_email_flag_2",     limit: 4
+    t.integer  "quotation_email_flag_3",     limit: 4
+    t.integer  "order_email_flag_1",         limit: 4
+    t.integer  "order_email_flag_2",         limit: 4
+    t.integer  "order_email_flag_3",         limit: 4
+    t.integer  "all_bid_flag_1",             limit: 4
+    t.integer  "all_bid_flag_2",             limit: 4
+    t.integer  "all_bid_flag_3",             limit: 4
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
   end
 
   create_table "quotation_middle_items", force: :cascade do |t|

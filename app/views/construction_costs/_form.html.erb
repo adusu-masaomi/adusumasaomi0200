@@ -1,4 +1,4 @@
-<%= simple_form_for @construction_cost, :html => { :class => 'well form-horizontal' } do |f| %>
+<%= simple_form_for @construction_cost,  :html => { :class => 'well form-horizontal' } do |f| %>
   
   <% if @construction_cost.errors.any? %>
   <div id="error_explanation">
@@ -13,6 +13,9 @@
  <% end %>
   
   <!--<%= f.input :construction_datum_id %>-->
+  
+  <%= f.input :construction_datum_id , input_html:{id:"construction_datum_id" }, as: :hidden  %>
+  
   <%= f.label :工事コード, {:class => "my-custom-class-l"}  %></br>
   <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , :tabindex=>"0", style: 'width:440px'} %>
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
@@ -47,20 +50,35 @@
   <%= f.input :purchase_order_amount,
  input_html:{id:"purchase_order_amount", :readonly => true } %>
  
+ 
   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   <!-- -->
-
-  <%= f.button :submit, :class => 'btn-primary' , :tabindex=>"5" %>
+  
+  <!--<%= f.button :submit, name: "upd", :class => 'btn-primary' , :tabindex=>"5" %>-->
+  
+  <!--<%= f.submit "更新する", name: "upd", class: "btn btn-blue500_rsd"  %>-->
+  <%= button_tag( '更新する', :value => 'html', :name => 'format', class: "btn btn-blue500_rsd" ) %>
+  
+  <!--<%= link_to "工事費集計表",
+            construction_costs_path(f.object, construction_costs_id: f.object.id, format: "pdf" ),
+            :class => 'btn  btn-lime500_ftg', :target=>["_blank"], :onclick => "return submitAfterValidation()", :method=> :put %>-->
+  
+  <!--upd170922-->
+  <%= button_tag( '工事費集計表', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , formtarget: "_blank", :onclick => "return submitAfterValidation()" ) %>
+  
+  
+  <%= link_to t('.cancel', :default => t("helpers.links.back")),
+                construction_data_path(construction_id: params[:construction_id], 
+				move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
+  
   <!--<%= f.button_tag :登録する, :type => 'button', :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" , :tabindex=>"5"  %>-->
   <!--<%= link_to t('.cancel', :default => t("helpers.links.cancel")),
-                construction_costs_path, :class => 'btn btn-default' %>-->
-  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 construction_costs_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
-                :class => 'btn btn-white_rsd' %>
-
+                :class => 'btn btn-white_rsd' %>-->
+  
 <% end %>
 
 <script type="text/javascript">
@@ -138,6 +156,10 @@
 	 
   } 
   
+  function changeFormat(format) {
+  // The ID here is in the format "model_name_field_name". This is default for any form_for.
+  $("#construction_cost_random_param_name").val(format);
+  }
   
   //仕入明細・労務費を取得
   //function setPurchaseOrder()
@@ -356,5 +378,53 @@
 	//	 document.forms[0].submit();
        //}
    //}
+
+  
+  
+  //印刷時の確認＆集計フラグをセット。
+  function submitAfterValidation() {
+  
+	//swalにしたいが、うまくいかないので保留
+	
+	
+	//swal({
+    //  title: "集計「済」にしますか?",
+    //  type: 'warning',
+    //  showCancelButton: true,
+    //  confirmButtonColor: '#3085d6',
+    //  cancelButtonColor: '#d33',
+    //  confirmButtonText: 'Ｏｋ'
+	//  
+    //}).then(function() {
+    //  confirmFlag = true;
+	//  //ここでajax発動しコントローラで履歴保存する
+	//  var id = 0;
+	//  construction_datum_id = document.getElementById("construction_datum_id").value;
+	//  $.get("<%= construction_costz_set_caluculated_flag_path %>",
+    //    { construction_datum_id: construction_datum_id },
+    //       function(data){
+	//	   }
+    //  );
+	//  location.reload();
+	//  return true;
+	//}, function(dismiss) {return false;})
+	 
+   
+	
+	
+	if (window.confirm('工事集計表を発行しますか？')) {
+	  //ここでajax発動しコントローラで履歴保存する
+	  var id = 0;
+	  construction_datum_id = document.getElementById("construction_datum_id").value;
+	  $.get("<%= construction_costz_set_caluculated_flag_path %>",
+         { construction_datum_id: construction_datum_id },
+         function(data){
+		   }
+      );
+	  return true;
+    }else{
+	  return false;
+	}
+  }
 
 </script>

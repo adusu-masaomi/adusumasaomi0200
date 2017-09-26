@@ -19,9 +19,12 @@
   <dd><%= number_to_currency(@construction_cost.constructing_amount,  precision: 0) %></dd>
 </dl>
 
-<%= link_to t('.back', :default => t("helpers.links.back")),
+<!--<%= link_to t('.back', :default => t("helpers.links.back")),
               construction_costs_path(construction_id: params[:construction_id], 
-                        move_flag: params[:move_flag]), :class => 'btn btn-white_rsd'  %>  
+                        move_flag: params[:move_flag]), :class => 'btn btn-white_rsd'  %>-->  
+<%= link_to t('.back', :default => t("helpers.links.back")),
+                construction_data_path(construction_id: params[:construction_id], 
+				move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
               edit_construction_cost_path(@construction_cost, construction_id: params[:construction_id], 
                     move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>

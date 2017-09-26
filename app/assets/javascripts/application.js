@@ -10,6 +10,7 @@
 // Read Sprockets README (https://github.com/rails/sprockets#sprockets-directives) for details
 // about supported directives.
 //
+
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
@@ -20,6 +21,8 @@
 //= require typehead.js.js
 //= require twitter/bootstrap
 //= require jquery.turbolinks
+// require sweetalert
+// require sweet-alert-confirm
 //= require select2
 //= require select2_locale_ja
 //= require_tree .

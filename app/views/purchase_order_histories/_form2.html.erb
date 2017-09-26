@@ -29,7 +29,8 @@
 	
    <div class = "form-inputs">
     <%= f.label :注文ＮＯ：, {style: 'color:blue'} %>
-   <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , {id:"purchase_order_datum_id", class: "searchableId" , style: 'width:200px'} %>
+   <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , 
+      {id:"purchase_order_datum_id", class: "searchableId" , style: 'width:200px'} %>
    
    <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
      <%= m.label :工事名：, {style: 'color:blue'} %>
@@ -110,7 +111,7 @@
       </br></br>
 	  
 	       <div id="subForms" class="sortDone" >
-           	<%= f.simple_fields_for :orders, @purchase_order_history.orders.order("sequential_id DESC"), :include_id => false  do |orders| %>
+           	<%= f.simple_fields_for :orders, @purchase_order_history.orders.order("sequential_id ASC"), :include_id => false  do |orders| %>
 		        
                <%= render 'order_fields', f: orders, cache: true %>
         <% end %> 

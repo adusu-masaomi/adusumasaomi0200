@@ -36,9 +36,9 @@
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
-      <th></th>
+      <!--<th></th>
 	  <th></th>
-      <th>　　　　　　</th>
+      <th>　　　　　　</th>-->
 	  <th><%= model_class.human_attribute_name(:construction_code) %></th>
 	  <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:supplies_expense) %></th>
@@ -53,17 +53,18 @@
   <tbody>
     <% @construction_costs.joins(:construction_datum).order("construction_code desc").each do |construction_cost| %>
       <tr>
+	  
         <td><%= link_to construction_cost.id, construction_cost_path(construction_cost, construction_id: params[:construction_id], 
                                move_flag: params[:move_flag]) %></td>
-		<td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+		<!--<td><%= link_to t('.back', :default => t("仕入")), purchase_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                                    :class => 'btn btn-lightgreen500_rsd keep-disp'  %></td>
 		<td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                                    :class => 'btn btn-blue500_rsd keep-disp'  %></td>
 		<td><%= link_to "工事費集計表",
-            construction_costs_path(construction_cost, construction_costs_id: construction_cost.id, format: "pdf"),
-            :class => 'btn  btn-lime500_ftg', :target=>["_blank"] %></td>
+            construction_costs_path(construction_cost, construction_costs_id: construction_cost.id, format: "pdf" ),
+            :class => 'btn  btn-lime500_ftg', :target=>["_blank"], :onclick => "submitAfterValidation()" %></td>-->
         <!--<td><%= construction_cost.construction_datum_id %></td>-->
-        <td><%= construction_cost.construction_datum.construction_code %></td>
+		<td><%= construction_cost.construction_datum.construction_code %></td>
 		<td><%= construction_cost.construction_datum.construction_name %></td>
 		<td><%= construction_cost.supplies_expense %></td>
         <td><%= construction_cost.labor_cost %></td>
@@ -71,7 +72,11 @@
 		<td><%= construction_cost.execution_amount %></td>
         <td><%= construction_cost.constructing_amount %></td>
         <td><%=l construction_cost.created_at %></td>
-        <td>
+        
+		<!--add170912 JS判定用ID追加-->
+		<td id="construction_datum_id", style="display:none;"><%= construction_cost.construction_datum_id %></td>
+		
+		<td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_construction_cost_path(construction_cost, construction_id: params[:construction_id], 
                                move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs' %>
@@ -114,6 +119,25 @@
 	 
   });
   
+  
+  //印刷時の確認＆集計フラグをセット。
+  function submitAfterValidation() {
+    //キャンセルした場合の処理が難しいので、確認メッセージなしとする。
+    //if (window.confirm('工事費集計表を発行しますか？')) {
+	  
+	  //ここでajax発動しコントローラで履歴保存する
+	  var id = 0;
+	  construction_datum_id = document.getElementById("construction_datum_id").innerText;
+	  
+	  $.get("<%= construction_costz_set_caluculated_flag_path %>",
+         { construction_datum_id: construction_datum_id },
+           function(data){
+		   }
+      );
+	  
+	//}
+ }
+
   
 
 </script>

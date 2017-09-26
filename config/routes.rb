@@ -216,9 +216,11 @@ Rails.application.routes.draw do
   get '/construction_costz/construction_labor_cost_select' => 'construction_costs#construction_labor_cost_select'
   get '/construction_costz/purchase_order_amount_select' => 'construction_costs#purchase_order_amount_select'
   
-  #add170210
   get '/construction_costz/purchase_amount_etc_select' => 'construction_costs#purchase_amount_etc_select'
   get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
+
+  #add170912
+  get '/construction_costz/set_caluculated_flag' => 'construction_costs#set_caluculated_flag'
 
   #add170621
   #見積書履歴保存処理
