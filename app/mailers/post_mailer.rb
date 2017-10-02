@@ -121,16 +121,17 @@ class PostMailer < ApplicationMailer
 	end
 	
 	#見積金額合計
-	#add170919
-	tmp_header = "見積合計価格：￥"
-	case $supplier
-      when 1
-        @total_quotation_price = tmp_header + user.total_quotation_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-      when 2
-        @total_quotation_price = tmp_header + user.total_quotation_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-      when 3
-        @total_quotation_price = tmp_header + user.total_quotation_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-	end
+	#del170930
+	#落札のみの金額が必要？？かもしれないため一旦保留とする。
+	#tmp_header = "見積合計価格：￥"
+	#case $supplier
+    #  when 1
+    #    @total_quotation_price = tmp_header + user.total_quotation_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+    #  when 2
+    #    @total_quotation_price = tmp_header + user.total_quotation_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+    #  when 3
+    #    @total_quotation_price = tmp_header + user.total_quotation_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+	#end
 	#
 	
 	

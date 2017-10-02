@@ -91,6 +91,13 @@ class MaterialMastersController < ApplicationController
     end
   end
   
+  #ajax
+  #資材の自動セット用（コード→ID取得）
+  def get_material_id
+    @material_id = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:id).flatten.join(" ")
+  end
+  
+  
   #select2高速化のための処理
   #def searchableMaterial
   #  respond_to do |format|

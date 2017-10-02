@@ -21,10 +21,10 @@
 //= require typehead.js.js
 //= require twitter/bootstrap
 //= require jquery.turbolinks
-// require sweetalert
-// require sweet-alert-confirm
 //= require select2
 //= require select2_locale_ja
+//= require sweetalert2
+//= require rails-sweetalert2-confirm
 //= require_tree .
 //= require_self
 //= require moment

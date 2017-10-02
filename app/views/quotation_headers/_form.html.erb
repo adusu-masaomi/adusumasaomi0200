@@ -20,10 +20,10 @@
   
   <%= f.input :quotation_date, :include_blank => true, input_html:{ id:"quotation_date", :tabindex=>"1",style: 'width:100px'} %>
   <div class="col-md-6" , style="margin-left : -15px">
-   <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{:tabindex=>"2",style: 'width:100px'} %>
+   <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{ id:"invoice_period_start_date", :tabindex=>"2",style: 'width:100px'} %>
   </div>
   <div style="margin-left : 0px">
-     <%= f.input :invoice_period_end_date, :include_blank => true, input_html:{:tabindex=>"3",style: 'width:100px'} %>
+     <%= f.input :invoice_period_end_date, :include_blank => true, input_html:{ id:"invoice_period_end_date", :tabindex=>"3",style: 'width:100px'} %>
   </div></br>
   
   <%= f.label :"件名Ｎｏ(＊該当無→”-”)" , {:class => "my-custom-class-l"} %></br>
@@ -64,6 +64,8 @@
   <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"22"}  %>
   
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
+  <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_start_date_hide'}, as: :hidden  %>
+  <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_end_date_hide'}, as: :hidden  %>
   
   <!--得意先M-->
   <%= f.simple_fields_for :customer_master, :remote => true do |m| %>
@@ -183,6 +185,28 @@
 		  
 		  //工事情報をセット
 		  //setConstructionDateDefault();
+		  
+		  //請求書有効期間開始日
+		  obj = document.getElementById("invoice_period_start_date_hide").textContent;
+		  if (obj != undefined){
+		    //年
+		    document.getElementsByName("quotation_header[invoice_period_start_date(1i)]")[0].value = obj.substr(0,4);
+		    //月
+		    document.getElementsByName("quotation_header[invoice_period_start_date(2i)]")[0].value = parseInt(obj.substr(5,2));
+		    //日
+		    document.getElementsByName("quotation_header[invoice_period_start_date(3i)]")[0].value = parseInt(obj.substr(8,2));
+		  }
+		  //請求書有効期間終了日
+		  obj = document.getElementById("invoice_period_end_date_hide").textContent;
+		  if (obj != undefined){
+		    //年
+		    document.getElementsByName("quotation_header[invoice_period_end_date(1i)]")[0].value = obj.substr(0,4);
+		    //月
+		    document.getElementsByName("quotation_header[invoice_period_end_date(2i)]")[0].value = parseInt(obj.substr(5,2));
+		    //日
+		    document.getElementsByName("quotation_header[invoice_period_end_date(3i)]")[0].value = parseInt(obj.substr(8,2));
+		  }
+		  
 		  
 		  //請求コード
 		  obj = document.getElementById("invoice_code").textContent;

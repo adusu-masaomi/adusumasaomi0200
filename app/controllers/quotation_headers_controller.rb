@@ -232,7 +232,11 @@ class QuotationHeadersController < ApplicationController
 	
 	if quotation_header.present?
      
-	   #日付はうまくセットできないので保留・・・(datePickerにするしかなさそう)
+	   #請求書有効期間開始日
+	   @invoice_period_start_date = quotation_header.pluck(:invoice_period_start_date).flatten.join(" ")
+	   #請求書有効期間終了日
+	   @invoice_period_end_date = quotation_header.pluck(:invoice_period_end_date).flatten.join(" ")
+	   
 	   #@quotation_date =
 	   #    Array[[quotation_header.pluck(:quotation_date).slice(0).year, quotation_header.pluck(:quotation_date).slice(0).year]]
 	

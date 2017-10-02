@@ -15,7 +15,9 @@ class CustomerMaster < ActiveRecord::Base
     validates :closing_date, presence: true, numericality: :integer
     validates :due_date, presence: true, numericality: :integer
 	
-	validates :search_character, presence: true, length: { maximum: 1 } , :format => {:with => /^[ぁ-んー－]+$/, :multiline => true, :message =>'はひらがなで入力して下さい。'} 
+	#現状、利用価値が少ないのでチェックしないものとする・・・
+	#add 171002
+	#validates :search_character, presence: true, length: { maximum: 1 } , :format => {:with => /^[ぁ-んー－]+$/, :multiline => true, :message =>'はひらがなで入力して下さい。'} 
 	
 	#見積書・請求書等での敬称として使用
 	def self.honorific 

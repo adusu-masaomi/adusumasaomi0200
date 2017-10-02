@@ -21,6 +21,9 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	attr_accessor :construction_name
 	attr_accessor :supplier_name
 	
+	#資材ID自動セット用
+	attr_accessor :material_id_hide
+	
 	
 	#工事画面からの遷移にて使用
 	#attr_accessor :construction_id

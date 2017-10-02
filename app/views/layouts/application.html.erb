@@ -325,6 +325,12 @@ body > .container {
   $(".searchableSelect2_1").select2({ theme: "classic" });
   $(".searchableSelect2_2").select2({ theme: "classic" });
   $(".searchableSelect2_3").select2({ theme: "classic" });
+  //明細フォーム用追加(次のコントロール移動をここに記述すると正常動作しないため、初期設定の宣言のみ行う）
+  $(".searchableSelect1_1").select2({ theme: "classic" });
+  $(".searchableSelect1_2").select2({ theme: "classic" });
+  $(".searchableSelect1_3").select2({ theme: "classic" });
+  //
+  
   
   //select2をenterキー押下した場合(リストが閉じられた時)に次のコントロールへ移動させる
   $( ".searchableSelect2_1" ).on("select2:close", function (e) {

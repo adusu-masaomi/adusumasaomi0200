@@ -85,6 +85,8 @@ end
 	#工事データの初期値をセット
     set_construction_default
 	
+	#@purchase_order_datum.mail_sent_flag = 0
+	
   end
 
   # GET /purchase_order_data/1/edit

@@ -471,6 +471,9 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  #item[:maker_name] = params[:maker_name][i]
 		  item[:list_price] = params[:list_price][i]
 		  
+		  #add170928
+		  item[:unit_master_id] = params[:unit_master_id][i]
+		  
 		  #メーカーの処理(upd170616)
 		  item[:maker_id] = params[:maker_id][i]
           @maker_master = MakerMaster.find(params[:maker_id][i])

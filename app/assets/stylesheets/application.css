@@ -15,6 +15,7 @@
  *= require typeaheadjs
  *= require jquery-ui
  *= require_self
+ *= require sweetalert2
  *= require_tree .
  *= require bootstrap 
  *= require_moment

@@ -29,8 +29,9 @@
   </div>
   </br></br></br></br></br>
   
-  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3"} %>
-  <%= f.input :alias_name ,  input_html:{id:"alias_name", :tabindex=>"4", style: 'width:250px'} %>
+  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3", :onkeydown => "copyConstructionNameToAlias($(this).val(),event)" } %>
+  <!--<%= f.input :alias_name ,  input_html:{id:"alias_name", :tabindex=>"4", style: 'width:250px'} %>-->
+  <%= f.input :alias_name ,  input_html:{id:"alias_name", :tabindex=>"4", style: 'width:450px'} %>
   <%= f.input :reception_date , input_html:{:tabindex=>"5"} %>
   <%= f.label :得意先, {:class => "my-custom-class-l" }  %></br>
   <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:prompt => "どれか一つを選択して下さい"} , {id:"customer_id", :tabindex=>"6", class: "searchableCustomerName" , style: 'width:330px' } %>
@@ -89,6 +90,16 @@
        //});  
 
   });
+  
+  //工事名→通称名へコピー（初期値として）
+  function copyConstructionNameToAlias(constructionName,e){
+    if (e.keyCode == 13 || e.keyCode == 9) {
+      if (constructionName != "") {
+        document.getElementById("alias_name").value = constructionName;
+      }
+	}
+  }
+  
   
   //見積書→工事情報のセット
   function setConstructionDefaultAjax()

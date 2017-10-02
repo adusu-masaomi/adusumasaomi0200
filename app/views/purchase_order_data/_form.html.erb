@@ -1,4 +1,4 @@
-<%= simple_form_for @purchase_order_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+<%= simple_form_for @purchase_order_datum, :html => { :id => 'form_id', :class => 'well form-horizontal' } do |f| %>
   <% if @purchase_order_datum.errors.any? %>
    <div id="error_explanation">
     <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
@@ -33,14 +33,23 @@
     <%= m.input :alias_name, label:"通称" , as: :hidden  %>
   <% end %>
   <%= f.input :alias_name, label:"通称／備考（メール送信しない場合は”備考”としても登録ができます。）" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>
-  <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
+  
+  
+  <%= f.check_box :mail_sent_flag,  { :id => "mail_sent_flag",  :class => "mail_sent_flag"} , '1', '0' %> 
+  <%= f.label :mail_sent_label, "メール送信済フラグ（障害発生等で再送信したい場合は、チェックを外してください）", {style: 'color: green;font-size:12px;', :tabindex=>"6"} %>
+  
+  <!--<%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>-->
   
   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   
   <div>
-  <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？" } %>
+  <!--これを使いたいがsubmitでは現状sweetalertが使えないので、保留中・・・-->
+  <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？"} %>-->
+  <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", 
+    :onclick => "return confirm('メール送信&更新します。よろしいですか？ ' )"  %>
+  
   <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
@@ -69,11 +78,24 @@
 	     $('[tabindex=5]').focus(); 
 	   });
 	   
-        //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
-       var flag = document.getElementById("mail_sent_flag").value;
-       if (flag == 1) {
+       //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+       //var flag = document.getElementById("mail_sent_flag").value;
+	   //if (flag == 1) {
+       
+       if (document.getElementById("mail_sent_flag").checked) {
 	     document.getElementById("mail_sent_button").disabled = true;
 	   } 
+	   
+	   //メール送信のチェックを解除した場合に、送信ボタンを復活させる。
+	   $('.mail_sent_flag').on('change', function(){
+         if ($(this).is(':checked')) {
+		 //チェックされた場合
+		   document.getElementById("mail_sent_button").disabled = true;
+		 }else{
+		 //チェック外した場合
+		   document.getElementById("mail_sent_button").disabled = false;
+		 }
+       });
    });
   
   window.onload = function(){
@@ -148,4 +170,25 @@
       );
    };  
 
+
+  $('a[data-sweet-confirm]').on('click', function(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  debugger;
+
+  var $link = $(this);
+
+  swal({
+    title: $link.data('sweet-confirm'),
+    text: "You won't be able to revert this!",
+    type: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!'
+  }).then(function() {
+    $link.trigger('click.rails');
+  }, function(dismiss) {})
+});
 </script>
