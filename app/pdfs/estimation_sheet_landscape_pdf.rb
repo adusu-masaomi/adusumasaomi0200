@@ -110,11 +110,23 @@ class EstimationSheetLandscapePDF
 		   #見積日付
 		   @report.page.item(:quotation_date2).value(@gengou) 
 		   
-		   #郵便番号
-		   @report.page.item(:post2).value(@quotation_headers.post) 
+		   #郵便番号(得意先)
+		   #@report.page.item(:pos2).value(@quotation_headers.post) 
+		   @report.page.item(:post).value(@quotation_headers.post) 
 		 
-		   #住所
-		   @report.page.item(:address2).value(@quotation_headers.address) 
+		   #住所(得意先)
+		   #upd171012 分割された住所を一つにまとめる。
+		   all_address = @quotation_headers.address
+		   if @quotation_headers.house_number.present?
+		     all_address += @quotation_headers.house_number
+		   end
+		   if @quotation_headers.address2.present?
+		     all_address += "　" + @quotation_headers.address2
+		   end
+		   #@report.page.item(:address).value(@quotation_headers.address)
+           @report.page.item(:address).value(all_address) 
+		   #
+		   
 		   #TEL
 		   @report.page.item(:tel).value(@quotation_headers.tel) 
 		   #FAX
@@ -130,9 +142,19 @@ class EstimationSheetLandscapePDF
 		   #工事期間
 		   @report.page.item(:construction_period2).value(@quotation_headers.construction_period) 
 		 
-		   #工事場所
-		   @report.page.item(:construction_place2).value(@quotation_headers.construction_place) 
-		 
+		   #住所（工事場所）
+		   #upd171012 分割された住所を一つにまとめる。
+		   all_address = @quotation_headers.construction_place
+		   if @quotation_headers.construction_house_number.present?
+		     all_address += @quotation_headers.construction_house_number
+		   end
+		   if @quotation_headers.construction_place2.present?
+		     all_address += "　" + @quotation_headers.construction_place2
+		   end
+		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
+		   @report.page.item(:construction_place).value(all_address) 
+		   #
+		   
 		   #取引方法
 		   @report.page.item(:trading_method2).value(@quotation_headers.trading_method) 
 		 

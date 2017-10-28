@@ -6,16 +6,25 @@ class ConstructionDailyReportsController < ApplicationController
   @@construction_datum_id = []
   @@new_flag = []
   
+  @@construction_id_for_report = nil
+    
   # GET /construction_daily_reports
   # GET /construction_daily_reports.json
   def index
     # @construction_daily_reports = ConstructionDailyReport.all
      
+	 #グラグ画面で保持した工事IDを元に戻す
+	 if @@construction_id_for_report.present?
+	   params[:construction_id] = @@construction_id_for_report
+	   params[:move_flag] = "1"
+	   @@construction_id_for_report = nil
+	 end
+	 
 	 #ransack保持用コード
      query = params[:q]
      query ||= eval(cookies[:recent_search_history].to_s)  	
 		
-     
+	 
 	 if params[:move_flag] == "1"
 	   #工事一覧画面から遷移した場合
 	   construction_id = params[:construction_id]
@@ -35,7 +44,16 @@ class ConstructionDailyReportsController < ApplicationController
      #
 	 
 	 @construction_daily_reports = @q.result(distinct: true)
-     @construction_daily_reports = @construction_daily_reports.page(params[:page])
+     
+	 #グラフ用データとして一旦保持
+	 #@chart_data = @construction_daily_reports
+	 
+	 @construction_daily_reports = @construction_daily_reports.page(params[:page])
+	 
+	 #グラフ用
+	 # 日ごとの合計値
+     #@chart_data = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('working_times / 3600')
+  
    
     # @users = User.all.order(sort_column + ' ' + sort_direction)　
     
@@ -93,6 +111,56 @@ class ConstructionDailyReportsController < ApplicationController
 	
 	
 	end
+  	
+  end
+  
+  #グラフ表示用
+  def index2
+    
+
+	 #ransack保持用コード
+     #query = params[:q]
+     #query ||= eval(cookies[:recent_search_history].to_s)  	
+		
+     
+	 if params[:move_flag] == "1"
+	   #工事一覧画面から遷移した場合
+	   construction_id = params[:construction_id]
+	   #query = {"construction_datum_id_eq"=> construction_id }
+	   params[:q] = {"construction_datum_id_eq"=> construction_id }
+	 end
+	 #メインの画面からの検索用工事IDを保持
+	 if params[:construction_id].present?
+	   @@construction_id_for_report = params[:construction_id]
+	 end
+	 
+	 
+	 @q = ConstructionDailyReport.ransack(params[:q])   
+	 #@q = ConstructionDailyReport.ransack(query)
+     
+	 #ransack保持用コード
+     #search_history = {
+     #value: params[:q],
+     #expires: 24.hours.from_now
+     #}
+     #cookies[:recent_search_history] = search_history if params[:q].present?
+     #
+	 
+	 @construction_daily_reports = @q.result(distinct: true)
+     
+	 #グラフ用データとして一旦保持
+	 @chart_data = @construction_daily_reports
+	 
+	 @construction_daily_reports = @construction_daily_reports.page(params[:page])
+	 
+	 #グラフ用
+	 # 日ごとの合計値
+     @chart_data_times = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('working_times / 3600')
+	 @chart_data_costs = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('labor_cost')
+  
+     @construction_data = ConstructionDatum.all
+     @staff = Staff.all
+  
   	
   end
   

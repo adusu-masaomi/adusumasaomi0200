@@ -1,6 +1,9 @@
 class QuotationDetailMiddleClassificationsController < ApplicationController
   before_action :set_quotation_detail_middle_classification, only: [:show, :edit, :update, :destroy]
   
+  #add171016
+  before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
+  
   @@new_flag = []
   
     # GET /quotation_detail_middle_classifications
@@ -36,11 +39,12 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
       @null_flag = "1"
     end 
-
+    
+	
     if @null_flag == "" 
       #ransack保持用コード
       query = params[:q]
-      query ||= eval(cookies[:recent_search_history].to_s)  	
+      query ||= eval(cookies[:recent_search_history].to_s)
     end
 	
     #@q = QuotationDetailMiddleClassification.ransack(params[:q]) 
@@ -55,17 +59,64 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
        expires: 480.minutes.from_now
       }
       cookies[:recent_search_history] = search_history if params[:q].present?
-    end
+	  
+	end
 	#
+	
 
     @quotation_detail_middle_classifications = @q.result(distinct: true)
 	
+	
+	#add171016
+	#ビューでのソート処理追加
+	if (params[:q].present? && params[:q][:s].present?) || $sort_qm != nil
+	    
+		#order順のパラメータ(asc/desc)がなぜか１パターンしか入らないので、カラム強制にセットする。
+	    column_name = "line_number"
+	    
+		if $not_sort_qm != true
+		#ここでにソートを切り替える。（パラメータで入ればベストだが）
+		#（モーダル編集、行ソートでこの処理をしないようにしている）
+		
+		  if params[:q].present? 
+            if $sort_qm.nil?
+	           $sort_qm = "desc"
+	        end   
+ 
+		    if $sort_qm != "asc"
+		      $sort_qm = "asc"
+		    else
+		      $sort_qm = "desc"
+		    end
+	      end
+		else
+		  $not_sort_qm = false
+		end
+		
+		#並び替えする（降順/昇順）
+		if $sort_qm == "asc"
+	      @quotation_detail_middle_classifications = @quotation_detail_middle_classifications.order(column_name + " asc")
+		elsif $sort_qm == "desc"
+	      @quotation_detail_middle_classifications = @quotation_detail_middle_classifications.order(column_name + " desc")
+		end
+	end
+	#add end 
+
   end
-  
+    
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
   def reorder
-  	row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
-    #row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:seq => i})}
+    
+	$not_sort_qm = true               #add171016
+	
+    if $sort_qm != "asc"              #add171016
+  	  row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+    else                              #add171016
+	  row = params[:row].split(",")   #add171016
+	end
+	
+	
+	#row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:seq => i})}
 	#行番号へセットするため、配列は１から開始させる。
 	row.each_with_index {|row, i| QuotationDetailMiddleClassification.update(row, {:line_number => i + 1})}
     render :text => "OK"
@@ -809,7 +860,13 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     # Use callbacks to share common setup or constraints between actions.
     def set_quotation_detail_middle_classification
       @quotation_detail_middle_classification = QuotationDetailMiddleClassification.find(params[:id])
+	end
+
+    #add171016
+    def initialize_sort
+	  $not_sort_qm = true
     end
+	
 
     #以降のレコードの行番号を全てインクリメントする
     def line_insert

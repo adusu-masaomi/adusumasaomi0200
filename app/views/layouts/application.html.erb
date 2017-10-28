@@ -315,6 +315,38 @@ body > .container {
 	 }
    }
   
+  //住所から郵便番号を返すajax
+  //(引数postIdは変換先の郵便番号ID)
+  function setPostAuto(thisAddress, postId, e){
+  	if (e.keyCode == 13 || e.keyCode == 9) {
+	  var address = thisAddress;
+	  
+	  //countはデフォの50から1に変更
+	  
+	  if (thisAddress != undefined){
+	     $.ajax({
+           url: "http://zip.ricollab.jp/search"
+           , data: { q: address, type: "json", count: 1 }
+           , dataType: "jsonp"
+         }).done(function (data) {
+           
+		   var result = $.map(data.result, function (item) {
+             
+			 //var zip = "〒"  item.zipcode.substring(0, 3) + "-" + item.zipcode.substring(3);
+             document.getElementById(postId).value = item.zipcode;
+			 
+			 formatPost2(postId);
+			 
+		   });
+		   
+		 }).fail(function (jqXHR, textStatus, errorThrown) {
+           //alert(textStatus);
+         });
+	  }
+	}
+  }
+
+  
   //次のタブへコントロールを移す（select2用)
   function nextControlSelect2(obj){
     nextIndex = obj.tabIndex + 1;
@@ -464,7 +496,6 @@ function shubun(nen) {//秋分の日
         return nen <= 1979 ? 24 : 23;
     }
 }
-
 
 
 </script>

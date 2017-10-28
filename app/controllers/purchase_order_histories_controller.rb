@@ -499,14 +499,6 @@ class PurchaseOrderHistoriesController < ApplicationController
                 item[:list_price] = @material_master.list_price
 			  end
 			  
-			  #del170616
-			  #@maker_master = MakerMaster.find(@material_master.maker_id)
-			  #if @maker_master.maker_name != "-"  #upd170310
-			  ##資材マスターのメーカー名をセット
-			  ##(マスター側未登録を考慮。但しアプデは考慮していない）
-              #  item[:maker_name] = @maker_master.maker_name
-			  #end
-			  
 			  if params[:material_name][i] != @material_master.material_name
 			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
@@ -514,6 +506,16 @@ class PurchaseOrderHistoriesController < ApplicationController
                   materials.update_attributes!(:material_name => params[:material_name][i] )
                 end 
 			  end
+			  
+			  #add171006
+			  if item[:maker_id] != @material_master.maker_id
+			  #メーカー名を登録or変更した場合は、商品マスターへ反映させる。
+			    materials = MaterialMaster.where(:id => @material_master.id).first
+			    if materials.present?
+                  materials.update_attributes!(:maker_id => item[:maker_id] )
+                end 
+			  end
+			  
 			  
 			  #仕入単価マスターの単位も更新する
 			  purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 

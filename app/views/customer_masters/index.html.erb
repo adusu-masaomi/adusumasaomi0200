@@ -1,4 +1,7 @@
-<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<!--<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>-->
+<!--カスタマイズ版を使用（画面位置保持の為）-->
+<%= javascript_include_tag 'jquery.tablefix' %>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = CustomerMaster -%>
 <div class="page-header", style="width:1920px">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
@@ -64,10 +67,20 @@
   <tbody>
     <% @customer_masters.order("id desc").each do |customer_master| %>
       <tr>
-        <td><%= link_to customer_master.id, customer_master_path(customer_master) %></td>
+        <td><%= link_to customer_master.id, customer_master_path(customer_master), :class => 'keep-disp' %></td>
         <td><%= customer_master.customer_name %></td>
         <td><%= customer_master.post %></td>
-        <td><%= customer_master.address %></td>
+		
+		<!--upd171013-->
+		<% @address = customer_master.address %>
+		<% if customer_master.house_number.present? %>
+		  <% @address += customer_master.house_number %>
+		<% end %>
+		<% if customer_master.address2.present? %>
+		  <% @address += "　" + customer_master.address2 %>
+		<% end %>
+		
+        <td><%= @address %></td>
         <td><%= customer_master.tel_main %></td>
         <td><%= customer_master.fax_main %></td>
 		<td><%= mail_to(customer_master.email_main, name = nil, {:style => 'text-decoration:underline'}) %></td>
@@ -106,12 +119,12 @@
         <td><%=l customer_master.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_customer_master_path(customer_master), :class => 'btn btn-default btn-xs' %>
+                      edit_customer_master_path(customer_master), :class => 'btn btn-default btn-xs keep-disp' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       customer_master_path(customer_master),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
       </tr>
     <% end %>
@@ -148,6 +161,26 @@
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
      //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});
+	 
+	 //画面位置を保持する
+     $('form').keepPosition();
   });
+  
+   //プラグイン化
+  $.fn.keepPosition = function(){
+    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+    var key = 'keep-position-'+location.pathname;
+    var win = $(window);
+    this.each(function(){
+        //$(this).on('submit',function(){
+        $(".keep-disp").click(function(){
+			div_top = bodyDiv.scrollTop();
+			$.cookie(key, div_top);
+	    });
+    });
+    setTimeout(function(){
+		bodyDiv.scrollTop($.cookie(key));
+    },0);
+  }
 
 </script>

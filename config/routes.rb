@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :constants
   resources :quotation_material_details
   resources :quotation_material_headers
   
@@ -66,7 +67,7 @@ Rails.application.routes.draw do
   resources :construction_costs
   resources :affiliations
   resources :construction_daily_reports
-  resources :staffs
+    resources :staffs
   resources :purchase_unit_prices
   resources :purchase_order_data
   #resources :purchase_order_data do
@@ -178,9 +179,11 @@ Rails.application.routes.draw do
   #add170904
   get "/quotation_material_headerz/get_data" => 'quotation_material_headers#get_data'
   get "/quotation_material_headerz/email_select" => 'quotation_material_headers#email_select'
-  
   #add170906
   get "/quotation_material_headerz/set_sequence" => 'quotation_material_headers#set_sequence'
+  
+  #add171023
+  get "/quotation_material_headerz/get_purchase_order_code" => 'quotation_material_headers#get_purchase_order_code'
   
   #161212
   #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
@@ -214,6 +217,10 @@ Rails.application.routes.draw do
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
   get '/construction_daily_reportz/end_day_select' => 'construction_daily_reports#end_day_select'
+  
+  #add171004 グラフ画面
+  get '/construction_daily_reports_graph' => "construction_daily_reports#index2"
+  
   
   get '/construction_costz/construction_name_select' => 'construction_costs#construction_name_select'
   get '/construction_costz/construction_labor_cost_select' => 'construction_costs#construction_labor_cost_select'
@@ -474,6 +481,7 @@ Rails.application.routes.draw do
   get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
   get '/inventoriez/get_quantity' => 'inventories#get_quantity'
   
+  
   #del170707
   #get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
   #add170707
@@ -495,6 +503,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :constants
   resources :quotation_material_details
   resources :quotation_material_headers
   resources :working_small_items

@@ -51,14 +51,22 @@ class EstimationSheetPDF
 		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_large_classification.quotation_header_history_id)
 		   end
 		 
-		   #binding.pry
-		 
-		   #郵便番号
+		   #郵便番号(得意先)
 		   @report.page.item(:post).value(@quotation_headers.post) 
 		 
-		   #住所
-		   @report.page.item(:address).value(@quotation_headers.address) 
-		 
+		   #住所(得意先)
+		   #upd171012 分割された住所を一つにまとめる。
+		   all_address = @quotation_headers.address
+		   if @quotation_headers.house_number.present?
+		     all_address += @quotation_headers.house_number
+		   end
+		   if @quotation_headers.address2.present?
+		     all_address += "　" + @quotation_headers.address2
+		   end
+		   #@report.page.item(:address).value(@quotation_headers.address)
+           @report.page.item(:address).value(all_address) 
+		   #
+		   
 		   #得意先名
 		   #@report.page.item(:customer_name).value(@quotation_headers.customer_name) 
 		   #update 170809
@@ -107,9 +115,19 @@ class EstimationSheetPDF
 		   #工事期間
 		   @report.page.item(:construction_period).value(@quotation_headers.construction_period) 
 		 
-		   #工事場所
-		   @report.page.item(:construction_place).value(@quotation_headers.construction_place) 
-		 
+		   #住所（工事場所）
+		   #upd171012 分割された住所を一つにまとめる。
+		   all_address = @quotation_headers.construction_place
+		   if @quotation_headers.construction_house_number.present?
+		     all_address += @quotation_headers.construction_house_number
+		   end
+		   if @quotation_headers.construction_place2.present?
+		     all_address += "　" + @quotation_headers.construction_place2
+		   end
+		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
+		   @report.page.item(:construction_place).value(all_address) 
+		   #
+		   
 		   #取引方法
 		   @report.page.item(:trading_method).value(@quotation_headers.trading_method) 
 		 

@@ -351,6 +351,9 @@
      division_id = document.getElementById("division_id").value;
 	 division_id = parseInt(division_id);
 	 
+	 inventory_division_id = document.getElementById("inventory_division_id").value;
+	 inventory_division_id = parseInt(inventory_division_id);
+	 
 	 if (division_id == INDEX_DIVISION_SHIPPING) {
 	   document.getElementById("check_unit").checked = true;
 	   //在庫区分も”出庫”にする
@@ -361,7 +364,13 @@
 	   getInventoryUnitPrices();
 	   
 	 }else{
-	   document.getElementById("check_unit").checked = false;
+	   
+	   if (inventory_division_id == INDEX_INVENTORY_STOCK){
+	   //add171011入庫の場合もチェック入れる
+	     document.getElementById("check_unit").checked = true;
+	   }else{
+	     document.getElementById("check_unit").checked = false;
+	   }
 	 }
    }
    

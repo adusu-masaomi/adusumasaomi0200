@@ -33,8 +33,11 @@ class ConstructionDatum < ActiveRecord::Base
     
 	#緯度経度の自動登録
 	#add170620
-    geocoded_by :address
+    geocoded_by :address_with_house_number
     after_validation :geocode, if: lambda {|obj| obj.address_changed?}
+	
+	#geocoded_by :address
+    #after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
 	#scope :with_id, -> { where(id: "purchase_order_data.construction_id")} 
 	scope :with_id,  -> { joins(:purchase_order_datum) }
@@ -42,6 +45,17 @@ class ConstructionDatum < ActiveRecord::Base
 	def self.ransackable_scopes(auth_object=nil)
   		[:with_id]
 	end
+	
+	#緯度経度保存用アドレス
+	def address_with_house_number
+	  if self.house_number.nil?
+	    address_with_house_number = self.address
+	  else
+        address_with_house_number = self.address + self.house_number
+      end
+	  
+	end
+	
 	
 	#リスト表示用(CD/名称)
 	def p_cd_name

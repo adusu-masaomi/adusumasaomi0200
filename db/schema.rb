@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170905071300) do
+ActiveRecord::Schema.define(version: 20171023073535) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -30,6 +30,12 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.integer  "holiday_flag", limit: 4
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "constants", force: :cascade do |t|
+    t.string   "purchase_order_last_header_code", limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   create_table "construction_costs", force: :cascade do |t|
@@ -75,6 +81,7 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.date     "construction_period_end"
     t.string   "post",                       limit: 255
     t.string   "address",                    limit: 255
+    t.string   "house_number",               limit: 255
     t.string   "address2",                   limit: 255
     t.decimal  "latitude",                               precision: 9, scale: 6
     t.decimal  "longitude",                              precision: 9, scale: 6
@@ -112,6 +119,8 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.string   "search_character",      limit: 255
     t.string   "post",                  limit: 255
     t.string   "address",               limit: 255
+    t.string   "house_number",          limit: 255
+    t.string   "address2",              limit: 255
     t.string   "tel_main",              limit: 255
     t.string   "fax_main",              limit: 255
     t.string   "email_main",            limit: 255
@@ -193,29 +202,33 @@ ActiveRecord::Schema.define(version: 20170905071300) do
   end
 
   create_table "delivery_slip_headers", force: :cascade do |t|
-    t.string   "delivery_slip_code",    limit: 255
-    t.string   "quotation_code",        limit: 255
-    t.string   "invoice_code",          limit: 255
+    t.string   "delivery_slip_code",        limit: 255
+    t.string   "quotation_code",            limit: 255
+    t.string   "invoice_code",              limit: 255
     t.date     "delivery_slip_date"
-    t.integer  "construction_datum_id", limit: 4
-    t.string   "construction_name",     limit: 255
-    t.integer  "customer_id",           limit: 4
-    t.string   "customer_name",         limit: 255
-    t.integer  "honorific_id",          limit: 4
-    t.string   "responsible1",          limit: 255
-    t.string   "responsible2",          limit: 255
-    t.string   "post",                  limit: 255
-    t.string   "address",               limit: 255
-    t.string   "tel",                   limit: 255
-    t.string   "fax",                   limit: 255
-    t.string   "construction_period",   limit: 255
-    t.string   "construction_post",     limit: 255
-    t.string   "construction_place",    limit: 255
-    t.integer  "delivery_amount",       limit: 4
-    t.integer  "execution_amount",      limit: 4
-    t.integer  "last_line_number",      limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.integer  "construction_datum_id",     limit: 4
+    t.string   "construction_name",         limit: 255
+    t.integer  "customer_id",               limit: 4
+    t.string   "customer_name",             limit: 255
+    t.integer  "honorific_id",              limit: 4
+    t.string   "responsible1",              limit: 255
+    t.string   "responsible2",              limit: 255
+    t.string   "post",                      limit: 255
+    t.string   "address",                   limit: 255
+    t.string   "house_number",              limit: 255
+    t.string   "address2",                  limit: 255
+    t.string   "tel",                       limit: 255
+    t.string   "fax",                       limit: 255
+    t.string   "construction_period",       limit: 255
+    t.string   "construction_post",         limit: 255
+    t.string   "construction_place",        limit: 255
+    t.string   "construction_house_number", limit: 255
+    t.string   "construction_place2",       limit: 255
+    t.integer  "delivery_amount",           limit: 4
+    t.integer  "execution_amount",          limit: 4
+    t.integer  "last_line_number",          limit: 4
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
   create_table "employee_master", force: :cascade do |t|
@@ -353,10 +366,14 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.string   "responsible2",              limit: 255
     t.string   "post",                      limit: 255
     t.string   "address",                   limit: 255
+    t.string   "house_number",              limit: 255
+    t.string   "address2",                  limit: 255
     t.string   "tel",                       limit: 255
     t.string   "fax",                       limit: 255
     t.string   "construction_period",       limit: 255
     t.string   "construction_place",        limit: 255
+    t.string   "construction_house_number", limit: 255
+    t.string   "construction_place2",       limit: 255
     t.string   "payment_period",            limit: 255
     t.date     "invoice_period_start_date"
     t.date     "invoice_period_end_date"
@@ -638,11 +655,15 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.string   "responsible2",               limit: 255
     t.string   "post",                       limit: 255
     t.string   "address",                    limit: 255
+    t.string   "house_number",               limit: 255
+    t.string   "address2",                   limit: 255
     t.string   "tel",                        limit: 255
     t.string   "fax",                        limit: 255
     t.string   "construction_period",        limit: 255
     t.string   "construction_post",          limit: 255
     t.string   "construction_place",         limit: 255
+    t.string   "construction_house_number",  limit: 255
+    t.string   "construction_place2",        limit: 255
     t.string   "trading_method",             limit: 255
     t.string   "effective_period",           limit: 255
     t.integer  "quote_price",                limit: 4
@@ -683,6 +704,9 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.integer  "quantity",                     limit: 4
     t.integer  "unit_master_id",               limit: 4
     t.integer  "list_price",                   limit: 4
+    t.integer  "quotation_unit_price_1",       limit: 4
+    t.integer  "quotation_unit_price_2",       limit: 4
+    t.integer  "quotation_unit_price_3",       limit: 4
     t.integer  "quotation_price_1",            limit: 4
     t.integer  "quotation_price_2",            limit: 4
     t.integer  "quotation_price_3",            limit: 4
@@ -690,6 +714,12 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.integer  "bid_flag_2",                   limit: 4
     t.integer  "bid_flag_3",                   limit: 4
     t.integer  "mail_sent_flag",               limit: 4
+    t.integer  "quotation_email_flag_1",       limit: 4
+    t.integer  "quotation_email_flag_2",       limit: 4
+    t.integer  "quotation_email_flag_3",       limit: 4
+    t.integer  "order_email_flag_1",           limit: 4
+    t.integer  "order_email_flag_2",           limit: 4
+    t.integer  "order_email_flag_3",           limit: 4
     t.integer  "sequential_id",                limit: 4,   null: false
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
@@ -705,6 +735,9 @@ ActiveRecord::Schema.define(version: 20170905071300) do
     t.string   "responsible",                limit: 255
     t.string   "email",                      limit: 255
     t.integer  "quotation_header_origin_id", limit: 4
+    t.integer  "total_quotation_price_1",    limit: 4
+    t.integer  "total_quotation_price_2",    limit: 4
+    t.integer  "total_quotation_price_3",    limit: 4
     t.integer  "supplier_id_1",              limit: 4
     t.integer  "supplier_id_2",              limit: 4
     t.integer  "supplier_id_3",              limit: 4

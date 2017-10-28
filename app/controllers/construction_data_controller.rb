@@ -272,6 +272,7 @@ class ConstructionDataController < ApplicationController
   
   # ajax
   #add170218 見積書などで使用
+  #upd171013
   def construction_and_customer_select
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
@@ -280,14 +281,28 @@ class ConstructionDataController < ApplicationController
 	 #郵便番号・住所
 	 @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
 	 add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+	 #番地  add171006(仮)
+	 num = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
 	 add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
 	 
 	 @address = ""
 	 if add1.present?
 	   @address = add1 
 	 end
+	 
+	 #番地
+	 if num.present?
+	   @house_number = num 
+	 end
+	 
+	 #add171006(仮)
+	 #if num.present?
+	 #  @address += num 
+	 #end
+	 
 	 if add2.present?
-	   @address += add2 
+	   @address2 = add2 
+	   #@address += add2 
 	 end
 	 #add end
 	 
@@ -337,7 +352,7 @@ class ConstructionDataController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
-      :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
+      :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag)
     end
 end

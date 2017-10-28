@@ -74,16 +74,27 @@
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
   <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"12"} %>
   </div>
-  <div style="margin-left : -50px;margin-top : -20px">
+  <!--<div class="col-xs-2",  style="margin-left : -50px;margin-top : -20px">-->
+  <div class="col-xs-2",  style="margin-left : -0px;margin-top : -20px">
   <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"13"} %>
   </div>
+  
+  <div style="margin-top : 25px">
+  <%= button_tag "金額クリア", type: 'button', :class => 'btn btn-yellow300_rsd btn-xs', onclick: "clearPrice()" %>
+  </div>
+  </br></br></br>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
   <%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", style: 'width:120px', :tabindex=>"14", :onchange => "calcLaborTotal()"}  %>
   </div>
-  <div style="margin-left : -50px;margin-top : -20px">
-  <%= f.input :labor_productivity_unit_total, input_html:{id:"labor_productivity_unit_total", style: 'width:120px', :tabindex=>"15"}  %>
+  <div class="col-xs-2", style="margin-left : -0px;margin-top : -20px">
+  <%= f.input :labor_productivity_unit_total,  input_html:{id:"labor_productivity_unit_total", style: 'width:120px', :tabindex=>"15"}  %>
   </div>
+  
+  <div style="margin-top : 10px">
+  <%= button_tag "歩掛クリア", type: 'button', :class => 'btn btn-lightblue100_rsd btn-xs', onclick: "clearLaborProductivityUnit()" %>
+  </div>
+  </br></br></br>
   
   <%= f.check_box :piping_wiring_flag, :class => "piping_wiring_flag" %>
   <%= f.label_tag :piping_wiring_flag, '配管配線　　　' %> 
@@ -694,8 +705,23 @@
 	 //歩掛り計
 	 calcLaborTotal();
   }  
+  
+  //単価・金額をリセットする
+  //add171017
+  function clearPrice(){
+    document.getElementById("working_unit_price").value = "";
+    document.getElementById("execution_unit_price").value = "";
+    document.getElementById("quote_price").value = "";
+    document.getElementById("execution_price").value = "";
+  }
+  //歩掛をリセットする
+  //add171017
+  function clearLaborProductivityUnit(){
+    document.getElementById("labor_productivity_unit").value = "";
+    document.getElementById("labor_productivity_unit_total").value = "";
+  }
+  //
 
- 
   //ENTER→TABキーに変換する処理。
   //modalの場合は、共通化ができない（なぜか）
   $('[tabindex]').keydown(function (e) {

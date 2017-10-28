@@ -1,4 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<!--グラフ用-->
+<%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
 <%- model_class = ConstructionDailyReport -%>
 <div class="page-header", style="width:1920px">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
@@ -11,10 +13,19 @@
   
   <%= f.label :construction_code, '工事名　' %>
   <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
-  </br>
   
+  <!--</br>-->
   <%= f.label :staff_id, '社員' %>
   <%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {style: 'width:220px' } %>
+  
+  </br>
+  
+  <!--
+  <%= f.label :working_date, '作業日' %>
+  <%= f.date_select :working_date_gteq, {include_blank: true} ,  {id: "working_date_start"}   %>
+  <%= f.label :working_date, '〜' %>
+  <%= f.date_select :working_date_lteq, {include_blank: true} ,  {id: "working_date_end"}   %>
+  -->
   	<div>
         <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
         <%= link_to "労務費集計表",
@@ -23,6 +34,10 @@
         <%= link_to "作業日報",
             construction_daily_reports_path(@construction_daily_reports, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], pdf_flag: "2" ),
             :class => 'btn  btn-bluegrey300_ftg', :target=>["_blank"] %>
+		<!--グラフ表示機能-->
+		<%= link_to "グラフ",
+		    construction_daily_reports_graph_path(@construction_daily_reports, construction_id: params[:construction_id], move_flag: params[:move_flag] ),
+            :class => 'btn  btn-lime500_ftg' %>
 		<%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_daily_report_path(:new_flag => "0", construction_id: params[:construction_id], move_flag: params[:move_flag] ),
             :class => 'btn btn-primary' %>
@@ -34,6 +49,11 @@
 
   	</div>
    <% end %>
+   
+   <!--グラフ表示-->
+   <!--<%= bar_chart @chart_data,height: "200px" %>-->
+  
+  
 </div>
 
 
@@ -129,8 +149,8 @@
   $(document).ready(function(){
 	$(".searchablePurchaseCode").select2({ theme: "classic" });
 
-        $(".searchableConstructionCode").select2({ theme: "classic" });
-	$(".searchableConstructionName").select2({ theme: "classic" });
+    $(".searchableConstructionCode").select2({ theme: "classic" });
+	$(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	$(".searchableCustomerName").select2({ theme: "classic" });
 
         $(".searchableMaterialCode").select2({ theme: "classic" });

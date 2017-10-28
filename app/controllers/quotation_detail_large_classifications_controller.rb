@@ -1,10 +1,15 @@
 class QuotationDetailLargeClassificationsController < ApplicationController
   before_action :set_quotation_detail_large_classification, only: [:show, :edit, :update, :destroy]
-
+  
+  #add171016
+  before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
+  
   @@new_flag = []
   max_line_number = 0
   
-  
+   #add171016
+  before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
+
   # GET /quotation_detail_large_classifications
   # GET /quotation_detail_large_classifications.json
   def index
@@ -43,6 +48,42 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 
     @quotation_detail_large_classifications = @q.result(distinct: true)
     
+	#add171016
+	#ビューでのソート処理追加
+	if (params[:q].present? && params[:q][:s].present?) || $sort_ql != nil
+	    
+		#order順のパラメータ(asc/desc)がなぜか１パターンしか入らないので、カラム強制にセットする。
+	    column_name = "line_number"
+	    
+		if $not_sort_ql != true
+		#ここでにソートを切り替える。（パラメータで入ればベストだが）
+		#（モーダル編集、行ソートでこの処理をしないようにしている）
+		
+		  if params[:q].present? 
+            if $sort_ql.nil?
+	           $sort_ql = "desc"
+	        end   
+ 
+		    if $sort_ql != "asc"
+		      $sort_ql = "asc"
+		    else
+		      $sort_ql = "desc"
+		    end
+	      end
+		else
+		  $not_sort_ql = false
+		end
+		
+		#並び替えする（降順/昇順）
+		if $sort_ql == "asc"
+	      @quotation_detail_large_classifications = @quotation_detail_large_classifications.order(column_name + " asc")
+		elsif $sort_ql == "desc"
+	      @quotation_detail_large_classifications = @quotation_detail_large_classifications.order(column_name + " desc")
+		end
+	end
+	#add end 
+	
+	
 	#内訳データ見出用
     if params[:quotation_header_name].present?
 	  @quotation_header_name = params[:quotation_header_name]
@@ -115,7 +156,14 @@ class QuotationDetailLargeClassificationsController < ApplicationController
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
   def reorder
     
-	row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+	$not_sort_ql = true               #add171016
+	
+	if $sort_ql != "asc"              #add171016
+	  row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+	else                              #add171016
+	  row = params[:row].split(",")   #add171016
+	end
+	
 	#行番号へセットするため、配列は１から開始させる。
 	row.each_with_index {|row, i| QuotationDetailLargeClassification.update(row, {:line_number => i + 1})}
     render :text => "OK"
@@ -683,6 +731,11 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	   @quotation_detail_large_classification = QuotationDetailLargeClassification.find(params[:id])
     end
     
+	#add171016
+    def initialize_sort
+	  $not_sort_ql = true
+    end
+	
     # ストロングパラメータ
     # Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_large_classification_params
@@ -792,8 +845,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   construction_datum_id: @quotation_header.construction_datum_id, construction_name: @quotation_header.construction_name, 
                                   customer_id: @quotation_header.customer_id, customer_name: @quotation_header.customer_name, honorific_id: @quotation_header.honorific_id,
                                   responsible1: @quotation_header.responsible1, responsible2: @quotation_header.responsible2, post: @quotation_header.post, 
-                                  address: @quotation_header.address, tel: @quotation_header.tel, fax: @quotation_header.fax, 
+                                  address: @quotation_header.address, house_number: @quotation_header.house_number, address2: @quotation_header.address2, 
+								  tel: @quotation_header.tel, fax: @quotation_header.fax, 
                                   construction_period: @quotation_header.construction_period, construction_place: @quotation_header.construction_place, 
+								  construction_house_number: @quotation_header.construction_house_number, construction_place2: @quotation_header.construction_place2, 
                                   invoice_period_start_date: @quotation_header.invoice_period_start_date, invoice_period_end_date: @quotation_header.invoice_period_end_date, 
                                   billing_amount: @quotation_header.quote_price, execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
           #上記、見積日は移行しないものとする。
@@ -931,8 +986,10 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   construction_datum_id: @quotation_header.construction_datum_id, construction_name: @quotation_header.construction_name, 
                                   customer_id: @quotation_header.customer_id, customer_name: @quotation_header.customer_name, honorific_id: @quotation_header.honorific_id,
                                   responsible1: @quotation_header.responsible1, responsible2: @quotation_header.responsible2, post: @quotation_header.post, 
-                                  address: @quotation_header.address, tel: @quotation_header.tel, fax: @quotation_header.fax, construction_period: @quotation_header.construction_period, 
+                                  address: @quotation_header.address, house_number: @quotation_header.house_number, address2: @quotation_header.address2, 
+                                  tel: @quotation_header.tel, fax: @quotation_header.fax, construction_period: @quotation_header.construction_period, 
                                   construction_post: @quotation_header.construction_post, construction_place: @quotation_header.construction_place, 
+                                  construction_house_number: @quotation_header.construction_house_number, construction_place2: @quotation_header.construction_place2, 
                                   delivery_amount: @quotation_header.quote_price, execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
           #上記、見積日は移行しないものとする。
           @deliver_slip_header = DeliverySlipHeader.new(delivery_slip_header_params)

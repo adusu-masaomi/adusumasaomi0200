@@ -20,7 +20,7 @@ module ApplicationHelper
     link_to(name, '#', class: "add_fields btn btn-cyan700_rsd ", data: {id: id, fields: fields.gsub("\n", "")})
   end
  
-  
+ 
   #def my_color_for(condition)
   #   if condition == 1 then
   #    'red !important'

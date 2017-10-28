@@ -8,18 +8,16 @@
   <dd><%= @quotation_header.quotation_code %></dd>
   <dt><strong><%= model_class.human_attribute_name(:quotation_date) %>:</strong></dt>
   <dd><%= @quotation_header.quotation_date %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:construction_datum_id) %>:</strong></dt>
-  <dd><%= @quotation_header.construction_datum_id %></dd>
   <dt><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></dt>
   <dd><%= @quotation_header.construction_name %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:customer_id) %>:</strong></dt>
-  <dd><%= @quotation_header.customer_id %></dd>
   <dt><strong><%= model_class.human_attribute_name(:customer_name) %>:</strong></dt>
   <dd><%= @quotation_header.customer_name %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:post) %>:</strong></dt>
-  <dd><%= @quotation_header.post %></dd>
   <dt><strong><%= model_class.human_attribute_name(:address) %>:</strong></dt>
   <dd><%= @quotation_header.address %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:house_number) %>:</strong></dt>
+  <dd><%= @quotation_header.house_number %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address2) %>:</strong></dt>
+  <dd><%= @quotation_header.address2 %></dd>
   <dt><strong><%= model_class.human_attribute_name(:tel) %>:</strong></dt>
   <dd><%= @quotation_header.tel %></dd>
   <dt><strong><%= model_class.human_attribute_name(:fax) %>:</strong></dt>
@@ -28,6 +26,10 @@
   <dd><%= @quotation_header.construction_period %></dd>
   <dt><strong><%= model_class.human_attribute_name(:construction_place) %>:</strong></dt>
   <dd><%= @quotation_header.construction_place %></dd>
+  <dt><strong>番地:</strong></dt>
+  <dd><%= @quotation_header.construction_house_number %></dd>
+  <dt><strong>建物名:</strong></dt>
+  <dd><%= @quotation_header.construction_place2 %></dd>
   <dt><strong><%= model_class.human_attribute_name(:trading_method) %>:</strong></dt>
   <dd><%= @quotation_header.trading_method %></dd>
   <dt><strong><%= model_class.human_attribute_name(:effective_period) %>:</strong></dt>

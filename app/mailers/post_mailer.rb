@@ -103,7 +103,8 @@ class PostMailer < ApplicationMailer
   #注文依頼メール(見積後)
   def send_order_after_quotation(user)
    
-    @quotation_code = "注文No:" + user.quotation_code
+    @purchase_order_code = "注文No:" + $purchase_order_code
+	#@quotation_code = "見積No:" + user.quotation_code
     if user.construction_datum.alias_name.present?
     #通称名をセット
       @construction_name = "工事名:" + user.construction_datum.alias_name
@@ -121,18 +122,22 @@ class PostMailer < ApplicationMailer
 	end
 	
 	#見積金額合計
-	#del170930
-	#落札のみの金額が必要？？かもしれないため一旦保留とする。
+	
+	#upd171019
 	#tmp_header = "見積合計価格：￥"
-	#case $supplier
-    #  when 1
-    #    @total_quotation_price = tmp_header + user.total_quotation_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-    #  when 2
-    #    @total_quotation_price = tmp_header + user.total_quotation_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-    #  when 3
-    #    @total_quotation_price = tmp_header + user.total_quotation_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-	#end
-	#
+	tmp_header = "注文金額合計：￥"
+	case $supplier
+      when 1
+        #@total_quotation_price = tmp_header + user.total_quotation_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+		@total_quotation_price = tmp_header + user.total_order_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+      when 2
+        #@total_quotation_price = tmp_header + user.total_quotation_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+		@total_quotation_price = tmp_header + user.total_order_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+      when 3
+        #@total_quotation_price = tmp_header + user.total_quotation_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+		@total_quotation_price = tmp_header + user.total_order_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+	end
+	
 	
 	
     #本番用

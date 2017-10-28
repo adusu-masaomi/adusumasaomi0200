@@ -143,10 +143,18 @@ class QuotationHeadersController < ApplicationController
 	  
 	   @manual_flag = true
 	
+	   #upd171010 住所関連追加
        customer_params = {customer_name: params[:quotation_header][:customer_name], 
 	                    honorific_id: params[:quotation_header][:honorific_id], 
 	                    responsible1: params[:quotation_header][:responsible1], 
-						responsible2: params[:quotation_header][:responsible2]}
+                        responsible2: params[:quotation_header][:responsible2],
+                        post: params[:quotation_header][:post], 
+                        address: params[:quotation_header][:address],
+                        house_number: params[:quotation_header][:house_number], 
+                        address2: params[:quotation_header][:address2], 
+                        tel_main: params[:quotation_header][:tel], 
+                        fax_main: params[:quotation_header][:fax],
+                        closing_date: 0, due_date: 0 }
 	  
 	   @customer_master = CustomerMaster.new(customer_params)
        if @customer_master.save!(:validate => false)
@@ -191,6 +199,28 @@ class QuotationHeadersController < ApplicationController
           params[:quotation_header][:customer_master_attributes][:responsible2] = params[:quotation_header][:responsible2]
 		end
       
+	    #add171010
+        #住所関連/tel,fax追加
+		if params[:quotation_header][:post].present?
+          params[:quotation_header][:customer_master_attributes][:post] = params[:quotation_header][:post]
+		end
+		if params[:quotation_header][:address].present?
+          params[:quotation_header][:customer_master_attributes][:address] = params[:quotation_header][:address]
+		end
+		if params[:quotation_header][:house_number].present?
+          params[:quotation_header][:customer_master_attributes][:house_number] = params[:quotation_header][:house_number]
+		end
+        if params[:quotation_header][:address2].present?
+          params[:quotation_header][:customer_master_attributes][:address2] = params[:quotation_header][:address2]
+		end
+		if params[:quotation_header][:tel].present?
+          params[:quotation_header][:customer_master_attributes][:tel_main] = params[:quotation_header][:tel]
+		end
+		if params[:quotation_header][:fax].present?
+          params[:quotation_header][:customer_master_attributes][:fax_main] = params[:quotation_header][:fax]
+		end
+		#
+	  
 	    #更新する
 	    @quotation_header.update(customer_masters_params)
 	  end
@@ -208,6 +238,10 @@ class QuotationHeadersController < ApplicationController
      @customer_name = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_name).flatten.join(" ")
   	 @post = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
 	 @address = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+	 #add171012
+	 @house_number = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+	 @address2 = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+	 #add end
 	 @tel = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:tel_main).flatten.join(" ")
 	 @fax = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:fax_main).flatten.join(" ")
      @responsible1 = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
@@ -299,8 +333,12 @@ class QuotationHeadersController < ApplicationController
 	   @responsible2 = quotation_header.pluck(:responsible2).flatten.join(" ")
 	   #郵便番号
 	   @post = quotation_header.pluck(:post).flatten.join(" ")
-	   #住所
+	   #住所(得意先)
 	   @address = quotation_header.pluck(:address).flatten.join(" ")
+	   #add171012
+	   @house_number = quotation_header.pluck(:house_number).flatten.join(" ")
+	   @address2 = quotation_header.pluck(:address2).flatten.join(" ")
+	   #add end
 	   #tel
 	   @tel = quotation_header.pluck(:tel).flatten.join(" ")
 	   #fax
@@ -311,6 +349,11 @@ class QuotationHeadersController < ApplicationController
 	   @construction_post = quotation_header.pluck(:construction_post).flatten.join(" ")
 	   #工事場所
 	   @construction_place = quotation_header.pluck(:construction_place).flatten.join(" ")
+	   #add171012
+	   @construction_house_number = quotation_header.pluck(:construction_house_number).flatten.join(" ")
+	   @construction_place2 = quotation_header.pluck(:construction_place2).flatten.join(" ")
+	   #add end
+	   
 	   #取引方法
 	   @trading_method = quotation_header.pluck(:trading_method).flatten.join(" ")
 	   #有効期間
@@ -406,16 +449,19 @@ class QuotationHeadersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def quotation_header_params
-      params.require(:quotation_header).permit(:quotation_code, :invoice_code, :delivery_slip_code, :quotation_header_origin_id, :quotation_date, :construction_datum_id, :construction_name, 
-                                               :honorific_id, :responsible1, :responsible2, :customer_id, :customer_name, :post, :address, :tel, :fax, :construction_period, 
-                                               :construction_post, :construction_place, :trading_method, :effective_period, :net_amount, :quote_price, :execution_amount, 
+      params.require(:quotation_header).permit(:quotation_code, :invoice_code, :delivery_slip_code, :quotation_date, :construction_datum_id, :construction_name, 
+                                               :honorific_id, :responsible1, :responsible2, :customer_id, :customer_name, :post, :address, :house_number, :address2, :tel, :fax, 
+                                               :construction_period, :construction_post, :construction_place, :construction_house_number, :construction_place2, 
+                                               :trading_method, :effective_period, :net_amount, :quote_price, :execution_amount, 
                                                :invoice_period_start_date, :invoice_period_end_date )
+	  #upd171014 "quotation_header_origin_id"は誤って上書きの危険性があるので抹消。
     end
     
     # 
     def customer_masters_params
 	     #upd170809
-         params.require(:quotation_header).permit(customer_master_attributes: [:id, :customer_name, :honorific_id, :responsible1, :responsible2 ])
+         params.require(:quotation_header).permit(customer_master_attributes: [:id, :customer_name, :honorific_id, :responsible1, :responsible2, 
+                        :post, :address, :house_number, :address2, :tel_main, :fax_main ])
     end
 
 end

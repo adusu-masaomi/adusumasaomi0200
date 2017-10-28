@@ -42,16 +42,19 @@
   <%= f.input :post , hint: "＊数値のみ（ハイフンなし）で入力して下さい。" ,  
                        input_html:{id:"post",  :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','addressX','addressX');", :tabindex=>"9"} %>
   <div class="col-lg-6" , style="margin-left : -15px">
-  <%= f.input :address , hint: "＊都道府県〜番地まで入力して下さい。", input_html:{id:"address", name:"addressX", style: 'width:320px', :tabindex=>"10"} %>
+  <%= f.input :address , hint: "＊都道府県のみ入力して下さい。", input_html:{id:"address", name:"addressX", style: 'width:320px', :tabindex=>"10", :onkeydown => "setPostAuto($(this).val(), 'post', event)"} %>
   </div>
-  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", input_html:{id:"address2", style: 'width:320px', :tabindex=>"11"} %>
+  
+  <%= f.input :house_number , hint: "＊番地のみ入力して下さい。", input_html:{id:"house_number", style: 'width:320px', :tabindex=>"11"} %>
+  
+  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label_html:{style: 'margin-top : -30px;'},  input_html:{id:"address2", style: 'width:320px;', :tabindex=>"12"} %>
   
   <%= f.check_box :billed_flag %> 
-  <%= f.label :billed_flag, "請求済み", {style: 'color: blue', :tabindex=>"12"} %>
+  <%= f.label :billed_flag, "請求済み", {style: 'color: blue', :tabindex=>"13"} %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.check_box :calculated_flag %> 
-  <%= f.label :calculated_flag, "集計済み", {style: 'color: green', :tabindex=>"13"} %></br></br>
+  <%= f.label :calculated_flag, "集計済み", {style: 'color: green', :tabindex=>"14"} %></br></br>
   
   </br></br>
     
@@ -153,4 +156,5 @@
     
   }
   
+    
 </script>

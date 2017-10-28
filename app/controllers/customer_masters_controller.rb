@@ -134,7 +134,7 @@ class CustomerMastersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def customer_master_params
-      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :tel_main, :fax_main, :email_main, :closing_date, :closing_date_division,
-                     :due_date, :due_date_division, :responsible1, :responsible2, :contact_id)
+      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :house_number, :address2, :tel_main, :fax_main, :email_main, :closing_date, 
+	                 :closing_date_division, :due_date, :due_date_division, :responsible1, :responsible2, :contact_id)
     end
 end

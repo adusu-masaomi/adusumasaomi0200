@@ -78,7 +78,8 @@
     <tr>
       <th style="width:80px;"></th>
 	  <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
-      <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
+      <!--<th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>-->
+	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number) ) %></th>
       <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_item_name) %></th>
       <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_specification) %></th>
       <th align="right" , style="width:50px;">　数量</th>

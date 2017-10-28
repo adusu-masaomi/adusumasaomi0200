@@ -50,18 +50,40 @@
   </div>
   </br></br></br>
   <%= f.input :post, input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"11"} %>
-  <%= f.input :address, input_html:{id:"address", name:"address", :tabindex=>"12"} %>
-  <%= f.input :tel, input_html:{id:"tel", :tabindex=>"13"} %>
-  <%= f.input :fax, input_html:{id:"fax", :tabindex=>"14"} %>
-  <%= f.input :construction_period, input_html:{id:"construction_period", :tabindex=>"15"}  %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+  <%= f.input :address, hint: "＊都道府県のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"12",
+                        :onkeydown => "setPostAuto($(this).val(), 'post', event)"} %>
+  </div>
+  
+  <!--add171010-->
+  <%= f.input :house_number , hint: "＊番地のみ入力して下さい。", input_html:{id:"house_number", style: 'width:320px', :tabindex=>"13"} %>
+  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label_html:{style: 'margin-top : -30px;'},  input_html:{id:"address2", style: 'width:320px;', :tabindex=>"14"} %>
+  <!--add end-->
+  
+  <%= f.input :tel, input_html:{id:"tel", :tabindex=>"15"} %>
+  <%= f.input :fax, input_html:{id:"fax", :tabindex=>"16"} %>
+  <%= f.input :construction_period, input_html:{id:"construction_period", :tabindex=>"17"}  %>
   <%= f.input :construction_post, label:"郵便番号（工事場所）", input_html:{ id:"construction_post", :onchange => "formatPost2(id)", 
-       :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');", :tabindex=>"16"}  %>
-  <%= f.input :construction_place, input_html:{ id:"construction_place", name:"construction_place", :tabindex=>"17"}  %>
-  <%= f.input :trading_method, input_html:{ id:"trading_method", :tabindex=>"18"}  %>
-  <%= f.input :effective_period, input_html:{ id:"effective_period", :tabindex=>"19"}  %>
-  <%= f.input :net_amount, input_html:{ id:"net_amount", :tabindex=>"20"}  %>
-  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", :tabindex=>"21"} %>
-  <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"22"}  %>
+       :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');", :tabindex=>"18"}  %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県のみ入力して下さい。", input_html:{ id:"construction_place", style: 'width:320px;', 
+        name:"construction_place", :tabindex=>"19", :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
+  </div>
+  
+  <!--add171010-->
+  <%= f.input :construction_house_number , hint: "＊番地のみ入力して下さい。", label:"番地（工事場所）", input_html:{id:"construction_house_number",
+              style: 'width:320px', :tabindex=>"20"} %>
+  <%= f.input :construction_place2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（工事場所）", label_html:{style: 'margin-top : -30px;'},  
+            input_html:{id:"construction_place2", style: 'width:320px;', :tabindex=>"21"} %>
+  <!--add end-->
+  
+  <%= f.input :trading_method, input_html:{ id:"trading_method", :tabindex=>"22"}  %>
+  <%= f.input :effective_period, input_html:{ id:"effective_period", :tabindex=>"23"}  %>
+  <%= f.input :net_amount, input_html:{ id:"net_amount", :tabindex=>"24"}  %>
+  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", :tabindex=>"25"} %>
+  <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"26"}  %>
   
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
   <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_start_date_hide'}, as: :hidden  %>
@@ -72,6 +94,10 @@
     <%= m.input :honorific_id , input_html:{ id:"honorific_id"}, as: :hidden %>
 	<%= m.input :responsible1 , input_html:{ id:"responsible1"}, as: :hidden %>
 	<%= m.input :responsible2 , input_html:{ id:"responsible2"}, as: :hidden %>
+	<!--add171014-->
+	<%= m.input :tel_main , input_html:{ id:"tel_main"}, as: :hidden %>
+	<%= m.input :fax_main , input_html:{ id:"fax_main"}, as: :hidden %>
+	<!--add end-->
   <% end %>
 
   
@@ -93,7 +119,7 @@
      $(".searchableConstructionCode").select2({ theme: "bootstrap" });
 
      $( ".searchableConstructionCode" ).change(function(e) {
-	  　  setConstructionDateDefault();
+	     setConstructionInfoDefault();
 	 });
 	 
 	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
@@ -137,7 +163,7 @@
   }
   
    //工事情報のセット
-  function setConstructionDateDefault()
+  function setConstructionInfoDefault()
   {  
     //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
     obj = document.getElementById("construction_datum_id");
@@ -156,6 +182,13 @@
 		  
 		  obj = document.getElementById("construction_place").textContent;
           document.getElementById("construction_place").value = obj;
+		  
+		  //add171012
+		  obj = document.getElementById("construction_house_number").textContent;
+          document.getElementById("construction_house_number").value = obj;
+		  obj = document.getElementById("construction_place2").textContent;
+          document.getElementById("construction_place2").value = obj;
+		  //
 		  
 		  //add170218
 		  //顧客情報も合わせてセットする
@@ -184,7 +217,7 @@
         function(data){
 		  
 		  //工事情報をセット
-		  //setConstructionDateDefault();
+		  //setConstructionInfoDefault();
 		  
 		  //請求書有効期間開始日
 		  obj = document.getElementById("invoice_period_start_date_hide").textContent;
@@ -237,6 +270,11 @@
 		  //住所
 		  obj = document.getElementById("address").textContent;
           document.getElementById("address").value = obj;
+		  obj = document.getElementById("house_number").textContent;
+          document.getElementById("house_number").value = obj;
+		  obj = document.getElementById("address2").textContent;
+          document.getElementById("address2").value = obj;
+		  
 		  //tel
 		  obj = document.getElementById("tel").textContent;
           document.getElementById("tel").value = obj;
@@ -249,9 +287,15 @@
 		  //郵便番号(工事場所)  
 		  obj = document.getElementById("construction_post").textContent;
           document.getElementById("construction_post").value = obj;
-		  //工事場所
+		  //住所(工事場所)
 		  obj = document.getElementById("construction_place").textContent;
           document.getElementById("construction_place").value = obj;
+		  //番地
+		  obj = document.getElementById("construction_house_number").textContent;
+          document.getElementById("construction_house_number").value = obj;
+		  //建物
+		  obj = document.getElementById("construction_place2").textContent;
+          document.getElementById("construction_place2").value = obj;
 		  //取引方法
 		  obj = document.getElementById("trading_method").textContent;
           document.getElementById("trading_method").value = obj;
@@ -292,6 +336,13 @@
 		  //住所
 		  obj = document.getElementById("address").textContent;
           document.getElementById("address").value = obj;
+		  //add171012
+		  obj = document.getElementById("house_number").textContent;
+          document.getElementById("house_number").value = obj;
+		  obj = document.getElementById("address2").textContent;
+          document.getElementById("address2").value = obj;
+		  //add end 
+		  
 		  //tel
 	      obj = document.getElementById("tel").textContent;
           document.getElementById("tel").value = obj;

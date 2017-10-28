@@ -192,6 +192,7 @@ class PurchaseDataController < ApplicationController
     @@purchase_datum_supplier_id = @purchase_datum.supplier_id
 	@@purchase_datum_notes = @purchase_datum.notes
 	@@purchase_datum_division_id = @purchase_datum.division_id
+	@@purchase_datum_inventory_division_id = @purchase_datum.inventory_division_id
     
   end
 
@@ -223,6 +224,7 @@ class PurchaseDataController < ApplicationController
 		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id
          @purchase_datum.notes ||= @@purchase_datum_notes
 		 @purchase_datum.division_id ||= @@purchase_datum_division_id
+		 @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
 	   end
 	   
   end

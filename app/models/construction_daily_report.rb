@@ -71,6 +71,15 @@ class ConstructionDailyReport < ActiveRecord::Base
     	#User.sumでもかまいません
     	#カラム名(フィールド名)は大文字使ってもいいですが、普通小文字の方がよいです
    end
+   #作業時間合計
+   def self.sumtimes  
+    	sum = sum(:working_times)
+		if sum.present?
+		  sum = sum / 3600
+		end
+    	#User.sumでもかまいません
+    	#カラム名(フィールド名)は大文字使ってもいいですが、普通小文字の方がよいです
+   end
 
     #以下、全てcsv用
    def self.to_csv(options = {})

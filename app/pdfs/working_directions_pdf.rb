@@ -40,12 +40,21 @@ class WorkingDirectionsPDF
           end
 		 
 		 #if @flag.nil? 
-		   #@flag = "1"
-		   #report.page.item(:issue_date).value(Date.today)
+		   
+		   construction_place = construction_datum.address
+		   
+		   #add171013 番地
+		   if construction_datum.house_number.present?
+		     construction_place = construction_place + construction_datum.house_number
+		   end
+		   #
+		   
 		   if construction_datum.address2.present?
-		     construction_place = construction_datum.address + "　" + construction_datum.address2
-		   else
-             construction_place = construction_datum.address
+		     #construction_place = construction_datum.address + "　" + construction_datum.address2
+			 construction_place += "　" + construction_datum.address2
+			 
+		   #else
+           #  construction_place = construction_datum.address
            end
 		   
 		   #report.page.item(:issue_date).value($issue_date)
