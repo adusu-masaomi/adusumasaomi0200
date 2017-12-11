@@ -270,6 +270,42 @@ class ConstructionDataController < ApplicationController
      @working_safety_matter_name = WorkingSafetyMatter.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_safety_matter_name).flatten.join(" ")
   end
   
+  #add171121
+  def customer_extract
+    
+	if params[:customer_id] != ""
+      #初期値として、”手入力”も選択できるようにする
+	  @customer_extract = ConstructionDatum.where(:id => 1).where("id is NOT NULL").
+           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
+
+	  
+	  #カテゴリー別のアイテムをセット
+	  @customer_extract  += ConstructionDatum.where(:customer_id => params[:customer_id]).where("id is NOT NULL").
+           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
+    else
+	#未選択状態の場合は、全リストを出す
+	  #カテゴリー別のアイテムをセット
+	  
+	  #upd171205 リストに全て載せようとすると処理落ちするので
+	  #現在日から１年前からの、登録された工事データのみ表示させるようにする。
+	  #
+	  require 'date'
+      now_date = Date.today
+      past_date = now_date << 12
+	  #
+	  
+	  @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).
+	      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
+	  
+	  #@customer_extract  = ConstructionDatum.all.
+      #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
+	
+	end
+  end
+    
+  
+  
+  
   # ajax
   #add170218 見積書などで使用
   #upd171013

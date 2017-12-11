@@ -21,7 +21,7 @@ class PostMailer < ApplicationMailer
     
         #本番用
         #mail to: $email_responsible ,
-        #cc: "adusu@coda.ocn.ne.jp",
+        #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
         
         #test用
         mail to: "kamille1973@live.jp" ,
@@ -57,11 +57,12 @@ class PostMailer < ApplicationMailer
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #cc: "adusu@coda.ocn.ne.jp",
- 
+	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
+    
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+	cc: ["ilovekyosukehimuro@yahoo.co.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
+    #cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
     subject: '注文依頼'
@@ -90,8 +91,8 @@ class PostMailer < ApplicationMailer
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #cc: "adusu@coda.ocn.ne.jp",
- 
+	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
+    
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
     cc: "ilovekyosukehimuro@yahoo.co.jp", 
@@ -143,11 +144,11 @@ class PostMailer < ApplicationMailer
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #cc: "adusu@coda.ocn.ne.jp",
- 
+	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
+    
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+	cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
     subject: '注文依頼'

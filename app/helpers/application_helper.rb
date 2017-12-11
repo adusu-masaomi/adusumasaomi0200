@@ -20,7 +20,15 @@ module ApplicationHelper
     link_to(name, '#', class: "add_fields btn btn-cyan700_rsd ", data: {id: id, fields: fields.gsub("\n", "")})
   end
  
- 
+  def full_title(page_title)
+    base_title = "Adusu" # 自分のアプリ名を設定する
+    if page_title.empty?
+      base_title
+    else
+      "#{page_title} | #{base_title}"
+    end
+  end
+  
   #def my_color_for(condition)
   #   if condition == 1 then
   #    'red !important'

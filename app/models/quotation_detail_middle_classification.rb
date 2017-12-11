@@ -15,9 +15,20 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   #短縮名手入力用(add170822)
   attr_accessor :working_middle_item_short_name_manual
   
+  #add 1711004
+  #attr_accessor :category
+  attr_accessor :quotation_middle_item_id
+  attr_accessor :master_insert_flag
+  #ajax用（リスト）
+  #attr_accessor :working_middle_item_category_id 
+  attr_accessor :working_middle_item_category_id_call
+  attr_accessor :working_middle_item_id_select_hide
+  attr_accessor :working_middle_item_short_name_select_hide
+  #
+  
   def self.serial_number
-    #upd170704 100to999
     [[("<行選択>").to_s , (1..999).to_a ]]
+    #[[("<行選択>").to_s , (0..999).to_a ]]
   end 
   
   #金額合計(見積)

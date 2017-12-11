@@ -36,8 +36,8 @@ class PurchaseOrderDatum < ActiveRecord::Base
     scope :with_id,  -> { joins(:construction_datum) }
 	
     def p_num_cd
-      if self.purchase_order_code.present?
-	    self.purchase_order_code + '<' + self.construction_datum.id.to_s + '>'
+      if self.purchase_order_code.present?  && self.construction_datum.present?
+        self.purchase_order_code + '<' + self.construction_datum.id.to_s + '>'
       end
     end
     

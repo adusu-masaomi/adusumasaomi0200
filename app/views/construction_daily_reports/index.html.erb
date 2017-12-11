@@ -2,6 +2,7 @@
 <!--グラフ用-->
 <%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
 <%- model_class = ConstructionDailyReport -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
   

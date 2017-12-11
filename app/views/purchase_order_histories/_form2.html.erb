@@ -31,7 +31,8 @@
     <%= f.label :注文ＮＯ：, {style: 'color:blue'} %>
    <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , 
       {id:"purchase_order_datum_id", class: "searchableId" , style: 'width:200px'} %>
-   
+	  
+	
    <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
      <%= m.label :工事名：, {style: 'color:blue'} %>
      <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
@@ -73,10 +74,23 @@
    
   
    </br>
+   
    <%= f.input :responsible , label:"担当者", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
    <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   
+   <%= f.collection_select :material_id_select_hide, @material_masters.all, :id, :p_material_code_name,  {} , 
+      {id:"material_id_select_hide", hidden: true } %>
+   
    <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
    <%= f.input :material_id_hide, input_html:{id: "material_id_hide" }, as: :hidden %>
+   
+   <!--明細ajax用 add171030-->
+   <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %></br>
+   <%= f.input :material_code_hide,  input_html:{id:"material_code_hide" }, as: :hidden %>
+   <%= f.input :material_name_hide,  input_html:{id:"material_name_hide" }, as: :hidden %>
+   <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %>
+   <%= f.input :list_price_hide,  input_html:{id:"list_price_hide", }, as: :hidden %>
+   <!-- -->
    
    <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
    <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
@@ -168,6 +182,8 @@
 	   
 	   
 	     var itemCode = $(this)[0].value;
+		 
+		
 		 if (itemCode != "") {
 	       //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
 		   searchItemCode(itemCode);
@@ -181,8 +197,32 @@
 		   gTop = $(this)[0].offsetTop;
 		   
        });
+	   
+	   $( ".searchableSelect1_1" ).change(function(e) {
+         //品番IDを取得
+		 gMaterial_id = $(this)[0].value;
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-14);
+		 //
+		 setItem(gMaterial_id, selectedIndex);
+       });
+	   
+	   
 	   $( ".searchableSelect1_1" ).on("select2:close", function (e) {
-	     //次のコントロールへフォーカスを移す
+	    
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	     selectedIndex = controlName.slice(42);
+         selectedIndex = selectedIndex.slice(0,-14);
+		 gSelectedIndex = selectedIndex;
+         //
+		 
+		 
+		 //次のコントロールへフォーカスを移す
 			setNextControlOnSelect(e,3);
 	   });
  
@@ -203,6 +243,14 @@
 	       //Y座標を取得
 		   gTop = $(this)[0].offsetTop;
 		   
+       });
+	   
+	   $( ".searchableSelect1_3" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //メーカーIDからアイテム抽出する
+		 setMaterialExtractByMaker(obj);
        });
 	   
 	   $( ".searchableSelect1_3" ).on("select2:close", function (e) {
@@ -226,6 +274,8 @@ gMaterial_code = "";
 gControl_id = 0;
 gTop = 0;
 
+gTrigger = false;
+
 //明細フォーム新規追加時の制御
 $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    
@@ -244,9 +294,25 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
     
 	 $( ".searchableSelect1_1" ).change(function(e) {
      	
-          gMaterial_id = $(this).val();
-          selectedIndex  = getSelectedChildIndex(gMaterial_id);
-         setItem(gMaterial_id, selectedIndex);
+         //gMaterial_id = $(this).val();
+         //selectedIndex  = getSelectedChildIndex(gMaterial_id);
+         
+		 //171028 インデックスが取れないので
+		 // 大幅改修中！！！！！！！！！！！！
+		 
+		 //品番IDを取得
+		 gMaterial_id = $(this)[0].value;
+		 
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+		 
+	     var selectedIndex = 0;
+	    
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-14);
+		 //
+		 
+		 setItem(gMaterial_id, selectedIndex);
      
 	
        });
@@ -260,11 +326,20 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 		
 	   }));
 	   $( ".searchableSelect1_1" ).on("select2:close", function (e) {
-	     //次のコントロールへフォーカスを移す
+	     //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	     selectedIndex = controlName.slice(42);
+         selectedIndex = selectedIndex.slice(0,-14);
+		 gSelectedIndex = selectedIndex;
+         //
+	
+		 
+		 //次のコントロールへフォーカスを移す
 			setNextControlOnSelect(e,3);
 	   });
 	   
-	 //単位
+   //単位
        $(".searchableSelect1_2").select2({ theme: "classic" });
        
 	 //単位操作後の処理(新規追加時)
@@ -277,7 +352,23 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	   
 	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
        $( ".searchableSelect1_2" ).on("select2:close", function (e) {
-       
+         
+		 //171028 インデックスが取れないので
+		 // 大幅改修中！！！！！！！！！！！！
+		 
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	    
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-17);
+		 
+		 gSelectedIndex = selectedIndex;
+		 //
+		 
+		 
+		 //debugger;
+	    
 	     //次のコントロールへフォーカスを移す
 	     setNextControlOnSelect(e,2);
 		
@@ -295,6 +386,16 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	       //Y座標を取得
 		   gTop = $(this)[0].offsetTop;
        });
+	   
+	   $( ".searchableSelect1_3" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //メーカーIDからアイテム抽出する
+		 setMaterialExtractByMaker(obj);
+		
+       });
+	   
        $( ".searchableSelect1_3" ).on("select2:close", function (e) {
          //次のコントロールへフォーカスを移す
 			setNextControlOnSelect(e,1);
@@ -319,7 +420,7 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    // alert('Inserted!');
 });
 
-  window.onload = function(){
+   window.onload = function(){
      
       //170719ソート機能は不安定のため、一旦保留に  
       //$(".sortDone").sortable();
@@ -352,25 +453,39 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    switch (flag){
      case 1:
 	 //メーカー→定価の場合
-       selectedIndex  = getSelectedChildIndexSome(3);
-       gSelectedIndex = selectedIndex;
-       document.getElementsByName("list_price[]")[selectedIndex].focus();
-      
+	 
+	   //if (gSelectedIndex >  0) {
+	     var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][list_price]";
+	     if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+		 }
+	   //}
 	   break;
 	 case 2:
 	 //単位→メーカーの場合
 	   
-	   selectedIndex  = getSelectedChildIndexSome(4);
-       gSelectedIndex = selectedIndex;
-       document.getElementsByName("maker_id[]")[selectedIndex].focus();
+	   //selectedIndex  = getSelectedChildIndexSome(4);
+       //gSelectedIndex = selectedIndex;
+       
+	   
+	   //171028 改修中！　インデックスは従来のものを使う！！！！！！！！！
+	   //document.getElementsByName("maker_id[]")[selectedIndex].focus();
+	   var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][maker_id]";
+	   
+	   document.getElementsByName(nm)[0].focus();
 	   
 	   break;
 	 case 3:
 	 //資材リスト→資材コードの場合
+	   //selectedIndex  = getSelectedChildIndexSome(5);
+       //gSelectedIndex = selectedIndex;
+       
+	   var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][material_code]";
+	   document.getElementsByName(nm)[0].focus();
 	   
-	   selectedIndex  = getSelectedChildIndexSome(5);
-       gSelectedIndex = selectedIndex;
-       document.getElementsByName("material_code[]")[selectedIndex].focus();
+	   //document.getElementsByName("material_code[]")[selectedIndex].focus();
 	   
 	   break;
    }
@@ -379,7 +494,35 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 
    return false;
  }
-
+ 
+ //メーカー別にアイテムを抽出する処理
+ //add171101
+ function setMaterialExtractByMaker(obj){
+ 
+   //name属性に埋め込まれているIDを抜き出す
+   var controlName = obj[0].name;
+   var selectedIndex = 0;
+   selectedIndex = controlName.slice(42);
+   selectedIndex = selectedIndex.slice(0,-11);
+   //
+		   
+   if (gTrigger == false){
+   	 //var maker_id = $(this)[0].value;
+     var maker_id = obj[0].value;
+	 //メーカーIDから該当する品番リストを取得する
+     $.get("<%= purchase_order_historiez_material_extract_path %>",
+        {maker_id: maker_id},
+       function(data){
+	   
+	     if (document.getElementById("material_id_select_hide").innerHTML != "") {
+           var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+	       document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	     }
+	   });
+	 }	 
+     //
+ }
+ 
  //入力チェック(eメール用）
  function submitAfterValidationEmail(){
    document.getElementById("sent_flag").value = 1;

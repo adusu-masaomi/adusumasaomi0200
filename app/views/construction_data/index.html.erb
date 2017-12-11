@@ -2,8 +2,8 @@
  <!--カスタマイズ版を使用-->
  <%= javascript_include_tag 'jquery.tablefix' %>
  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
- 
 <%- model_class = ConstructionDatum -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 
 <div class="page-header" style="margin-bottom:0;width:1920px;">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
@@ -15,14 +15,15 @@
   <%= search_form_for @q, :html => {:style=> 'width:1280px' } do |f| %>
     <%= f.label :construction_name, '工事名　' %>
     <!--<%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>-->
-    <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>
+    <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id:'id', style: 'width:400px' , class: "searchableConstructionName" } %>
     
     <%= f.label :construction_code, '工事コード(範囲)' %>
     <%= f.text_field :construction_code_cont, include_blank: true  %>
 	
 	<%= f.label :customer_name, '得意先名　' %>
     <!--<%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
-    <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>
+    <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {id: 'customer_id', style: 'width:330px' , 
+	     class: "searchableCustomerName", :onchange => "setConstructionExtractByCutomer()" } %>
 
 	</br><%= f.label :billed_flag, '請求済' %>
 	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
@@ -236,6 +237,21 @@
     },0);
   }
  
+  //カテゴリー別にアイテムを抽出する処理
+  function setConstructionExtractByCutomer(){
+    var customer_id = document.getElementById("customer_id").value;
+	$.get("<%= construction_dataz_customer_extract_path %>",
+      {customer_id: customer_id},
+       function(data){
+		 
+		 document.getElementById("id").value = "";
+		 
+		 //リストを未選択状態にする
+		 //document.getElementById("working_middle_item_id_select_hide").value = "";
+		 //短縮名も同様
+		 //document.getElementById("working_middle_item_short_name_select_hide").value = "";
+	});
+  }
   
 
 </script>

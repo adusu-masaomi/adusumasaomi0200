@@ -370,10 +370,15 @@ class QuotationHeadersController < ApplicationController
   
   #内訳データを参照元からコピー
   def copyBreakDown
-    if @quotation_header.quotation_header_origin_id.present?
-  
+    	
+	#if @quotation_header.quotation_header_origin_id.present?
+	#upd171106
+    if params[:quotation_header][:quotation_header_origin_id].present?
+	
       #コピー元の一覧テーブルをセット
-      quotation_header = QuotationHeader.find(@quotation_header.quotation_header_origin_id)
+      #quotation_header = QuotationHeader.find(@quotation_header.quotation_header_origin_id)
+	  #upd171106
+	  quotation_header = QuotationHeader.find(params[:quotation_header][:quotation_header_origin_id])
       
 	  new_header_id = @quotation_header.id
 	  #内訳データ抹消(コピー先)
@@ -417,7 +422,7 @@ class QuotationHeadersController < ApplicationController
 	QuotationDetailMiddleClassification.where(quotation_header_id: new_header_id, 
 	    quotation_detail_large_classification_id: new_large_classification_id).destroy_all
 	
-	@qdmc = QuotationDetailMiddleClassification.where(quotation_header_id: @quotation_header.quotation_header_origin_id,
+	@qdmc = QuotationDetailMiddleClassification.where(quotation_header_id: params[:quotation_header][:quotation_header_origin_id],
 	                               quotation_detail_large_classification_id: old_large_classification_id)
 	#binding.pry
 	

@@ -6,6 +6,7 @@ class EstimationSheetPDF
   def self.create quotation_detail_large_classifications
 	#見積書PDF発行
         
+		
 		#履歴データの判定
 		@history =false
 	    if $print_type == "51" || $print_type == "52"
@@ -31,12 +32,21 @@ class EstimationSheetPDF
         # ブロック内のrow.valuesで値を設定する
 	  
        @flag = nil
-	
-		
+	   
+	   #add171206
+	   #ソートしている場合は、並び順を変える
+	   #if $sort_ql == "asc" 
+	   #  sort_string = "line_number ASC"
+	   #else
+	   #  sort_string = "line_number ASC"
+	   #end
+	   #
+	   
+	   
        #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
 	   #upd170626
-	   quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
-	  	 
+	   quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+        
 		 #---見出し---
 		 
 		 if @flag.nil? 
@@ -223,6 +233,8 @@ class EstimationSheetPDF
 	 
 	 #内訳データでループ
 	 #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+	 #$construction_data.order("construction_code desc").each do |construction_datum| 
+	 
 	 #upd170626
 	 @quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
 	   #upd170626
@@ -264,11 +276,22 @@ class EstimationSheetPDF
 	   
 	   
 	  @flag = nil
-	
+	  
+	  #add171206
+	  #ソートしている場合は、並び順を変える
+	  if $sort_qm == "asc"
+	    sort_string = "line_number desc"
+	  else
+	    sort_string = "line_number asc"
+	  end
+	  #
+	  
 	 
       #$quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
       #upd170626
-	  @quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
+	  #@quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
+	  #upd171206
+	  @quotation_detail_middle_classifications.order(sort_string).each do |quotation_detail_middle_classification| 
       
       	 #---見出し---
 		 

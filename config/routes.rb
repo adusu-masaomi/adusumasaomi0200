@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resources :working_categories
+  resources :working_specific_small_items
+  resources :working_specific_middle_items
   resources :constants
   resources :quotation_material_details
   resources :quotation_material_headers
@@ -198,9 +201,10 @@ Rails.application.routes.draw do
   get "/purchase_order_historiez/email_select" => 'purchase_order_histories#email_select'
   #add170212
   get "/purchase_order_historiez/material_select" => 'purchase_order_histories#material_select'
-  
-  #add170722
   get "/purchase_order_historiez/set_sequence" => 'purchase_order_histories#set_sequence'
+  
+  #add171101
+  get "/purchase_order_historiez/material_extract" => 'purchase_order_histories#material_extract'
   
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
@@ -213,6 +217,9 @@ Rails.application.routes.draw do
   #add170830
   get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
   get '/construction_dataz/delivery_slip_header_select' => 'construction_data#delivery_slip_header_select'
+  
+  #add171121
+  get '/construction_dataz/customer_extract' => 'construction_data#customer_extract'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -352,6 +359,14 @@ Rails.application.routes.draw do
   get '/delivery_slip_detail_large_classificationz/labor_productivity_unit_total_select' => 'delivery_slip_detail_large_classifications#labor_productivity_unit_total_select'
   ###
   
+  #add171107
+  get '/quotation_detail_large_classificationz/working_specific_middle_item_select' => 'quotation_detail_large_classifications#working_specific_middle_item_select'
+  
+  #add171125
+  get '/delivery_slip_detail_large_classificationz/working_specific_middle_item_select' => 'delivery_slip_detail_large_classifications#working_specific_middle_item_select'
+  get '/delivery_slip_detail_middle_classificationz/working_specific_middle_item_select' => 'delivery_slip_detail_middle_classifications#working_specific_middle_item_select'
+
+
   #見積明細D,見積内訳M連動用
   get '/quotation_detail_middle_classificationz/working_middle_item_select' => 'quotation_detail_middle_classifications#working_middle_item_select'
   get '/quotation_detail_middle_classificationz/working_middle_specification_select' => 'quotation_detail_middle_classifications#working_middle_specification_select'
@@ -364,6 +379,10 @@ Rails.application.routes.draw do
   get '/quotation_detail_middle_classificationz/material_id_select' => 'quotation_detail_middle_classifications#material_id_select'
   get '/quotation_detail_middle_classificationz/quotation_material_name_select' => 'quotation_detail_middle_classifications#quotation_material_name_select'
   get '/quotation_detail_middle_classificationz/material_unit_price_select' => 'quotation_detail_middle_classifications#material_unit_price_select'
+  
+  #add171106
+  get '/quotation_detail_middle_classificationz/working_specific_middle_item_select' => 'quotation_detail_middle_classifications#working_specific_middle_item_select'
+  
   #労務単価 
   get '/quotation_detail_middle_classificationz/labor_unit_price_select' => 'quotation_detail_middle_classifications#labor_unit_price_select'
   #歩掛
@@ -474,12 +493,25 @@ Rails.application.routes.draw do
   #add170712
   get '/working_small_itemz/material_standard_select' => 'working_small_items#material_standard_select'
   
+  #add171113
+  get '/working_small_itemz/material_code_standard_select' => 'working_small_items#material_code_standard_select'
+  
    #会社休日取得用
   get '/business_holidayz/get_business_holiday' => 'business_holidays#get_business_holiday'
   
   #在庫単価取得用 170419
   get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
   get '/inventoriez/get_quantity' => 'inventories#get_quantity'
+  
+  get '/working_middle_itemz/item_extract' => 'working_middle_items#item_extract'
+  
+  #add171110
+  get '/working_specific_middle_itemz/working_material_info_select' => 'working_specific_middle_items#working_material_info_select'
+  
+  #add171115
+  get '/working_middle_itemz/working_material_info_select' => 'working_middle_items#working_material_info_select'
+  
+  get '/working_unitz/working_unit_name_select' => 'working_units#working_unit_name_select'
   
   
   #del170707
@@ -503,6 +535,9 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :working_categories
+  resources :working_specific_small_items
+  resources :working_specific_middle_items
   resources :constants
   resources :quotation_material_details
   resources :quotation_material_headers

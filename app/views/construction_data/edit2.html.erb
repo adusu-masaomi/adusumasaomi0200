@@ -1,4 +1,5 @@
 <%- model_class = ConstructionDatum -%>
+<% provide(:title, '作業指示書') %>
 <div class="page-header">
   <!--<h1><%=t '作業指示書', :default => [:'helpers.titles.edit', 'Edit %{model}'], :model => '作業指示書' %></h1>-->
   <h1><%=t '.title', :default => ['作業指示書の発行', 'Edit %{model}'], :model => model_class.model_name.human.titleize %></h1>

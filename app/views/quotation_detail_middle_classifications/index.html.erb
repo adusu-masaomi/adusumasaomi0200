@@ -1,5 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailMiddleClassification -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px" >
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   
@@ -30,16 +31,22 @@
 					  quotation_header_name: params[:quotation_header_name],
 					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]), remote: true,
             :class => 'btn btn-primary' %>
-<!--マスター画面へ遷移-->
-<!--<%= link_to t('.new', :default => t("新規(マスター)")),
-            new_working_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
-			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
-			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
-            :class => 'btn btn-teal500_rsd' %>-->
 <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
                                        quotation_header_name: params[:quotation_header_name]),
             :class => 'btn btn-warning' %>
+<!--マスター画面へ遷移-->
+<%= link_to t('.new', :default => t("共通マスター")),
+            new_working_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
+			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
+            :class => 'btn btn-teal500_rsd' %>
+<%= link_to t('.new', :default => t("固有マスター")),
+            new_working_specific_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
+			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
+            :class => 'btn btn-purple300_rsd' %>
+
 </br>
 <!--upd170626 global valiable erased-->
 <font size="3";><b>
@@ -74,7 +81,7 @@
     <tr>
       <th style="width:40px;"><%= model_class.human_attribute_name(:id) %></th>
       <!--<th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>-->
-	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number) ) %></th>
+	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number), default_order: :asc ) %></th>
 	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
 	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
       <th style="width:50px;">　数量</th>

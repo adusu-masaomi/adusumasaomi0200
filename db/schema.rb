@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171023073535) do
+ActiveRecord::Schema.define(version: 20171113081044) do
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -140,8 +140,10 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.integer  "delivery_slip_header_id",         limit: 4
     t.integer  "delivery_slip_items_division_id", limit: 4
     t.integer  "working_large_item_id",           limit: 4
+    t.integer  "working_specific_middle_item_id", limit: 4
     t.string   "working_large_item_name",         limit: 255
     t.string   "working_large_item_short_name",   limit: 255
+    t.integer  "working_middle_item_category_id", limit: 4
     t.string   "working_large_specification",     limit: 255
     t.integer  "line_number",                     limit: 4
     t.integer  "quantity",                        limit: 4
@@ -169,8 +171,10 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.integer  "delivery_slip_detail_large_classification_id", limit: 4
     t.integer  "delivery_slip_item_division_id",               limit: 4
     t.integer  "working_middle_item_id",                       limit: 4
+    t.integer  "working_specific_middle_item_id",              limit: 4
     t.string   "working_middle_item_name",                     limit: 255
     t.string   "working_middle_item_short_name",               limit: 255
+    t.integer  "working_middle_item_category_id",              limit: 4
     t.integer  "line_number",                                  limit: 4
     t.string   "working_middle_specification",                 limit: 255
     t.integer  "quantity",                                     limit: 4
@@ -519,31 +523,33 @@ ActiveRecord::Schema.define(version: 20171023073535) do
   end
 
   create_table "quotation_detail_large_classifications", force: :cascade do |t|
-    t.integer  "quotation_header_id",           limit: 4
-    t.integer  "quotation_items_division_id",   limit: 4
-    t.integer  "working_large_item_id",         limit: 4
-    t.string   "working_large_item_name",       limit: 255
-    t.string   "working_large_item_short_name", limit: 255
-    t.string   "working_large_specification",   limit: 255
-    t.integer  "line_number",                   limit: 4
-    t.integer  "quantity",                      limit: 4
-    t.integer  "execution_quantity",            limit: 4
-    t.integer  "working_unit_id",               limit: 4
-    t.string   "working_unit_name",             limit: 255
-    t.integer  "working_unit_price",            limit: 4
-    t.string   "quote_price",                   limit: 255
-    t.integer  "execution_unit_price",          limit: 4
-    t.string   "execution_price",               limit: 255
-    t.float    "labor_productivity_unit",       limit: 24
-    t.float    "labor_productivity_unit_total", limit: 24
-    t.integer  "last_line_number",              limit: 4
-    t.string   "remarks",                       limit: 255
-    t.integer  "construction_type",             limit: 4
-    t.integer  "piping_wiring_flag",            limit: 4
-    t.integer  "equipment_mounting_flag",       limit: 4
-    t.integer  "labor_cost_flag",               limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
+    t.integer  "quotation_header_id",             limit: 4
+    t.integer  "quotation_items_division_id",     limit: 4
+    t.integer  "working_large_item_id",           limit: 4
+    t.integer  "working_specific_middle_item_id", limit: 4
+    t.string   "working_large_item_name",         limit: 255
+    t.string   "working_large_item_short_name",   limit: 255
+    t.integer  "working_middle_item_category_id", limit: 4
+    t.string   "working_large_specification",     limit: 255
+    t.integer  "line_number",                     limit: 4
+    t.integer  "quantity",                        limit: 4
+    t.integer  "execution_quantity",              limit: 4
+    t.integer  "working_unit_id",                 limit: 4
+    t.string   "working_unit_name",               limit: 255
+    t.integer  "working_unit_price",              limit: 4
+    t.string   "quote_price",                     limit: 255
+    t.integer  "execution_unit_price",            limit: 4
+    t.string   "execution_price",                 limit: 255
+    t.float    "labor_productivity_unit",         limit: 24
+    t.float    "labor_productivity_unit_total",   limit: 24
+    t.integer  "last_line_number",                limit: 4
+    t.string   "remarks",                         limit: 255
+    t.integer  "construction_type",               limit: 4
+    t.integer  "piping_wiring_flag",              limit: 4
+    t.integer  "equipment_mounting_flag",         limit: 4
+    t.integer  "labor_cost_flag",                 limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   create_table "quotation_detail_middle_classifications", force: :cascade do |t|
@@ -551,8 +557,10 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.integer  "quotation_detail_large_classification_id", limit: 4
     t.integer  "quotation_items_division_id",              limit: 4
     t.integer  "working_middle_item_id",                   limit: 4
+    t.integer  "working_specific_middle_item_id",          limit: 4
     t.string   "working_middle_item_name",                 limit: 255
     t.string   "working_middle_item_short_name",           limit: 255
+    t.integer  "working_middle_item_category_id",          limit: 4
     t.integer  "line_number",                              limit: 4
     t.string   "working_middle_specification",             limit: 255
     t.integer  "quantity",                                 limit: 4
@@ -738,6 +746,9 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.integer  "total_quotation_price_1",    limit: 4
     t.integer  "total_quotation_price_2",    limit: 4
     t.integer  "total_quotation_price_3",    limit: 4
+    t.integer  "total_order_price_1",        limit: 4
+    t.integer  "total_order_price_2",        limit: 4
+    t.integer  "total_order_price_3",        limit: 4
     t.integer  "supplier_id_1",              limit: 4
     t.integer  "supplier_id_2",              limit: 4
     t.integer  "supplier_id_3",              limit: 4
@@ -842,6 +853,12 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.datetime "updated_at",                        null: false
   end
 
+  create_table "working_categories", force: :cascade do |t|
+    t.string   "category_name", limit: 255
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
   create_table "working_large_items", force: :cascade do |t|
     t.string   "working_large_item_name",       limit: 255
     t.string   "working_large_item_short_name", limit: 255
@@ -861,29 +878,31 @@ ActiveRecord::Schema.define(version: 20171023073535) do
   end
 
   create_table "working_middle_items", force: :cascade do |t|
-    t.string   "working_middle_item_name",       limit: 255
-    t.string   "working_middle_item_short_name", limit: 255
-    t.string   "working_middle_specification",   limit: 255
-    t.integer  "working_unit_id",                limit: 4
-    t.float    "working_unit_price",             limit: 24
-    t.integer  "execution_unit_price",           limit: 4
-    t.integer  "material_id",                    limit: 4
-    t.string   "working_material_name",          limit: 255
-    t.float    "execution_material_unit_price",  limit: 24
-    t.float    "material_unit_price",            limit: 24
-    t.float    "execution_labor_unit_price",     limit: 24
-    t.float    "labor_unit_price",               limit: 24
-    t.integer  "labor_unit_price_standard",      limit: 4
-    t.float    "labor_productivity_unit",        limit: 24
-    t.float    "labor_productivity_unit_total",  limit: 24
-    t.integer  "material_quantity",              limit: 4
-    t.integer  "accessory_cost",                 limit: 4
-    t.integer  "material_cost_total",            limit: 4
-    t.integer  "labor_cost_total",               limit: 4
-    t.integer  "other_cost",                     limit: 4
-    t.integer  "seq",                            limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.string   "working_middle_item_name",        limit: 255
+    t.string   "working_middle_item_short_name",  limit: 255
+    t.integer  "working_middle_item_category_id", limit: 4
+    t.string   "working_middle_specification",    limit: 255
+    t.integer  "working_unit_id",                 limit: 4
+    t.string   "working_unit_name",               limit: 255
+    t.float    "working_unit_price",              limit: 24
+    t.integer  "execution_unit_price",            limit: 4
+    t.integer  "material_id",                     limit: 4
+    t.string   "working_material_name",           limit: 255
+    t.float    "execution_material_unit_price",   limit: 24
+    t.float    "material_unit_price",             limit: 24
+    t.float    "execution_labor_unit_price",      limit: 24
+    t.float    "labor_unit_price",                limit: 24
+    t.integer  "labor_unit_price_standard",       limit: 4
+    t.float    "labor_productivity_unit",         limit: 24
+    t.float    "labor_productivity_unit_total",   limit: 24
+    t.integer  "material_quantity",               limit: 4
+    t.integer  "accessory_cost",                  limit: 4
+    t.integer  "material_cost_total",             limit: 4
+    t.integer  "labor_cost_total",                limit: 4
+    t.integer  "other_cost",                      limit: 4
+    t.integer  "seq",                             limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   create_table "working_safety_matters", force: :cascade do |t|
@@ -898,10 +917,50 @@ ActiveRecord::Schema.define(version: 20171023073535) do
     t.string   "working_small_item_code", limit: 255
     t.string   "working_small_item_name", limit: 255
     t.float    "unit_price",              limit: 24
+    t.float    "rate",                    limit: 24
     t.integer  "quantity",                limit: 4
     t.float    "labor_productivity_unit", limit: 24
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+  end
+
+  create_table "working_specific_middle_items", force: :cascade do |t|
+    t.integer  "quotation_header_id",             limit: 4
+    t.integer  "delivery_slip_header_id",         limit: 4
+    t.string   "working_middle_item_name",        limit: 255
+    t.string   "working_middle_item_short_name",  limit: 255
+    t.integer  "working_middle_item_category_id", limit: 4
+    t.string   "working_middle_specification",    limit: 255
+    t.integer  "working_unit_id",                 limit: 4
+    t.string   "working_unit_name",               limit: 255
+    t.float    "working_unit_price",              limit: 24
+    t.integer  "execution_unit_price",            limit: 4
+    t.integer  "material_id",                     limit: 4
+    t.string   "working_material_name",           limit: 255
+    t.float    "execution_material_unit_price",   limit: 24
+    t.float    "material_unit_price",             limit: 24
+    t.float    "execution_labor_unit_price",      limit: 24
+    t.float    "labor_unit_price",                limit: 24
+    t.integer  "labor_unit_price_standard",       limit: 4
+    t.float    "labor_productivity_unit",         limit: 24
+    t.float    "labor_productivity_unit_total",   limit: 24
+    t.integer  "material_cost_total",             limit: 4
+    t.integer  "seq",                             limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  create_table "working_specific_small_items", force: :cascade do |t|
+    t.integer  "working_specific_middle_item_id", limit: 4
+    t.integer  "working_small_item_id",           limit: 4
+    t.string   "working_small_item_code",         limit: 255
+    t.string   "working_small_item_name",         limit: 255
+    t.float    "unit_price",                      limit: 24
+    t.float    "rate",                            limit: 24
+    t.integer  "quantity",                        limit: 4
+    t.float    "labor_productivity_unit",         limit: 24
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
   end
 
   create_table "working_times_detail_data", force: :cascade do |t|

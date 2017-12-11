@@ -31,7 +31,8 @@ body > .container {
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= content_for?(:title) ? yield(:title) : "Adusu" %></title>
+    <!--<title><%= content_for?(:title) ? yield(:title) : "Adusu" %></title>-->
+    <title><%= full_title(yield(:title)) %></title>
     <%= csrf_meta_tags %>
 
     <!--読み込む順番注意！-->
@@ -137,6 +138,7 @@ body > .container {
                  	  <li><a href="/quotation_headers">●見積書データ管理</a></li>
                           <li><a href="/working_middle_items">○作業明細ﾏｽﾀｰ</a></li>  
                           <li><a href="/working_units">○作業単位ﾏｽﾀｰ</a></li>
+						  <li><a href="/working_categories">○カテゴリー</a></li>
                         </ul>
                      </li>
            <li class="dropdown">
@@ -145,6 +147,7 @@ body > .container {
                     <li><a href="/invoice_headers">●請求書データ管理</a></li>
                     <li><a href="/working_middle_items">○作業明細ﾏｽﾀｰ</a></li>  
                     <li><a href="/working_units">○作業単位ﾏｽﾀｰ</a></li>
+                    <li><a href="/working_categories">○カテゴリー</a></li>
                 </ul>
            </li>
 		   <li class="dropdown">
@@ -153,6 +156,7 @@ body > .container {
                     <li><a href="/delivery_slip_headers">●納品書データ管理</a></li>
                     <li><a href="/working_middle_items">○作業明細ﾏｽﾀｰ</a></li>  
                     <li><a href="/working_units">○作業単位ﾏｽﾀｰ</a></li>
+                    <li><a href="/working_categories">○カテゴリー</a></li>
                 </ul>
            </li>
 	
@@ -241,6 +245,9 @@ body > .container {
   //社員所属
   var AFFILIATION_OUTSOURCING = 4;      //外注
   
+  //グローバル変数
+  //
+  
   $(document).ready(function() {
     //del 170427
 	//$("a.add_fields").
@@ -276,9 +283,15 @@ body > .container {
   //ENTER→TABキーに変換する処理。
   $('[tabindex]').keydown(function (e) {
     if (e.keyCode == 13 || e.keyCode == 9) {
-        var tabindex = parseInt($(this).attr('tabindex'));
-        $('[tabindex='+(tabindex+1)+']').focus();
-    
+        
+		//add171205
+		if (document.activeElement.id.slice(0,5) != "modal"){
+		
+		  var tabindex = parseInt($(this).attr('tabindex'));
+          $('[tabindex='+(tabindex+1)+']').focus();
+       
+	    }
+	
         return false;
     }
     
@@ -495,6 +508,23 @@ function shubun(nen) {//秋分の日
     } else {
         return nen <= 1979 ? 24 : 23;
     }
+}
+/**
+ * 全角から半角への変革関数
+ * 入力値の英数記号を半角変換して返却
+ * [引数]   strVal: 入力値
+ * [返却値] String(): 半角変換された文字列
+ */
+function toHalfWidth(strVal){
+  // 半角変換
+  var halfVal = strVal.replace(/[！-～]/g,
+    function( tmpStr ) {
+      // 文字コードをシフト
+      return String.fromCharCode( tmpStr.charCodeAt(0) - 0xFEE0 );
+    }
+  );
+ 
+  return halfVal;
 }
 
 

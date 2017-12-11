@@ -1,5 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationHeader -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   

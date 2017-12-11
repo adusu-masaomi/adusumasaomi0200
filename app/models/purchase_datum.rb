@@ -41,6 +41,17 @@ class PurchaseDatum < ActiveRecord::Base
 	validates_numericality_of :purchase_amount, :only_integer => true, :allow_nil => false
     #validates: purchase_amount, numericality: { only_integer: true }
 	
+	validate :purchase_order_code_check   #add171108
+	
+    def purchase_order_code_check
+	#注文番号のチェック（既に集計済みなら除外する）
+    #add171108  
+	  if construction_datum.calculated_flag == 1
+	    errors.add(:purchase_order_datum_id, ": 工事集計済みのNoです。確認してください。" << 
+        "　　　　　　　" << "（やむなく登録したい場合は、一旦集計フラグを解除して下さい。）")
+      end 
+	end
+	
 # scope 
 
 	scope :with_purchase_order, -> (purchase_order_data_construction_datum_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_datum_id = ?", purchase_order_data_construction_datum_id )}

@@ -1,5 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = QuotationDetailLargeClassification -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
 
@@ -22,12 +23,15 @@
             new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], quotation_header_name: params[:quotation_header_name],
 			   new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
-<!--<%= link_to t('.new', :default => t("新規(マスター)")),
-            new_working_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
-            :class => 'btn btn-teal500_rsd' %>-->
 <%= link_to "一覧へ",
             quotation_headers_path(),
             :class => 'btn btn-info' %>
+<%= link_to t('.new', :default => t("共通マスター")),
+            new_working_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
+            :class => 'btn btn-teal500_rsd' %>
+<%= link_to t('.new', :default => t("固有マスター")),
+            new_working_specific_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
+            :class => 'btn btn-purple300_rsd' %>
 <%= link_to "見積書(提出用)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
             :class => 'btn btn-green500_ftg' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>
@@ -72,14 +76,14 @@
   </style>
   
   <!--見出し固定用設定追加-->
-  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;table-layout:fixed;">
   
   <thead>
     <tr>
       <th style="width:80px;"></th>
 	  <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
       <!--<th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>-->
-	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number) ) %></th>
+	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number), default_order: :asc ) %></th>
       <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_item_name) %></th>
       <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_specification) %></th>
       <th align="right" , style="width:50px;">　数量</th>

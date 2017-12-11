@@ -1,5 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = MaterialMaster -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
    <!-- kaminari用追加箇所開始 -->

@@ -334,11 +334,17 @@ class EstimationSheetLandscapePDF
 	   
 	  
 	  #@page_number = @report.page_count - @estimation_sheet_pages
+	   #add171206
+	  #ソートしている場合は、並び順を変える
+	  if $sort_qm == "asc"
+	    sort_string = "line_number desc"
+	  else
+	    sort_string = "line_number asc"
+	  end
+	  #
 	  
-	  
-      #$quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
-      @quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
-	   
+      #@quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
+	  @quotation_detail_middle_classifications.order(sort_string).each do |quotation_detail_middle_classification|
 	  	 
 				
       	 #---見出し---

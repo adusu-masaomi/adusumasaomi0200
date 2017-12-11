@@ -454,31 +454,34 @@ class PurchaseOrderHistoriesController < ApplicationController
 		
 		 
 		  ######
-          #varidate用のために、本来の箇所から離れたパラメータを再セットする
-		  #item[:quantity] = params[:quantity][i]
+          #item[:quantity] = params[:quantity][i]
 		  #upd170906 数値は全角入力の場合、半角に変換する
-		  if  params[:quantity][i].to_i == 0
-		    params[:quantity][i] = params[:quantity][i].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
+		  #if  params[:quantity][i].to_i == 0
+		  #  params[:quantity][i] = params[:quantity][i].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
+		  #end
+		  #item[:quantity] = params[:quantity][i].to_i
+		  
+		  #upd171030
+		  if  item[:quantity].to_i == 0
+		    item[:quantity] = item[:quantity].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
 		  end
-		  item[:quantity] = params[:quantity][i].to_i
+		  item[:quantity] = item[:quantity].to_i
 		  ###
 		  
-		  item[:material_id] = params[:material_id][i]
 		  
-		  ##add170213
-		  item[:material_code] = params[:material_code][i]
-		  item[:material_name] = params[:material_name][i]
-		  #item[:maker_name] = params[:maker_name][i]
-		  item[:list_price] = params[:list_price][i]
-		  
-		  #add170928
-		  item[:unit_master_id] = params[:unit_master_id][i]
-		  
-		  #メーカーの処理(upd170616)
-		  item[:maker_id] = params[:maker_id][i]
-          @maker_master = MakerMaster.find(params[:maker_id][i])
+		  #del171030
+		  #varidate用のために、本来の箇所から離れたパラメータを再セットする
+		  #item[:material_id] = params[:material_id][i]
+		  #item[:material_code] = params[:material_code][i]
+		  #item[:material_name] = params[:material_name][i]
+		  #item[:list_price] = params[:list_price][i]
+		  #item[:unit_master_id] = params[:unit_master_id][i]
+		  #item[:maker_id] = params[:maker_id][i]
+          
+		  #@maker_master = MakerMaster.find(params[:maker_id][i])
+		  #upd171028
+		  @maker_master = MakerMaster.find(item[:maker_id])
 		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
-		  
 		  
           if @maker_master.present?
             item[:maker_name] = @maker_master.maker_name
@@ -499,15 +502,16 @@ class PurchaseOrderHistoriesController < ApplicationController
                 item[:list_price] = @material_master.list_price
 			  end
 			  
-			  if params[:material_name][i] != @material_master.material_name
+			  #if params[:material_name][i] != @material_master.material_name
+			  if item[:material_name] != @material_master.material_name
 			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  materials.update_attributes!(:material_name => params[:material_name][i] )
+                  #materials.update_attributes!(:material_name => params[:material_name][i] )
+				  materials.update_attributes!(:material_name => item[:material_name] )
                 end 
 			  end
 			  
-			  #add171006
 			  if item[:maker_id] != @material_master.maker_id
 			  #メーカー名を登録or変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
@@ -518,18 +522,22 @@ class PurchaseOrderHistoriesController < ApplicationController
 			  
 			  
 			  #仕入単価マスターの単位も更新する
-			  purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
-                 params[:purchase_order_history][:supplier_master_id], params[:material_id][i] ]).first
+			  #purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+              #   params[:purchase_order_history][:supplier_master_id], params[:material_id][i] ]).first
 			  
-			  #if purchase_unit_price.present?
+			  purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+                 params[:purchase_order_history][:supplier_master_id], item[:material_id] ]).first 
+			  
 			  if item[:unit_master_id].present?
-			    purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+			    #purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+				#                               unit_id: item[:unit_master_id]}
+			    purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
 				                               unit_id: item[:unit_master_id]}
+			 
 				if purchase_unit_price.present?
 				  purchase_unit_price.update(purchase_unit_price_params)
 				else
-				  #add170914
-				  #新規登録も考慮する。
+				  #新規登録も考慮
 			      purchase_unit_price = PurchaseUnitPrice.create(purchase_unit_price_params)
 				end
 			  end
@@ -539,23 +547,28 @@ class PurchaseOrderHistoriesController < ApplicationController
 		    if item[:_destroy] != "1"
 			
 			  
-			  if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+			  #if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+			  if item[:material_code] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
 			    
-				@material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
+				@material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-				  material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
-                                        maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
-			      @material_master = MaterialMaster.create(material_master_params)
-			    end
-			  
+				  #material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
+                  #                      maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
+                  #upd171028 パラメータは従来通り
+				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                                        maker_id: item[:maker_id], list_price: item[:list_price] }
+                  @material_master = MaterialMaster.create(material_master_params)
+                end
+
                 #仕入先単価マスターへも登録。
-                @material_master = MaterialMaster.find_by(material_code: params[:material_code][i])
+                @material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    if @material_master.present?
 			      material_id = @material_master.id
 				  supplier_id = params[:purchase_order_history][:supplier_master_id]
 				  
-				  supplier_material_code = params[:material_code][i]
+				  #supplier_material_code = params[:material_code][i]
+				  supplier_material_code = item[:material_code]
 				  
 				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
 				  #岡田電気の場合のみ、品番のハイフンは抹消する
@@ -661,15 +674,27 @@ class PurchaseOrderHistoriesController < ApplicationController
      @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
 	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
 	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
-     @maker_id_hide = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+     @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
 	 
-	 #add170804
-	 @unit_id_hide = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+	 @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
 	 #add170914 該当なければひとまず”個”にする
-	 if @unit_id_hide.blank?
-	   @unit_id_hide = "3"
+	 if @unit_id.blank?
+	   @unit_id = "3"
 	 end
+	
+  end
+  
+  #メーカーから該当する商品を取得
+  def material_extract
+    #まず手入力用IDをセット。
+    @material_extract = MaterialMaster.where(:id => 1).where("id is NOT NULL").
+     pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+	
+	#次に抽出されたアイテムをセット
+	@material_extract += MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").
+     pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+	
 	
   end
   

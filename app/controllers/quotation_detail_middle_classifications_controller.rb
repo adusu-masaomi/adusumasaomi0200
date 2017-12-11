@@ -10,6 +10,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   # GET /quotation_detail_middle_classifications.json
   def index
     
+	
 	#@quotation_detail_middle_classifications = QuotationDetailMiddleClassification.all
     
     @null_flag = ""
@@ -133,7 +134,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
   # GET /quotation_detail_middle_classifications/new
   def new
-    @quotation_detail_middle_classification = QuotationDetailMiddleClassification.new
+  
+      @quotation_detail_middle_classification = QuotationDetailMiddleClassification.new
     @quotation_detail_large_classification = QuotationDetailLargeClassification.all
     
     ###
@@ -153,7 +155,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
        end
     end 
     
-    #行番号を取得する
+	#行番号を取得する
     get_line_number
     ###
   end
@@ -193,79 +195,6 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	   end
     end
       
-	  
-	#upd170823 サブルーチン化
-	#################
-#	  
-#	  #同様に手入力用IDの場合、明細(中分類)マスターへ登録する。
-#      if @quotation_detail_middle_classification.working_middle_item_id == 1
-#         
-#		 @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @quotation_detail_middle_classification.working_middle_item_name , working_middle_specification: @quotation_detail_middle_classification.working_middle_specification)
-#      else
-#	    #手入力以外の場合   #add170714
-#		 @check_item = WorkingMiddleItem.find(@quotation_detail_middle_classification.working_middle_item_id)
-#      end
-#		 @working_unit_id_params = @quotation_detail_middle_classification.working_unit_id
-#         if @working_unit.present?
-#           @working_unit_all_params = WorkingUnit.find_by(working_unit_name: @quotation_detail_middle_classification.working_unit_name)
-#		   @working_unit_id_params = @working_unit_all_params.id
-#		 end 
-         #if @check_item.nil?
- #         large_item_params = nil   #add170714
-		  #add170823
-#		  #短縮名（手入力）
-#		  if params[:quotation_detail_middle_classification][:working_middle_item_short_name_manual] != "<手入力>"
-#		    working_middle_item_short_name_manual = params[:quotation_detail_middle_classification][:working_middle_item_short_name_manual]
-#		  else
-#		    working_middle_item_short_name_manual = ""
-#		  end
-		  ##
-		  # 全選択の場合
-		  #upd170823 短縮名追加
-#		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
-#		      large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
- #                                   working_middle_item_short_name: working_middle_item_short_name_manual, 
-#working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification, 
-#working_unit_id: @working_unit_id_params, 
-#working_unit_price: @quotation_detail_middle_classification.working_unit_price,
-#execution_unit_price: @quotation_detail_middle_classification.execution_unit_price,
-#material_id: @quotation_detail_middle_classification.material_id,
-#working_material_name: @quotation_detail_middle_classification.quotation_material_name,
-#material_unit_price: @quotation_detail_middle_classification.material_unit_price,
-#labor_unit_price: @quotation_detail_middle_classification.labor_unit_price,
-#labor_productivity_unit: @quotation_detail_middle_classification.labor_productivity_unit,
-#labor_productivity_unit_total: @quotation_detail_middle_classification.labor_productivity_unit_total,
-#material_quantity: @quotation_detail_middle_classification.material_quantity,
-#accessory_cost: @quotation_detail_middle_classification.accessory_cost,
-#material_cost_total: @quotation_detail_middle_classification.material_cost_total,
-#labor_cost_total: @quotation_detail_middle_classification.labor_cost_total,
-#other_cost: @quotation_detail_middle_classification.other_cost
-# }
-               #del170714 
-               #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
-#          else
-		     # アイテムのみ更新の場合
-			 #upd170626 short_name抹消(無駄に１が入るため)
-#		     if params[:quotation_detail_middle_classification][:check_update_item] == "true" 
-#		         large_item_params = { working_middle_item_name:  @quotation_detail_middle_classification.working_middle_item_name, 
-#                 working_middle_item_short_name: working_middle_item_short_name_manual, 
-#                 working_middle_specification:  @quotation_detail_middle_classification.working_middle_specification,
-#                 working_unit_id: @working_unit_id_params } 
-		          #del170714 
-		          #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
-#		     end
-#          end
-          #upd170714
-#		  if large_item_params.present?
-#		     if @check_item.nil?
-#		       @quotation_middle_item = WorkingMiddleItem.create(large_item_params)
-#		     else
-#			   @quotation_middle_item = @check_item.update(large_item_params)
-#		     end
-#		  end
-         #end
-     #end
-	#################
 
 
      #品目データの金額を更新
@@ -458,17 +387,73 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     end
   end
   
-  #add170823
+  #行を全て＋１加算する。 add171120
+  def increment_line_number
+    status = false 
+    if params[:quotation_header_id].present?
+	
+	  @search_records = QuotationDetailMiddleClassification.where("quotation_header_id = ?",
+            params[:quotation_header_id]).where(:quotation_detail_large_classification_id => 
+			        params[:quotation_detail_large_classification_id])
+      
+	  last_line_number = 0
+	  
+	  if @search_records.present?
+        @search_records.order("line_number desc").each do |qdmc|
+	      if qdmc.line_number.present?
+	        qdmc.line_number += 1
+			#ループの初回が、最終レコードのになるので、行を最終行として保存する
+		    if last_line_number == 0
+			  last_line_number = qdmc.line_number
+		    end
+		    #
+	        qdmc.update_attributes!(:line_number => qdmc.line_number)
+	  	    status = true
+	      end
+        end
+		
+	    #最終行を書き込む
+		if status == true
+		  quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", 
+		         params[:quotation_header_id],  
+		            params[:quotation_detail_large_classification_id]]).first
+		   
+		  if quotation_detail_large_classifiations.present?
+		    quotation_detail_large_classifiations.update_attributes!(:last_line_number => last_line_number)
+		  end
+		end
+		
+	  end
+	end  
+	
+	return status
+	
+  end
+  
+  
   #作業明細マスターの更新
   def update_working_middle_item
   
       if params[:quotation_detail_middle_classification][:working_middle_item_id] == "1"
          
-		 @check_item = WorkingMiddleItem.find_by(working_middle_item_name: params[:quotation_detail_middle_classification][:working_middle_item_name] , 
-		   working_middle_specification: params[:quotation_detail_middle_classification][:working_middle_specification] )
+		 if params[:quotation_detail_middle_classification][:master_insert_flag] == "true"   #add171106
+		   @check_item = WorkingMiddleItem.find_by(working_middle_item_name: params[:quotation_detail_middle_classification][:working_middle_item_name] , 
+		     working_middle_specification: params[:quotation_detail_middle_classification][:working_middle_specification] )
+	     else
+		 #add171106 固有マスターより検索
+		   @check_item = WorkingSpecificMiddleItem.find_by(working_middle_item_name: params[:quotation_detail_middle_classification][:working_middle_item_name] , 
+		     quotation_header_id: params[:quotation_detail_middle_classification][:quotation_header_id] )
+		 end
       else
-	    #手入力以外の場合   #add170714
-		 @check_item = WorkingMiddleItem.find(params[:quotation_detail_middle_classification][:working_middle_item_id])
+	    #手入力以外の場合   
+		 if params[:quotation_detail_middle_classification][:master_insert_flag] == "true"   #add171106
+		   @check_item = WorkingMiddleItem.find(params[:quotation_detail_middle_classification][:working_middle_item_id])
+		 else
+		 #add171106 固有マスターより検索
+		   if params[:quotation_detail_middle_classification][:working_middle_specific_item_id].present?
+		     @check_item = WorkingSpecificMiddleItem.find(params[:quotation_detail_middle_classification][:working_middle_specific_item_id])
+		   end
+		 end
       end
 		
 		 @working_unit_id_params = params[:quotation_detail_middle_classification][:working_unit_id]
@@ -477,12 +462,9 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
            @working_unit_all_params = WorkingUnit.find_by(working_unit_name: params[:quotation_detail_middle_classification][:working_unit_name] )
 		   @working_unit_id_params = @working_unit_all_params.id
 		 end 
- 
-         #if @check_item.nil?
+ 		  
+          large_item_params = nil   
 		  
-          large_item_params = nil   #add170714
-		  
-		  #add170823
 		  #短縮名（手入力）
 		  if params[:quotation_detail_middle_classification][:working_middle_item_short_name_manual] != "<手入力>"
 		    working_middle_item_short_name_manual = params[:quotation_detail_middle_classification][:working_middle_item_short_name_manual]
@@ -494,23 +476,25 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		  # 全選択の場合
 		  #upd170823 短縮名追加
 		  if params[:quotation_detail_middle_classification][:check_update_all] == "true" 
+		      #upd171106 未使用項目を削除
 		      large_item_params = { working_middle_item_name:  params[:quotation_detail_middle_classification][:working_middle_item_name], 
                                     working_middle_item_short_name: working_middle_item_short_name_manual, 
                                     working_middle_specification:  params[:quotation_detail_middle_classification][:working_middle_specification] , 
-                                    working_unit_id: @working_unit_id_params, 
+                                    working_middle_item_category_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id], 
+									working_unit_id: @working_unit_id_params, 
                                     working_unit_price: params[:quotation_detail_middle_classification][:working_unit_price] ,
                                     execution_unit_price: params[:quotation_detail_middle_classification][:execution_unit_price] ,
-                                    material_id: params[:quotation_detail_middle_classification][:material_id] ,
-                                    working_material_name: params[:quotation_detail_middle_classification][:quotation_material_name],
+                                    #material_id: params[:quotation_detail_middle_classification][:material_id] ,
+                                    #working_material_name: params[:quotation_detail_middle_classification][:quotation_material_name],
                                     material_unit_price: params[:quotation_detail_middle_classification][:material_unit_price] ,
                                     labor_unit_price: params[:quotation_detail_middle_classification][:labor_unit_price] ,
                                     labor_productivity_unit: params[:quotation_detail_middle_classification][:labor_productivity_unit] ,
-                                    labor_productivity_unit_total: params[:quotation_detail_middle_classification][:labor_productivity_unit_total] ,
-                                    material_quantity: params[:quotation_detail_middle_classification][:material_quantity] ,
-                                    accessory_cost: params[:quotation_detail_middle_classification][:accessory_cost] ,
-                                    material_cost_total: params[:quotation_detail_middle_classification][:material_cost_total] ,
-                                    labor_cost_total: params[:quotation_detail_middle_classification][:labor_cost_total],
-                                    other_cost: params[:quotation_detail_middle_classification][:other_cost] 
+                                    labor_productivity_unit_total: params[:quotation_detail_middle_classification][:labor_productivity_unit_total] 
+                                    #material_quantity: params[:quotation_detail_middle_classification][:material_quantity] ,
+                                    #accessory_cost: params[:quotation_detail_middle_classification][:accessory_cost] ,
+                                    #material_cost_total: params[:quotation_detail_middle_classification][:material_cost_total] ,
+                                    #labor_cost_total: params[:quotation_detail_middle_classification][:labor_cost_total]
+                                    #other_cost: params[:quotation_detail_middle_classification][:other_cost] 
                                   }
                #del170714 
                #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
@@ -522,25 +506,31 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		         large_item_params = { working_middle_item_name: params[:quotation_detail_middle_classification][:working_middle_item_name] , 
                  working_middle_item_short_name: working_middle_item_short_name_manual, 
                  working_middle_specification: params[:quotation_detail_middle_classification][:working_middle_specification] ,
-                 working_unit_id: @working_unit_id_params } 
+                 working_middle_item_category_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id], 
+				 working_unit_id: @working_unit_id_params } 
 		   
 		     end
 		   
           end
 
-          #upd170714
-		  if large_item_params.present?
+          if large_item_params.present?
 		     if @check_item.nil?
-		       #@quotation_middle_item = WorkingMiddleItem.create(large_item_params)
-			   @check_item = WorkingMiddleItem.create(large_item_params)
-		     
-			   #手入力の場合のパラメータを書き換える。
-			   params[:quotation_detail_middle_classification][:working_middle_item_id] = @check_item.id
-			   params[:quotation_detail_middle_classification][:working_middle_item_short_name] = @check_item.id
-			 
+		       if params[:quotation_detail_middle_classification][:master_insert_flag] == "true"   #add171106
+			     @check_item = WorkingMiddleItem.create(large_item_params)
+		         #手入力の場合のパラメータを書き換える。
+			     params[:quotation_detail_middle_classification][:working_middle_item_id] = @check_item.id
+			     params[:quotation_detail_middle_classification][:working_middle_item_short_name] = @check_item.id
+			   else
+			   #add171106 固有マスターへ登録
+			     #ヘッダIDを連想配列へ追加
+				 large_item_params.store(:quotation_header_id, params[:quotation_detail_middle_classification][:quotation_header_id])
+				 
+			     @check_item = WorkingSpecificMiddleItem.create(large_item_params)
+		         #手入力の場合のパラメータを書き換える。
+			     params[:quotation_detail_middle_classification][:working_specific_middle_item_id] = @check_item.id
+			   end
 			 else
 			 
-			   #@quotation_middle_item = @check_item.update(large_item_params)
 			   @check_item.update(large_item_params)
 		     end
 			 
@@ -712,6 +702,15 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   end
   def working_middle_specification_select
      @working_middle_specification = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_specification).flatten.join(" ")
+  
+     #add171124
+     @working_middle_item_category_id  = WorkingMiddleItem.with_category.where(:id => params[:id]).pluck("working_categories.category_name, working_categories.id")
+	 #登録済みと異なるケースもあるので、任意で変更もできるように全て値をセット
+	 @working_middle_item_category_id  += WorkingCategory.all.pluck("working_categories.category_name, working_categories.id")
+	 #
+	 
+	 @working_middle_item_short_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_short_name).flatten.join(" ")
+	 
   end
   def working_unit_price_select
      @working_unit_price = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_unit_price).flatten.join(" ")
@@ -719,6 +718,29 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   def execution_unit_price_select
      @execution_unit_price = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:execution_unit_price).flatten.join(" ")
   end
+  
+  #固有マスター関連取得 add171106
+  def working_specific_middle_item_select
+     @working_middle_item_name = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:working_middle_item_name).flatten.join(" ")
+     @working_middle_specification = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:working_middle_specification).flatten.join(" ")
+     
+	 #単位
+	 @working_unit_id  = WorkingSpecificMiddleItem.with_unit.where(:id => params[:working_specific_middle_item_id]).pluck("working_units.working_unit_name, working_units.id")
+	 #登録済み単位と異なるケースもあるので、任意で変更もできるように全ての単位をセット
+     unit_all = WorkingUnit.all.pluck("working_units.working_unit_name, working_units.id")
+	 @working_unit_id = @working_unit_id + unit_all
+	 #
+	 
+	 @working_unit_price = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:working_unit_price).flatten.join(" ")
+     @execution_unit_price = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:execution_unit_price).flatten.join(" ")
+	 
+	 @labor_productivity_unit = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:labor_productivity_unit).flatten.join(" ")
+     #歩掛計
+     @labor_productivity_unit_total = WorkingSpecificMiddleItem.where(:id => params[:working_specific_middle_item_id]).where("id is NOT NULL").pluck(:labor_productivity_unit_total).flatten.join(" ")
+	 
+  end
+  
+  ###
   
   #使用材料id(うまくいかないので保留・・・)
   def material_id_select
@@ -921,9 +943,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
    
    #見出しデータへ最終行番号保存用
     def quotation_dlc_set_last_line_number
-        @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
+        @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", 
+		   @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
 		
-        check_flag = false
+		check_flag = false
 	    if @quotation_detail_large_classifiations.last_line_number.nil? 
           check_flag = true
         else
@@ -943,15 +966,28 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #行番号を取得し、インクリメントする。（新規用）
     def get_line_number
       @line_number = 1
-      if @quotation_detail_middle_classification.quotation_header_id.present? && @quotation_detail_middle_classification.quotation_detail_large_classification_id.present?
-         @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
+	  
+	  if $sort_qm != "asc"   #add171120
+        if @quotation_detail_middle_classification.quotation_header_id.present? && @quotation_detail_middle_classification.quotation_detail_large_classification_id.present?
+           @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
 		 
-		 if @quotation_detail_large_classifiations.present?
-            if @quotation_detail_large_classifiations.last_line_number.present?
-               @line_number = @quotation_detail_large_classifiations.last_line_number + 1
-            end
-         end
-      end
+		   if @quotation_detail_large_classifiations.present?
+              if @quotation_detail_large_classifiations.last_line_number.present?
+                 @line_number = @quotation_detail_large_classifiations.last_line_number + 1
+              end
+           end
+        end
+	  else
+	  #add171120
+	  #昇順ソートしている場合は、行を最終ではなく先頭にする。
+	    #登録済みレコードの行を全て事前に加算する
+		status = increment_line_number
+		
+		#インクリメント失敗していたら、行は０にする。
+		if status == false
+		  @line_number = 0
+		end
+	  end
 	  
 	  @quotation_detail_middle_classification.line_number = @line_number
     end
@@ -960,8 +996,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	# Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_middle_classification_params
       params.require(:quotation_detail_middle_classification).permit(:quotation_header_id, :quotation_detail_large_classification_id, :line_number, 
-                                                                     :quotation_items_division_id, :working_middle_item_id, :working_middle_item_name, 
-                                                                     :working_middle_item_short_name, :working_middle_specification, :execution_quantity, :quantity,
+                                                                     :quotation_items_division_id, :working_middle_item_id, :working_specific_middle_item_id, :working_middle_item_name, 
+                                                                     :working_middle_item_short_name, :working_middle_item_category_id, :working_middle_specification, :execution_quantity, :quantity,
                                                                      :working_unit_id, :working_unit_name, :working_unit_price, :quote_price, :execution_unit_price,
                                                                      :execution_price, :material_id, :quotation_material_name, :material_unit_price, :labor_unit_price,
                                                                      :labor_productivity_unit, :labor_productivity_unit_total, :material_quantity, :accessory_cost, 

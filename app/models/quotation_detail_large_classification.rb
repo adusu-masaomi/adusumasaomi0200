@@ -8,9 +8,8 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   end
   
   def self.serial_number
-    #[[("<行選択>").to_s , (1..100).to_a ]]
-    #upd170704
     [[("<行選択>").to_s , (1..999).to_a ]]
+	#[[("<行選択>").to_s , (0..999).to_a ]]
   end 
   
   #行挿入用
@@ -21,6 +20,16 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   
   #短縮名手入力用(add170822)
   attr_accessor :working_large_item_short_name_manual
+  
+  #add 1711004
+  attr_accessor :quotation_large_item_id
+  attr_accessor :master_insert_flag
+  #ajax用（リスト）
+  #attr_accessor :working_middle_item_category_id 
+  attr_accessor :working_middle_item_category_id_call
+  attr_accessor :working_middle_item_id_select_hide
+  attr_accessor :working_middle_item_short_name_select_hide
+  #
   
   #金額合計(見積)
   def self.sumpriceQuote  
