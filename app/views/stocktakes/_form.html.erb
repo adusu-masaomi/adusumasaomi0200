@@ -1,0 +1,134 @@
+<%= simple_form_for @stocktake, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :stocktake_date, input_html:{ :tabindex=>"0"} %>
+  <!--<%= f.input :material_master_id, input_html:{ :tabindex=>"1"} %>-->
+  <%= f.label :material_name , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :material_master_id, MaterialMaster.all, :id, :p_material_code_name, {:prompt => "どれか一つを選択して下さい"} , {id:"material_master_id", 
+  class: "searchableSelect2_1" , style: 'width:440px' } %>-->
+  <%= f.collection_select :material_master_id, MaterialMaster.with_inventory_item, :id, :p_material_code_name, {:prompt => "どれか一つを選択して下さい"} , 
+  {id:"material_master_id", class: "searchableSelect2_1" , style: 'width:440px' } %>
+  
+  <%= f.input :physical_quantity, input_html:{ id:"physical_quantity", :tabindex=>"2", :onfocusout => "calcQuantity()" } %>
+  <%= f.input :unit_price, input_html:{ :tabindex=>"3", id:"unit_price" } %>
+  <%= f.input :unit_price_hide , input_html:{ id:"unit_price_hide"} , as: :hidden%>
+  <%= f.input :physical_amount, input_html:{ id:"physical_amount", :tabindex=>"4"} %>
+  <%= f.input :book_quantity, input_html:{ id:"book_quantity", :readonly => true } %>
+  <%= f.input :quantity_hide , input_html:{ id:"quantity_hide"} , as: :hidden%>
+  <%= f.input :difference, label: "差異", input_html:{ id:"difference", :readonly => true } %>
+  
+  <%= f.input :book_amount, input_html:{ id:"book_amount", :readonly => true } %>
+  <%= f.input :amount_hide , input_html:{ id:"amount_hide"} , as: :hidden%>
+  <!--<%= f.input :inventory_id , input_html:{ id:"inventory_id"} , as: :hidden%>-->
+  <%= f.input :different_amount, label: "差異金額", input_html:{ id:"different_amount", :value =>  0, :readonly => true } %>
+  
+  <%= f.button :submit, :class => 'btn-primary', :tabindex => "5" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                stocktakes_path, :class => 'btn btn-default' %>
+<% end %>
+
+<script type="text/javascript">
+   $(document).on('ready page:load', function(){
+     $(".searchableSelect2_1").select2({ theme: "bootstrap" });
+	 //select2のタブインデックスはここで指定する
+	 $(".searchableSelect2_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',1)}).trigger('load');
+	 $( ".searchableSelect2_1" ).change(function(e) {
+	 //品番を選んだ場合の処理
+	    //在庫マスター単価を取得
+        getInventoryUnitPrices();
+		//在庫マスター数量を取得
+		getInventoryQuantity();
+	 });
+		
+   });
+   
+   //フォームロード時のイベント
+   window.onload = function(){
+     calcQuantity();
+   }
+   
+   //在庫Mより現在単価を取得する（出庫の場合に取得する）--ajax利用
+   function getInventoryUnitPrices() {
+     material_master_id = document.getElementById("material_master_id").value;
+	 $.get("<%= inventoriez_get_unit_price_path %>",
+          {material_id: material_master_id },
+          function(data){
+		    obj = document.getElementById("unit_price_hide").textContent;
+			
+			if (obj != "") {
+			  document.getElementById("unit_price").value = obj;
+			  //add171128 idもセット（単位を取るため）
+			  //obj = document.getElementById("inventory_id").textContent;
+			  //document.getElementById("inventory_id").value = obj;
+			}else{ 
+			  window.confirm('在庫マスターが存在しません。品番を確認してください。');
+			}
+	 });
+   }
+   //在庫Mより現在数量と金額取得する（出庫の場合に取得する）--ajax利用
+   function getInventoryQuantity() {
+     material_master_id = document.getElementById("material_master_id").value;
+	 $.get("<%= inventoriez_get_quantity_path %>",
+          {material_id: material_master_id },
+          function(data){
+		    obj = document.getElementById("quantity_hide").textContent;
+			if (obj != "") {
+			  document.getElementById("book_quantity").value = obj;
+			}
+			obj = document.getElementById("amount_hide").textContent;
+			if (obj != "") {
+			  document.getElementById("book_amount").value = obj;
+			}
+	 });
+   }
+   //数量の計算
+   function calcQuantity(){
+     var physical_quantity = document.getElementById("physical_quantity").value;
+     var book_quantity = document.getElementById("book_quantity").value;
+     
+	 var difference = 0;
+	 
+	 //実地数量-帳簿数量
+     //if (physical_quantity != undefined && physical_quantity > 0 &&
+	 //    book_quantity != undefined && book_quantity > 0 ) {
+     if (physical_quantity != undefined && book_quantity != undefined )
+     {
+         difference = physical_quantity - book_quantity
+         document.getElementById("difference").value = difference;
+	 }
+	 
+	 //金額も計算する
+	 calcPrice();
+	 //差異金額も計算
+	 calcDifferAmount();
+   }
+   //金額の計算
+   function calcPrice(){
+     var physical_quantity = document.getElementById("physical_quantity").value;
+     var unit_price = document.getElementById("unit_price").value;
+     
+     //if (physical_quantity != undefined && physical_quantity > 0 &&
+	 //    unit_price != undefined && unit_price > 0 ) {
+	 if (physical_quantity != undefined && book_quantity != undefined && 
+	       unit_price != undefined && unit_price > 0 ) 
+		 {
+		   var physical_amount = physical_quantity * unit_price
+		   document.getElementById("physical_amount").value = physical_amount;
+		   
+	     }
+     
+   }
+   
+   //差異金額
+   function calcDifferAmount(){
+     
+	 //debugger;
+     if (document.getElementById("physical_amount").value != "" && 
+	     document.getElementById("book_amount").value != "" ) 
+       
+	   var different_amount = document.getElementById("physical_amount").value -
+	                          document.getElementById("book_amount").value;
+	   document.getElementById("different_amount").value = different_amount;
+   }
+   
+</script>
+

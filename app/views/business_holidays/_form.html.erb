@@ -1,0 +1,8 @@
+<%= simple_form_for @business_holiday, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :working_date, input_html:{:tabindex=>"0"} %>
+  <%= f.input :holiday_flag, hint: "＊会社休日(日曜・祝日除く)の場合のみ”１”を登録してください。", input_html:{:tabindex=>"1", value: f.object.holiday_flag || 1 } %>
+  
+  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"2" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                business_holidays_path, :class => 'btn btn-default' %>
+<% end %>

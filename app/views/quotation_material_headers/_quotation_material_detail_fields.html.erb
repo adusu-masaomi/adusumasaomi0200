@@ -1,0 +1,838 @@
+<div class="sortThese">
+<div class="nested-fields well form-inline">
+
+  
+  <!--<%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>-->
+  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , value: $seq_exists, style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  
+  <%= f.input :sequential_id_hide,  input_html:{id:"sequential_id_hide", }, as: :hidden %>
+  <%= f.input :sort_order,  input_html:{id:"sort_order", }, as: :hidden %>
+  
+  <% if f.object.sequential_id.present? %>
+    <% if @form_detail_order != "sequential_id DESC" %>
+      <% $seq_exists -=  1 %>
+	<% else %>
+	  <% $seq_exists +=  1 %>
+	<% end %>
+  <% end %>
+  
+  <%= f.label :品番選択, {style: 'width:770px'}  %>
+  <%= f.label :単位, {style: 'width:50px;margin-left:-85px;'}  %>
+  <!--<%= f.label :メール送信フラグ, {style: 'width:120px;margin-left:-5px;'}  %>-->
+  
+  <!--単価１〜３ -->
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;
+  
+  <%= f.input :quotation_unit_price_1,  label: "見積単価１", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_1",  style: 'width:100px;color:purple' , 
+       class: "quotation_unit_price_1", :tabindex=>"10", :onkeydown => "checkQuotationUnitPriceAll(1,event)" } %>
+
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.input :quotation_unit_price_2,  label: "見積単価２", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_2",  style: 'width:100px;color:purple' , 
+       class: "quotation_unit_price_2", :tabindex=>"12",:onkeydown => "checkQuotationUnitPriceAll(2,event)"  } %>
+	   
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.input :quotation_unit_price_3,  label: "見積単価３", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_3",  style: 'width:100px;color:purple' , 
+       class: "quotation_unit_price_3", :tabindex=>"14", :onkeydown => "checkQuotationUnitPriceAll(3,event)"  } %>
+  
+  
+  </br>
+  <!--upd170720マスター類はあらかじめセットされた変数から取得-->
+  <!--<%= f.collection_select :material_id, @material_masters.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
+  {class: "searchableSelect1_1 form-control" , id: "material_id" , name:"material_id[]",  style: 'width:650px' } %>-->
+  
+  <%= f.collection_select :material_id, @material_masters.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
+  {class: "searchableSelect1_1 form-control" , id: "material_id" ,  style: 'width:650px' } %>
+  
+  <%= f.label :数量, {style: 'width:28px'}  %>
+  <!--<%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>-->
+  <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2"  %>
+  <td>&nbsp;&nbsp;</td>
+  <!--<%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
+     { id: "unit_master_id", name:"unit_master_id[]", class: "searchableSelect1_2" , style: 'width:50px' } %>-->
+  <%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
+     { class: "searchableSelect1_2 form-control" , style: 'width:50px' } %>
+  
+  
+  <!--新規の場合は、送信済みフラグは初期化させる-->
+  <% if $new_flag == 1 %>
+    <% @flag = 0 %>
+  <% else %>
+    <% @flag = f.object.mail_sent_flag %>
+  <% end %>
+  
+  <!--
+  <%= f.select :mail_sent_flag, Order.mail_flag, {:include_blank => true, :selected => @flag }, 
+       {id:'mail_sent_flag', :class => "my-custom-class", style: 'width:120px;margin-left:0px;font-size:16px;font-weight:bold;color:red;' } %>
+  -->
+  
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+  <!-- -->
+  <%= f.input :quotation_price_1,  label: "見積金額１", input_html:{ id: "quotation_price_1", :tabindex=>"11", style: 'width:100px' , class: "quotation_price_1" , :onchange => "checkQuotationPriceAll(1)" } %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.input :quotation_price_2,  label: "見積金額２", input_html:{ id: "quotation_price_2", :tabindex=>"13", style: 'width:100px' , class: "quotation_price_2" , :onchange => "checkQuotationPriceAll(2)" } %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.input :quotation_price_3,  label: "見積金額３", input_html:{ id: "quotation_price_3", :tabindex=>"15", style: 'width:100px' , class: "quotation_price_3" , :onchange => "checkQuotationPriceAll(3)" } %>
+  <!-- -->
+  
+  </br>
+  
+  <!--<%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onkeydown => "setMaterialCode($(this).val())" } %>-->
+  <%= f.input :material_code,  input_html:{ id: "material_code", style: 'width:150px', :tabindex=>"0", :onchange => "setMaterialCode($(this).val())" } %>
+  
+  <%= f.input :material_name,  input_html:{ id: "material_name",  style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
+   <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <!--<%= f.collection_select :maker_id, @maker_masters.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
+      {class: "searchableSelect1_3 form-control" , id: "maker_id" , name:"maker_id[]",  style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>-->
+	  
+  <%= f.collection_select :maker_id, @maker_masters.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
+      {class: "searchableSelect1_3 form-control" , id: "maker_id" ,  style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>
+  
+  <!--<%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px' , :tabindex=>"4" } %>-->
+  <%= f.input :list_price,  input_html:{ id: "list_price", style: 'width:100px' , :tabindex=>"4" } %>
+  
+  <!--落札フラグ-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.check_box :bid_flag_1,  :id => "bid_flag_1" %>
+  <%= f.label :bid_flag_1, '落札　　　', { style: 'color:red'}  %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.check_box :bid_flag_2,  :id => "bid_flag_2" %>
+  <%= f.label :bid_flag_2, '落札　　　', { style: 'color:red'}  %>
+  
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.check_box :bid_flag_3,  :id => "bid_flag_3" %>
+  <%= f.label :bid_flag_3, '落札　　　', { style: 'color:red'}  %></br>
+  
+  <!--メール送信フラグ-->
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+  <%= f.label :mail_sent_flag, 'メール送信フラグ：', { style: 'font-size:8px'} %>
+  
+  &nbsp;
+  
+  <%= f.check_box :quotation_email_flag_1,  :id => "quotation_email_flag_1" %>
+  <%= f.label :quotation_email_flag_1, '見積', { style: 'font-size:8px;color:green'}  %>
+  <%= f.check_box :order_email_flag_1,  :id => "order_email_flag_1" %>
+  <%= f.label :order_email_flag_1, '注文', { style: 'font-size:8px;color:brown'}  %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+  <%= f.check_box :quotation_email_flag_2,  :id => "quotation_email_flag_2" %>
+  <%= f.label :quotation_email_flag_2, '見積', { style: 'font-size:8px;color:green'}  %>
+  <%= f.check_box :order_email_flag_2,  :id => "order_email_flag_2" %>
+  <%= f.label :order_email_flag_2, '注文', { style: 'font-size:8px;color:brown'}  %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+  <%= f.check_box :quotation_email_flag_3,  :id => "quotation_email_flag_3" %>
+  <%= f.label :quotation_email_flag_3, '見積', { style: 'font-size:8px;color:green'}  %>
+  <%= f.check_box :order_email_flag_3,  :id => "order_email_flag_3" %>
+  <%= f.label :order_email_flag_3, '注文', { style: 'font-size:8px;color:brown'}  %>
+  
+  </br>
+  <!-- -->
+  
+  <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %>
+  <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %>
+  <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %>
+  
+</div>
+</div>
+ 
+ <script type="text/javascript">
+
+  //cIndex = 0;
+  //var i = 0;
+  
+  
+  //$(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+  
+      
+	  
+	  
+ //});  
+  
+  //選択した行のインデックスを取得
+  function getSelectedChildIndex(id){
+    item = document.getElementsByName("material_id[]");
+    var select_index = 0;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  if (id == item[index].value){
+	    select_index = index;
+	  }
+	}
+    return select_index;
+	
+  }
+  
+  //見積合計を計算
+  function setTotalQuotation(Flag){
+    
+	var detail_price;
+    var total_price = 0;
+	var total_id = "";
+	
+	//add171024
+	var total_order_price = 0;
+	var total_order_id = "";
+	var bid_flag = "";
+	
+	//依頼先１〜３により分岐
+	switch (Flag){
+      case 1:
+        detail_price = document.querySelectorAll("#quotation_price_1");
+		total_id = "total_quotation_price_1";
+
+        //add171024
+		bid_flag = document.querySelectorAll("#bid_flag_1");
+        total_order_id = "total_order_price_1";
+    
+		break;
+      case 2:
+        detail_price = document.querySelectorAll("#quotation_price_2");
+		total_id = "total_quotation_price_2";
+		
+		//add171024
+		bid_flag = document.querySelectorAll("#bid_flag_2");
+        total_order_id = "total_order_price_2";
+		
+        break;
+      case 3:
+        detail_price = document.querySelectorAll("#quotation_price_3");
+		total_id = "total_quotation_price_3";
+		
+		//add171024
+		bid_flag = document.querySelectorAll("#bid_flag_3");
+        total_order_id = "total_order_price_3";
+		
+        break;
+    }
+
+	for (var index = 0; index < detail_price.length  ; index ++) {
+	  
+	  //if (detail_price[index].value != ""){
+	  if (detail_price[index].value != false){
+        total_price += parseInt(detail_price[index].value);
+		
+		//注文合計・・・落札ありの場合のみ計上する
+		if (bid_flag[index].checked == true){
+		  total_order_price += parseInt(detail_price[index].value);
+		}
+		
+	  }
+    }
+	
+	document.getElementById(total_id).value = total_price;
+	
+	//add171024
+	document.getElementById(total_order_id).value = total_order_price;
+	
+  }
+  
+  //見積単価から金額を算出
+  function checkQuotationUnitPriceAll(Flag,e){
+     
+	 if (e.keyCode == 13 || e.keyCode == 9) {
+	 //  return false;
+     } else {
+       return false;
+	 }
+	 
+	 
+	 var unit_price;
+	 var num = 0;
+	 
+     //quantity = document.getElementsByName("quantity[]");
+	 quantity = document.querySelectorAll("#quantity");
+	 
+	 //依頼先１〜３により分岐
+	switch (Flag){
+      case 1:
+        num = 1;
+		unit_price = document.querySelectorAll("#quotation_unit_price_1");
+		price = document.querySelectorAll("#quotation_price_1");
+		break;
+      case 2:
+	    num = 2;
+        unit_price = document.querySelectorAll("#quotation_unit_price_2");
+		price = document.querySelectorAll("#quotation_price_2");
+		break;
+      case 3:
+	    num = 3;
+        unit_price = document.querySelectorAll("#quotation_unit_price_3");
+		price = document.querySelectorAll("#quotation_price_3");
+		break;
+    }
+	
+	
+	for (var index = 0; index < unit_price.length  ; index ++) {
+	  if (unit_price[index].value > 0 && quantity[index].value > 0){
+	    price[index].value = parseInt(unit_price[index].value * quantity[index].value);
+		
+		//落札のチェックも行う
+		checkQuotationPriceAll(num);
+	  }
+	}
+     
+  }
+  
+  //落札のチェックを行う。
+  function checkBidAll(){
+  
+    checkPrice_1 = document.querySelectorAll("#quotation_price_1");
+	 checkItem_1 = document.querySelectorAll("#bid_flag_1");
+	 checkPrice_2 = document.querySelectorAll("#quotation_price_2");
+	 checkItem_2 = document.querySelectorAll("#bid_flag_2");
+	 checkPrice_3 = document.querySelectorAll("#quotation_price_3");
+	 checkItem_3 = document.querySelectorAll("#bid_flag_3");
+	
+	
+	
+	for (var index = 0; index < checkPrice_1.length  ; index ++) {
+	  var price_1_win = false;
+	  var price_2_win = false;
+	  var price_3_win = false;
+	  
+	  
+	  ///判定///
+	  
+	  //〜〜〜価格１の判定〜〜〜
+	  //価格１のみ存在？
+	  if (checkPrice_1[index].value > 0 && checkPrice_2[index].value == "" && checkPrice_3[index].value  == "" ){
+	    price_1_win = true;
+	  }
+	  //価格１が価格２より安い？(価格３が未セット)
+	  if (checkPrice_2[index].value != ""  && checkPrice_3[index].value == "" &&
+	      parseInt(checkPrice_1[index].value) < parseInt(checkPrice_2[index].value)) {
+		  price_1_win = true;
+	  }
+	  //価格１が価格3より安い？(価格2が未セット)
+	  if (checkPrice_3[index].value != ""  && checkPrice_2[index].value == "" &&
+	      parseInt(checkPrice_1[index].value) < parseInt(checkPrice_3[index].value)) {
+		  price_1_win = true;
+	  }
+	  //価格1が一番安い？
+	  if (checkPrice_2[index].value != ""  && checkPrice_3[index].value != "" &&
+	      parseInt(checkPrice_2[index].value) > parseInt(checkPrice_1[index].value) && 
+		  parseInt(checkPrice_3[index].value) > parseInt(checkPrice_1[index].value) ) {
+		  price_1_win = true;
+	  }
+	  
+	  //〜〜〜価格2の判定〜〜〜
+	  //価格2のみ存在？
+	  if (checkPrice_2[index].value > 0 && checkPrice_1[index].value == "" && checkPrice_3[index].value  == "" ){
+	    price_2_win = true;
+	  }
+	  //価格１が価格２より高い？(価格３が未セット)
+	  if (checkPrice_2[index].value != ""  && checkPrice_3[index].value == "" &&
+	      parseInt(checkPrice_1[index].value) > parseInt(checkPrice_2[index].value)) {
+		  price_2_win = true;
+	  }
+	  //価格3が価格２より高い？(価格1が未セット)
+	  if (checkPrice_3[index].value != ""  && checkPrice_1[index].value == "" &&
+	      parseInt(checkPrice_3[index].value) > parseInt(checkPrice_2[index].value)) {
+		  price_2_win = true;
+	  }
+	  //価格2が一番安い？
+	  if (checkPrice_1[index].value != ""  && checkPrice_3[index].value != "" &&
+	      parseInt(checkPrice_1[index].value) > parseInt(checkPrice_2[index].value) && 
+		  parseInt(checkPrice_3[index].value) > parseInt(checkPrice_2[index].value) ) {
+		  price_2_win = true;
+	  }
+	  //〜〜〜価格３の判定〜〜〜
+	  //価格3のみ存在？
+	  if (checkPrice_3[index].value > 0 && checkPrice_1[index].value == "" && checkPrice_2[index].value  == "" ){
+	    price_3_win = true;
+	  }
+	  //価格３が価格１より安い？(価格2が未セット)
+	  if (checkPrice_1[index].value != ""  && checkPrice_2[index].value == "" &&
+	      parseInt(checkPrice_1[index].value) > parseInt(checkPrice_3[index].value)) {
+		  price_3_win = true;
+	  }
+	  //価格３が価格2より安い？(価格1が未セット)
+	  if (checkPrice_2[index].value != ""  && checkPrice_1[index].value == "" &&
+	      parseInt(checkPrice_2[index].value) > parseInt(checkPrice_3[index].value)) {
+		  price_3_win = true;
+	  }
+	  //価格３が一番安い？
+	  if (checkPrice_1[index].value != ""  && checkPrice_2[index].value != "" &&
+	      parseInt(checkPrice_1[index].value) > parseInt(checkPrice_3[index].value) && 
+		  parseInt(checkPrice_2[index].value) > parseInt(checkPrice_3[index].value) ) {
+		  price_3_win = true;
+	  }
+	  /////
+	  
+	  //見積価格１が一番安い？
+	  if (price_1_win == true) {
+    	 checkItem_1[index].checked = true;
+		 //他のチェック外す
+		 checkItem_2[index].checked = false;
+		 checkItem_3[index].checked = false;
+	  }
+	  //見積価格2が一番安い？
+	  if (price_2_win == true) {
+    	 checkItem_2[index].checked = true;
+		 //他のチェック外す
+		 checkItem_1[index].checked = false;
+		 checkItem_3[index].checked = false;
+	  }
+	  //見積価格3が一番安い？
+	  if (price_3_win == true) {
+    	 checkItem_3[index].checked = true;
+		 //他のチェック外す
+		 checkItem_1[index].checked = false;
+		 checkItem_2[index].checked = false;
+	  }
+	  
+	  
+	}
+    
+  }
+  
+  
+  //見積もり価格をチェック＆落札チェック
+  function checkQuotationPriceAll(Flag){
+     
+	 
+	 //合計をセット
+	 //setTotalQuotation(Flag);
+     
+	 //落札をチェック
+	 checkBidAll();
+     
+	 //合計をセット
+	 setTotalQuotation(Flag);
+	 
+  }
+  
+  //選択した行のインデックスを取得(手入力を考慮し、品番で判別)
+  function getSelectedChildIndexCode(){
+    item = document.getElementsByName("material_code[]");
+    var select_index = 0;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  //upd170616
+	  //if (gMaterial_code == item[index].value){
+	  if (gTop == item[index].offsetTop){
+        select_index = index;
+	  }
+	}
+    return select_index;
+  }
+  
+  //選択した行のインデックスを取得(数量の場合)
+  function getSelectedChildIndexQuantity(){
+    item = document.getElementsByName("quantity[]");
+    var select_index = 0;
+	
+	//debugger;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  //upd170616
+	  if (gControl_id == item[index].id){
+	  //if (gMaterial_code == item[index].value){
+	    select_index = index;
+		//select_index = (item.length -1) - index ;
+	  }
+	}
+    return select_index;
+  }
+  
+  //選択した行のインデックスを取得(数量等の場合)
+  function getSelectedChildIndexSome(flag){
+	item = document.getElementsByName("material_code[]");
+    var select_index = 0;
+	
+	//商品コード位置の座標を取得、レイアウト変更時注意(27)
+	//但し、商品コード同一のものがある場合は正常動作しない！(ないものとする)
+	switch (flag){
+	  case 1:
+	  //品名の場合
+	    material_offsetTop = gTop;
+	    break;
+	  case 2:
+	  //数量の場合
+	    material_offsetTop = gTop + 27; 
+		break;
+      case 3:
+	  //メーカーの場合
+	    material_offsetTop = gTop + 1;
+		break;
+	  case 4:
+	  //単位へ移動させる場合
+	    material_offsetTop = gTop + 31;
+		break;
+	  case 5:
+	  //資材リスト→資材コードへ移動させる場合
+	    material_offsetTop = gTop + 31;
+		break;
+	}
+
+	for (var index = 0; index < item.length  ; index ++) {
+	  if (material_offsetTop == item[index].offsetTop){
+	    select_index = index;
+	  }
+	}
+	return select_index;
+  }
+
+  //タブ判定のため、品番をグローバルへセット
+  function setMaterialCode(thisValue){
+    gMaterial_code = thisValue;
+	
+	//debugger;
+	
+  }
+  
+  //更新前に数量をチェックする
+  //function checkQuantity(ok_flag){
+  var checkQuantity = function(ok_flag){ 
+  
+    //quantity = document.getElementsByName("quantity[]");
+	quantity = document.querySelectorAll("#quantity");
+	destroy = document.getElementsByName("_destroy[]");
+	
+	//item = document.getElementsByName("material_id[]");
+	item = document.querySelectorAll("#material_id");
+	
+	//var message = "";
+	
+	for (var i = 0; i < quantity.length ; i ++) {
+	    if (quantity[i].value == undefined || quantity[i].value == 0){
+	      
+		  
+		  //if (destroy[i].value != "1") {
+		  
+		    itemName = item[i].options[item[i].selectedIndex].innerText;
+		    window.confirm(itemName + 'の数量を入力してください。');
+		  
+		    ok_flag = false;
+		  //}
+	    }
+	}
+	
+	//if (ok_flag == false){
+	//  window.confirm( message );
+	//}
+	
+	return ok_flag;
+  }
+  
+ 
+  //各値の自動セット-ajax
+  function setItem(item_id, selected_index)
+  {
+		 id = parseInt(item_id);
+        
+		 //add170804
+		 var supplier_master_id = document.getElementById("supplier_master_id").value;
+		 
+		 if (id != 1 ) {
+		 //手入力は除外&明細に同一品番はないものとする(ある場合は正常動作しない）
+			$.get("<%= purchase_order_historiez_material_select_path %>",
+             {id: id , supplier_master_id: supplier_master_id },
+              function(data){
+		        
+				
+				//商品コードをセット
+				obj = document.getElementById("material_code").textContent;
+				//document.getElementsByName("material_code[]")[selected_index].value = obj;
+				
+				
+				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][material_code]";
+				document.getElementsByName(nm)[0].value = obj;
+				
+				//商品名をセット
+				obj = document.getElementById("material_name").textContent;
+				
+				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][material_name]";
+				document.getElementsByName(nm)[0].value = obj;
+				//document.getElementsByName("material_name[]")[selected_index].value = obj;
+				
+				//単位をセット
+				obj = document.getElementById("unit_id_hide").textContent;
+			    if (obj != null){
+		          var index = parseInt(obj);
+				  
+				  var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][unit_master_id]";
+				  document.getElementsByName(nm)[0].value = obj;
+                  //$(".searchableSelect1_2")[selected_index].value = index; 
+				  
+				  $(".searchableSelect1_2").trigger("change"); 
+		        }
+				
+				//メーカー名をセット
+				obj = document.getElementById("maker_id_hide").textContent;
+			    if (obj != null){
+		          var index = parseInt(obj);
+                  //$(".searchableSelect1_3")[selected_index].value = index; 
+				  var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][maker_id]";
+				  document.getElementsByName(nm)[0].value = obj;
+				  
+				  $(".searchableSelect1_3").trigger("change"); 
+		        }
+				
+				//定価をセット
+				obj = document.getElementById("list_price").textContent;
+				//document.getElementsByName("list_price[]")[selected_index].value = obj;
+				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][list_price]";
+				document.getElementsByName(nm)[0].value = obj;
+				
+			  }
+            );
+		  }
+  }
+  
+  //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+  function searchItemCode(itemCode, selectedIndex){
+      
+	 
+	  if (itemCode != "" && selectedIndex != undefined){
+	  	
+		//商品コードからマスターより一致するコード検索し、あれば自動でセットする。
+        $.get("<%= material_masterz_get_material_id_path %>",
+             {material_code: itemCode},
+          function(data){
+		    obj = document.getElementById("material_id_hide").textContent;
+			document.getElementById("material_id_hide").value = obj;
+		    
+		    if (obj != "") {
+			  var material_id = parseInt(obj);
+			  
+			  var nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][material_id]";
+			  document.getElementsByName(nm)[0].value = material_id;
+			  //$(".searchableSelect1_1")[selectedIndex].value = material_id;
+			  
+			  $(".searchableSelect1_1").trigger("change")[selectedIndex];
+			  
+			  //triggerはうまくいかないので直接セット
+			  setItem(material_id, selectedIndex);
+			  
+			}
+		   
+          }
+        );	
+		
+	  }
+  }
+  
+  
+  
+  function resetDetailsMailSentFlag(){
+     //メールの送信フラグをリセットする。
+       
+	   //item = document.getElementsByName("quotation_material_header[quotation_material_details_attributes][0][mail_sent_flag]");
+       item = document.querySelectorAll("#mail_sent_flag")
+	   
+	   for (var index = 0; index < item.length  ; index ++) {
+	     item[index].value = 0;
+	   }
+	   
+  
+  }
+  
+  function setAllBidFlag(flag,checkFlag){
+       
+	 //落札フラグを全てチェックor解除する
+       if (flag == 1){
+	     item = document.querySelectorAll("#bid_flag_1")
+	   }
+	   if (flag == 2){
+	     item = document.querySelectorAll("#bid_flag_2")
+	   }
+	   if (flag == 3){
+	     item = document.querySelectorAll("#bid_flag_3")
+	   }
+	   
+	   
+	   for (var index = 0; index < item.length  ; index ++) {
+	     item[index].checked = checkFlag;
+	   }
+	   
+	 //他のチェックを外す
+	   if (checkFlag == true){
+	     
+	     
+	     //仕入先１の場合
+		 if (flag == 1){
+		   item = document.querySelectorAll("#bid_flag_2")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		   item = document.querySelectorAll("#bid_flag_3")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		 }
+		 //仕入先2の場合
+		 if (flag == 2){
+		   item = document.querySelectorAll("#bid_flag_1")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		   item = document.querySelectorAll("#bid_flag_3")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		 }
+		 //仕入先3の場合
+		 if (flag == 3){
+		   item = document.querySelectorAll("#bid_flag_1")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		   item = document.querySelectorAll("#bid_flag_2")
+		   for (var index = 0; index < item.length  ; index ++) {
+	         item[index].checked = false;
+	       }
+		 }
+	   }
+  }
+  
+  
+  function focusQuantity(selected_index)
+  {
+     document.getElementsByName("quantity[]")[selected_index].focus();
+     //debugger;
+  }
+  
+  //ENTER→TABキーに変換する処理。
+  //レンダリングの場合は、共通化ができない（なぜか）
+  $('[tabindex]').keydown(function (e) {
+  
+    if (e.keyCode == 13 || e.keyCode == 9) {
+	  setNextControl(e);
+	}
+    
+  }); 
+  
+  //次のコントロールにフォーカスを移す（レンダリングの場合）
+  function setNextControl(e){
+  	var current = document.activeElement;
+	gControl_id = current.id;
+	controlName = current.name;
+	
+   
+	var selectedIndex = 0;
+	
+	var moveFlag = false;
+	var nm = "";
+	
+	  //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+	  selectedIndex = controlName.slice(65);
+	  
+	  if (controlName.substr(-10,10) == "[quantity]") {
+	  //数量→単位へ
+		moveFlag = true;
+		//nameに埋め込まれているIDを抜き出す
+		selectedIndex = selectedIndex.slice(0,-11);
+		//単位名をセット
+	    nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][unit_master_id]"
+	  }else if (controlName.substr(-15,15) == "[material_code]") {
+	  //商品コード→商品名
+		moveFlag = true;
+		var itemCode = current.value;
+		selectedIndex = selectedIndex.slice(0,-16);
+		//プルダウンと照合し、あれば自動セットする
+	    searchItemCode(itemCode, selectedIndex);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][material_name]"
+	 }else if (controlName.substr(-15,15) == "[material_name]") {
+	  //商品名→数量
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-16);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quantity]"
+	  }else if (controlName.substr(-16,16) == "[unit_master_id]") {
+	  //単位→メーカー
+		moveFlag = true;
+	    selectedIndex = selectedIndex.slice(0,-17);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][maker_id]"
+	  }else if (controlName.substr(-12,12) == "[list_price]") {
+	  //定価→見積単価１へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-13);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
+	  }else if (controlName.substr(-24,24) == "[quotation_unit_price_1]") {
+	  //見積単価１→金額１へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-25);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_price_1]"
+	  }else if (controlName.substr(-19,19) == "[quotation_price_1]") {
+	  //金額１→見積単価２へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-20);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_2]"
+	  }else if (controlName.substr(-24,24) == "[quotation_unit_price_2]") {
+	  //見積単価2→金額2へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-25);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_price_2]"
+	  }else if (controlName.substr(-19,19) == "[quotation_price_2]") {
+	  //金額２→見積単価３へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-20);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_3]"
+	  }else if (controlName.substr(-24,24) == "[quotation_unit_price_3]") {
+	  //見積単価3→金額3へ
+	    moveFlag = true;
+		selectedIndex = selectedIndex.slice(0,-25);
+		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_price_3]"
+	  }
+	  
+	  if (moveFlag == true){
+	    document.getElementsByName(nm)[0].focus();
+		e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+	  }
+	  
+	  
+ 	//}else{
+	//  selectedIndex = gSelectedIndex ;
+	//}
+		
+		//var tabindex = parseInt($(this).attr('tabindex'));
+        
+		//170925 フォーカスは、うまくいかないので保留中・・・
+		//$('[tabindex='+(tabindex+1)+']')[selectedIndex].focus();
+    
+	return false;
+    
+  }
+  
+   //ENTERキーを無効にする（タブが設定されてない場合）
+   $("input"). keydown(function(e) {
+     if ((e.which && e.which === 13) || (e.keyCode && e.keyCode === 13)) {
+	   return false;
+     } else {
+       return true;
+     }
+   });
+ 
+  
+  
+ </script>

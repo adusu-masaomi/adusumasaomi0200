@@ -1,0 +1,164 @@
+.select2-selection{
+  background-color:#F5A9A9 !important;
+}
+
+
+.hideMe {
+     display: none !important; 
+     visibility: hidden !important; 
+}
+
+
+#modal-content{
+    width:50%;
+    margin:1.5em auto 0;
+    padding:10px 20px;
+    border:2px solid #aaa;
+    background:#fff;
+    z-index:2;
+    position:fixed;
+}
+
+
+/*検索プルダウンで使用*/
+.select2-container-left {
+  margin: 0px 0px 0px -15px;
+}
+
+/*検索プルダウン(横並び)*/
+.select2-container {
+  margin: 0px 0px 0px -15px;
+  position: relative;
+  display: inline-block;
+  /* inline-block for ie7 */
+  zoom: 1;
+  *display: inline;
+  vertical-align: middle;
+}
+
+.select2-container--open .select2-dropdown {
+  left: 15px;
+}
+
+
+/*プルダウンで使用*/
+.my-custom-class {
+  font-family: sans-serif;
+  font-size: 18px;
+  width: 300px;
+  height: auto;
+  line-height: 0;
+  margin-left: -15px;
+}
+
+/*ラベルで使用*/
+.my-custom-class-l {
+  font-size: 14px;
+  width: 250px;
+  height: auto;
+  line-height: 1;
+  margin-left: -15px;
+}
+/*ラベル(右寄せ)で使用*/
+.my-custom-class-lr{
+  font-size: 10px;
+  width: 85px;
+  height: auto;
+  line-height: 1;
+  margin-left: 0px;
+}
+/*ラベル(右寄せ)で使用*/
+.my-custom-class-lr2{
+  font-size: 10px;
+  width: 40px;
+  height: auto;
+  line-height: 1;
+  margin-left: 15px;
+}
+/*プルダウン(右寄せ)で使用*/
+.my-custom-class-r {
+  font-family: sans-serif;
+  font-size: 18px;
+  width: 600px;
+  height: auto;
+  line-height: 1;
+  margin-left: 0px;
+}
+/*プルダウン(右寄せ2)で使用*/
+.my-custom-class-r2 {
+  font-size: 10px;
+  width: 300px;
+  height: auto;
+  line-height: 0;
+  margin-right: -190px;
+  margin-left: -10px;
+}
+
+/*日付のテキストで使用*/
+.my-custom-class-d {
+  font-size: 14px;
+  width: 150px;
+  height: auto;
+  line-height: 1;
+  /*margin-left: -10px;*/
+}
+/*メニューの左端ロゴ部分カラー*/
+.navbar-inverse .navbar-brand {
+  color: #ffffff;
+}
+/*メニューの左端ロゴ部分ホバー時カラー*/
+.navbar-inverse .navbar-brand:hover,
+.navbar-inverse .navbar-brand:focus {
+  color: #ffff00;
+  background-color: transparent;
+}
+.navbar-inverse {
+  background-color: #9e481b;
+  background-image: -moz-linear-gradient(top, #ffb337, #cc7426);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffb337), to(#111111));
+  background-image: -webkit-linear-gradient(top, #ffb337, #cc7426);
+  background-image: -o-linear-gradient(top, #ffb337, #cc7426);
+  background-image: linear-gradient(to bottom, #ffb337, #cc7426);
+  background-repeat: repeat-x;
+  border-color: #c22525;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffb337', endColorstr='#ffcc7426', GradientType=0);
+}
+/*メニューフォーカス時のカラー*/
+.navbar-inverse .navbar-nav > li > a:hover,
+.navbar-inverse .navbar-nav > li > a:focus {
+  color: #ffffff;
+  background-color: #d0b17c;
+}
+/*メニューフォーカス時のカラー*/
+.navbar-inverse .navbar-nav > .active > a,
+.navbar-inverse .navbar-nav > .active > a:hover,
+.navbar-inverse .navbar-nav > .active > a:focus {
+  color: #ffffff;
+  background-color: #d0b17c;
+}
+/* navbar ドロップダウン(子)のボックスカラー(old-ac7618) */
+.dropdown-menu {
+background-color: #d0b17c;
+border: 1px solid #ceb63c;
+border: 1px solid #ceb63c(206,182,60,1);
+-webkit-box-shadow: 0 6px 12px rgba(94, 136, 129, 0.35);
+box-shadow: 0 6px 12px rgba(94, 136, 129, 0.35);
+}
+/*ドロップダウンのメニューテキスト色*/
+.dropdown-menu > li > a:hover,
+.dropdown-menu > li > a:focus {
+  color: #ffb337;
+  background-color: #f5f5f5;
+}
+/*ドロップダウンクリック時(old-ba9522)*/
+.dropdown-toggle:active, .open .dropdown-toggle {background:#d0b17c !important; color:#000 !important;}
+/*トグルダウン（ドロップダウンの階層トップ）色*/
+.dropdown-toggle {
+  color: #ffffff !important;
+}
+/*トグルダウンフォーカス時（ドロップダウンの階層トップ）色*/
+.dropdown-toggle:hover,
+.dropdown-toggle:focus {
+  color: #ffff00 !important;
+  background-color: transparent;
+}

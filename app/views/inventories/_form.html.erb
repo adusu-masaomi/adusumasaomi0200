@@ -1,0 +1,113 @@
+<%= simple_form_for @inventory, :html => { :class => 'well form-horizontal' } do |f| %>
+   <% if @inventory.errors.any? %>
+   <div id="error_explanation">
+     <h2><%= @inventory.errors.count %>件のエラーがあります。</h2>
+ 
+     <ul>
+     <% @inventory.errors.full_messages.each do |msg| %>
+       <li><%= msg %></li>
+     <% end %>
+     </ul>
+   </div>
+  <% end %>
+  
+  <!--将来使用するかも(倉庫・場所 --初期値１をセット) -->
+  <%= f.input :warehouse_id , input_html:{id:'warehouse_id', :value => 1 } , as: :hidden %>
+  <%= f.input :location_id , input_html:{id:'location_id', :value => 1 } , as: :hidden %>
+  <!--<%= f.input :material_master_id %>-->
+  <%= f.label :品名, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :material_master_id, MaterialMaster.all,  :id, :p_material_code_name,  
+      {:prompt => "どれか一つを選択して下さい",:selected => @inventory.material_master_id} , 
+      {id:'material_master_id', :class => "searchableSelect2_1" }  %>
+  
+  <%= f.input :inventory_quantity, label_html:{style: 'color: #E60091'}, input_html:{ id: "inventory_quantity", style: 'font-weight: bold;' ,
+                                                                          :tabindex=>"1", :onfocusout => "copyQuantity()"} %>
+  <%= f.input :current_unit_price, label_html:{style: 'color: green;'}, input_html:{ id: "current_unit_price", :tabindex=>"2", :onfocusout => "setAmount()"} %>
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_master_id, UnitMaster.all,:id, :unit_name, {:selected => @inventory.unit_master_id || 1} ,
+     {id:"unit_id", style: 'width:110px;' , :class => "searchableSelect2_2"} %>
+  <%= f.input :inventory_amount, label_html:{style: 'color: purple;'}, input_html:{ id: "inventory_amount", :tabindex=>"4"} %>
+  
+  <%= f.label :仕入業者, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all,  :id, :supplier_name,  
+      {:prompt => "どれか一つを選択して下さい"} , 
+      {id:'supplier_master_id', :class => "searchableSelect2_3" }  %>
+	  
+  <%= f.input :current_history_id , { :readonly => true} %>
+  <%= f.input :current_warehousing_date, :include_blank => true, input_html:{ :tabindex=>"6"} %>
+  <%= f.input :current_quantity, label_html:{style: 'color: blue;'}, input_html:{ id: "current_quantity", style: 'font-weight: bold;',  :tabindex=>"7"} %>
+  <!--<%= f.input :next_history_id_1, { :readonly => true} %>-->
+  <%= f.input :next_history_id_1, {} %>
+  <%= f.input :next_warehousing_date_1, :include_blank => true, input_html:{:tabindex=>"8"} %>
+  <%= f.input :next_quantity_1, input_html:{style: 'color: blue;font-weight: bold;', :tabindex=>"9"} %>
+  <%= f.input :next_unit_price_1, input_html:{:tabindex=>"10"} %>
+  <!--<%= f.input :next_history_id_2, { :readonly => true} %>-->
+  <%= f.input :next_history_id_2, { } %>
+  <%= f.input :next_warehousing_date_2, :include_blank => true, input_html:{:tabindex=>"11"} %>
+  <%= f.input :next_quantity_2, input_html:{style: 'color: blue;font-weight: bold;', :tabindex=>"12"} %>
+  <%= f.input :next_unit_price_2,  input_html:{:tabindex=>"13"} %>
+  <%= f.input :last_unit_price, label_html:{ style: 'color: red;'},input_html:{ id: "last_unit_price", :tabindex=>"14"} %>
+  
+  <%= f.button :submit, :class => 'btn-primary',  :tabindex => "15" %>
+  
+  <%= f.input :action_flag, input_html:{id:'action_flag', :value => @action_flag} , as: :hidden %>
+  
+  
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                inventories_path, :class => 'btn btn-default' %>
+<% end %>
+
+<script type="text/javascript">
+   $(document).on('ready page:load', function(){
+     $(".searchableSelect2_1").select2({ theme: "bootstrap" });
+	 //select2のタブインデックスはここで指定する
+	 $(".searchableSelect2_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+
+	 //$(".searchableSelect2_1").select2("enable",false);
+	 
+     $(".searchableSelect2_2").select2({ theme: "bootstrap" });
+	 //select2のタブインデックスはここで指定する
+	 $(".searchableSelect2_2").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',3)}).trigger('load');
+
+	 //$(".searchableSelect2_2").select2("enable",false);
+	 
+	 $(".searchableSelect2_3").select2({ theme: "bootstrap" });
+	 //select2のタブインデックスはここで指定する
+	 $(".searchableSelect2_3").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',5)}).trigger('load');
+   });
+   
+  //在庫数量のコピー
+  function copyQuantity(){
+    if (document.getElementById("inventory_quantity") != undefined){
+	  if (document.getElementById("action_flag").value == "new"){
+	  //新規の場合のみ処理する
+        document.getElementById("current_quantity").value = document.getElementById("inventory_quantity").value ;
+	  }
+	}
+    
+  }
+   
+  //金額のセット
+  function setAmount(){
+    
+	if (document.getElementById("action_flag").value == "new"){
+	//新規の場合のみ処理する
+    
+	  if (document.getElementById("current_unit_price") != undefined){
+	  //最終単価へまずセット
+	    document.getElementById("last_unit_price").value = document.getElementById("current_unit_price").value ;
+	  }
+	
+	  if (document.getElementById("inventory_quantity") != undefined && 
+	    document.getElementById("current_unit_price") != undefined ) {
+        var amount = document.getElementById("inventory_quantity").value * document.getElementById("current_unit_price").value;
+	    document.getElementById("inventory_amount").value = amount;
+      }
+	}
+	
+  }
+   
+</script>

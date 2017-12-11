@@ -1,0 +1,158 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = DeliverySlipDetailLargeClassification -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+   <%= search_form_for @q do |f| %>
+  <%= f.label :construction_code, '納品Ｎｏ　' %>
+  <%= f.select :delivery_slip_header_id_eq, options_from_collection_for_select(DeliverySlipHeader.all, "id", "delivery_slip_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableDeliverySlipCode" } %>
+  <%= f.label :construction_code, '件名　' %>
+  <%= f.select :with_header_id, options_from_collection_for_select(DeliverySlipHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
+  <%= f.label :working_large_item, '品目名　' %>
+  <%= f.select :working_large_item_name_eq, options_from_collection_for_select(DeliverySlipDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
+
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+</div>
+<div style="width:1280px;">
+
+		
+<%= link_to t('.new', :default => t("新規作成")),
+            new_delivery_slip_detail_large_classification_path(delivery_slip_header_id: params[:delivery_slip_header_id],
+                     delivery_slip_header_name: params[:delivery_slip_header_name], new_flag: "1"), remote: true,
+            :class => 'btn btn-primary' %>
+<%= link_to "一覧へ",
+            delivery_slip_headers_path(),
+            :class => 'btn btn-info' %>
+<!---->
+<%= link_to t('.new', :default => t("共通マスター")),
+            new_working_middle_item_path(move_flag: "3",  delivery_slip_header_id: params[:delivery_slip_header_id],  delivery_slip_header_name: params[:delivery_slip_header_name]),
+            :class => 'btn btn-teal500_rsd' %>
+<%= link_to t('.new', :default => t("固有マスター")),
+            new_working_specific_middle_item_path(move_flag: "3",  delivery_slip_header_id: params[:delivery_slip_header_id],  delivery_slip_header_name: params[:delivery_slip_header_name]),
+            :class => 'btn btn-purple300_rsd' %>
+<!---->
+<%= link_to "納品書(提出用)PDF",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id], print_type: "1",  format: "pdf" ),
+            :class => 'btn btn-orange600_ftg' , :target=>["_blank"] %>
+<%= link_to "納品書(提出／印付)PDF",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id], print_type: "3",  format: "pdf" ),
+            :class => 'btn btn-red500_ftg' , :target=>["_blank"] %>
+<%= link_to "納品書(控え)PDF",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id], print_type: "2",  format: "pdf" ),
+            :class => 'btn btn-orange200_ftg' , :target=>["_blank"] %>
+<%= link_to "請求書データ作成",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id],
+            delivery_slip_code: params[:delivery_slip_code], invoice_code: params[:invoice_code], quotation_code: params[:quotation_code],
+            data_type: "1" ),
+            :class => 'btn btn-grey300_rsd' , :data => {:confirm => '請求書データを作成しますか？'}  %>
+<%= link_to "見積書データ作成",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id],
+            delivery_slip_code: params[:delivery_slip_code], invoice_code: params[:invoice_code], quotation_code: params[:quotation_code],
+            data_type: "2" ),
+            :class => 'btn btn-success' , :data => {:confirm => '見積書データを作成しますか？'} %>
+</br>
+<font size="3";><b>
+<%= "件名:" %>
+<%= @delivery_slip_header_name %>
+</b></font>
+</div>
+
+<td>納品金額合計:<%=number_to_currency(@delivery_slip_detail_large_classifications.sumpriceDeliverySlip,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@delivery_slip_detail_large_classifications.sumpriceExecution,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @delivery_slip_detail_large_classifications.sumLaborProductivityUnitTotal.to_s + "人" %>
+</td>
+
+
+<div id="delivery_slip_detail_large_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;table-layout:fixed;">
+  
+  <thead>
+    <tr>
+      <th style="width:80px;"></th>
+	  <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>-->
+	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number), default_order: :asc  ) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_item_name) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_specification) %></th>
+      <th align="right" , style="width:50px;">　数量</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 納品単価</th>
+      <th style="width:110px;">　 納品金額</th>
+      <th style="width:50px;">　実数</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 実行単価</th>
+      <th style="width:110px;">　 実行金額</th>
+      <th style="width:80px;">　　　 歩掛</th>
+      <th style="width:80px;">　　 歩掛計</th>
+      <th style="width:20px;">配</th>
+      <th style="width:20px;">機</th>
+      <th style="width:20px;">労</th>
+      <th style="width:250px;"><%= model_class.human_attribute_name(:remarks) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody class="delivery_slip_detail_large_classification-index">
+    <%= render "index" %>
+  </tbody>
+  </table>
+  </div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableDeliverySlipCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableLargeItem").select2({ theme: "classic" });
+     //見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 1;  //固定列数
+		//ht -= 70;
+		ht -= 108;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
+
+     $( "#tablefix tbody" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 delivery_slip_header_id = document.getElementById("delivery_slip_header_id").innerText;
+		 
+		 $.post("<%= delivery_slip_detail_large_classificationz_reorder_path %>",
+           { row: row, ajax_delivery_slip_header_id: delivery_slip_header_id },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	   },
+	       
+     });
+     $( ".sortable" ).disableSelection();
+  });
+</script>
+

@@ -1,0 +1,39 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_header_id: 1
+  delivery_slip_header_id: 1
+  working_middle_item_name: MyString
+  working_middle_item_short_name: MyString
+  working_middle_item_category_id: 1
+  working_middle_specification: MyString
+  working_unit_id: 1
+  working_unit_price: 1.5
+  execution_unit_price: 1
+  material_id: 1
+  working_material_name: MyString
+  execution_material_unit_price: 1.5
+  material_unit_price: 1.5
+  execution_labor_unit_prce: 1.5
+  labor_unit_price: 1.5
+  labor_productivity_unit: 1.5
+  seq: 1
+
+two:
+  quotation_header_id: 1
+  delivery_slip_header_id: 1
+  working_middle_item_name: MyString
+  working_middle_item_short_name: MyString
+  working_middle_item_category_id: 1
+  working_middle_specification: MyString
+  working_unit_id: 1
+  working_unit_price: 1.5
+  execution_unit_price: 1
+  material_id: 1
+  working_material_name: MyString
+  execution_material_unit_price: 1.5
+  material_unit_price: 1.5
+  execution_labor_unit_prce: 1.5
+  labor_unit_price: 1.5
+  labor_productivity_unit: 1.5
+  seq: 1

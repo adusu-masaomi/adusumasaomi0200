@@ -1,0 +1,17 @@
+<%= simple_form_for(@working_specific_small_item) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.input :working_middle_specific_item_id %>
+    <%= f.input :working_small_item_id %>
+    <%= f.input :working_small_item_code %>
+    <%= f.input :working_small_item_name %>
+    <%= f.input :unit_price %>
+    <%= f.input :quantity %>
+    <%= f.input :labor_productivity_unit %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

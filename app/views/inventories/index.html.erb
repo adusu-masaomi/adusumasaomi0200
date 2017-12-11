@@ -1,0 +1,121 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = Inventory -%>
+<div class="page-header", style="width:1920px">
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @inventories %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q, :html => {:style=> 'width:1920px' } do |f| %>
+    <%= f.label :material_code, '品番：：' %>
+    <!--<%= f.select :material_master_id_eq, MaterialMaster.all.map{|st| [st.material_code, st.id]}, {include_blank: true}, 
+	      {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
+	<%= f.select :material_master_id_eq, Inventory.all.map{|st| [st.material_master.material_code, st.material_master.id]}, {include_blank: true}, 
+	      {style: 'width:220px' , class: "searchableMaterialCode" } %>
+	<%= f.label :material_name, '品名：' %>
+    <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:330px', id: 'material_name'  %>
+	<%= f.label :inventory_category, 'カテゴリー：' %>
+    <%= f.select :with_material_category_include, Inventory.category.map{ |value, key| [value, key+1] }, {include_blank: true}, 
+	      {style: 'width:220px' , class: "searchableMaterialCode" } %></br>
+
+	<div>
+       <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
+	   <%= link_to "在庫一覧表",
+            inventories_path(@inventory, format: "pdf", :print_flag => "1"),
+            :class => 'btn  btn-success', :target=>["_blank"] %>
+	   <%= link_to "棚卸表(記入用)",
+            inventories_path(@inventory, format: "pdf", :print_flag => "2"),
+            :class => 'btn  btn-info', :target=>["_blank"] %>
+			
+	   <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_inventory_path,
+            :class => 'btn btn-primary' %>
+			
+	 </div>
+   <% end %>
+   <!-- kaminari用追加箇所開始 -->
+   <%= paginate @inventories %>
+   <!-- kaminari用追加箇所終了 --> 
+   
+</div>
+
+
+
+<!--<table class="table table-striped">-->
+<!--見出し固定用設定追加-->
+<div style="margin-top : 0px;", class="span11 table-scrollable" >
+<style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+ <!--見出し固定用設定追加-->
+ <!--本番用-->
+ <!--<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;">-->
+ <!--テスト用-->
+ <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1280px;">
+
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th><%= model_class.human_attribute_name(:warehouse_id) %></th>-->
+      <!--<th><%= model_class.human_attribute_name(:location_id) %></th>-->
+      <th><%= sort_link(@q, :material_master_material_code, model_class.human_attribute_name(:material_code) ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:material_name) %></th>-->
+      <th><%= sort_link(@q, :material_master_material_name, model_class.human_attribute_name(:material_name) ) %></th>
+      <th><%= model_class.human_attribute_name(:inventory_quantity) %></th>
+	  <th><%= model_class.human_attribute_name(:unit_name) %></th>
+      <th><%= model_class.human_attribute_name(:inventory_amount) %></th>
+      <th><%= model_class.human_attribute_name(:current_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:list_price) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @inventories.order("id desc").each do |inventory| %>
+      <tr>
+        <td><%= link_to inventory.id, inventory_path(inventory) %></td>
+        <!--<td><%= inventory.warehouse_id %></td>-->
+        <!--<td><%= inventory.location_id %></td>-->
+        <!--<td><%= inventory.material_master_id %></td>-->
+        <td><%= inventory.material_master.material_code %></td>
+        <td><%= inventory.material_master.material_name %></td>
+        <td><%= inventory.inventory_quantity %></td>
+		<% if inventory.unit_master.present? %>
+          <td><%= inventory.unit_master.unit_name %></td>
+		<% else %>
+		  <td>-</td>
+		<% end %>
+        <td><%= inventory.inventory_amount %></td>
+        <td><%= inventory.current_unit_price %></td>
+        <td><%= inventory.material_master.list_price %></td>
+        <td><%=l inventory.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_inventory_path(inventory), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      inventory_path(inventory),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+
+			
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+  // $(".searchableSupplierName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST }); 
+  // $(".searchableMakerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST }); 
+  // $(".searchableConstructionCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+  // $(".searchableCustomerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+   $(".searchableMaterialCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+  });
+  
+</script>

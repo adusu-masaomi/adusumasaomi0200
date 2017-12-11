@@ -1,0 +1,37 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Working Small Items</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Working middle item</th>
+      <th>Working small item code</th>
+      <th>Working small item name</th>
+      <th>Unit price</th>
+      <th>Quantity</th>
+      <th>Labor productivity unit</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @working_small_items.each do |working_small_item| %>
+      <tr>
+        <td><%= working_small_item.working_middle_item_id %></td>
+        <td><%= working_small_item.working_small_item_code %></td>
+        <td><%= working_small_item.working_small_item_name %></td>
+        <td><%= working_small_item.unit_price %></td>
+        <td><%= working_small_item.quantity %></td>
+        <td><%= working_small_item.labor_productivity_unit %></td>
+        <td><%= link_to 'Show', working_small_item %></td>
+        <td><%= link_to 'Edit', edit_working_small_item_path(working_small_item) %></td>
+        <td><%= link_to 'Destroy', working_small_item, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Working small item', new_working_small_item_path %>

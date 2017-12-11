@@ -1,0 +1,1032 @@
+<%= simple_nested_form_for @working_specific_middle_item, :html => { :class => 'well form-horizontal' , :style => "width:1280px" } do |f| %>
+    
+	<!--バリデーション-->
+	<% if @working_specific_middle_item.errors.any? %>
+      <div id="error_explanation">
+        <h2><%= @working_specific_middle_item.errors.count %>件のエラーがあります。</h2>
+       <ul>
+       <% @working_specific_middle_item.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+       <% end %>
+       </ul>
+      </div>
+    <% end %>
+	
+	<div class="field">
+	
+	<div class="row">
+      <div class="col-md-5">
+	  
+	    <!-- 既存マスターの呼出用-->
+	    <div class="col-md-6", style="margin-left : -15px;margin-top : 0px;">
+		  <%= f.label :"(呼出用)固有マスター" , {:class => "my-custom-class-l" } %></br>
+		    <% if params[:move_flag] == "1" || params[:move_flag] == "2" %>
+		      <%= f.collection_select :working_specific_middle_item_for_call, WorkingSpecificMiddleItem.where(:quotation_header_id => params[:quotation_header_id]).all, 
+		       :id, :working_middle_item_name, {:include_blank => true } , {id:"id", class: "searchableSelect2_3" , style: 'width:250px;'} %>
+			<% elsif  params[:move_flag] == "3" || params[:move_flag] == "4" %>
+			  <%= f.collection_select :working_specific_middle_item_for_call, WorkingSpecificMiddleItem.where(:delivery_slip_header_id => params[:delivery_slip_header_id]).all, 
+		       :id, :working_middle_item_name, {:include_blank => true } , {id:"id", class: "searchableSelect2_3" , style: 'width:250px;'} %>
+			   
+			<% end %>
+		</div>
+		</br>
+		</br>
+		</br>
+		
+		<hr style="border-top: 3px outset #c0c0c0;width: 100%;height:3;margin-left : -15px">
+				
+		
+		<div class="col-lg-6" , style="margin-top : -10px;margin-left : -15px">
+          <%= f.input :working_middle_item_short_name, input_html:{:tabindex=> "4", style: 'width:220px'} %>
+		</div>
+		<div style="margin-top : 10px;">
+		  <%= f.label :"カテゴリー" , {:class => "my-custom-class-l", style: 'margin-left : 14.5px' } %></br>
+          <%= f.select :working_middle_item_category_id, WorkingCategory.all.map{|t| [t.category_name, t.id]}, {:selected => @working_specific_middle_item.working_middle_item_category_id || 1}, 
+             {id:'working_middle_item_category_id', :class => "my-custom-class", style: 'width:190px;margin-left:14.5px;height:25px;font-size:16;', :tabindex=> "5" } %>
+		</div>
+				
+        <%= f.input :working_middle_item_name, label_html:{ style: 'margin-left : -248px'}, input_html:{id:'working_middle_item_name', :tabindex=> "6", style: 'width:500px' } %>
+        <%= f.input :working_middle_specification, input_html:{:tabindex=>"7", style: 'width:500px' } %>
+        
+		<div class="col-md-5" , style="margin-left : -15px;margin-top : 0px">
+		<%= f.label :"単位" , {:class => "my-custom-class-l"} %></br>
+        <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, 
+          {:prompt => 'どれか一つを選択して下さい', :selected => @working_specific_middle_item.working_unit_id || 2 } , 
+            {id:'working_unit_id', :class => "searchableSelect2_1", style: 'width:180px' } %>
+		</div>
+		<!--単位名-->
+		<div style="margin-top : -0px">
+          <%= f.input :working_unit_name , label: "単位名(手入力可)", label_html:{style:"margin-left: 0px;margin-top :-7px;font-size:14;"}, 
+		  input_html:{id:"working_unit_name", style: 'width:180px',  
+		  :value => @working_specific_middle_item.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name) ,:tabindex=>"9" }  %>
+        </div>
+			
+        <!--実行材料費 -->
+        <b><%= f.input :execution_material_unit_price, input_html:{id:'execution_material_unit_price',
+               :tabindex=>"10", style: 'width:500px;color:blue', :onchange => "calcMaterialUnitPrice()"} %>
+		<%= link_to "明細", "#" ,
+            :class => 'btn btn-teal500_rsd btn-xs' , :style => "width:70px;margin-top:-15px;margin-left:415px;", :onclick => 'dispDiv()' %>	 
+        </b>
+        <!--歩掛り-->
+		<b><%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", style: 'width:500px;color:brown', 
+			:onchange => "calcLaborCost()", :tabindex=>"11" } %>
+		<%= link_to "明細", "#" ,
+            :class => 'btn btn-teal500_rsd btn-xs' , :style => "width:70px;margin-top:-15px;margin-left:415px;", :onclick => 'dispDiv()' %>
+        </b>
+        <!--材料費-->
+        <%= f.input :material_unit_price, input_html:{id:"material_unit_price", style: 'width:500px', :tabindex=>"12", :onchange => "calcAccessory(this.form)"} %>
+        <!--実行労務単価-->
+		<b><%= f.input :execution_labor_unit_price, input_html:{id:"execution_labor_unit_price", style: 'width:500px;color:red', :tabindex=>"13",:onchange => "calcUnitPriceOnly()"} %>
+		<%= link_to "明細", "#" ,
+            :class => 'btn btn-teal500_rsd btn-xs' , :style => "width:70px;margin-top:-15px;margin-left:415px;", :onclick => 'dispDiv()' %>
+        </b>
+        <!--労務単価-->
+        <%= f.input :labor_unit_price, input_html:{id:"labor_unit_price", style: 'width:500px', :tabindex=>"14", :onchange => "calcUnitPriceOnly()"}  %>
+        <!--実行単価-->
+        <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:500px', :tabindex=>"15" }  %>
+        <!--単価-->
+        <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:500px', :tabindex=>"16" }   %>
+		
+		<!-- ajax用 -->
+		<%= f.input :material_code_hide, input_html:{id:'material_code_hide'}, as: :hidden  %>
+		<%= f.input :material_name_hide, input_html:{id:'material_name_hide'}, as: :hidden  %>
+        <%= f.input :quantity_hide, input_html:{id:'quantity_hide'}, as: :hidden  %>
+		<%= f.input :unit_price_hide, input_html:{id:'unit_price_hide'}, as: :hidden  %>
+		<%= f.input :labor_productivity_unit_hide, input_html:{id:'labor_productivity_unit_hide'}, as: :hidden  %>
+		
+		<!--共通マスターを更新するか否かのフラグ-->
+		<%= f.input :master_insert_flag , input_html:{ id:"master_insert_flag"}, as: :hidden %>
+		
+		<!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。--> 
+       <%= f.hidden_field_tag(:move_flag, params[:move_flag], {id: "move_flag"}) %>
+       <!--見積書用パラメータ-->
+	   <%= f.hidden_field_tag(:quotation_header_id, params[:quotation_header_id]) %>
+	   <%= f.hidden_field_tag(:quotation_header_name, params[:quotation_header_name]) %>
+	   <%= f.hidden_field_tag(:quotation_detail_large_classification_id, params[:quotation_detail_large_classification_id]) %>
+	   
+	   <!--納品書用パラメータ-->
+	   <%= f.hidden_field_tag(:delivery_slip_header_id, params[:delivery_slip_header_id]) %>
+	   <%= f.hidden_field_tag(:delivery_slip_header_name, params[:delivery_slip_header_name]) %>
+	   <%= f.hidden_field_tag(:delivery_slip_detail_large_classification_id, params[:delivery_slip_detail_large_classification_id]) %>
+	   <!-- -->
+	   
+	   
+	   <%= f.hidden_field_tag(:working_large_item_name, params[:working_large_item_name]) %>
+	   <%= f.hidden_field_tag(:working_large_specification, params[:working_large_specification]) %>
+        
+	   <%= f.collection_select :working_middle_item_id_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name,  {} , 
+         {id:"working_middle_item_id_select_hide",  hidden: true  } %>
+       <%= f.collection_select :working_middle_item_short_name_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name,  {} , 
+         {id:"working_middle_item_short_name_select_hide",  hidden: true   } %>
+	  
+	   <%= f.input :action_flag , input_html:{ id:"action_flag"}, as: :hidden %>
+		
+	</div>
+  
+  
+    <div class="col-md-7" id="filter">
+	  
+	  
+	
+	  <%= f.simple_fields_for :working_specific_small_items, :html => { :class => 'well form-inline' } do |builder| %>
+         <%= render "working_specific_small_item_fields", f: builder %>
+	  <% end %>
+	  <!--</p>-->
+	  <!--ボタンのデザインはヘルパー側で指定-->
+	  <%= link_to_add_fields "品目追加", f, :working_specific_small_items %>
+	  <!--スペース空ける-->
+	  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      <!--<%= link_to "←反映", "#" ,
+			:class => 'btn btn-purple400_rsd' , :data => {:confirm => '計算結果を左画面に反映させますか？'} %>-->
+	  <%= link_to "←反映", "#" ,
+            :class => 'btn btn-purple400_rsd' , :onclick => 'setDetailTotalToOriginal()' %>
+			
+	  <font color=blue><%= f.label :material_cost_total, "資材費計:" %></font>
+	  <font color=blue><b><%= f.text_field :material_cost_total , :style => 'width:50px; text-align:right;' , id:'material_cost_total' , 
+           :tabindex=>"17"  %></b></font> 
+      <font color=green><%= f.label :labor_unit_price_standard, "労務単価:" %></font>
+	  <font color=green><b><%= f.text_field :labor_unit_price_standard , :style => 'width:60px; text-align:right;' ,  id:'labor_unit_price_standard', 
+                     :onchange => "calcLaborCostTotal()" ,:tabindex=>"18"  %></b></font>
+	  <font color=brown><%= f.label :labor_productivity_unit_sum, "×歩掛合計:" %></font> 
+	  <font color=brown><b><%= f.text_field :labor_productivity_unit_sum , :style => 'width:60px; text-align:right;' , id:'labor_productivity_unit_sum',
+                     :onchange => "calcLaborCostTotal()" , :tabindex=>"19"  %></b></font> 
+	  <font color=red><%= f.label :labor_cost, "=労務費:" %></font> 
+	  <font color=red><b><%= f.text_field :labor_cost , :style => 'width:60px; text-align:right;' , id:'labor_cost' , :tabindex=>"14"  %></b></font> 
+	  
+	</div>
+	
+	</div>
+  </div>
+ <% end %>
+  
+   
+  <input type="button"  id="commit" class = 'btn btn-primary' tabindex ="20" value="登録する" />
+  <!--add171114 更新ボタン追加-->
+  <input type="button"  id="update" class = 'btn btn-lightgreen700_rsd' tabindex ="21" value="更新する" />
+  <% if params[:move_flag].blank? %>
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_middle_items_path, :class => 'btn btn-white_rsd' %>
+  <% else %>
+  <!--見積作成画面へ戻る-->
+	<!--内訳の場合-->
+	  <% if params[:move_flag] == "1" %>
+        <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
+                       quotation_header_name: params[:quotation_header_name] ), :class => 'btn btn-white_rsd' %>
+	  <% elsif params[:move_flag] == "2" %>
+	    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_detail_middle_classifications_path(quotation_header_id: params[:quotation_header_id], 
+					   quotation_header_name: params[:quotation_header_name], quotation_header_name: params[:quotation_header_name],
+					   quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ), 
+                 :class => 'btn btn-white_rsd' %>
+	  <% elsif params[:move_flag] == "3" %>
+	  <!--納品内訳-->
+	    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                delivery_slip_detail_large_classifications_path(delivery_slip_header_id: params[:delivery_slip_header_id], 
+                       delivery_slip_header_name: params[:delivery_slip_header_name] ), :class => 'btn btn-white_rsd' %>
+	  <% elsif params[:move_flag] == "4" %>
+	  <!--納品明細-->
+	    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                delivery_slip_detail_middle_classifications_path(delivery_slip_header_id: params[:delivery_slip_header_id], 
+					   delivery_slip_header_name: params[:delivery_slip_header_name], delivery_slip_header_name: params[:delivery_slip_header_name],
+					   delivery_slip_detail_large_classification_id: params[:delivery_slip_detail_large_classification_id],
+					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ), 
+                 :class => 'btn btn-white_rsd' %>
+	  <% end %>
+  <% end %>  
+<script type="text/javascript">
+  //$(document).on('ready page:load', function(){
+  
+  var sub_form_visivle;
+  
+  $(document).ready(function(){
+     //単位--select2のタブインデックスはここで指定しておく。
+     $(".searchableSelect2_1").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',8)}).trigger('load');
+	//add171108
+     $( ".searchableSelect2_1" ).change(function(e) {
+         setWorkingUnitName();
+	 });
+	 
+	 //(呼出用)共通マスター
+	 //タブインデックスはここで指定
+	 $(".searchableSelect2_2").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+		
+	 $( ".searchableSelect2_2" ).change(function(e) {
+	   
+	   //記号のリストも更新する
+	   if (document.getElementById("working_middle_item_id").value != 
+	      document.getElementById("working_large_item_short_name_for_call").value){
+          document.getElementById("working_large_item_short_name_for_call").value = 
+		    document.getElementById("working_middle_item_id").value;
+		  $(".searchableSelect2_4").trigger("change");
+		}
+	 });
+	 
+	 //(呼出用)共通記号--select2のタブインデックスはここで指定しておく。
+     $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',2)}).trigger('load');
+	 $( ".searchableSelect2_4" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 $( ".searchableSelect2_4" ).change(function(e) {
+       
+	   //共通リストも更新する
+	   if (document.getElementById("working_middle_item_id").value != 
+	      document.getElementById("working_large_item_short_name_for_call").value){
+		  document.getElementById("working_middle_item_id").value = 
+		    document.getElementById("working_large_item_short_name_for_call").value;
+		  $(".searchableSelect2_2").trigger("change");
+	   }
+	 });
+	 
+	 //(呼出用)固有マスター
+	 //タブインデックスはここで指定
+	 $(".searchableSelect2_3").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',3)}).trigger('load');
+	 $( ".searchableSelect2_3" ).change(function(e) {
+        
+		setItemInfo(2);
+	 });
+	 
+	
+	//明細フォームの"削除"ボタンクリック時の動作
+	$('form').on('click', '.remove_fields', function(event) {
+	   $(this).prev('input[type=hidden]').val('1');
+	  $(this).closest('fieldset').hide();
+	  
+	  //
+	  var child_index = this.id;
+	  //資材費合計を再計算
+      setMaterialPriceToZero(child_index);
+	  CalcLaborMaterialCostTotal("material_price");
+	  
+	  //歩掛合計を再計算
+	  setLaborProductivityUnitTotalToZero(child_index);
+	  CalcLaborLaborProductivityUnitSum("labor_productivity_unit_total");
+	  //労務費を再計算
+      calcLaborCostTotal();
+	  //
+	  
+	  return event.preventDefault();
+	  
+    });
+   
+    //明細フォームの"品目追加"ボタンクリック時の動作
+	$('form').on ('click', '.add_fields', 
+      function(event) {
+        time = new Date().getTime();
+        regexp = new RegExp($(this).data('id'), 'g');
+		  
+        $(this).before($(this).data('fields').replace(regexp, time));
+		
+		//生成されたselect2をここで制御する(ここで記述しないと動作しない)
+		$(".searchableMaterial").select2({ theme: "classic" });
+		$( ".searchableMaterial" ).change(function(e) {
+		  
+		   //material_id
+           material_id = $(this)[0].value;
+		   
+		   var child_index = $(this)[0].id;
+           child_index = child_index.replace( /working_small_item_id/g , "" ) ;
+		   
+		   if (material_id != undefined){
+			 
+			 material_id =  parseInt(material_id);
+			 
+			 //ajax
+		     $.get("<%= working_small_itemz_material_standard_select_path %>",
+               { material_id: material_id },
+			   function(data){ 
+			   
+			     //品番をセット
+				 obj = document.getElementById("material_code_hide");
+				 var working_small_item_code = "working_small_item_code" + child_index;
+				 document.getElementById(working_small_item_code).value = obj.innerText;
+				 
+				 //品名をセット
+				 obj = document.getElementById("material_name_hide");
+				 var working_small_item_name = "working_small_item_name" + child_index;
+				 document.getElementById(working_small_item_name).value = obj.innerText;
+				 
+				 //数量をセット
+				 obj = document.getElementById("quantity_hide");
+				 var quantity = "quantity" + child_index;
+				 document.getElementById(quantity).value = obj.innerText;
+				 
+				 //単価をセット
+				 obj = document.getElementById("unit_price_hide");
+				 var unit_price = "unit_price" + child_index;
+				 document.getElementById(unit_price).value = obj.innerText;
+				 
+				 //資材費を算出
+				 //del171118 基本手入力になる（単純に数量×単価にならない）
+				 //calcMaterialPrice(child_index, document.getElementById(quantity).value, 
+                 //                  document.getElementById(unit_price).value);
+				 
+				 //歩掛をセット
+				 obj = document.getElementById("labor_productivity_unit_hide");
+				 var labor_productivity_unit = "labor_productivity_unit" + child_index;
+				 document.getElementById(labor_productivity_unit).value = obj.innerText;
+				 
+				 //歩掛り計を算出
+				 calcLaborProductivityUnitTotal(child_index, document.getElementById(quantity).value, 
+								   document.getElementById(labor_productivity_unit).value);
+				
+				 //資材費合計を算出
+				 CalcLaborMaterialCostTotal("material_price");
+				
+				 //歩掛計を算出
+				 CalcLaborLaborProductivityUnitSum("labor_productivity_unit_total");
+				 
+				 //労務費を算出
+				 calcLaborCostTotal();
+			   }
+             );
+		   }
+		   
+       
+       });
+       //
+		//return event.preventDefault();
+		return false;
+	  })
+  });
+  
+  $(window).load(function(){
+  
+	 //明細の合計値を算出しておく
+	 //資材費合計を算出
+	   CalcLaborMaterialCostTotal("material_price");
+				
+	 //歩掛計を算出
+	   CalcLaborLaborProductivityUnitSum("labor_productivity_unit_total");
+				 
+	 //労務費を算出
+	   calcLaborCostTotal();
+	 //
+  
+     //サブフォームを非表示にする
+	 $('#filter').addClass('hide');
+	 sub_form_visivle = false;
+	 
+   // 明細フォームのクリックイベントによって、更新ボタンが何故か無効になるので、下記追記して対処。
+	 // 登録ボタンを押した場合の処理
+	 $('#commit').click(function(){
+	   document.getElementById("action_flag").value = "new"
+	   confirmBeforeSave();
+	 });
+	 
+	 //add171114
+	 // 更新ボタンを押した場合の処理
+	 $('#update').click(function(){
+	   document.getElementById("action_flag").value = "edit"
+	   confirmBeforeSave();
+	 });
+	 
+  })
+  
+  //更新前の確認
+  function confirmBeforeSave(){
+     if (document.getElementById("move_flag").value == ""){
+	    document.getElementById("master_insert_flag").value = "true";
+		document.forms[0].submit();
+     }else{
+		//見積画面からの遷移のみ、確認ボタンを表示（show非表示のため）
+		if (document.getElementById("action_flag").value != "edit"){
+		//登録ボタンを押した場合
+		  if (window.confirm('共通マスターに保存しますか？\n(キャンセルした場合は、固有マスターのみに登録されます。)')) {
+	        document.getElementById("master_insert_flag").value = "true";
+	      }else{
+	        document.getElementById("master_insert_flag").value = "false"
+	      }
+		}else{
+		//更新ボタンを押した場合--確認のみ
+		  window.alert('固有マスターへ更新します。');
+		  document.getElementById("master_insert_flag").value = "false";
+		}
+		
+		
+		document.forms[0].submit();
+	  }
+  }
+  
+  //明細の合計を元画面へ反映させる
+  function setDetailTotalToOriginal(){
+	//debugger;
+	if (window.confirm('計算結果を左画面に反映させますか？')) {
+	  //実行材料費
+	  if (document.getElementById("material_cost_total") != undefined){
+	    document.getElementById("execution_material_unit_price").value = 
+          document.getElementById("material_cost_total").value;
+	  }
+	  //歩掛計
+	  if (document.getElementById("labor_productivity_unit_sum") != undefined){
+	    document.getElementById("labor_productivity_unit").value = 
+          document.getElementById("labor_productivity_unit_sum").value;
+	  }
+	  //実行労務単価
+	  if (document.getElementById("labor_cost") != undefined){
+	    document.getElementById("execution_labor_unit_price").value = 
+          document.getElementById("labor_cost").value;
+	  }
+	  
+	  //add171031
+	  calcMaterialUnitPrice();
+	}
+  }
+  
+  //資材費のセット(明細)
+  function calcMaterialPrice(child_index,quantity,unit_price){
+	
+	if (quantity != undefined && unit_price != undefined) {
+	  
+	  //add171107
+	  //全角になっている場合があるので、半角にする
+	  quantity = toHalfWidth(quantity);
+	  unit_price = toHalfWidth(unit_price);
+	  var index = "quantity" + child_index;
+	  document.getElementById(index).value = quantity;
+	  index = "unit_price" + child_index;
+	  document.getElementById(index).value = unit_price;
+	  //
+	  
+	  //add171113
+	  //掛け率追加
+	  var rateId = "rate" + child_index;
+	  rate = document.getElementById(rateId).value;
+	  if (rate != ""){
+	    rate = toHalfWidth(rate);
+	    document.getElementById(rateId).value = rate; //add171118
+      }else{
+	    rate = 1;
+	  }
+	  //
+	  
+      var material_price = "material_price" + child_index;
+      //document.getElementById(material_price).value = quantity * unit_price;
+	  //171113
+	  document.getElementById(material_price).value = quantity * rate * unit_price;
+    }
+  }
+  
+  //数量・単価の変更の場合は資材費を再計算させる
+  function PrepareCalcMaterialPrice(child_index, value){
+	  //if (value == "quantity" || value == "unit_price") {
+	  //up171113
+	  if (value == "quantity" || value == "unit_price" || value == "rate" ) {
+		
+		//var quantity_id = "quantity" + child_index;
+		//quantity = document.getElementById(quantity_id).value;
+		
+		//upd171118
+	    //全角になっている場合があるので、半角にする
+		var quantity_id = "quantity" + child_index;
+	    var quantity = document.getElementById(quantity_id).value;
+	    quantity = toHalfWidth(quantity);
+	    document.getElementById(quantity_id).value = quantity;
+	    //
+		
+		//var unit_price_id = "unit_price" + child_index;
+		//unit_price = document.getElementById(unit_price_id).value;
+		
+		//upd171118
+	    //全角になっている場合があるので、半角にする
+		var unit_price_id = "unit_price" + child_index;
+	    var unit_price = document.getElementById(unit_price_id).value;
+	    unit_price = toHalfWidth(unit_price);
+	    document.getElementById(unit_price_id).value = unit_price;
+	    //
+		
+		
+		calcMaterialPrice(child_index,quantity,unit_price);
+    }
+  }
+  
+  //労務費（合計）を算出
+  function calcLaborCostTotal(){
+	//add171107
+	//全角になっている場合があるので、半角にする
+	var labor_unit_price_standard = document.getElementById("labor_unit_price_standard").value;
+	labor_unit_price_standard = toHalfWidth(labor_unit_price_standard);
+	document.getElementById("labor_unit_price_standard").value = labor_unit_price_standard;
+	//
+	
+    if (document.getElementById("labor_unit_price_standard").value > 0 && document.getElementById("labor_productivity_unit_sum").value > 0) {
+       
+	   var labor_cost = document.getElementById("labor_unit_price_standard").value * document.getElementById("labor_productivity_unit_sum").value;
+       labor_cost = parseInt(labor_cost);
+	   
+	   document.getElementById("labor_cost").value = labor_cost;
+    }
+  }
+  
+  //歩掛計のセット(明細)
+  function calcLaborProductivityUnitTotal(child_index,quantity,labor_productivity_unit){
+	
+	if (quantity != undefined && labor_productivity_unit != undefined) {
+	  
+	  //add171107
+	  //全角になっている場合があるので、半角にする
+	  labor_productivity_unit = toHalfWidth(labor_productivity_unit);
+	  index = "labor_productivity_unit" + child_index;
+	  document.getElementById(index).value = labor_productivity_unit;
+	  //
+	
+      var labor_productivity_unit_total = "labor_productivity_unit_total" + child_index;
+      document.getElementById(labor_productivity_unit_total).value = quantity * labor_productivity_unit;
+    }
+  }
+  
+  //数量・歩掛変更の場合は歩掛計を再計算させる
+  function PrepareCalcLaborProductivityUnitTotal(child_index, value){
+	  
+	  if (value == "quantity" || value == "labor_productivity_unit") {
+		//var quantity_id = "quantity" + child_index;
+		//quantity = document.getElementById(quantity_id).value;
+		
+		//upd171118
+	    //全角になっている場合があるので、半角にする
+		var quantity_id = "quantity" + child_index;
+	    var quantity = document.getElementById(quantity_id).value;
+	    quantity = toHalfWidth(quantity);
+	    document.getElementById(quantity_id).value = quantity;
+	    //
+		
+		var labor_productivity_unit_id = "labor_productivity_unit" + child_index;
+		labor_productivity_unit = document.getElementById(labor_productivity_unit_id).value;
+		
+		calcLaborProductivityUnitTotal(child_index,quantity,labor_productivity_unit);
+		
+    }
+  }
+  
+  //明細の削除ボタンを押しても完全削除されないので、強制的に値をゼロにする(資材費)
+  function setMaterialPriceToZero(child_index){
+	var material_price_id = "material_price" + child_index;
+	
+	//debugger;
+	
+	if (document.getElementById(material_price_id).value > 0) {
+	  document.getElementById(material_price_id).value = 0
+    }
+  }
+
+  //明細の資材費合計を計算する
+  function CalcLaborMaterialCostTotal(value){
+	  
+	  if (value == "material_price" || value == "unit_price" || value == "quantity" || value == "rate") {
+		//一旦合計は初期化する
+		document.getElementById("material_cost_total").value = 0;
+		
+        item = document.getElementsByName("material_price[]");
+		var nowValue = 0;
+		
+		//debugger;
+		
+		for (var index = 0; index < item.length  ; index ++) {
+		  material_price = item[index].value;
+		  if (material_price != undefined ) {
+  		    material_price = parseInt(material_price) 
+		    if (material_price > 0){
+			  nowValue += material_price;
+            }
+		  }
+		}
+		if (nowValue > 0){
+		  document.getElementById("material_cost_total").value = nowValue;
+		}
+	  }
+  }
+  
+  //明細の歩掛計の合計を計算する
+  function CalcLaborLaborProductivityUnitSum(value){
+	if (value == "labor_productivity_unit_total"){
+	  //一旦合計は初期化する
+	  document.getElementById("labor_productivity_unit_sum").value = 0;
+	  //労務費も初期化
+	  document.getElementById("labor_cost").value = 0;
+	  
+      var sum = 0;  
+	  item = document.getElementsByName("labor_productivity_unit_total[]");
+	  
+	  //debugger;
+	  
+	  for (var index = 0; index < item.length  ; index ++) {
+		if (item[index] != undefined ) {
+		  labor_productivity_unit_total = parseFloat(item[index].value)
+		  if (labor_productivity_unit_total > 0) {
+		    sum += labor_productivity_unit_total;
+		  }
+	    }
+	  }
+	  if (sum > 0){
+		
+		
+		//小数点第4位を四捨五入する。
+		sum = floatFormat( sum, 4 );
+		  
+		document.getElementById("labor_productivity_unit_sum").value = sum;
+	  }
+    }
+  }
+  //明細の削除ボタンを押しても完全削除されないので、強制的に値をゼロにする(歩掛計)
+  function setLaborProductivityUnitTotalToZero(child_index){
+	var labor_productivity_unit_total_id = "labor_productivity_unit_total" + child_index;
+	
+	if (document.getElementById(labor_productivity_unit_total_id).value > 0) {
+	  document.getElementById(labor_productivity_unit_total_id).value = 0
+    }
+  }
+  
+  //(ajax)項目名等のセット
+  function setItemInfo(masterFlag)
+  {  
+     //idもここで切り分け必要？？
+	 if (masterFlag == 1){
+	   obj = document.getElementById("working_middle_item_id");
+	 }else{
+	   obj = document.getElementById("id");
+	 }
+	 //
+	
+     working_middle_item_id = parseInt(obj.value);
+     $.get("<%= working_specific_middle_itemz_working_material_info_select_path %>",
+       {id: working_middle_item_id, master_flag: masterFlag },
+        function(data){
+          
+		   window.location.reload();
+           event.preventDefault();
+  
+		  //obj = document.getElementById("working_middle_item_name").textContent;
+          //document.getElementById("working_middle_item_name").value = obj;
+		  
+		  
+		  }
+      );
+	  
+	  
+     //単価(保留)
+      //$.get("<%= working_middle_itemz_material_unit_price_select_path %>",
+      // {id: material_id },
+      //  function(data){
+      //    obj = document.getElementById("material_unit_price").textContent;
+      //    document.getElementById("material_unit_price").value = obj;
+	  //   }
+      //);
+    
+  }
+  
+  //未使用？？
+  //(ajax)項目・単価のセット
+  function setItemNameAndPrice()
+  {  
+    obj = document.getElementById("material_id");
+	//obj = document.getElementById("working_middle_item_id");
+	
+     material_id = parseInt(obj.value);
+     $.get("<%= working_middle_itemz_working_material_name_select_path %>",
+       {id: material_id },
+        function(data){
+          obj = document.getElementById("working_material_name").textContent;
+          document.getElementById("working_material_name").value = obj;
+		  }
+      );
+     //単価
+      $.get("<%= working_middle_itemz_material_unit_price_select_path %>",
+       {id: material_id },
+        function(data){
+          obj = document.getElementById("material_unit_price").textContent;
+          document.getElementById("material_unit_price").value = obj;
+		  }
+      );
+   };  
+
+  //金額計算(付属品等)
+  function calcAccessory(f)
+  {
+    //付属品の計算 
+    var num = (f.material_unit_price.value * f.material_quantity.value) * 0.3 ;
+    //小数点以下を四捨五入
+    f.accessory_cost.value = Math.round(num);
+  
+    //材料費計の計算
+    var num = (f.material_unit_price.value * f.material_quantity.value) + parseInt(f.accessory_cost.value); 
+    f.material_cost_total.value = num;
+   
+    if (f.labor_cost_total.value > 0){
+       calcOtherCost(f);
+    }   
+  }
+  
+  //金額計算(材料費)
+  function calcMaterialUnitPrice()
+  {
+     var obj = document.getElementById("execution_material_unit_price").value;
+     var num = obj * 1.35;
+     num = floatFormat( num, 4 ) ;
+	 
+	 document.getElementById("material_unit_price").value = num;
+     
+     var obj2 = document.getElementById("labor_productivity_unit").value;
+	 //if (obj2 > 0){  del171107 歩掛なくても計算するケース有り
+	   //金額計算(実行労務単価、労務単価)
+       calcLaborCost();
+	 //}
+  }
+  
+  //金額計算(実行労務単価、労務単価)
+  function calcLaborCost()
+  {
+    var obj = document.getElementById("labor_productivity_unit").value;
+    //del171107 歩掛なくても計算するケース有り
+	if (obj == "") {
+	  obj = 0;
+	}
+	
+	//if (obj > 0) {
+	  //実行労務単価
+	  document.getElementById("execution_labor_unit_price").value = obj * 11000;
+      //労務単価
+      document.getElementById("labor_unit_price").value = obj * 15000;
+      //実行単価
+	  //add171107
+	  if (document.getElementById("execution_labor_unit_price").value == ""){
+	    document.getElementById("execution_labor_unit_price").value = 0;
+      }
+      document.getElementById("execution_unit_price").value =
+      parseFloat(document.getElementById("execution_material_unit_price").value) + 
+	  parseFloat(document.getElementById("execution_labor_unit_price").value);
+	  //単価
+	  //add171107
+	  if (document.getElementById("labor_unit_price").value == ""){
+	    document.getElementById("labor_unit_price").value = 0;
+      }
+	  document.getElementById("working_unit_price").value =
+	  parseFloat(document.getElementById("material_unit_price").value) + parseFloat(document.getElementById("labor_unit_price").value);
+	  
+	//}
+	
+    //var num = f.labor_unit_price.value * f.labor_productivity_unit.value;
+    //小数点以下を四捨五入
+    //f.labor_cost_total.value = Math.round(num);
+    
+    //if (f.material_cost_total.value > 0){
+    //   calcOtherCost(f);
+    //}  
+  }
+  //金額計算(実行単価、単価のみ--労務単価が無いケースもあり)  add171107
+  function calcUnitPriceOnly()
+  {
+      //実行単価
+	  if (document.getElementById("execution_labor_unit_price").value == ""){
+	    document.getElementById("execution_labor_unit_price").value = 0;
+      }
+      document.getElementById("execution_unit_price").value =
+        parseFloat(document.getElementById("execution_material_unit_price").value) + 
+	    parseFloat(document.getElementById("execution_labor_unit_price").value);
+	  
+	  //単価
+	  if (document.getElementById("labor_unit_price").value == ""){
+	    document.getElementById("labor_unit_price").value = 0;
+      }
+	  document.getElementById("working_unit_price").value =
+	  parseFloat(document.getElementById("material_unit_price").value) + parseFloat(document.getElementById("labor_unit_price").value);
+	  
+	
+    //var num = f.labor_unit_price.value * f.labor_productivity_unit.value;
+    //小数点以下を四捨五入
+    //f.labor_cost_total.value = Math.round(num);
+    
+    //if (f.material_cost_total.value > 0){
+    //   calcOtherCost(f);
+    //}  
+  }
+  //金額計算(その他計)
+  function calcOtherCost(f)
+  {
+    var num = (parseInt(f.material_cost_total.value) + parseInt(f.labor_cost_total.value)) * 0.12 ;
+    //小数点以下を四捨五入
+    f.other_cost.value = Math.round(num);
+    if (f.other_cost.value > 0){
+       calcUnitPrice(f);
+    }  
+  } 
+  //金額計算(実行単価)
+  function calcUnitPrice(f)
+  {
+    var num = parseInt(f.material_cost_total.value) + parseInt(f.labor_cost_total.value) + parseInt(f.other_cost.value) ;
+    //f.working_unit_price.value = num;
+    f.execution_unit_price.value = num;
+  } 
+  
+  // 小数点n位までを残す関数
+  // number=対象の数値
+  // n=残したい小数点以下の桁数
+  function floatFormat( number, n ) {
+    var _pow = Math.pow( 10 , n ) ;
+    return Math.round( number * _pow ) / _pow ;
+  }
+  
+  //単位名のセット  add171108
+  function setWorkingUnitName()
+  {  
+    obj = document.getElementById("working_unit_id");
+     working_unit_id = parseInt(obj.value);
+     //$.get("<%= quotation_detail_large_classificationz_working_unit_name_select_path %>",
+	 $.get("<%= working_unitz_working_unit_name_select_path %>",
+       {id: working_unit_id },
+        function(data){
+		  obj = document.getElementById("working_unit_name").textContent;
+          document.getElementById("working_unit_name").value = obj;
+		  }
+      );
+  };  
+  
+  //カテゴリー別にアイテムを抽出する処理
+  function setItemExtractByCategory(){
+   var category_id = document.activeElement.value;
+   //if (category_id != "0"){
+	 $.get("<%= working_middle_itemz_item_extract_path %>",
+        {working_middle_item_category_id: category_id},
+         function(data){
+		   //アイテムのリストを再配置
+           document.getElementById("working_middle_item_id").innerHTML = document.getElementById("working_middle_item_id_select_hide").innerHTML;
+		   
+		   //短縮名のリストを再配置
+		   document.getElementById("working_large_item_short_name_for_call").innerHTML = document.getElementById("working_middle_item_short_name_select_hide").innerHTML;
+		   
+     });
+   //}
+  }
+  
+  //サブフォーム表示のオンオフ
+  function dispDiv() {
+	
+	if (sub_form_visivle == false) {
+	//表示
+	  $('#filter').removeClass('hide');
+	  sub_form_visivle = true;
+	}else{
+	//非表示
+	  $('#filter').addClass('hide');
+	  sub_form_visivle = false;
+    }	
+   
+  }; 
+  //明細フォームのカーソル移動
+  function focusNext(t, e, this_id, next_id){
+	  
+	  //debugger;
+	  
+	  //if (e.keyCode == 13) {
+		 //各種計の計算
+		 calcTotal(t, e, this_id, next_id);
+		 
+	  //}
+  	   return false;
+  }
+   //明細フォームのカーソル移動
+  function focusNextModal(t, e, this_id, next_id){
+	//if (e.keyCode == 13) {
+    //マウス移動の場合もあるので、enterキー押下以外でも処理させる
+
+	//各種計の計算(サブルーチン)
+      calcTotal(t, e, this_id, next_id);  
+	//}
+	
+	 if (e.keyCode == 13) {
+	//フォーカス移動はenterキー押下時のみ
+	  //debugger;
+	  
+      var child_index = t.id;
+	  value = this_id;
+	  child_index = child_index.replace(new RegExp(value, 'g'), "" ) ;
+	 
+ 	  //if (child_index > 1000){
+	    //フラグをセット（タブを自動移動させない）
+		
+	    gTabNotMove = true;
+	    //新規追加のレコードのみ、遷移する。既存のものは、動作がおかしくなるので別処理。
+	    var next_element_id = next_id + child_index;
+	    document.getElementById(next_element_id).focus();
+	  //}
+	}
+	
+	return false;
+  }
+  //明細フォームのカーソル移動(Enterキー押下の場合)
+  function focusNextNormal(t, e, this_id, next_id){
+	  
+	  if (e.keyCode == 13) {
+	    //各種計の計算(サブルーチン)
+		calcTotal(t, e, this_id, next_id);
+	  }
+  	   return false;
+  }
+  //カーソル移動による各種計の計算(サブルーチン)
+  function calcTotal(t, e, this_id, next_id){
+    //nested_fieldsはタブでどうしても制御ができないので、idでフォーカスするしかない・・
+	var child_index = t.id;
+	value = this_id;
+	child_index = child_index.replace(new RegExp(value, 'g'), "" ) ;
+	  
+	//数量・単価の変更の場合は資材費を再計算させる
+	PrepareCalcMaterialPrice(child_index, value);
+		
+	//数量・歩掛変更の場合は歩掛計を再計算させる
+    PrepareCalcLaborProductivityUnitTotal(child_index, value);
+	//歩掛り総計を再計算
+	CalcLaborLaborProductivityUnitSum("labor_productivity_unit_total");
+		
+	//資材費計の計算
+	CalcLaborMaterialCostTotal(value);
+	//労務費の計算
+	if (value == "quantity" || value == "labor_productivity_unit" || value == "labor_productivity_unit_total"
+        || value == "unit_price" ){
+        calcLaborCostTotal();
+	}
+	
+	//del171211
+	//if (child_index > 1000){
+	//  //新規追加のレコードのみ、遷移する。既存のものは、動作がおかしくなるので別処理。
+	//  var next_element_id = next_id + child_index;
+	//  document.getElementById(next_element_id).focus();
+	//}
+    
+  }
+  
+  
+  //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+  //add171113
+  //ajax部分はサブルーチンにしたほうがいいかも？？
+  function searchItemCode(t){
+   
+       child_index = t.id;
+	   
+	   //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+	   //child_index = child_index.slice(23);
+	   child_index = child_index.slice(29);  //upd171208
+	   
+	   //child_index = child_index.replace(new RegExp(value, 'g'), "" ) ;
+	      
+	   var itemCode = t.value;
+	   
+    	//商品コードからマスターより一致するコード検索し、あれば自動でセットする。
+        $.get("<%= working_small_itemz_material_code_standard_select_path %>",
+		
+             {material_code: itemCode},
+          function(data){
+		
+		    	 //品番をセット
+				 obj = document.getElementById("material_code_hide");
+				 var working_small_item_code = "working_small_item_code" + child_index;
+                 document.getElementById(working_small_item_code).value = obj.innerText;
+				 
+				 //品名をセット
+				 obj = document.getElementById("material_name_hide");
+				 var working_small_item_name = "working_small_item_name" + child_index;
+				 document.getElementById(working_small_item_name).value = obj.innerText;
+				 
+				 //数量をセット
+				 obj = document.getElementById("quantity_hide");
+				 var quantity = "quantity" + child_index;
+				 document.getElementById(quantity).value = obj.innerText;
+				 
+				 //単価をセット
+				 obj = document.getElementById("unit_price_hide");
+				 var unit_price = "unit_price" + child_index;
+				 document.getElementById(unit_price).value = obj.innerText;
+				 
+				 //資材費を算出
+				 //del171118 基本手入力になる（単純に数量×単価にならない）
+				 //calcMaterialPrice(child_index, document.getElementById(quantity).value, 
+                 //                  document.getElementById(unit_price).value);
+				 //歩掛をセット
+				 obj = document.getElementById("labor_productivity_unit_hide");
+				 var labor_productivity_unit = "labor_productivity_unit" + child_index;
+				 document.getElementById(labor_productivity_unit).value = obj.innerText;
+				 
+				 //歩掛り計を算出
+				 calcLaborProductivityUnitTotal(child_index, document.getElementById(quantity).value, 
+								   document.getElementById(labor_productivity_unit).value);
+				
+				 //資材費合計を算出
+				 CalcLaborMaterialCostTotal("material_price");
+				
+				 //歩掛計を算出
+				 CalcLaborLaborProductivityUnitSum("labor_productivity_unit_total");
+				 
+				 //労務費を算出
+				 calcLaborCostTotal();
+			
+			
+			
+		   
+          }
+       );
+  }	
+		
+</script>

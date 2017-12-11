@@ -1,0 +1,2 @@
+json.extract! working_specific_middle_item, :id, :quotation_header_id, :delivery_slip_header_id, :working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id, :working_middle_specification, :working_unit_id, :working_unit_price, :execution_unit_price, :material_id, :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_prce, :labor_unit_price, :labor_productivity_unit, :seq, :created_at, :updated_at
+json.url working_specific_middle_item_url(working_specific_middle_item, format: :json)

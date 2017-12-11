@@ -1,0 +1,2 @@
+json.extract! delivery_slip_header, :id, :delivery_slip_code, :quotation_code, :invoice_code, :delivery_slip_date, :construction_datum_id, :construction_name, :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, :post, :address, :tel, :fax, :construction_place, :delivery_amount, :execution_amount, :last_line_number, :created_at, :updated_at
+json.url delivery_slip_header_url(delivery_slip_header, format: :json)

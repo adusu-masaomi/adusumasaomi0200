@@ -1,0 +1,166 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<!--カスタマイズ版を使用-->
+<%- model_class = QuotationMaterialHeader -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header", style="width:1920px">
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @quotation_material_headers %>
+  <!-- 追加箇所終了 -->
+   <%= search_form_for @q , :url => quotation_material_headers_path(@q)  do |f| %>
+      <%= f.label :construction_datum_id, '工事名：：' %>
+      <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, 
+	      {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
+			
+      <div>
+         <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
+		 <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_quotation_material_header_path(construction_id: params[:construction_id], move_flag: params[:move_flag]),
+            :class => 'btn btn-primary' %>
+         <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+  	  </div>
+   <% end %>
+   
+</div>
+
+
+
+<!--<div class="span11 table-scrollable" style="margin-left : 10px">-->
+<!--見出し固定用設定追加-->
+<div style="margin-top : 0px;margin-left : 10px;", class="span11 table-scrollable" >
+ 
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+
+<!--<table class="table table-striped">-->
+<!--見出し固定用設定追加-->
+<table id="tablefix", class="table  table-striped">
+
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_code) %></th>
+      <th><%= model_class.human_attribute_name(:requested_date) %></th>
+	  <th><%= model_class.human_attribute_name(:construction_datum_id) %></th>
+	  <th><%= model_class.human_attribute_name(:alias_name) %></th>
+      <th>依頼先１</th>
+	  <th>依頼先２</th>
+	  <th>依頼先３</th>
+	  <!--<th><%= model_class.human_attribute_name(:responsible) %></th>
+	  <th><%= model_class.human_attribute_name(:email) %></th>-->
+	  <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @quotation_material_headers.order("quotation_code desc").each do |quotation_material_header| %>
+      <tr>
+        <td><%= link_to quotation_material_header.id, quotation_material_header_path(quotation_material_header) %></td>
+        <td><%= quotation_material_header.quotation_code %></td>
+		<td><%= quotation_material_header.requested_date %></td>
+		<% @quotation_code = quotation_material_header.quotation_code %>
+		<% if quotation_material_header.construction_datum.nil? %>
+           <td>-</td>
+           <% @construction_name = "-" %>
+        <% else %>
+		  <td><%= quotation_material_header.construction_datum.construction_name %></td>
+		  <% @construction_name = quotation_material_header.construction_datum.construction_name %>
+        <% end %>
+	   <% if quotation_material_header.construction_datum.nil? %>
+          <td>-</td>
+        <% else %>
+		  <td><%= quotation_material_header.construction_datum.alias_name %></td>
+		<% end %>
+		
+		<!--仕入先名１を表示-->
+		<% if quotation_material_header.supplier_id_1.present? %>
+		  <% @supplier_1 = SupplierMaster.find(quotation_material_header.supplier_id_1).supplier_name %>
+		  <td><%= @supplier_1 %></td>
+		<% else %>
+		  <td>-</td>
+		<% end %>
+		<!-- -->
+		<!--仕入先名２を表示-->
+		<% if quotation_material_header.supplier_id_2.present? %>
+		  <% @supplier_2 = SupplierMaster.find(quotation_material_header.supplier_id_2).supplier_name %>
+		  <td><%= @supplier_2 %></td>
+		<% else %>
+		  <td>-</td>
+		<% end %>
+		<!-- -->
+		<!--仕入先名３を表示-->
+		<% if quotation_material_header.supplier_id_3.present? %>
+		  <% @supplier_3 = SupplierMaster.find(quotation_material_header.supplier_id_3).supplier_name %>
+		  <td><%= @supplier_3 %></td>
+		<% else %>
+		  <td>-</td>
+		<% end %>
+		<!-- -->
+		
+		<!-- 以下コメントアウト
+		<% if quotation_material_header.supplier_master.nil? %>
+           <td>-</td>
+		   <td>-</td>
+		   <td>-</td>
+		   <% @supplier_name = "-" %>
+		<% else %>
+		  <td><%= quotation_material_header.supplier_master.supplier_name %></td>
+		  <td><%= quotation_material_header.responsible %></td>
+		  <td><%= quotation_material_header.email %></td>
+		  <% @supplier_name = quotation_material_header.supplier_master.supplier_name %>
+        <% end %>
+		-->
+		
+		<td><%=l quotation_material_header.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <!--<%= link_to t('.edit', :default => t("作成")),
+                      edit_quotation_material_header_path(quotation_material_header, :id => quotation_material_header.id), 
+					  :class => 'btn btn-info btn-xs' %>-->
+		 <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_quotation_material_header_path(quotation_material_header,construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+					  :class => 'btn btn-default btn-xs' %>
+
+		  <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      quotation_material_header_path(quotation_material_header,construction_id: params[:construction_id], move_flag: params[:move_flag]),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @quotation_material_headers %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+
+        //$(".searchablePurchaseOrderCode").select2({ theme: "classic" });
+		$(".searchableConstructionCode").select2({ theme: "classic" });
+		
+		//見出し固定用設定追加
+		var sz = window.parent.screen.width;
+		var fc = 1;    //デフォルトの固定列数(社長PC基準)
+		var ht = 618;  //デフォルトの高さ(社長PC基準)
+		
+		if (sz != 1920) {
+		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 2;  //固定列数
+		  ht -= 80;
+		}
+		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+		//
+	
+  });
+  
+  
+
+</script>

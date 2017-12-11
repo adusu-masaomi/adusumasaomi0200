@@ -1,0 +1,480 @@
+
+<div class="modal-dialog modal-lg" >
+  <div class="modal-content" >
+  <div style="padding-left : 15px;">
+<%= simple_form_for @quotation_breakdown_history, remote: true, :html => { id: "mymodal", :class => 'form-horizontal' } do |f| %>
+  
+  <!--非表示のフィールド-->
+  <!--件名(非表示)-->
+  <%= f.input :quotation_header_history_id, input_html:{id:"quotation_header_history_id", :value => @quotation_breakdown_history.quotation_header_history_id } , as: :hidden %>
+  <!--品名／仕様区分(非表示)-->
+  <%= f.input :quotation_items_division_id, input_html:{id:"quotation_items_division_id",  :value => 1 } , as: :hidden %>
+  <!--行番号-->
+  <%= f.label :"行番号" , { :class => "my-custom-class-l"} %></br>
+  <div class="col-md-7" , style="margin-left : -15px">
+  <%= f.select :line_number, QuotationBreakdownHistory.serial_number, {}, 
+    { id:"line_number", class: "searchableSelect2_1" , style: 'width:100px' } %>
+  <%= f.check_box :check_line_insert, {}, "true", "false" %>
+  <%= f.label_tag :check_line_insert, '行挿入する　　' %>
+  <%= f.label_tag :construction_type, '工事種別：' %>
+  <%= f.select :construction_type, WorkingUnit.types, {:selected => @quotation_breakdown_history.construction_type || 0}, 
+    {id:'construction_type', :class => "my-custom-class", style: 'width:120px;margin-left:8px;font-size:14px;', :onchange => "setLaborType()" } %>
+  </div></br></br>
+  <!--記号-->
+  <%= f.label :working_large_item_short_name , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :working_large_item_short_name, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name, 
+    {:selected => @quotation_breakdown_history.working_large_item_id || 1} , {id:'working_large_item_short_name',
+       :class => "searchableSelect2_2",  style: 'width:420px' } %></br>
+  <!--項目名-->
+  <%= f.label :"項目名", {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :working_large_item_id, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name, 
+     {:selected => @quotation_breakdown_history.working_large_item_id || 1} , 
+       {id:'working_large_item_id', :class => "searchableSelect2_3",  style: 'width:420px' } %></br>
+  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "3"}  %>
+  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"4" }  %>
+  
+  <div class="col-xs-2" , style="margin-left : -15px">
+  <%= f.input :quantity, label: "見積数量", :input_html => {id:'quantity', :tabindex=>"5", style: 'width:120px',
+        :value => @quotation_breakdown_history.quantity || 1, :onchange => "changeQuantity(0)" } %>
+  </div>
+  <div style="margin-left : -50px">
+  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"6", style: 'width:120px', 
+        :value => @quotation_breakdown_history.execution_quantity || 1 , :onchange => "changeQuantity(1)" } %>
+  </div>
+  
+  <!--単位-->
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
+  <%= f.label :"単位" , {} %></br>
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, {:prompt => 'どれか一つを選択して下さい', 
+  :selected => @quotation_breakdown_history.working_unit_id || 1 } , {id:'working_unit_id', :class => "searchableSelect2_4",  style: 'width:120px' } %></br>
+  </div>
+  <div style="margin-left : -50px;margin-top : -15px">
+  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", :tabindex=>"8", style: 'width:120px',  :value => @quotation_breakdown_history.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name)   }  %>
+  </div>
+  
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"9", :onchange => "calcTotalPrice()" } %>
+  </div>
+  <div style="margin-left : -50px;margin-top : -15px">
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"10", :onchange => "calcTotalPrice()"} %>
+  </div>
+  
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
+  <%= f.input :quote_price,  :input_html => {id:'quote_price', :tabindex=>"11", style: 'width:120px'} %>
+  </div>
+  <div style="margin-left : -50px;margin-top : -20px">
+  <%= f.input :execution_price, :input_html => {id:'execution_price', :tabindex=>"12", style: 'width:120px'} %>
+  </div>
+  <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
+  <%= f.input :labor_productivity_unit,  :input_html => {id:"labor_productivity_unit", :tabindex=>"13", style: 'width:120px', :onchange => "calcLaborTotal()"}  %>
+  </div>
+  <div style="margin-top : -15px">
+  <%= f.input :labor_productivity_unit_total,  :input_html => {id:"labor_productivity_unit_total", :tabindex=>"14", style: 'width:120px'}  %>
+  </div>
+  
+  <!--add170223-->
+  <%= f.check_box :piping_wiring_flag, :class => "piping_wiring_flag" %>
+  <%= f.label_tag :piping_wiring_flag, '配管配線　　　' %> 
+  <%= f.check_box :equipment_mounting_flag, :class => "equipment_mounting_flag" %>
+  <%= f.label_tag :equipment_mounting_flag, '機器取付　　' %>
+  <%= f.check_box :labor_cost_flag, :class => "labor_cost_flag" %>
+  <%= f.label_tag :labor_cost_flag, '労務費' %>
+  <!--add end-->
+  
+  <%= f.input :remarks,  :input_html => {:tabindex=>"15", style: 'width:420px'}  %>
+  
+  <%= f.check_box :check_update_item, {}, "true", "false" %>
+  <%= f.label_tag :check_update_item, '品名・仕様・単位のみマスター反映　　　' %> 
+  <%= f.check_box :check_update_all, {}, "true", "false" %>
+  <%= f.label_tag :check_update_all, '全てマスター反映' %></br>
+  
+  <%= hidden_field_tag(:quotation_header_history_id, 'index') %>
+  <%= hidden_field_tag(:working_large_item_id, 'index') %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], quotation_header_id: params[:quotation_header_id],
+                        quotation_header_name: params[:quotation_header_name] ), :class => 'btn btn-white500_rsd' %>
+<% end %>
+</div>
+ </div>
+</div>
+
+
+<script type="text/javascript">
+  
+  
+  
+  //モーダルの場合は、このコードがないとselect2が正常動作しない。
+  $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+  
+  $(document).ready(function(){
+     //行番号--select2のタブインデックスはここで指定。
+     $(".searchableSelect2_1").select2({ theme: "bootstrap"  }).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+     $( ".searchableSelect2_1" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 //記号（品名（短縮名））--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_2").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',1)}).trigger('load');
+     $( ".searchableSelect2_2" ).change(function(e) {
+    	document.getElementById("working_large_item_id").value = document.getElementById("working_large_item_short_name").value;
+		$(".searchableSelect2_3").trigger("change");
+	 });
+	 $( ".searchableSelect2_2" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 //項目名--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_3").select2({ theme: "bootstrap"  }).on("load", function(e) { 
+        $(this).prop('tabindex',2)}).trigger('load');
+     $( ".searchableSelect2_3" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+     $( ".searchableSelect2_3" ).change(function(e) {
+       setWorkingLargeItemName();
+	   setWorkingLarageSpecification();
+	   setUnit();
+	   setWorkingUnitPrice();
+	   setExecutionUnitPrice();
+	   //金額も計算
+	   calcTotalPrice();
+	   obj = document.getElementById("construction_type").value;
+	   if (obj == "0") {
+	     //歩掛りをマスターからセット
+	     //add170223 配管配線・機器取付の集計は除く
+		 setLaborProductivityUnit();
+		 setLaborProductivityUnitTotal();
+	   }
+     });
+     //単位--select2のタブインデックスはここで指定。
+	 $(".searchableSelect2_4").select2({ theme: "bootstrap"}).on("load", function(e) { 
+        $(this).prop('tabindex',7)}).trigger('load');
+     $( ".searchableSelect2_4" ).on("select2:close", function (e) {
+       nextControlSelect2(this);
+     });
+	 $( ".searchableSelect2_4" ).change(function(e) {
+         setWorkingUnitName();
+	 });
+	 
+  
+     //１つチェックがあれば、他のチェックを外す処理
+	 $('.piping_wiring_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.equipment_mounting_flag').prop("checked",false);
+		$('.labor_cost_flag').prop("checked",false);
+       }
+     });
+     $('.equipment_mounting_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.piping_wiring_flag').prop("checked",false);
+		$('.labor_cost_flag').prop("checked",false);
+       }
+     });
+	 $('.labor_cost_flag').on('change', function(){
+       if ($(this).is(':checked')) {
+	    $('.piping_wiring_flag').prop("checked",false);
+		$('.equipment_mounting_flag').prop("checked",false);
+       }
+     });
+	 //add end
+  });
+  
+  
+   //実行→見積数量の自動変更
+  function changeQuantity(flag)
+  {  
+     //upd170524
+	 if (flag==0){
+	   document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
+     }
+     //金額も計算
+     calcTotalPrice();
+
+     //if (document.getElementById("quantity").value > 0 && document.getElementById("execution_quantity").value == "" ) {
+     //  document.getElementById("execution_quantity").value = document.getElementById("quantity").value;
+     //}
+	 
+  } 
+  
+  //単位のセット
+  function setUnit(){
+      $.get("<%= quotation_detail_large_classificationz_working_unit_id_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+		  //単位名もセット
+		  setWorkingUnitName();
+        }
+      );       
+  }
+  //見積単価のセット
+  function setWorkingUnitPrice(){
+	  $.get("<%= quotation_detail_large_classificationz_working_unit_price_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("working_unit_price").textContent;
+          document.getElementById("working_unit_price").value = obj;
+		  
+		  calcTotalPrice();
+		  }
+      ); 
+  }    
+  //実行単価のセット
+  function setExecutionUnitPrice(){
+      $.get("<%= quotation_detail_large_classificationz_execution_unit_price_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("execution_unit_price").textContent;
+          document.getElementById("execution_unit_price").value = obj;
+		  
+		  calcTotalPrice();
+		  //debugger;
+		  }
+      );
+  }
+  
+  //歩掛りのセット
+  function setLaborProductivityUnit(){
+      $.get("<%= quotation_detail_large_classificationz_labor_productivity_unit_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("labor_productivity_unit").textContent;
+          document.getElementById("labor_productivity_unit").value = obj;
+		  }
+      );      
+  }
+  //歩掛り計のセット
+  function setLaborProductivityUnitTotal(){
+	  $.get("<%= quotation_detail_large_classificationz_labor_productivity_unit_total_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("labor_productivity_unit_total").textContent;
+          document.getElementById("labor_productivity_unit_total").value = obj;
+		  }
+      );      
+  }
+  
+  //add170223
+  //upd170308
+  //歩掛りのセット(配管集計時)
+  function setLaborType(){
+    //obj = document.getElementById("construction_type").value;
+    obj = parseInt(document.getElementById("construction_type").value);
+	
+    switch (obj){
+      case INDEX_SUBTOTAL:
+      //小計
+	    //アイテム名は自動でセットする。
+	    $(".searchableSelect2_2").val(ID_SUBTOTAL).trigger("change");
+		$(".searchableSelect2_3").val(ID_SUBTOTAL).trigger("change");
+        quotation_header_history_id = document.getElementById("quotation_header_history_id").value;
+		line_number = document.getElementById("line_number").value;
+	    $.get("<%= quotation_breakdown_historiez_subtotal_select_path %>",{quotation_header_history_id: quotation_header_history_id, line_number: line_number}, 
+		  function(data){
+	        //小計へセット
+            //  見積金額
+            obj = document.getElementById("quote_price").textContent;
+            document.getElementById("quote_price").value = obj;
+            //  実行金額
+            obj = document.getElementById("execution_price").textContent;
+            document.getElementById("execution_price").value = obj;
+            //  歩掛計
+            obj = document.getElementById("labor_productivity_unit_total").textContent;
+            document.getElementById("labor_productivity_unit_total").value = obj;
+            
+		    }
+	    );
+        break;
+	  case INDEX_DISCOUNT:
+	  //値引き
+	    //アイテム名は自動でセットする。
+	    $(".searchableSelect2_2").val(ID_DISCOUNT).trigger("change");
+		$(".searchableSelect2_3").val(ID_DISCOUNT).trigger("change");
+	    break;
+      //case "1":
+	  case INDEX_PIPING_WIRING_CONSTRUCTION:
+      //配管配線工事
+        //アイテム名は自動でセットする。
+        //”配管配線工事”のiDに切り替える。
+        $(".searchableSelect2_2").val(ID_PIPING_WIRING_CONSTRUCTION).trigger("change");
+		$(".searchableSelect2_3").val(ID_PIPING_WIRING_CONSTRUCTION).trigger("change");
+        //配管配線チェック済みのものから歩掛りを集計する。
+        quotation_header_history_id = document.getElementById("quotation_header_history_id").value;
+        $.get("<%= quotation_breakdown_historiez_LPU_piping_wiring_select_path %>",{quotation_header_history_id: quotation_header_history_id}, 
+          function(data){
+            setLaborUnit();
+            }
+        );
+        break;
+      case INDEX_EQUIPMENT_MOUNTING:
+      //機器取付
+        //アイテム名は自動でセットする。
+        $(".searchableSelect2_2").val(ID_EQUIPMENT_MOUNTING).trigger("change");
+        $(".searchableSelect2_3").val(ID_EQUIPMENT_MOUNTING).trigger("change");
+        //機器取付チェック済みのものから歩掛りを集計する。
+        quotation_header_history_id = document.getElementById("quotation_header_history_id").value;
+        $.get("<%= quotation_breakdown_historiez_LPU_equipment_mounting_select_path %>",{quotation_header_history_id: quotation_header_history_id}, 
+		  function(data){
+	        setLaborUnit();
+		    }
+	    );
+	    break;
+	  case INDEX_LABOR_COST:
+	    //アイテム名は自動でセットする。
+		$(".searchableSelect2_2").val(ID_LABOR_COST).trigger("change");
+		$(".searchableSelect2_3").val(ID_LABOR_COST).trigger("change");
+		
+	    //労務費チェック済みのものから歩掛りを集計する。
+		quotation_header_history_id = document.getElementById("quotation_header_history_id").value;
+	    $.get("<%= quotation_breakdown_historiez_LPU_labor_cost_select_path %>",{quotation_header_history_id: quotation_header_history_id}, 
+		  function(data){
+	          setLaborUnit();
+		    }
+	    );
+		break;
+     }
+  }
+  function setLaborUnit(){
+  //合計値をセットする
+      //del170306
+      //歩掛りへセット
+	  //obj = document.getElementById("labor_productivity_unit").textContent;
+      //document.getElementById("labor_productivity_unit").value = obj;
+	  //歩掛り計へセット
+      obj = document.getElementById("labor_productivity_unit_total").textContent;
+      document.getElementById("labor_productivity_unit_total").value = obj;
+  }
+  //add end 
+  
+  
+  //項目名のセット
+  function setWorkingLargeItemName()
+  {  
+   
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+	 
+	 $.get("<%= quotation_detail_large_classificationz_working_large_item_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("working_large_item_name").textContent;
+          document.getElementById("working_large_item_name").value = obj;
+		  }
+      );
+   };  
+  //仕様のセット
+  function setWorkingLarageSpecification()
+  {  
+    obj = document.getElementById("working_large_item_id");
+     working_large_item_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_large_specification_select_path %>",
+       {id: working_large_item_id },
+        function(data){
+          obj = document.getElementById("working_large_specification").textContent;
+          document.getElementById("working_large_specification").value = obj;
+		  }
+      );
+   };  
+   //単位名のセット
+  function setWorkingUnitName()
+  {  
+    obj = document.getElementById("working_unit_id");
+     working_unit_id = parseInt(obj.value);
+     $.get("<%= quotation_detail_large_classificationz_working_unit_name_select_path %>",
+       {id: working_unit_id },
+        function(data){
+		  //debugger;
+          obj = document.getElementById("working_unit_name").textContent;
+          document.getElementById("working_unit_name").value = obj;
+		  }
+      );
+   };  
+   
+  //歩掛り計を求める
+  function calcLaborTotal()
+  {
+      //upd170306
+	  //種別が通常の場合のみ処理
+      var obj = document.getElementById("construction_type");
+      if (obj.value == "0"){
+        var obj1 = document.getElementById("execution_quantity");
+        var obj2 = document.getElementById("labor_productivity_unit");
+        //実数＊歩掛
+	    if (obj1.value > 0 && obj2.value >0) {
+	      var num = (obj1.value * obj2.value)
+	      num = num * 1000;
+	      num = Math.round(num);
+	      num = num / 1000;
+	      document.getElementById("labor_productivity_unit_total").value = num;
+	    }
+	  }
+      //upd170306
+	  
+  }
+  
+   //区分が仕様を選択した時　　
+   function setWhenSpecification(f)
+   {
+          obj = document.getElementById("quotation_items_division_id");
+          index = obj.selectedIndex;
+          if (index == 1){
+             //数量を０にセット
+             obj2 = document.getElementById("quantity");
+             obj2.value = 0;
+			 
+			 //実行数量も０にセット
+             obj3 = document.getElementById("execution_quantity");
+             obj3.value = 0;
+
+             //単位をデフォ(１)にセット
+             $(".searchableSelect2_4").select2("val","1");
+          }
+   }
+   //見積・実行金額計算
+  function calcTotalPrice()
+  {
+    var obj1 = document.getElementById("quantity"); 
+    var obj2 = document.getElementById("execution_quantity");  
+    
+	//見積金額計算
+    var obj3 = document.getElementById("working_unit_price");      
+    if (obj3.value > 0){ 
+      var num = parseInt(obj1.value) * parseInt(obj3.value);
+      document.getElementById("quote_price").value = num;
+    };
+    //実行金額計算(仮)
+    var obj3 = document.getElementById("execution_unit_price");
+   
+    if (obj3.value > 0){ 
+      //var num = parseInt(obj1.value) * parseInt(obj3.value);
+      if (obj2.value > 0){
+        var num = parseInt(obj2.value) * parseInt(obj3.value);
+        document.getElementById("execution_price").value = num;
+      } 
+    }
+	
+	//歩掛りも計算
+	calcLaborTotal();
+  } 
+   
+  //ENTER→TABキーに変換する処理。
+  //modalの場合は、共通化ができない（なぜか）
+  $('[tabindex]').keydown(function (e) {
+    if (e.keyCode == 13 || e.keyCode == 9) {
+        var tabindex = parseInt($(this).attr('tabindex'));
+        $('[tabindex='+(tabindex+1)+']').focus();
+    
+	    return false;
+	}
+    
+  });
+  //次のタブへコントロールを移す（select2用)
+  //modalの場合は、共通化ができない（なぜか）
+  function nextControlSelect2(obj){
+    nextIndex = obj.tabIndex + 1;
+    $('[tabindex=' + nextIndex + ']').focus();
+  }
+
+
+</script>

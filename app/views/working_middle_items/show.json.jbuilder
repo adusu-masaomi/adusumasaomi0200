@@ -1,0 +1,1 @@
+json.partial! "working_middle_items/working_middle_item", working_middle_item: @working_middle_item

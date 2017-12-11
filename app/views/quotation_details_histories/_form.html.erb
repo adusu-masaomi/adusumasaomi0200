@@ -1,0 +1,48 @@
+<%= simple_form_for @quotation_details_history, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :quotation_header_history_id %>
+  <%= error_span(@quotation_details_history[:quotation_header_history_id]) %>
+  <%= f.input :quotation_breakdown_history_id %>
+  <%= error_span(@quotation_details_history[:quotation_breakdown_history_id]) %>
+  <%= f.input :working_middle_item_id %>
+  <%= error_span(@quotation_details_history[:working_middle_item_id]) %>
+  <%= f.input :working_middle_item_name %>
+  <%= error_span(@quotation_details_history[:working_middle_item_name]) %>
+  <%= f.input :working_middle_item_short_name %>
+  <%= error_span(@quotation_details_history[:working_middle_item_short_name]) %>
+  <%= f.input :line_number %>
+  <%= error_span(@quotation_details_history[:line_number]) %>
+  <%= f.input :working_middle_specification %>
+  <%= error_span(@quotation_details_history[:working_middle_specification]) %>
+  <%= f.input :quantity %>
+  <%= error_span(@quotation_details_history[:quantity]) %>
+  <%= f.input :execution_quantity %>
+  <%= error_span(@quotation_details_history[:execution_quantity]) %>
+  <%= f.input :working_unit_id %>
+  <%= error_span(@quotation_details_history[:working_unit_id]) %>
+  <%= f.input :working_unit_price %>
+  <%= error_span(@quotation_details_history[:working_unit_price]) %>
+  <%= f.input :quote_price %>
+  <%= error_span(@quotation_details_history[:quote_price]) %>
+  <%= f.input :execution_unit_price %>
+  <%= error_span(@quotation_details_history[:execution_unit_price]) %>
+  <%= f.input :execution_price %>
+  <%= error_span(@quotation_details_history[:execution_price]) %>
+  <%= f.input :labor_productivity_unit %>
+  <%= error_span(@quotation_details_history[:labor_productivity_unit]) %>
+  <%= f.input :labor_productivity_unit_total %>
+  <%= error_span(@quotation_details_history[:labor_productivity_unit_total]) %>
+  <%= f.input :remarks %>
+  <%= error_span(@quotation_details_history[:remarks]) %>
+  <%= f.input :construction_type %>
+  <%= error_span(@quotation_details_history[:construction_type]) %>
+  <%= f.input :piping_wiring_flag %>
+  <%= error_span(@quotation_details_history[:piping_wiring_flag]) %>
+  <%= f.input :equipment_mounting_flag %>
+  <%= error_span(@quotation_details_history[:equipment_mounting_flag]) %>
+  <%= f.input :labor_cost_flag %>
+  <%= error_span(@quotation_details_history[:labor_cost_flag]) %>
+
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_details_histories_path, :class => 'btn btn-default' %>
+<% end %>

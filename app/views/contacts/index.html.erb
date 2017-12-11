@@ -1,0 +1,85 @@
+<%- model_class = Contact -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @contacts %>
+  <!-- kaminari用追加箇所終了 -->
+  
+   <%= search_form_for @q do |f| %>
+   <%= f.label :name, '　担当者名(キーワード)：' %>
+   <%= f.text_field :name_cont, include_blank: true , id: 'name' %>
+   
+   <%= f.label :company_name, '　会社名(キーワード)：' %>
+   <%= f.text_field :company_name_cont, include_blank: true , id: 'company_name' %>
+     <div>
+        <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_contact_path,
+            :class => 'btn btn-primary' %>
+
+     </div>
+   <% end %>
+
+ 
+   
+</div>
+
+
+
+<table class="table table-striped", style="width:1280px">
+  <thead>
+    <tr>
+      <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+	  <th><%= model_class.human_attribute_name(:name) %></th>
+      <!--<th><%= model_class.human_attribute_name(:search_character) %></th>-->
+	  <th><%= sort_link(@q, :search_character, model_class.human_attribute_name(:search_character) ) %></th>
+      <th><%= model_class.human_attribute_name(:company_name) %></th>
+      <th><%= model_class.human_attribute_name(:affiliation) %></th>
+      <th><%= model_class.human_attribute_name(:department) %></th>
+      <th><%= model_class.human_attribute_name(:post) %></th>
+      <th><%= model_class.human_attribute_name(:address) %></th>
+      <th><%= model_class.human_attribute_name(:tel) %></th>
+      <th><%= model_class.human_attribute_name(:fax) %></th>
+      <th><%= model_class.human_attribute_name(:email) %></th>
+      <th><%= model_class.human_attribute_name(:url) %></th>
+      <th><%= model_class.human_attribute_name(:partner_division_id) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @contacts.each do |contact| %>
+      <tr>
+        <td><%= link_to contact.id, contact_path(contact) %></td>
+        <td><%= contact.name %></td>
+        <td><%= contact.search_character %></td>
+        <td><%= contact.company_name %></td>
+        <td><%= contact.affiliation %></td>
+        <td><%= contact.department %></td>
+        <td><%= contact.post %></td>
+        <td><%= contact.address %></td>
+        <td><%= contact.tel %></td>
+        <td><%= contact.fax %></td>
+        <td><%= contact.email %></td>
+        <td><%= contact.url %></td>
+        <td><%= Contact.partner_division[contact.partner_division_id][0] %></td>
+        <td><%=l contact.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_contact_path(contact), :class => 'btn btn-white_rsd btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      contact_path(contact),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+	<!-- kaminari用追加箇所開始 -->
+    <%= paginate @contacts %>
+    <!-- kaminari用追加箇所終了 -->
+  </tbody>
+</table>
+
+

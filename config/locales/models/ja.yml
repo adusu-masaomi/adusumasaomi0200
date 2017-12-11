@@ -1,0 +1,275 @@
+---
+ja:
+  attributes:
+    tel_main: 代表Tel
+    fax_main: 代表fax
+    email_main: 代表Email
+    responsible1: 担当者1
+    responsible2: 担当者2
+    responsible3: 担当者3
+    email1: 担当1Email
+    email2: 担当2Email
+    email3: 担当3Email
+    supplier_name: 仕入先名
+    supplier_material_code: 仕入先品番
+    material_id: 品番
+    material_master_id: 品番
+    supplier_id: 仕入業者
+    supplier_master_id: 仕入業者
+    material_code: 品番
+    material_name: 品名
+    maker_id: メーカー
+    quantity: 数量
+    list_price: 定価
+    notes: 備考
+    last_unit_price: 直近単価
+    last_unit_price_update_at: 直近単価更新日
+    unit_id: 単位
+    unit_master_id: 単位
+    purchase_order_date: 注文日
+    purchase_order_datum_id: 注文No
+    purchase_order_code: 注文No
+    construction_datum_id: 工事ID
+    construction_code: 工事コード
+    created_at: 登録日
+    customer_name: 得意先名
+    slip_code: 伝票番号
+    post: 郵便番号
+    address: 住所
+    closing_date: 締日
+    due_date: 支払日
+    maker_name: メーカー名
+    unit_name: 単位名
+    purchase_division_name: 仕入区分名
+    construction_code: 工事コード
+    construction_name: 工事名
+    alias_name: 通称
+    reception_date: 受付日
+    customer_id: 得意先ID
+    construction_start_date: 作業着工日
+    construction_end_date: 最終作業日
+    construction_period_start: 工期着工
+    construction_period_end: 工期完了
+    construction_detail: 工事内容
+    attention_matter: 留意事項
+    billed_flag: 請求済
+    working_safety_matter_name: 安全事項名
+    staff_name: 社員名
+    furigana: ふりがな
+    affiliation_id: 所属
+    hourly_wage: 時給
+    daily_pay: 日給
+    working_date: 作業日
+    staff_id: 社員
+    start_time_1: 開始時間1
+    end_time_1: 終了時間1
+    start_time_2: 開始時間2
+    end_time_2: 終了時間2
+    working_times: 勤務時間
+    man_month: 工数
+    labor_cost: 労務費
+    affiliation_name: 所属名
+    supplies_expense: 消耗品費
+    misellaneous_expense: 諸経費
+    constructing_amount: 請負金額
+    purchase_division_long_name: 仕入区分名(長)
+    name: ユーザー名
+    password: パスワード
+    password_confirmation: パスワード確認用
+    quotation_code: 見積書コード
+    invoice_code: 請求書コード
+    invoice_period_start_date: 請求書有効期間開始日
+    invoice_period_end_date: 請求書有効期間終了日
+    delivery_slip_code: 納品書コード
+    quotation_date: 見積書日付
+    construction_name: 工事名
+    construction_period: 工事期間
+    construction_place: 工事場所
+    trading_method: 取引方法
+    effective_period: 有効期間
+    quote_price: 見積金額
+    delivery_slip_price: 納品金額
+    execution_amount: 実行金額
+    net_amount: NET金額
+    quotation_items_division_id: 区分
+    quotation_header_id: 見積書見出ID
+    quotation_detail_large_classification_id: 見積書品目ID
+    quotation_large_item_id: 項目ID
+    quotation_middle_item_id: 品名ID
+    quotation_large_item_name: 項目名
+    working_large_item_name: 項目名
+    working_large_item_short_name: 記号
+    quotation_middle_item_name: 品名
+    working_middle_item_name: 品名
+    quotation_middle_item_short_name: 品目名(短縮)
+    working_middle_item_short_name: 記号
+    working_middle_item_category_id: カテゴリー
+    execution_quantity: 実行数量
+    execution_price: 実行金額
+    quotation_unit_id: 見積単位
+    labor_productivity_unit: 歩掛
+    labor_productivity_unit_total: 歩掛計
+    quotation_large_specification: 仕様
+    working_large_specification: 仕様
+    quotation_middle_specification: 仕様
+    working_middle_specification: 仕様
+    quotation_material_name: 使用材料名
+    working_material_name: 使用材料名
+    quotation_unit_price: 見積単価
+    working_unit_price: 単価
+    execution_unit_price: 実行単価
+    material_unit_price: 材料費
+    execution_material_unit_price: 実行材料費
+    material_cost_total: 材料費計
+    material_quantity: 使用材料数
+    labor_unit_price: 労務単価
+    execution_labor_unit_price: 実行労務単価
+    labor_cost_total: 労務費計
+    accessory_cost: 付属品等
+    other_cost: その他費用
+    quotation_unit_name: 見積単位名
+    line_number: 行    
+    invoice_code: 請求書コード
+    invoice_date: 請求書日付
+    payment_period: 支払期限
+    billing_amount: 請求金額
+    working_unit_id: 作業単位
+    working_unit_name: 作業単位名
+    remarks: 備考
+    latitude: 緯度
+    longitude: 経度
+    house_number: 番地
+    address2: 建物名
+       
+  activerecord:
+    models:
+       material_master: 資材マスター
+       purchase_datum: 仕入データ
+       purchase_order_datum: 注文Ｎｏデータ
+       purchase_order_history: 注文データ
+       supplier_master: 仕入先マスター
+       purchase_unit_price: 資材単価マスター
+       customer_master: 得意先マスター
+       maker_master: メーカーマスター
+       unit_master: 単位マスター
+       purchase_division: 仕入区分マスター
+       construction_datum: 工事データ
+       staff: 社員マスター
+       construction_daily_report: 労務データ
+       affiliation: 所属マスター
+       construction_cost: 工事費集計
+       working_safety_matter: 作業安全事項マスター
+       quotation_material_header: 資材見積データ
+       quotation_header: 見積書一覧データ
+       quotation_header_history: (過去分)見積書一覧データ
+       quotation_breakdown_history: (過去分)見積書内訳データ
+       quotation_details_history: (過去分)見積書明細データ
+       invoice_header: 請求書一覧データ
+       delivery_slip_header: 納品書一覧データ
+       delivery_slip_detail_large_classification: 納品書内訳データ
+       delivery_slip_detail_middle_classification: 納品書明細データ
+       quotation_detail_large_classification: 見積書内訳データ
+       quotation_detail_middle_classification: 見積書明細データ
+       invoice_detail_large_classification: 請求書内訳データ
+       invoice_detail_middle_classification: 請求書明細データ
+       quotation_large_item: 見積書内訳マスター
+       working_large_item: 作業内訳マスター
+       quotation_middle_item: 見積書明細マスター
+       working_middle_item: 作業明細マスター
+       working_specific_middle_item: 作業明細(固有)マスター
+       quotation_unit: 見積単位マスター
+       working_unit: 作業単位マスター
+       order: 注文データ
+       inventory_history: 入出庫データ
+       inventory: 在庫マスター
+       business_holiday: 会社休日マスター
+       stocktake: 棚卸データ
+       contact: 連絡先マスター
+       working_category: カテゴリーマスター
+    attributes:
+       delivery_slip_header:
+         delivery_slip_date: 納品日
+         delivery_amount: 納品金額
+       quotation_material_header:
+         requested_date: 依頼日
+         construction_datum_id: 工事
+         responsible: 担当者
+         email: Email
+       quotation_header_history:
+         issue_date: 作成日時
+       quotation_detail_large_classification:
+         working_unit_price: 単価
+       invoice_header:
+         deposit_amount: 入金金額
+         payment_method_id: 支払方法
+         commission: 手数料
+         payment_date: 入金日
+       invoice_detail_large_classification:
+         invoice_price: 請求金額
+       invoice_detail_middle_classification:
+         invoice_price: 請求金額
+       material_master:
+         standard_quantity: 標準数量
+         standard_labor_productivity_unit: 標準歩掛
+       working_large_item:
+         working_unit_price: 単価
+       construction_cost:
+         purchase_order_amount: 仕入明細
+         purchase_amount: 仕入金額合計
+         differense: 差額
+       construction_daily_report:
+         working_details: 作業内容
+       customer_master:
+         search_character: 検索文字
+       purchase_datum:
+         purchase_amount: 金額
+       purchase_unit_price:
+         unit_price: 仕入単価
+       inventory_history:
+         inventory_date: 入出庫日
+         unit_price: 単価
+         price: 金額
+         inventory_division_id: 入出庫区分
+         construction_name: 件名
+       inventory:
+         warehouse_id: 倉庫ID
+         location_id: ロケーションID
+         inventory_quantity: 在庫数
+         inventory_amount: 在庫金額
+         current_history_id: 現在履歴ID
+         current_warehousing_date: 現在入庫日
+         current_quantity: 現在在庫数
+         current_unit_price: 単価
+         next_history_id_1: 次回履歴ID
+         next_warehousing_date_1: 次回入庫日
+         next_quantity_1: 次回在庫数
+         next_unit_price_1: 次回単価
+         next_history_id_2: 次々回履歴ID
+         next_warehousing_date_2: 次々回入庫日
+         next_quantity_2: 次々回在庫数
+         next_unit_price_2: 次々回単価
+       business_holiday:
+         holiday_flag: 休日フラグ
+       stocktake:
+         stocktake_date: 棚卸日
+         physical_quantity: 実地数量
+         physical_amount: 実地金額
+         book_quantity: 帳簿数量
+         book_amount: 帳簿金額
+         unit_price: 単価
+       contact:
+         name: 氏名
+         search_character: 検索文字
+         company_name: 会社
+         affiliation: 所属
+         department: 役職
+         partner_division_id: 取引区分
+       working_category:
+         category_name: カテゴリー名
+    errors:
+      messages:
+        record_invalid: "バリデーションに失敗しました: %{errors}"
+        restrict_dependent_destroy:
+          has_one: "%{record}が存在しているので削除できません"
+          has_many: "%{record}が存在しているので削除できません"
+  

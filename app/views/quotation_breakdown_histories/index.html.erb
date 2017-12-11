@@ -1,0 +1,162 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+
+
+<%- model_class = QuotationBreakdownHistory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+  <!--検索フォームは必要ないと思われるので、省く-->
+  
+
+</div>
+<div style="width:1280px;">
+<%= link_to t('.new', :default => t("新規作成")),
+            new_quotation_breakdown_history_path(quotation_header_history_id: params[:quotation_header_history_id], new_flag: "1" , 
+                                     quotation_header_id: params[:quotation_header_id] , quotation_header_name: params[:quotation_header_name]), remote: true,
+            :class => 'btn btn-primary' %>
+<%= link_to "一覧へ",
+            quotation_header_histories_path(quotation_header_history_id: params[:quotation_header_history_id],quotation_header_id: params[:quotation_header_id]),
+            :class => 'btn btn-info' %>
+
+<%= link_to "見積書(提出用)PDF",
+            quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], print_type: "51", format: "pdf"),
+            :class => 'btn btn-green500_ftg' , :target=>["_blank"] %>
+<%= link_to "見積書(提出／印付)PDF",
+            quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], print_type: "52", format: "pdf"),
+            :class => 'btn btn-red500_ftg' , :target=>["_blank"], id: 'quotation_print_2' %>
+<%= link_to "見積書(控え)PDF",
+            quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], print_type: "53",  format: "pdf" ),
+            :class => 'btn btn btn-lime700_ftg' , :target=>["_blank"] %>
+
+<!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+
+<%= link_to "オリジナルデータへ上書きする",
+            quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], 
+            quotation_header_id: params[:quotation_header_id] , quotation_header_name: params[:quotation_header_name], 
+            data_type: "1" ),
+            :class => 'btn btn-purple600_rsd' , :data => {:confirm => 'オリジナルデータ（元データ）へ上書きします。本当によろしいですか？'}  %>
+			
+<!--履歴同士での、データ移行は行わないものとする。-->
+<!--<%= link_to "請求書データ作成",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_history_id: params[:quotation_header_history_id], 
+            quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
+            data_type: "1" ),
+            :class => 'btn btn-default' , :data => {:confirm => '請求書データを作成しますか？'}  %>
+<%= link_to "納品書データ作成",
+            quotation_detail_large_classifications_path($quotation_detail_large_classifications, quotation_header_history_id: params[:quotation_header_history_id],
+            quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
+            data_type: "2" ),
+            :class => 'btn btn-warning' , :data => {:confirm => '納品書データを作成しますか？'} %>-->
+
+
+</br>
+<font size="3";><b>
+<%= "件名:" %>
+<%= @quotation_header_name %>
+</b></font>
+</br>
+
+<td>見積金額合計:<%=number_to_currency(@quotation_breakdown_histories.sumpriceQuote,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_breakdown_histories.sumpriceExecution,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @quotation_breakdown_histories.sumLaborProductivityUnitTotal.to_s + "人" %>
+</td>
+</div>
+
+<div id="quotation_breakdown_history-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
+  
+  <thead>
+    <tr>
+      <th style="width:80px;"></th>
+	  <th style="width:35px;"><%= model_class.human_attribute_name(:id) %></th>
+      <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_item_name) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_large_specification) %></th>
+      <th align="right" , style="width:50px;">　数量</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 見積単価</th>
+	  <th style="width:110px;">　 見積金額</th>
+      <th style="width:50px;">　実数</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 実行単価</th>
+      <th style="width:110px;">　 実行金額</th>
+      <th style="width:80px;">　　　 歩掛</th>
+	  <th style="width:80px;">　　 歩掛計</th>
+      <th style="width:20px;">配</th>
+      <th style="width:20px;">機</th>
+      <th style="width:20px;">労</th>
+	  <th style="width:250px;"><%= model_class.human_attribute_name(:remarks) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody class="quotation_breakdown_history-index">
+    <%= render "index" %>
+  </tbody>
+  </table>
+  </div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableQuotationCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableLargeItem").select2({ theme: "classic" });
+     //見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	 if (sz != 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        fc = 1;  //固定列数
+		//ht -= 70;
+		ht -= 108;
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
+	 
+	 $( "#tablefix tbody" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 quotation_header_history_id = document.getElementById("quotation_header_history_id").innerText;
+		 
+         $.post("<%= quotation_breakdown_historiez_reorder_path %>",
+           { row: row, ajax_quotation_header_history_id: quotation_header_history_id },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	   },
+	   //update: function( event, ui ) {
+       //  quotation_header_history_id = document.getElementById("quotation_header_history_id").innerText;
+		 //↓本来ならここでIDを直接取れるが、使用しないためコメントアウトする。
+		 //id = ui.item.attr("id");
+	   //},
+	       
+    });
+    $( ".sortable" ).disableSelection();
+	 
+	 
+  });
+  
+  
+ 
+  
+</script>
+

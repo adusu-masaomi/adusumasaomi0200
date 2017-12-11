@@ -1,0 +1,2 @@
+json.extract! inventory, :id, :warehouse_id, :location_id, :material_master_id, :inventory_quantity, :inventory_amount, :unit_price_1, :unit_price_2, :unit_price_3, :created_at, :updated_at
+json.url inventory_url(inventory, format: :json)

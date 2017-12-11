@@ -1,0 +1,54 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Quotation material header:</strong>
+  <%= @quotation_material_detail.quotation_material_header_id %>
+</p>
+
+<p>
+  <strong>Material:</strong>
+  <%= @quotation_material_detail.material_id %>
+</p>
+
+<p>
+  <strong>Material code:</strong>
+  <%= @quotation_material_detail.material_code %>
+</p>
+
+<p>
+  <strong>Material name:</strong>
+  <%= @quotation_material_detail.material_name %>
+</p>
+
+<p>
+  <strong>Maker:</strong>
+  <%= @quotation_material_detail.maker_id %>
+</p>
+
+<p>
+  <strong>Maker name:</strong>
+  <%= @quotation_material_detail.maker_name %>
+</p>
+
+<p>
+  <strong>Quantity:</strong>
+  <%= @quotation_material_detail.quantity %>
+</p>
+
+<p>
+  <strong>Unit master:</strong>
+  <%= @quotation_material_detail.unit_master_id %>
+</p>
+
+<p>
+  <strong>List price:</strong>
+  <%= @quotation_material_detail.list_price %>
+</p>
+
+<p>
+  <strong>Mail sent flag:</strong>
+  <%= @quotation_material_detail.mail_sent_flag %>
+</p>
+
+<%= link_to 'Edit', edit_quotation_material_detail_path(@quotation_material_detail) %> |
+<%= link_to 'Back', quotation_material_details_path %>

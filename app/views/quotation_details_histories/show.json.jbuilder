@@ -1,0 +1,1 @@
+json.partial! "quotation_details_histories/quotation_details_history", quotation_details_history: @quotation_details_history

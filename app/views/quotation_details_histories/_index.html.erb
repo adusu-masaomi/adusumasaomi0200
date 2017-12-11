@@ -1,0 +1,94 @@
+ <% @quotation_details_histories.order("quotation_header_history_id desc, quotation_breakdown_history_id asc, line_number desc").each do |quotation_details_history| %>
+      <tr id="<%= quotation_details_history.id%>" >
+        <!--upd170308-->
+        <!--条件によって色を変える処理-->
+        <!--種別順の変更時はここも変更する-->
+        <% case quotation_details_history.construction_type %>
+        <% when $INDEX_SUBTOTAL  %>
+        <!--小計-->
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_DISCOUNT  %>
+        <!--値引-->
+          <% color = "green" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_PIPING_WIRING_CONSTRUCTION  %>
+          <% color = "red" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_EUIPMENT_MOUNTING  %>
+          <% color = "blue" %>
+          <% bold = "font-weight:bold" %> 
+		<% when $INDEX_LABOR_COST  %>
+		  <% color = "brown"%>
+		  <% bold = "font-weight:bold" %> 
+		<% else %>
+		  <% color = "black"%>
+		<% end %>
+		<!--add end-->
+		
+		<!--jsパラメータ用に隠しIDをセット-->
+		<td id="quotation_header_history_id", style="display:none;"><%= quotation_details_history.quotation_header_history_id %></td>
+		<td id="quotation_breakdown_history_id", style="display:none;"><%= quotation_details_history.quotation_breakdown_history_id %></td>
+        <!---->
+        <!--<td style="font-size : 8px;"><%= link_to quotation_details_history.id, quotation_details_history_path(quotation_details_history) %></td>-->
+        <!--IDからshow画面への遷移はしない-->
+        <td style="font-size : 8px;"><%= quotation_details_history.id %></td>
+        <td><%= quotation_details_history.line_number %></td>
+        <!--upd170223-->
+        <td style = <%= bold %> ><font color = <%= color %>  ><%= quotation_details_history.working_middle_item_name %></font></td>
+        <!--upd end-->
+        <td><%= quotation_details_history.working_middle_specification %></td>
+        <td align="right"><%= quotation_details_history.quantity %></td>
+        <% if quotation_details_history.working_unit_name != "<手入力>" %>
+          <td align="center"><%= quotation_details_history.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
+        <td align="right"><%= number_to_currency(quotation_details_history.working_unit_price,  precision: 0) %></td>
+        <!--upd170308-->
+		<% if quotation_details_history.quote_price.present? && quotation_details_history.quote_price.delete("^0-9").to_i > 0 %>
+          <td align="right" style = <%= bold %> ><%= number_to_currency(quotation_details_history.quote_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right" style = <%= bold %> ><%= quotation_details_history.quote_price %></td>
+        <% end %>
+        <td align="right"><%= quotation_details_history.execution_quantity %></td>
+        <% if quotation_details_history.working_unit_name != "<手入力>" %>
+          <td align="center"><%= quotation_details_history.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
+        <td align="right"><%= number_to_currency(quotation_details_history.execution_unit_price,  precision: 0) %></td>
+        <!--upd170308-->
+        <% if quotation_details_history.execution_price.present? && quotation_details_history.execution_price.delete("^0-9").to_i > 0 %>
+          <td align="right" style = <%= bold %> ><%= number_to_currency(quotation_details_history.execution_price,  precision: 0) %></td> 
+        <% else %>
+          <td align="right" style = <%= bold %> ><%= quotation_details_history.execution_price %></td>
+        <% end %>
+        <td align="right" style = <%= bold %> ><font color = <%= color %>  >
+        <%= number_with_precision(quotation_details_history.labor_productivity_unit, precision: 3) %></font></td>
+        <td align="right" style = <%= bold %> ><font color = <%= color %>  >
+        <%= number_with_precision(quotation_details_history.labor_productivity_unit_total, precision: 3) %></font></td>
+        <td><%= check_box("piping_wiring_flag", "active", {checked: check_if_true(quotation_details_history.piping_wiring_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("equipment_mounting_flag", "active", {checked: check_if_true(quotation_details_history.equipment_mounting_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("labor_cost_flag", "active", {checked: check_if_true(quotation_details_history.labor_cost_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= quotation_details_history.remarks %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_quotation_details_history_path(quotation_details_history, quotation_header_history_id: params[:quotation_header_history_id] ,
+					                             quotation_breakdown_history_id: quotation_details_history.quotation_breakdown_history_id, 
+                                                 quotation_header_id: params[:quotation_header_id] , quotation_header_name: params[:quotation_header_name], 
+												 working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ), 
+                                                  :class => 'btn btn-white_rsd btn-xs', remote: true %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      quotation_details_history_path(quotation_details_history, quotation_header_history_id: quotation_details_history.quotation_header_history_id,
+                                quotation_breakdown_history_id: quotation_details_history.quotation_breakdown_history_id, 
+                                quotation_header_id: params[:quotation_header_id] , quotation_header_name: params[:quotation_header_name],
+                                working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>

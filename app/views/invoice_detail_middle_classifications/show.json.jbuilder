@@ -1,0 +1,1 @@
+json.partial! "quotation_detail_middle_classifications/quotation_detail_middle_classification", quotation_detail_middle_classification: @quotation_detail_middle_classification

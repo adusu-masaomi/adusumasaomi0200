@@ -1,0 +1,31 @@
+<%- model_class = Stocktake -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:stocktake_date) %>:</strong></dt>
+  <dd><%= @stocktake.stocktake_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:material_code) %>:</strong></dt>
+  <dd><%= @stocktake.material_master.material_code %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:material_name) %>:</strong></dt>
+  <dd><%= @stocktake.material_master.material_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:physical_quantity) %>:</strong></dt>
+  <dd><%= @stocktake.physical_quantity %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:unit_price) %>:</strong></dt>
+  <dd><%= @stocktake.unit_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:physical_amount) %>:</strong></dt>
+  <dd><%= @stocktake.physical_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:book_quantity) %>:</strong></dt>
+  <dd><%= @stocktake.book_quantity %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              stocktakes_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_stocktake_path(@stocktake), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              stocktake_path(@stocktake),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

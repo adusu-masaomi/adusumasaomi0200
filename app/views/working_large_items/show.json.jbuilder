@@ -1,0 +1,1 @@
+json.partial! "working_large_items/working_large_item", working_large_item: @working_large_item

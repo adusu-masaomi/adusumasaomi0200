@@ -1,0 +1,31 @@
+<%- model_class = WorkingLargeItem -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_name) %>:</strong></dt>
+  <dd><%= @working_large_item.working_large_item_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_specification) %>:</strong></dt>
+  <dd><%= @working_large_item.working_large_specification %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_id) %>:</strong></dt>
+  <dd><%= @working_large_item.working_unit_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_price) %>:</strong></dt>
+  <dd><%= @working_large_item.working_unit_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_unit_price) %>:</strong></dt>
+  <dd><%= @working_large_item.execution_unit_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_productivity_unit) %>:</strong></dt>
+  <dd><%= @working_large_item.labor_productivity_unit %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_productivity_unit_total) %>:</strong></dt>
+  <dd><%= @working_large_item.labor_productivity_unit_total %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              working_large_items_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_working_large_item_path(@working_large_item), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              working_large_item_path(@working_large_item),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

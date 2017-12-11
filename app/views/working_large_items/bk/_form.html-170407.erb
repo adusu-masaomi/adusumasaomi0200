@@ -1,0 +1,36 @@
+<%= simple_form_for @working_large_item, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :working_large_item_name, input_html:{:tabindex=> "0"} %>
+  <%= f.input :working_large_specification, input_html:{:tabindex=> "1"} %>
+  <!--<%= f.input :working_unit_id %>-->
+  <%= f.label :"単位" , {} %></br>
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, 
+  {:prompt => 'どれか一つを選択して下さい', :selected => @working_large_item.working_unit_id || 2 } , 
+  {id:'working_unit_id', :class => "searchableWorkingUnit",  style: 'width:120px', :tabindex=> "2" } %></br>
+  
+  <%= f.input :working_unit_price, input_html:{:tabindex=> "3"} %>
+  <%= f.input :execution_unit_price, input_html:{:tabindex=> "4"} %>
+  <%= f.input :labor_productivity_unit, input_html:{:tabindex=> "5"} %>
+  <%= f.input :labor_productivity_unit_total, input_html:{:tabindex=> "6"} %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_large_items_path, :class => 'btn btn-default' %>
+<% end %>
+
+
+<script type="text/javascript">
+
+   var item_index = 0;
+
+   //$(document).ready(function(){
+   $(document).on('ready page:load', function(){
+     
+     $(".searchableWorkingUnit").select2({ theme: "bootstrap" });
+   
+   });
+   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+   $( ".searchableWorkingUnit" ).on("select2:close", function (e) {
+     $('[tabindex=3]').focus();
+   });
+	  
+</script>

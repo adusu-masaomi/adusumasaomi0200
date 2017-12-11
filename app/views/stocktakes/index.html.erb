@@ -1,0 +1,115 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = Stocktake -%>
+<div class="page-header", style="width:1920px">
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @stocktakes %>
+  <!-- kaminari用追加箇所終了 -->
+  <%= search_form_for @q, :html => {:style=> 'width:1920px' } do |f| %>
+    <%= f.label :stocktake_date, '棚卸日' %>
+    <%= f.text_field :stocktake_date_gteq, class:"input-append date datepicker", include_blank: true ,  
+              id: 'stocktake_date_start'   %>
+	<%= f.label :stocktake_date, '〜' %>
+    <%= f.text_field :stocktake_date_lteq, class:"input-append date datepicker", include_blank: true ,  
+              id: 'stocktake_date_end'   %>
+			  
+    <div>
+      <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_stocktake_path,
+            :class => 'btn btn-primary' %>
+      <%= link_to "棚卸表",
+            stocktakes_path(@stocktake, format: "pdf", :print_flag => "1" ),
+            :class => 'btn btn-info' , :target=>["_blank"] %>
+	    <%= link_to "在庫データ一括更新",
+            stocktakes_path(update_flag: "1" ),
+            :class => 'btn btn-warning' , :data => {:confirm => "在庫データが一括更新されます！！\n本当に実行しますか？？"} %>
+	  
+	  
+	  <!--<%= f.button_tag "在庫データ一括更新", :type => 'button', :class => "btn btn-warning", 
+               id: "mail_sent_button", :onclick => "submitAfterValidation()" %>-->
+	  <!--%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>-->
+	  <!--<%= link_to t('.new', :default => "在庫データ一括更新"),
+            new_stocktake_path,
+            :class => 'btn btn-warning' %>-->
+    </div>
+  <% end %>
+  <!-- kaminari用追加箇所開始 -->
+  <%= paginate @stocktakes %>
+  <!-- kaminari用追加箇所終了 --> 
+   
+</div>
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : 0px;", class="span11 table-scrollable" >
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <!--見出し固定用設定追加-->
+ <!--<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;">-->
+ <!--テスト用-->
+ <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1280px;">
+ 
+
+<!--<table class="table table-striped">-->
+  <thead>
+    <tr>
+      <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th><%= model_class.human_attribute_name(:stocktake_date) %></th>
+      <th><%= model_class.human_attribute_name(:material_code) %></th>
+	  <th><%= model_class.human_attribute_name(:material_name) %></th>
+      <th><%= model_class.human_attribute_name(:physical_quantity) %></th>
+      <th><%= model_class.human_attribute_name(:unit_price) %></th>
+	  <th><%= model_class.human_attribute_name(:unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:physical_amount) %></th>
+      <th><%= model_class.human_attribute_name(:book_quantity) %></th>
+      <th>差異</th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stocktakes.order("id desc").each do |stocktake| %>
+      <tr>
+        <td><%= link_to stocktake.id, stocktake_path(stocktake) %></td>
+        <td><%= stocktake.stocktake_date %></td>
+        <td><%= stocktake.material_master.material_code %></td>
+        <td><%= stocktake.material_master.material_name %></td>
+        <td><%= stocktake.physical_quantity %></td>
+        <td><%= stocktake.unit_price %></td>
+        <% if stocktake.inventory.present? %>
+          <td><%= stocktake.inventory.unit_master.unit_name %></td>
+        <% else %>
+          <td>-</td>
+		<% end %>
+        <td><%= stocktake.physical_amount %></td>
+        <td><%= stocktake.book_quantity %></td>
+        <td><%= stocktake.physical_quantity - stocktake.book_quantity %></td>
+		
+        <td><%=l stocktake.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_stocktake_path(stocktake), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      stocktake_path(stocktake),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+ 
+ //入力チェック後の、更新処理
+ function submitAfterValidation() {
+   if (window.confirm('在庫データが一括更新されます！！\n本当に実行しますか？')) {
+	 document.forms[0].submit();
+   }
+ }
+ 
+</script>

@@ -1,0 +1,1 @@
+json.array! @working_units, partial: 'working_units/working_unit', as: :working_unit

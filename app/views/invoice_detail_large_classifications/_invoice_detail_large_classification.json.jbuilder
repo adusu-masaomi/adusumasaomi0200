@@ -1,0 +1,2 @@
+json.extract! invoice_detail_large_classification, :id, :invoice_header_id, :invoice_items_division_id, :invoice_large_item_id, :invoice_large_item_name, :invoice_large_specification, :line_number, :quantity, :execution_quantity, :quotation_unit_id, :quotation_unit_name, :invoice_unit_price, :invoice_price, :exectuion_unit_price, :execution_price, :labor_productivity_unit, :labor_productivity_unit_total, :last_line_number, :created_at, :updated_at
+json.url invoice_detail_large_classification_url(invoice_detail_large_classification, format: :json)

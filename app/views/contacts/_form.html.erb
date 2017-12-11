@@ -1,0 +1,32 @@
+<%= simple_form_for @contact, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :name, input_html:{ :tabindex=>"0"} %>
+  <%= f.input :search_character, hint: "最低１文字(句読点なし)をひらがなで入力してください。" ,input_html:{ :tabindex=>"1"} %>
+  <%= f.input :company_name, input_html:{ :tabindex=>"2"} %>
+  <%= f.input :affiliation, input_html:{ :tabindex=>"3"} %>
+  <%= f.input :department, input_html:{ :tabindex=>"4"} %>
+  <%= f.input :post, input_html:{ :tabindex=>"5"} %>
+  <%= f.input :address, input_html:{ :tabindex=>"6"} %>
+  <%= f.input :tel, input_html:{ :tabindex=>"7"} %>
+  <%= f.input :fax, input_html:{ :tabindex=>"8"} %>
+  <%= f.input :email, input_html:{ :tabindex=>"9"} %>
+  <%= f.input :url, input_html:{ :tabindex=>"10"} %>
+  <!--<%= f.input :partner_division_id %>-->
+  <%= f.label :取引先区分, {:class => "my-custom-class-l"}  %></br>
+  <%= f.select :partner_division_id, Contact.partner_division, {}, 
+       {id:'searchableSelect2_1', :class => "my-custom-class", style: 'width:120px;margin-left:-10px;font-size:16px;', :tabindex=>"11" } %></br></br>
+
+  <%= f.button :submit, :class => 'btn-primary', :tabindex => "12" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                contacts_path, :class => 'btn btn-white_rsd' %>
+<% end %>
+
+<script type="text/javascript">
+   
+   $(document).on('ready page:load', function(){
+     $(".searchableSelect2_1").select2({ theme: "bootstrap" });
+	 //select2のタブインデックスはここで指定する
+	 //$(".searchableSelect2_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+     //   $(this).prop('tabindex',1)}).trigger('load');
+   });
+   
+</script>

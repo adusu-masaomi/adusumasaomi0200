@@ -1,0 +1,1 @@
+json.array! @business_holidays, partial: 'business_holidays/business_holiday', as: :business_holiday

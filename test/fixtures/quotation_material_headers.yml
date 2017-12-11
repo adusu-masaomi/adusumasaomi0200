@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_code: MyString
+  requested_date: 2017-09-04
+  construction_datum_id: 1
+  supplier_master_id: 1
+  responsible: MyString
+
+two:
+  quotation_code: MyString
+  requested_date: 2017-09-04
+  construction_datum_id: 1
+  supplier_master_id: 1
+  responsible: MyString

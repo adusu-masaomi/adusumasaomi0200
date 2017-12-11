@@ -1,0 +1,68 @@
+<%- model_class = WorkingSpecificMiddleItem -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:quotation_header_id) %></th>
+      <th><%= model_class.human_attribute_name(:delivery_slip_header_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
+      <th><%= model_class.human_attribute_name(:working_middle_item_short_name) %></th>
+      <th><%= model_class.human_attribute_name(:working_middle_item_category_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_middle_specification) %></th>
+      <th><%= model_class.human_attribute_name(:working_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:material_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_material_name) %></th>
+      <th><%= model_class.human_attribute_name(:execution_material_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:material_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_labor_unit_prce) %></th>
+      <th><%= model_class.human_attribute_name(:labor_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
+      <th><%= model_class.human_attribute_name(:seq) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @working_specific_middle_items.each do |working_specific_middle_item| %>
+      <tr>
+        <td><%= link_to working_specific_middle_item.id, working_specific_middle_item_path(working_specific_middle_item) %></td>
+        <td><%= working_specific_middle_item.quotation_header_id %></td>
+        <td><%= working_specific_middle_item.delivery_slip_header_id %></td>
+        <td><%= working_specific_middle_item.working_middle_item_name %></td>
+        <td><%= working_specific_middle_item.working_middle_item_short_name %></td>
+        <td><%= working_specific_middle_item.working_middle_item_category_id %></td>
+        <td><%= working_specific_middle_item.working_middle_specification %></td>
+        <td><%= working_specific_middle_item.working_unit_id %></td>
+        <td><%= working_specific_middle_item.working_unit_price %></td>
+        <td><%= working_specific_middle_item.execution_unit_price %></td>
+        <td><%= working_specific_middle_item.material_id %></td>
+        <td><%= working_specific_middle_item.working_material_name %></td>
+        <td><%= working_specific_middle_item.execution_material_unit_price %></td>
+        <td><%= working_specific_middle_item.material_unit_price %></td>
+        <td><%= working_specific_middle_item.execution_labor_unit_prce %></td>
+        <td><%= working_specific_middle_item.labor_unit_price %></td>
+        <td><%= working_specific_middle_item.labor_productivity_unit %></td>
+        <td><%= working_specific_middle_item.seq %></td>
+        <td><%=l working_specific_middle_item.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_working_specific_middle_item_path(working_specific_middle_item), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      working_specific_middle_item_path(working_specific_middle_item),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_working_specific_middle_item_path,
+            :class => 'btn btn-primary' %>

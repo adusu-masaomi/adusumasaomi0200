@@ -1,0 +1,86 @@
+<%= simple_form_for @inventory_history, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :inventory_date , input_html:{:tabindex=>"0"} %>
+  <%= f.label :construction_name , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name,  {:include_blank => true} , {id:'construction_datum_id', :tabindex => "1", 
+       :class => "searchableConstructionCode",  style: 'width:440px;' } %></br></br>
+  <%= f.label :material_name , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :material_master_id, MaterialMaster.all, :id, :p_material_code_name, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", 
+  class: "searchableMaterial" , :tabindex=>"2",style: 'width:440px' } %>
+  
+  <%= f.input :quantity, input_html:{id:'quantity', :tabindex=>"3", :onchange => "calcMoney()" }  %>
+  <!--<%= f.input :unit_master_id %>-->
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_master_id, UnitMaster.all,:id, :unit_name, {:prompt => "どれか一つを選択して下さい"} , {id:"unit_master_id", :tabindex=>"4" , 
+                              style: 'width:110px;' , :class => "searchableUnit"} %>
+  
+  <%= f.input :unit_price, input_html:{id:'unit_price', :tabindex=>"5", :onchange => "calcMoney()" } %>
+  <%= f.input :price, input_html:{ id:'price', :tabindex=>"6"} %>
+  <!--<%= f.input :supplier_master_id %>-->
+  
+  <%= f.label :仕入先, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
+      {id:"supplier_master_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"7" }  %></br></br>
+  
+  <%= f.label :入出庫区分, {:class => "my-custom-class-l"}  %></br>
+  <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {}, 
+       {id:'inventory_division_id', :class => "my-custom-class", style: 'width:120px;margin-left:-10px;font-size:16px;', :tabindex=>"8" } %>
+  
+  
+  <%= f.input :slip_code, input_html:{:tabindex=>"9"} %>
+  
+  <%= f.button :submit, :class => 'btn-primary', :tabindex => "10" %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                inventory_histories_path, :class => 'btn btn-white_rsd' %>
+  <!--<div style = "margin-left: -10px;">
+    <%= link_to t('.cancel', :default => "戻る"),
+                inventory_histories_path, :class => 'btn btn-default btn-lg' %>-->
+  </div>
+				
+<% end %>
+
+<script type="text/javascript">
+  $(document).on('ready page:load', function(){
+    $(".searchableConstructionCode").select2({ theme: "bootstrap" });
+    //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+    $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+       $('[tabindex=2]').focus(); 
+    });
+	
+    $(".searchableMaterial").select2({ theme: "bootstrap" });
+    //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+    $( ".searchableMaterial" ).on("select2:close", function (e) {
+       $('[tabindex=3]').focus(); 
+    });
+	
+	$(".searchableUnit").select2({ theme: "bootstrap" });
+	//select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+    $( ".searchableUnit" ).on("select2:close", function (e) {
+       $('[tabindex=5]').focus(); 
+    });
+	
+    $(".searchableSupplier").select2({ theme: "bootstrap" });
+    //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+    $( ".searchableSupplier" ).on("select2:close", function (e) {
+       $('[tabindex=8]').focus(); 
+    });
+	
+  });
+  
+  
+   //金額計算
+  function calcMoney()
+  {
+   
+    var quantity = document.getElementById("quantity").value; 
+    var unit_price = document.getElementById("unit_price").value; 
+	
+	var price = quantity * unit_price;
+	
+    //小数点以下を切り捨て
+	price  = Math.floor(price);
+	
+	//金額をセット
+    document.getElementById("price").value = price;
+  }
+  
+</script>

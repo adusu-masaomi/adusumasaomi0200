@@ -1,0 +1,1 @@
+json.partial! "working_specific_small_items/working_specific_small_item", working_specific_small_item: @working_specific_small_item

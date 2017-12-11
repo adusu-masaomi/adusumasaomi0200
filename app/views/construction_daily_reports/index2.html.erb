@@ -1,0 +1,111 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<!--グラフ用-->
+<%= javascript_include_tag "//www.google.com/jsapi", "chartkick" %>
+<%- model_class = ConstructionDailyReport -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header", style="width:1920px">
+  <h1><font size="5"><%=t '.title' , :default => model_class.model_name.human.pluralize.titleize + 'のグラフ' %></font></h1>
+  
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @construction_daily_reports %>
+  <!-- 追加箇所終了 -->
+
+  <%= search_form_for @q, 
+    url: construction_daily_reports_graph_path(@construction_daily_reports, construction_id: params[:construction_id], move_flag: params[:move_flag] ) do |f| %>
+  
+  <%= f.label :construction_code, '工事名　' %>
+  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:400px' ,
+   class: "searchableConstructionName" } %>
+  
+  <!--</br>-->
+  <%= f.label :staff_id, '社員　' %>
+  
+  <%= f.select :staff_id_eq, Staff.all.map{|st| [st.staff_name, st.id]}, {include_blank: true}, {style: 'width:220px' ,class: "searchableStaffName" } %>
+   
+  <!--<%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {style: 'width:220px' } %>-->
+  
+  
+  </br>
+  
+  
+  <%= f.label :working_date, '作業日' %>
+  <%= f.date_select :working_date_gteq, {include_blank: true} ,  {id: "working_date_start"}   %>
+  <%= f.label :working_date, '〜' %>
+  <%= f.date_select :working_date_lteq, {include_blank: true} ,  {id: "working_date_end"}   %>
+  
+  <!--スペース空ける-->
+  &nbsp;&nbsp;&nbsp;
+  <%= button_tag "クリア", type: 'button', :class => 'btn btn-yellow300_rsd btn-xs', onclick: "clearDate()" %>
+  
+  	<div>
+		<%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+		<!--<%= form_tag(construction_daily_reports_graph_path) do %>
+           <%= f.submit_tag '検索(集計)', :class => 'btn btn-teal50_rsd' %> 
+        <% end %>-->
+		
+		<%= link_to t('.back', :default => t("helpers.links.back")),
+              construction_daily_reports_path(construction_id: @construction_id, 
+                        move_flag: params[:move_flag]), :class => 'btn btn-white_rsd'  %>
+						
+		
+        <!--<%= link_to "CSV", construction_daily_reports_path(params.merge(format: 'csv')) , 'data-no-turbolink'=>true, :class => 'btn btn-default'%>-->
+        <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<td><font size="3">合計金額:<%=number_to_currency(@construction_daily_reports.sumprice,  precision: 0 ) %></font></td>-->
+
+  	</div>
+   <% end %>
+   
+   <!--グラフ表示-->
+   <%= bar_chart @chart_data_costs,  :title => "労務費計：" + number_to_currency(@construction_daily_reports.sumprice,  precision: 0 ) ,  
+        height: "600px", colors: ["green", "#999"] %>
+   <%= bar_chart @chart_data_times, :title => "作業時間計：" + number_with_delimiter(@construction_daily_reports.sumtimes) + '時間', height: "600px" %>
+  
+</div>
+
+
+<!--<div class="span11 table-scrollable">-->
+<!--見出し固定用設定追加-->
+<div style="margin-top : -20px;", class="span11 table-scrollable" >
+ 
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchablePurchaseCode").select2({ theme: "classic" });
+    $(".searchableConstructionCode").select2({ theme: "classic" });
+	$(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+	$(".searchableStaffName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+	$(".searchableCustomerName").select2({ theme: "classic" });
+    $(".searchableMaterialCode").select2({ theme: "classic" });
+    $(".searchableMakerName").select2({ theme: "classic" });
+		
+	//見出し固定用設定追加
+	var sz = window.parent.screen.width;
+	var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	var ht = 610;  //デフォルトの高さ(社長PC基準)
+		
+	if (sz != 1920) {
+      //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+      //fc = 3;  //固定列数
+	  fc = 2;  //固定列数
+	  ht -= 70;
+	}
+	$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+    //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});
+  });
+  
+  //検索日付をリセットする
+  function clearDate(){
+    //from
+	document.getElementsByName("q[working_date_gteq(1i)]")[0].value = "";
+	document.getElementsByName("q[working_date_gteq(2i)]")[0].value = "";
+	document.getElementsByName("q[working_date_gteq(3i)]")[0].value = "";
+	//to
+	document.getElementsByName("q[working_date_lteq(1i)]")[0].value = "";
+	document.getElementsByName("q[working_date_lteq(2i)]")[0].value = "";
+	document.getElementsByName("q[working_date_lteq(3i)]")[0].value = "";
+  }
+  
+</script>

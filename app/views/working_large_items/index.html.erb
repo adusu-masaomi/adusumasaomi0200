@@ -1,0 +1,135 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = WorkingLargeItem -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @working_large_items %>
+  <!-- 追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+  <%= f.label :working_large_item_name, '品目名：' %>
+  <%= f.select :id_eq, options_from_collection_for_select(WorkingLargeItem.all, "id", "working_large_item_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  	<div>
+    	<%= f.submit '検索する' %>
+  	</div>
+   <% end %>
+
+</div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_working_large_item_path,
+            :class => 'btn btn-primary' %>	
+<div class="span11 table-scrollable">
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>			
+<table id="tablefix", class="table table-striped", style="font-size : 12px;width:1880px;">
+  <thead>
+    <tr>
+      <th>seq</th>
+	  <th><%= sort_link(@q, :working_large_item_short_name, model_class.human_attribute_name(:working_large_item_short_name) ) %></th>
+	  <th><%= sort_link(@q, :working_large_item_name, model_class.human_attribute_name(:working_large_item_name) ) %></th>
+      <th><%= model_class.human_attribute_name(:working_large_specification) %></th>
+      <th><%= model_class.human_attribute_name(:working_unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:execution_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:labor_productivity_unit) %></th>
+      <!--<th><%= model_class.human_attribute_name(:labor_productivity_unit_total) %></th>-->
+	  <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @working_large_items.order("id desc").each do |working_large_item| %>
+      <tr id="<%= working_large_item.id%>" >
+        <!--<td><%= link_to working_large_item.id, working_large_item_path(working_large_item) %></td>-->
+		<!--ここはIDではなくソート用のseqをセット(その代わり、閲覧不可。)-->
+		<td><%= working_large_item.seq %></td>
+		
+        <td><%= working_large_item.working_large_item_short_name %></td>
+		<td><%= working_large_item.working_large_item_name %></td>
+        <td><%= working_large_item.working_large_specification %></td>
+        <% if working_large_item.WorkingUnit.present? %>
+          <td><%= working_large_item.WorkingUnit.working_unit_name %></td>
+        <% else %>
+		  <td>-</td>
+		<% end %>
+		<td><%= working_large_item.working_unit_price %></td>
+        <td><%= working_large_item.execution_unit_price %></td>
+        <td><%= working_large_item.labor_productivity_unit %></td>
+        <!--<td><%= working_large_item.labor_productivity_unit_total %></td>-->
+		<td><%= link_to working_large_item.id, working_large_item_path(working_large_item) %></td>
+        <td><%=l working_large_item.created_at.in_time_zone('Tokyo') %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_working_large_item_path(working_large_item), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      working_large_item_path(working_large_item),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+	<!-- 追加箇所開始 -->
+    <%= paginate @working_large_items %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+</div>
+
+<!-- 追加箇所開始 -->
+<%= paginate @working_large_items %>
+<!-- 追加箇所終了 -->
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableLargeItem").select2({ theme: "classic" });
+	//見出し固定用設定追加
+		var sz = window.parent.screen.width;
+		var fc = 1;    //デフォルトの固定列数(社長PC基準)
+		var ht = 618;  //デフォルトの高さ(社長PC基準)
+		
+		if (sz != 1920) {
+		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 2;  //固定列数
+		  ht -= 80;
+		}
+		//$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+		//ソートした場合に見栄えがおかしくなるので、列固定はしない。
+		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1});
+		
+	//
+  
+    $( "#tablefix tbody" ).sortable({
+	//$( ".sortable" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 
+         var row = $(this).sortable('toArray').toString();
+         $.post("<%= working_large_itemz_reorder_path %>",
+           { row: row },
+           function(data){
+           }
+         );
+		 //下記ではうまくいかなかった。
+		 //jQuery.post('<%=working_large_items_path%>', $(this).sortable( 'serialize'), null, 'text'); 
+	   },
+	       
+    });
+    $( ".sortable" ).disableSelection();
+  
+  });
+  
+  
+   
+	
+  
+</script>

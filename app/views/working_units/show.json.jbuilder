@@ -1,0 +1,1 @@
+json.partial! "working_units/working_unit", working_unit: @working_unit

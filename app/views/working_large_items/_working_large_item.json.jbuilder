@@ -1,0 +1,2 @@
+json.extract! working_large_item, :id, :working_large_item_name, :working_large_specification, :working_unit_id, :working_unit_price, :execution_unit_price, :labor_productivity_unit, :labor_productivity_unit_total, :created_at, :updated_at
+json.url working_large_item_url(working_large_item, format: :json)

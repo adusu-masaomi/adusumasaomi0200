@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  working_large_item_name: MyString
+  working_large_specification: MyString
+  working_unit_id: 1
+  working_unit_price: 1
+  execution_unit_price: 1
+  labor_productivity_unit: 1.5
+  labor_productivity_unit_total: 1.5
+
+two:
+  working_large_item_name: MyString
+  working_large_specification: MyString
+  working_unit_id: 1
+  working_unit_price: 1
+  execution_unit_price: 1
+  labor_productivity_unit: 1.5
+  labor_productivity_unit_total: 1.5

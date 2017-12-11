@@ -1,0 +1,142 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = QuotationDetailsHistory -%>
+<div class="page-header", style="width:1920px" >
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!--検索フォームは必要ないと思われるので、カット-->
+
+</div>
+
+<div style="width:1280px;">
+<%= link_to t('.new', :default => t("新規作成")),
+            new_quotation_details_history_path(quotation_header_history_id: params[:quotation_header_history_id], 
+                quotation_header_id: params[:quotation_header_id],
+                quotation_breakdown_history_id: params[:quotation_breakdown_history_id], 
+                quotation_header_name: params[:quotation_header_name], new_flag: "1", 
+				working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ), remote: true,
+                     :class => 'btn btn-primary' %>
+<td><%= link_to "内訳へ",
+            quotation_breakdown_histories_path(quotation_header_history_id: params[:quotation_header_history_id], quotation_header_name: params[:quotation_header_name],
+                                               quotation_header_id: params[:quotation_header_id]),
+            :class => 'btn btn-warning' %>
+</br>
+<font size="3";><b>
+<%= "件名:" %>
+<%= @quotation_header_name %>
+<%= "　　" %>
+<%= "項目:" %>
+<%= @working_large_item_name[0] %>
+<%= "　　" %>
+<%= "仕様:" %>
+<%= @working_large_item_name[1] %>  
+</b></font>
+</div>
+
+<td>見積金額合計:<%=number_to_currency(@quotation_details_histories.sumpriceQuote,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;実行金額合計:<%=number_to_currency(@quotation_details_histories.sumpriceExecution,  precision: 0 ) %>
+&nbsp;&nbsp;&nbsp;&nbsp;歩掛計の合計:<%= @quotation_details_histories.sumLaborProductivityUnitTotal.to_s + "人" %>
+</td>
+
+<div id="quotation_details_history-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+  <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;table-layout:fixed;">
+
+  <thead>
+    <tr>
+      <th style="width:40px;"><%= model_class.human_attribute_name(:id) %></th>
+      <th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
+	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
+      <th style="width:50px;">　数量</th>
+      <th style="width:50px;">単位</th>
+	  <th style="width:80px;">　 見積単価</th>
+      <th style="width:110px;">　 見積金額</th>
+      <th style="width:50px;">　実数</th>
+      <th style="width:50px;">単位</th>
+      <th style="width:80px;">　 実行単価</th>
+      <th style="width:110px;">　 実行金額</th>
+      <th style="width:80px;">　　　 歩掛</th>
+      <th style="width:80px;">　　 歩掛計</th>
+      <th style="width:20px;">配</th>
+      <th style="width:20px;">機</th>
+      <th style="width:20px;">労</th>
+      <th style="width:250px;"><%= model_class.human_attribute_name(:remarks) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody class="quotation_details_history-index">
+     <%= render "index" %>
+  </tbody>
+  </table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableQuotationCode").select2({ theme: "classic" });
+        $(".searchableConstructionName").select2({ theme: "classic" });
+        $(".searchableLargeItem").select2({ theme: "classic" });
+        $(".searchableMiddleItem").select2({ theme: "classic" });
+		$(".searchableMiddleSpecification").select2({ theme: "classic" });
+		
+	   //見出し固定用設定追加
+	   var sz = window.parent.screen.width;
+	   var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	   var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	   if (sz != 1920) {
+	   //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+          fc = 1;  //固定列数
+		  //ht -= 70;
+		  ht -= 108;
+	   }
+	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	   
+	   $( "#tablefix tbody" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 quotation_header_history_id = document.getElementById("quotation_header_history_id").innerText;
+		 quotation_breakdown_history_id = document.getElementById("quotation_breakdown_history_id").innerText;
+		 
+		 $.post("<%= quotation_details_historiez_reorder_path %>",
+           { row: row, ajax_quotation_header_history_id: quotation_header_history_id,
+             ajax_quotation_breakdown_history_id: quotation_breakdown_history_id },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	   },
+	      
+       });
+       $( ".sortable" ).disableSelection();
+	 
+  });
+  
+  function addParam(link){
+    var default_page_number = $('default_page_number');
+    if(document.getElementById("default_page_number").value > 0){
+        var num = document.getElementById("default_page_number").value;
+        //ここでコントローラにパラメータが送られる。
+        link.href += "&default_page_number=" + escape(num);
+        return true;
+    } else {
+        alert('Input string for search');
+        return false;
+    }
+  }
+  
+</script>
+
+

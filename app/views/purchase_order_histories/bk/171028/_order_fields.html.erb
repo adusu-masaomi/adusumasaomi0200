@@ -1,0 +1,410 @@
+<div class="sortThese">
+<div class="nested-fields well form-inline">
+  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , value: $seq_exists, style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  
+  <% if f.object.sequential_id.present? %>
+    <% $seq_exists -=  1 %>
+  <% end %>
+  
+  <!--<%= f.input :purchase_order_history_id,  input_html:{ id: "purchase_order_history_id" }, as: :hidden %>-->
+  <%= f.label :品番選択, {style: 'width:770px'}  %>
+  <%= f.label :単位, {style: 'width:50px;margin-left:-85px;'}  %>
+  <%= f.label :メール送信フラグ, {style: 'width:120px;margin-left:-5px;'}  %>
+  </br>
+  <!--upd170720マスター類はあらかじめセットされた変数から取得-->
+  <%= f.collection_select :material_id, @material_masters.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
+      {class: "searchableSelect1_1 form-control" , id: "material_id" , name:"material_id[]",  style: 'width:650px' } %>
+  
+  <%= f.label :数量, {style: 'width:28px'}  %>
+  <%= f.text_field :quantity, size:10, id: "quantity" , name:"quantity[]", :tabindex=>"2"  %>
+  <td>&nbsp;&nbsp;</td>
+  <%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
+        { id: "unit_master_id", name:"unit_master_id[]",  class: "searchableSelect1_2" , style: 'width:50px' } %>
+  
+  <%= f.select :mail_sent_flag, Order.mail_flag, {:include_blank => true}, 
+       {id:'mail_sent_flag', :class => "my-custom-class", style: 'width:120px;margin-left:0px;font-size:16px;font-weight:bold;color:red;' } %>
+  
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
+  <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+ 
+  </br>
+  <%= f.input :material_code,  input_html:{ class: "material_code", id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", 
+       :onkeydown => "setMaterialCode($(this).val())" } %>
+  <!--<%= f.input :material_code,  input_html:{ id: "material_code", name: "material_code[]", style: 'width:150px', :tabindex=>"0", :onchange => "setMaterialCode($this)" } %>-->
+  <%= f.input :material_name,  input_html:{ id: "material_name", name: "material_name[]", style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
+   <!--以下スペースあり-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.collection_select :maker_id, @maker_masters.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
+      {class: "searchableSelect1_3 form-control" , id: "maker_id" , name:"maker_id[]",  style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>
+  
+  <%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px' , :tabindex=>"4" } %>
+  
+  <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %></br>
+  <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %></br>
+  <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %></br>
+  
+</div>
+</div>
+ 
+ <script type="text/javascript">
+
+  //cIndex = 0;
+  //var i = 0;
+  
+  
+  //$(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+  
+      
+	  
+	  
+ //});  
+  
+  //選択した行のインデックスを取得
+  function getSelectedChildIndex(id){
+    item = document.getElementsByName("material_id[]");
+    var select_index = 0;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  if (id == item[index].value){
+	    select_index = index;
+	  }
+	}
+    return select_index;
+  }
+  //選択した行のインデックスを取得(手入力を考慮し、品番で判別)
+  function getSelectedChildIndexCode(){
+    item = document.getElementsByName("material_code[]");
+    var select_index = 0;
+	
+	for (var index = 0; index < item.length  ; index ++) {
+	  //upd170927
+	  if (gMaterial_code == item[index].value){
+	  //if (gTop == item[index].offsetTop){
+        select_index = index;
+	  }
+	}
+	
+	
+    return select_index;
+  }
+  
+  //選択した行のインデックスを取得(数量等の場合)
+  function getSelectedChildIndexSome(flag){
+    //item = document.getElementsByName("quantity[]");
+	item = document.getElementsByName("material_code[]");
+    var select_index = 0;
+	
+	//商品コード位置の座標を取得、レイアウト変更時注意(27)
+	//但し、商品コード同一のものがある場合は正常動作しない！(ないものとする)
+	switch (flag){
+	  case 1:
+	  //品名の場合
+	    material_offsetTop = gTop;
+	    break;
+	  case 2:
+	  //数量の場合
+	    
+	    material_offsetTop = gTop + 27; 
+		
+		//material_offsetTop = gTop - 4;
+		break;
+      case 3:
+	  //メーカーの場合
+	    material_offsetTop = gTop + 1;
+		
+		break;
+	  case 4:
+	  //単位へ移動させる場合
+	    material_offsetTop = gTop + 31;
+		break;
+	  case 5:
+	  //資材リスト→資材コードへ移動させる場合
+	    material_offsetTop = gTop + 31;
+		
+		break;
+	}
+	
+
+	for (var index = 0; index < item.length  ; index ++) {
+	  
+	  if (material_offsetTop == item[index].offsetTop){
+	  
+	  //upd170616
+	  //if (gControl_id == item[index].id){
+	  //if (gMaterial_code == item[index].value){
+	  
+	    select_index = index;
+		
+	  }
+	}
+	return select_index;
+  }
+  
+  //タブ判定のため、品番をグローバルへセット
+  function setMaterialCode(thisValue){
+  //function setMaterialCode(this){
+    
+	gMaterial_code = thisValue;
+	
+
+	//商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+	//新規追加後に、商品コードを登録・変更した場合。
+	//searchItemCode(thisValue);
+	
+  }
+  
+  //更新前に数量をチェックする
+  //function checkQuantity(ok_flag){
+  var checkQuantity = function(ok_flag){ 
+  
+    quantity = document.getElementsByName("quantity[]");
+	item = document.getElementsByName("material_id[]");
+	
+	
+	//var message = "";
+	
+	for (var i = 0; i < quantity.length ; i ++) {
+	    if (quantity[i].value == undefined || quantity[i].value == 0){
+	      //debugger;
+		  itemName = item[i].options[item[i].selectedIndex].innerText;
+		  
+		  window.confirm(itemName + 'の数量を入力してください。');
+		  //message = message + itemName + 'の数量を入力してください。';
+		  
+		  ok_flag = false;
+	    }
+	}
+	
+	//if (ok_flag == false){
+	//  window.confirm( message );
+	//}
+	
+	return ok_flag;
+  }
+  
+ 
+  //各値の自動セット-ajax
+  function setItem(item_id, selected_index)
+  {
+		 id = parseInt(item_id);
+        
+		 //add170804
+		 var supplier_master_id = document.getElementById("supplier_master_id").value;
+		 
+		 if (id != 1 ) {
+		 //手入力は除外&明細に同一品番はないものとする(ある場合は正常動作しない）
+			$.get("<%= purchase_order_historiez_material_select_path %>",
+             {id: id , supplier_master_id: supplier_master_id },
+              function(data){
+		        
+				
+				//商品コードをセット
+				obj = document.getElementById("material_code").textContent;
+				document.getElementsByName("material_code[]")[selected_index].value = obj;
+				
+				//商品名をセット
+				obj = document.getElementById("material_name").textContent;
+				document.getElementsByName("material_name[]")[selected_index].value = obj;
+				
+				//単位をセット
+				obj = document.getElementById("unit_id_hide").textContent;
+			    
+				//add170907
+				//単位未登録の場合は、”個”にする
+				if (obj == ""){ obj = "3" };
+				
+				if (obj != null){
+		          var index = parseInt(obj);
+				  
+                  $(".searchableSelect1_2")[selected_index].value = index; 
+				  
+				  $(".searchableSelect1_2").trigger("change"); 
+		        }
+				
+				//メーカー名をセット
+				//obj = document.getElementById("maker_name").textContent;
+				//document.getElementsByName("maker_name[]")[selected_index].value = obj;
+				obj = document.getElementById("maker_id_hide").textContent;
+			    if (obj != null){
+		          var index = parseInt(obj);
+                  $(".searchableSelect1_3")[selected_index].value = index; 
+				  
+				  $(".searchableSelect1_3").trigger("change"); 
+		        }
+				
+				//定価をセット
+				obj = document.getElementById("list_price").textContent;
+				document.getElementsByName("list_price[]")[selected_index].value = obj;
+				
+				
+			  }
+            );
+		  }
+  }
+  
+  function setItem_old(e)
+  {  
+     //objId = document.getElementsByName("material_id");
+	 objId = document.getElementById("material_id");
+	 product_select = $(this);
+	
+    //product_select.parent().find('.cost-input').val(product_select.find(':selected').data('unit_cost'))
+	 //product_select.parent().find('.searchableMaterial').val(product_select.find(':selected').data('material_id'))
+	 
+	 var id = product_select.find(':selected').data('material_id');
+	 
+	 // cIndex += 1;     
+     //項目名
+     // $.get("<%= purchase_order_datum_material_select_path %>",
+     //  {id: id },
+     //   function(data){
+     //     document.getElementsByName("material_code")[cIndex -1].value = document.getElementsByName("material_code_hide")[0].textContent;
+	 //	  }
+     // );
+
+  }  
+  
+  function focusQuantity(selected_index)
+  {
+     document.getElementsByName("quantity[]")[selected_index].focus();
+  }
+  
+  //ENTER→TABキーに変換する処理。
+  //レンダリングの場合は、共通化ができない（なぜか）
+  $('[tabindex]').keydown(function (e) {
+    if (e.keyCode == 13 || e.keyCode == 9) {
+	    
+		setNextControl(e);
+		
+		
+	}
+    
+  }); 
+  
+  
+  //次のコントロールにフォーカスを移す（レンダリングの場合）
+  function setNextControl(e){
+       var current = document.activeElement;
+		gControl_id = current.id
+		
+		
+		//if (gSelectedIndex == 0){
+		   
+		   if (gControl_id.substr(-8,8) == "quantity") {
+		   //数量のみ変更した場合を考慮(add170616)
+		     
+			 gTop = current.offsetTop;
+			 
+			 selectedIndex  = getSelectedChildIndexSome(2);
+			 gSelectedIndex = selectedIndex;
+			 			 
+			 //単位へフォーカスする
+			 document.getElementsByName("unit_master_id[]")[selectedIndex].focus();
+			 
+			 //var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][unit_master_id]"
+			 //document.getElementsByName(nm)[0].focus();
+			 
+			 //document.getElementsByName("maker_id[]")[selectedIndex].focus();
+			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+			 
+		   }else if (gControl_id == "maker_id") {
+           //メーカーの場合→プルダウンはここへ飛ばない。
+		   //  gTop = current.offsetTop;
+		   //	 selectedIndex  = getSelectedChildIndexSome(3);
+			// gSelectedIndex = selectedIndex;
+			// document.getElementsByName("list_price[]")[selectedIndex].focus();
+			// e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+		   
+		   }else if (gControl_id == "material_code") {
+		   //手入力の場合はコードでインデックス取得
+             
+			 //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+	         //新規追加後に、商品コードを登録・変更した場合。
+	         searchItemCode(gMaterial_code);
+			 
+			 //idで判断つかないのでx座標から推定する。-->再入力でNG...
+			 //gTop = current.offsetTop;
+			 
+			 selectedIndex  = getSelectedChildIndexCode();
+			 gSelectedIndex = selectedIndex;
+			 
+			 document.getElementsByName("material_name[]")[selectedIndex].focus();
+			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+			 
+			 
+		   }else if (gControl_id == "material_name") {
+		   //品名→数量へフォーカス
+		     //selectedIndex = gSelectedIndex ;
+			 
+			 gTop = current.offsetTop;
+			 selectedIndex  = getSelectedChildIndexSome(1);
+			 
+		     document.getElementsByName("quantity[]")[selectedIndex].focus();
+			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+			 
+			 
+		   //}else if (gControl_id == "quantity") {
+		   //  debugger;
+		   }
+ 		 //}else{
+		 //  selectedIndex = gSelectedIndex ;
+		   
+		 //}
+		
+		//if (gControl_id != "material_code") {
+		//  var tabindex = parseInt($(this).attr('tabindex'));
+        //  $('[tabindex='+(tabindex+1)+']')[selectedIndex].focus();
+        //}
+		
+	    return false;
+  
+  }
+  
+   
+  //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+  function searchItemCode(itemCode){
+   
+      item = document.getElementsByName("material_code[]");
+	  
+	  //var current_code = $(".material_code").context.activeElement.value;
+	  var current_code = itemCode;
+	  
+	  var select_index = 0;
+	  
+	  for (var index = 0; index < item.length  ; index ++) {
+	    if (current_code == item[index].value){
+		  select_index = index;
+		}
+	  }
+      
+	  if (select_index != undefined){
+	  	
+		//商品コードからマスターより一致するコード検索し、あれば自動でセットする。
+        $.get("<%= material_masterz_get_material_id_path %>",
+             {material_code: itemCode},
+          function(data){
+		    obj = document.getElementById("material_id_hide").textContent;
+			document.getElementById("material_id_hide").value = obj;
+		    
+		    if (obj != "") {
+			  var material_id = parseInt(obj);
+		 	  $(".searchableSelect1_1")[select_index].value = material_id;
+			  $(".searchableSelect1_1").trigger("change")[select_index];
+			  
+			  //triggerはうまくいかないので直接セット
+			  gMaterial_id = material_id;  //test id
+			  setItem(gMaterial_id, select_index);
+			  
+			}
+		   
+          }
+        );	
+		
+	  }
+  }
+   
+ </script>

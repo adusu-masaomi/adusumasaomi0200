@@ -1,0 +1,1 @@
+json.partial! "quotation_material_details/quotation_material_detail", quotation_material_detail: @quotation_material_detail

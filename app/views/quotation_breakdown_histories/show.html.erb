@@ -1,0 +1,63 @@
+<%- model_class = QuotationBreakdownHistory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:quotation_header_history_id) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.quotation_header_history_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:quotation_items_division_id) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.quotation_items_division_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_id) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_large_item_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_name) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_large_item_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_short_name) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_large_item_short_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_specification) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_large_specification %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:line_number) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.line_number %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:quantity) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.quantity %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_quantity) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.execution_quantity %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_id) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_unit_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_name) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_unit_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_price) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.working_unit_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:quote_price) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.quote_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_unit_price) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.execution_unit_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_price) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.execution_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_productivity_unit) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.labor_productivity_unit %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_productivity_unit_total) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.labor_productivity_unit_total %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:last_line_number) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.last_line_number %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:remarks) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.remarks %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_type) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.construction_type %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:piping_wiring_flag) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.piping_wiring_flag %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:equipment_mounting_flag) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.equipment_mounting_flag %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_cost_flag) %>:</strong></dt>
+  <dd><%= @quotation_breakdown_history.labor_cost_flag %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              quotation_breakdown_histories_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_quotation_breakdown_history_path(@quotation_breakdown_history), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              quotation_breakdown_history_path(@quotation_breakdown_history),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

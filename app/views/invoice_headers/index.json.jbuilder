@@ -1,0 +1,1 @@
+json.array! @quotation_headers, partial: 'quotation_headers/quotation_header', as: :quotation_header

@@ -1,0 +1,29 @@
+<%- model_class = QuotationHeaderHistory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:issue_date) %>:</strong></dt>
+  <dd><%= @quotation_header_history.issue_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></dt>
+  <dd><%= @quotation_header_history.construction_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:quote_price) %>:</strong></dt>
+  <dd><%= @quotation_header_history.quote_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_amount) %>:</strong></dt>
+  <dd><%= @quotation_header_history.execution_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:net_amount) %>:</strong></dt>
+  <dd><%= @quotation_header_history.net_amount %></dd>
+  <!--<dt><strong><%= model_class.human_attribute_name(:last_line_number) %>:</strong></dt>-->
+  <!--<dd><%= @quotation_header_history.last_line_number %></dd>-->
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              quotation_header_histories_path(quotation_header_id: params[:quotation_header_id]), :class => 'btn btn-white_rsd'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_quotation_header_history_path(@quotation_header_history,quotation_header_id: params[:quotation_header_id]), :class => 'btn btn-white_rsd' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              quotation_header_history_path(@quotation_header_history),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

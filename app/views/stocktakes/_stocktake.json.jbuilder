@@ -1,0 +1,2 @@
+json.extract! stocktake, :id, :stocktake_date, :material_master_id, :physical_quantity, :unit_price, :physical_amount, :book_quantity, :created_at, :updated_at
+json.url stocktake_url(stocktake, format: :json)

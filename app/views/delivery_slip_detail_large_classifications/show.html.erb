@@ -1,0 +1,33 @@
+<%- model_class = InvoiceDetailLargeClassification -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:invocie_header_id) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.invocie_header_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_id) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.working_large_item_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_large_item_name) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.working_large_item_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:quantity) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.quantity %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:working_unit_id) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.working_unit_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:billing_amount) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.billing_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_price) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.execution_price %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:labor_productivity_unit) %>:</strong></dt>
+  <dd><%= @invocie_detail_large_classification.labor_productivity_unit %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              invocie_detail_large_classifications_path(invocie_header_id: params[:invocie_header_id]), :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_invocie_detail_large_classification_path(@invocie_detail_large_classification), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              invocie_detail_large_classification_path(@invocie_detail_large_classification),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

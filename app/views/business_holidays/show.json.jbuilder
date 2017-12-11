@@ -1,0 +1,1 @@
+json.partial! "business_holidays/business_holiday", business_holiday: @business_holiday

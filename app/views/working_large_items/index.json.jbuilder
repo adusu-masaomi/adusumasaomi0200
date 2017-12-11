@@ -1,0 +1,1 @@
+json.array! @working_large_items, partial: 'working_large_items/working_large_item', as: :working_large_item

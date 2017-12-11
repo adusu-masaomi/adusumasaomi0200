@@ -1,0 +1,29 @@
+<%- model_class = QuotationMaterialHeader -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:quotation_code) %>:</strong></dt>
+  <dd><%= @quotation_material_header.quotation_code %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></dt>
+  <dd><%= @quotation_material_header.construction_datum.construction_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:requested_date) %>:</strong></dt>
+  <dd><%= @quotation_material_header.requested_date %></dd>
+  <!--<dt><strong><%= model_class.human_attribute_name(:supplier_master_id) %>:</strong></dt>
+  <dd><%= @quotation_material_header.supplier_master_id %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:responsible) %>:</strong></dt>
+  <dd><%= @quotation_material_header.responsible %></dd>-->
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              quotation_material_headers_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_quotation_material_header_path(@quotation_material_header, construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+			  :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              quotation_material_header_path(@quotation_material_header),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

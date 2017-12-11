@@ -1,0 +1,2 @@
+json.extract! quotation_header_history, :id, :issue_date, :quotation_header_id, :quote_price, :execution_price, :net_amount, :last_line_number, :created_at, :updated_at
+json.url quotation_header_history_url(quotation_header_history, format: :json)

@@ -1,0 +1,19 @@
+<%= simple_form_for @working_unit, :html => { :class => 'well form-horizontal' } do |f| %>
+  <% if @working_unit.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= @working_unit.errors.count %>件のエラーがあります。</h2>
+      <ul>
+        <% @working_unit.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+ 　 
+  
+  <%= f.input :working_unit_name %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_units_path, :class => 'btn btn-default' %>
+<% end %>

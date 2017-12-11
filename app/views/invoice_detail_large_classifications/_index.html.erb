@@ -1,0 +1,99 @@
+<% @invoice_detail_large_classifications.order("invoice_header_id desc, line_number desc").each do |invoice_detail_large_classification| %>
+      <tr id="<%= invoice_detail_large_classification.id%>">
+	    <td><%= link_to "明細へ",
+            invoice_detail_middle_classifications_path(invoice_header_id: invoice_detail_large_classification.invoice_header_id, 
+                                                         invoice_header_name: invoice_detail_large_classification.InvoiceHeader.construction_name,
+                                                         working_large_item_name: invoice_detail_large_classification.working_large_item_name, 
+                                                         working_large_specification: invoice_detail_large_classification.working_large_specification,
+                                                         invoice_detail_large_classification_id: invoice_detail_large_classification.id,  new_flag: "1"),
+            :class => 'btn btn-warning'%>
+        </td>
+        
+        <!--add170223-->
+        <!--条件によって色を変える処理-->
+        <% case invoice_detail_large_classification.construction_type %>
+        <% when $INDEX_SUBTOTAL  %>
+        <!--小計-->
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_DISCOUNT  %>
+        <!--値引-->
+          <% color = "green" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_PIPING_WIRING_CONSTRUCTION  %>
+          <% color = "red" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_EUIPMENT_MOUNTING  %>
+          <% color = "blue" %>
+          <% bold = "font-weight:bold" %> 
+        <% when $INDEX_LABOR_COST  %>
+          <% color = "brown"%>
+          <% bold = "font-weight:bold" %> 
+        <% else %>
+          <% color = "black"%>
+        <% end %>
+        <!--add end-->
+		
+        <td id="invoice_header_id", style="display:none;"><%= invoice_detail_large_classification.invoice_header_id %></td>
+        <!--<td><%= link_to invoice_detail_large_classification.id, invoice_detail_large_classification_path(invoice_detail_large_classification) %></td>-->
+        <td><%= invoice_detail_large_classification.id %></td>
+        <td><%= invoice_detail_large_classification.line_number %></td>
+        <td><%= invoice_detail_large_classification.working_large_item_name %></td>
+        <td><%= invoice_detail_large_classification.working_large_specification %></td>
+        <td align="right"><%= invoice_detail_large_classification.quantity %></td>
+        <% if invoice_detail_large_classification.working_unit_name != "<手入力>" %>
+          <td align="center"><%= invoice_detail_large_classification.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
+		<!--upd170308-->
+        <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= number_to_currency(invoice_detail_large_classification.working_unit_price,  precision: 0) %></font></td>
+        <% if invoice_detail_large_classification.invoice_price.present? && invoice_detail_large_classification.invoice_price.delete("^0-9").to_i > 0 %>
+          <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= number_to_currency(invoice_detail_large_classification.invoice_price,  precision: 0) %></font></td>
+        <% else %>
+          <td align="right"><%= invoice_detail_large_classification.invoice_price %></td>
+        <% end %>
+        <td align="right"><%= invoice_detail_large_classification.execution_quantity %></td>
+        <% if invoice_detail_large_classification.working_unit_name != "<手入力>" %>
+          <td align="center"><%= invoice_detail_large_classification.working_unit_name %></td>
+        <% else %>
+          <td align="center">-</td>
+        <% end %>
+		<!--upd170308-->
+        <td align="right"><%= number_to_currency(invoice_detail_large_classification.execution_unit_price,  precision: 0) %></font></td>
+        <% if invoice_detail_large_classification.execution_price.present? && invoice_detail_large_classification.execution_price.delete("^0-9").to_i > 0 %>
+          <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= number_to_currency(invoice_detail_large_classification.execution_price,  precision: 0) %></font></td>
+        <% else %>
+          <td align="right" style = <%= bold %> ><font color = <%= color %> ><%= invoice_detail_large_classification.execution_price %></font></td>
+        <% end %>
+        
+		<!--upd170223-->
+		<td align="right" style = <%= bold %> ><font color = <%= color %>  >
+        <%= number_with_precision(invoice_detail_large_classification.labor_productivity_unit, precision: 3) %></font></td>
+        <td align="right" style = <%= bold %> ><font color = <%= color %>  >
+		<%= number_with_precision(invoice_detail_large_classification.labor_productivity_unit_total, precision: 3) %></font></td>
+        <!--upd end-->
+		<!--add170223-->
+		<td><%= check_box("piping_wiring_flag", "active", {checked: check_if_true(invoice_detail_large_classification.piping_wiring_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("equipment_mounting_flag", "active", {checked: check_if_true(invoice_detail_large_classification.equipment_mounting_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <td><%= check_box("labor_cost_flag", "active", {checked: check_if_true(invoice_detail_large_classification.labor_cost_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <!--add end-->
+		
+		<!--<td><%= invoice_detail_large_classification.remarks %></td>-->
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_invoice_detail_large_classification_path(invoice_detail_large_classification, invoice_header_id: invoice_detail_large_classification.invoice_header_id, 
+                          invoice_header_name: params[:invoice_header_name]), 
+                          :class => 'btn btn-white_rsd btn-xs' , remote: true%>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      invoice_detail_large_classification_path(invoice_detail_large_classification, invoice_header_id: invoice_detail_large_classification.invoice_header_id,
+                          invoice_header_name: params[:invoice_header_name]),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+

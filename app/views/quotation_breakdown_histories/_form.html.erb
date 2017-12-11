@@ -1,0 +1,29 @@
+<%= simple_form_for @quotation_breakdown_history, :html => { :class => 'form-horizontal' } do |f| %>
+  <%= f.input :quotation_header_history_id %>
+  <%= f.input :quotation_items_division_id %>
+  <%= f.input :working_large_item_id %>
+  <%= f.input :working_large_item_name %>
+  <%= f.input :working_large_item_short_name %>
+  <%= f.input :working_large_specification %>
+  <%= f.input :line_number %>
+  <%= f.input :quantity %>
+  <%= f.input :execution_quantity %>
+  <%= f.input :working_unit_id %>
+  <%= f.input :working_unit_name %>
+  <%= f.input :working_unit_price %>
+  <%= f.input :quote_price %>
+  <%= f.input :execution_unit_price %>
+  <%= f.input :execution_price %>
+  <%= f.input :labor_productivity_unit %>
+  <%= f.input :labor_productivity_unit_total %>
+  <%= f.input :last_line_number %>
+  <%= f.input :remarks %>
+  <%= f.input :construction_type %>
+  <%= f.input :piping_wiring_flag %>
+  <%= f.input :equipment_mounting_flag %>
+  <%= f.input :labor_cost_flag %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_breakdown_histories_path, :class => 'btn btn-default' %>
+<% end %>

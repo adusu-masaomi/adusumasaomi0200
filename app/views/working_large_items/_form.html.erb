@@ -1,0 +1,86 @@
+<%= simple_form_for @working_large_item, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :working_large_item_short_name, input_html:{:tabindex=> "0"} %>
+  <%= f.input :working_large_item_name, input_html:{:tabindex=> "1"} %>
+  <%= f.input :working_large_specification, input_html:{:tabindex=> "2"} %>
+  <!--<%= f.input :working_unit_id %>-->
+  <%= f.label :"単位" , {} %></br>
+  <!--<%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, 
+  {:prompt => 'どれか一つを選択して下さい', :selected => @working_large_item.working_unit_id || 2 } , 
+  {id:'working_unit_id', :class => "searchableSelect2_1",  style: 'width:120px', :tabindex=> "3" } %></br>-->
+  
+  <!--単位-->
+  <%= f.collection_select :working_unit_id, WorkingUnit.all, :id, :working_unit_name, 
+  {:prompt => 'どれか一つを選択して下さい', :selected => @working_large_item.working_unit_id || 2 } , 
+  {id:'working_unit_id', :class => "searchableSelect2_1",  style: 'width:120px' } %></br>
+
+  <!--実行材料費 -->
+  <%= f.input :execution_material_unit_price, input_html:{id:'execution_material_unit_price',:tabindex=>"4", :onchange => "calcMaterialUnitPrice()"} %>
+  <!--歩掛り-->
+  <%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", :tabindex=> "5", :onchange => "calcLaborCost()"} %>
+  <!--材料費-->
+  <%= f.input :material_unit_price, input_html:{id:"material_unit_price", :tabindex=>"6", :onchange => "calcAccessory(this.form)"} %>
+  <!--実行労務単価-->
+  <%= f.input :execution_labor_unit_price, input_html:{id:"execution_labor_unit_price", :tabindex=>"7"} %>
+  <!--労務単価-->
+  <%= f.input :labor_unit_price, input_html:{id:"labor_unit_price", :tabindex=>"8"}  %>
+  <!--実行単価-->
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", :tabindex=> "9"} %>
+  <!--単価-->
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", :tabindex=> "10"} %>
+  
+  <!--<%= f.input :labor_productivity_unit_total, input_html:{:tabindex=> "7"} %>-->
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_large_items_path, :class => 'btn btn-default' %>
+<% end %>
+
+
+<script type="text/javascript">
+
+   var item_index = 0;
+
+   //$(document).ready(function(){
+   $(document).on('ready page:load', function(){
+     
+	 //単位--select2のタブインデックスはここで指定しておく。
+     $(".searchableSelect2_1").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',3)}).trigger('load');
+   });
+   
+   //金額計算(材料費)
+  function calcMaterialUnitPrice()
+  {
+     var obj = document.getElementById("execution_material_unit_price").value;
+     var num = obj * 1.35;
+     num = floatFormat( num, 4 ) ;
+	 
+	 document.getElementById("material_unit_price").value = num;
+     
+     var obj2 = document.getElementById("labor_productivity_unit").value;
+	 if (obj2 > 0){
+	   //金額計算(実行労務単価、労務単価)
+       calcLaborCost();
+	 }
+  }
+  
+  //金額計算(実行労務単価、労務単価)
+  function calcLaborCost()
+  {
+    var obj = document.getElementById("labor_productivity_unit").value;
+    if (obj > 0) {
+	  //実行労務単価
+	  document.getElementById("execution_labor_unit_price").value = obj * 11000;
+      //労務単価
+      document.getElementById("labor_unit_price").value = obj * 15000;
+      //実行単価
+      document.getElementById("execution_unit_price").value =
+      parseFloat(document.getElementById("execution_material_unit_price").value) + 
+	  parseFloat(document.getElementById("execution_labor_unit_price").value);
+	  //単価
+	  document.getElementById("working_unit_price").value =
+	  parseFloat(document.getElementById("material_unit_price").value) + parseFloat(document.getElementById("labor_unit_price").value);
+	  
+	}
+   }  
+</script>

@@ -1,0 +1,49 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  invoice_code: MyString
+  quotation_code: MyString
+  delivery_slip_code: MyString
+  invoice_date: 2017-01-17
+  construction_datum_id: 1
+  construction_name: MyString
+  customer_id: 1
+  customer_name: MyString
+  honorific_id: 1
+  responsible1: MyString
+  responsible2: MyString
+  post: MyString
+  address: MyString
+  tel: MyString
+  fax: MyString
+  construction_place: MyString
+  payment_period: 2017-01-17
+  invoice_period_start_date: 2017-01-17
+  invoice_period_end_date: 2017-01-17
+  billing_amount: 1
+  execution_amount: 1
+  last_line_number: 1
+
+two:
+  invoice_code: MyString
+  quotation_code: MyString
+  delivery_slip_code: MyString
+  invoice_date: 2017-01-17
+  construction_datum_id: 1
+  construction_name: MyString
+  customer_id: 1
+  customer_name: MyString
+  honorific_id: 1
+  responsible1: MyString
+  responsible2: MyString
+  post: MyString
+  address: MyString
+  tel: MyString
+  fax: MyString
+  construction_place: MyString
+  payment_period: 2017-01-17
+  invoice_period_start_date: 2017-01-17
+  invoice_period_end_date: 2017-01-17
+  billing_amount: 1
+  execution_amount: 1
+  last_line_number: 1

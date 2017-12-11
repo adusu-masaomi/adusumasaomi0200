@@ -1,0 +1,2 @@
+module WorkingMiddleItemsHelper
+end

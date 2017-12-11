@@ -1,0 +1,7 @@
+<%- model_class = QuotationMaterialHeader -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+</br>
+<div class="page-header">
+  <h1><font size="5"><%=t '.title', :default => [:'helpers.titles.edit', 'Edit %{model}'], :model => model_class.model_name.human.titleize %></font></h1>
+</div>
+<%= render :partial => 'form' %>

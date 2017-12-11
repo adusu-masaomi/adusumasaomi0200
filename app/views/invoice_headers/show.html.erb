@@ -1,0 +1,54 @@
+<%- model_class = InvoiceHeader -%>
+<% provide(:title, "請求書一覧データ") %>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:invoice_code) %>:</strong></font></dt>
+  <dd><%= @invoice_header.invoice_code %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:invoice_date) %>:</strong></font></dt>
+  <dd><%= @invoice_header.invoice_date %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></font></dt>
+  <dd><%= @invoice_header.construction_name %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:customer_name) %>:</strong></font></dt>
+  <dd><%= @invoice_header.customer_name %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:post) %>:</strong></font></dt>
+  <dd><%= @invoice_header.post %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:address) %>:</strong></font></dt>
+  <dd><%= @invoice_header.address %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:tel) %>:</strong></font></dt>
+  <dd><%= @invoice_header.tel %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:fax) %>:</strong></font></dt>
+  <dd><%= @invoice_header.fax %></dd>
+  <dt><font color=blue><strong><%= model_class.human_attribute_name(:payment_period) %>:</strong></font></dt>
+  <dd><%= @invoice_header.payment_period %></dd>
+  <dt><font color=blue><strong>請求金額(税込):</strong></font></dt>
+  
+  <% if @invoice_header.billing_amount.present? %>
+    <dd><%= number_to_currency(@invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></dd>
+  <% else %>
+    <dd></dd>
+  <% end %>
+  
+  <dt><font color=green><strong><%= model_class.human_attribute_name(:deposit_amount) %>:</strong></font></dt>
+  <dd><%= number_to_currency(@invoice_header.deposit_amount,  precision: 0) %></dd>
+  <dt><font color=green><strong><%= model_class.human_attribute_name(:payment_method_id) %>:</strong></font></dt>
+  <dd><%= InvoiceHeader.payment_method[@invoice_header.payment_method_id][0] %></dd>
+  <dt><font color=green><strong><%= model_class.human_attribute_name(:commission) %>:</strong></font></dt>
+  <dd><%= number_to_currency(@invoice_header.commission,  precision: 0) %></dd>
+  <dt><font color=green><strong><%= model_class.human_attribute_name(:payment_date) %>:</strong></font></dt>
+  <dd><%= @invoice_header.payment_date %></dd>
+  <dt><font color=green><strong><%= model_class.human_attribute_name(:remarks) %>:</strong></font></dt>
+  <dd><%= @invoice_header.remarks %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              invoice_headers_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_invoice_header_path(@invoice_header), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              invoice_header_path(@invoice_header),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

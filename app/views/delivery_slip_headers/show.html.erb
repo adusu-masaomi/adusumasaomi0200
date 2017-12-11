@@ -1,0 +1,48 @@
+<%- model_class = DeliverySlipHeader -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:delivery_slip_code) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.delivery_slip_code %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:delivery_slip_date) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.delivery_slip_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_name) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.construction_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:customer_name) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.customer_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:post) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.post %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.address %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:house_number) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.house_number %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:address2) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.address2 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:tel) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.tel %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:fax) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.fax %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:construction_place) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.construction_place %></dd>
+  <dt><strong>番地:</strong></dt>
+  <dd><%= @delivery_slip_header.construction_house_number %></dd>
+  <dt><strong>建物名:</strong></dt>
+  <dd><%= @delivery_slip_header.construction_place2 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:delivery_amount) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.delivery_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:execution_amount) %>:</strong></dt>
+  <dd><%= @delivery_slip_header.execution_amount %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              delivery_slip_headers_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_delivery_slip_header_path(@delivery_slip_header), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              delivery_slip_header_path(@delivery_slip_header),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

@@ -1,0 +1,2 @@
+json.extract! inventory_history, :id, :inventory_date, :contruction_datum_id, :material_id, :quantity, :unit_id, :unit_price, :price, :supplier_master_id, :inventory_division_id, :slip_code, :created_at, :updated_at
+json.url inventory_history_url(inventory_history, format: :json)

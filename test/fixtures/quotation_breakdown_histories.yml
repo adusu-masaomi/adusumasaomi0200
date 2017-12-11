@@ -1,0 +1,51 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  quotation_header_hisory_id: 1
+  quotation_items_division_id: 1
+  working_large_item_id: 1
+  working_large_item_name: MyString
+  working_large_item_short_name: MyString
+  working_large_specification: MyString
+  line_number: 1
+  quantity: 1
+  execution_quantity: 1
+  working_unit_id: 1
+  working_unit_name: 1
+  working_unit_price: 1
+  quote_price: 1
+  execution_unit_price: 1
+  execution_price: MyString
+  labor_productivity_unit: 1.5
+  labor_productivity_unit_total: 1.5
+  last_line_number: 1
+  remarks: MyString
+  construction_type: 1
+  piping_wiring_flag: 1
+  equipment_mounting_flag: 1
+  labor_cost_flag: 1
+
+two:
+  quotation_header_hisory_id: 1
+  quotation_items_division_id: 1
+  working_large_item_id: 1
+  working_large_item_name: MyString
+  working_large_item_short_name: MyString
+  working_large_specification: MyString
+  line_number: 1
+  quantity: 1
+  execution_quantity: 1
+  working_unit_id: 1
+  working_unit_name: 1
+  working_unit_price: 1
+  quote_price: 1
+  execution_unit_price: 1
+  execution_price: MyString
+  labor_productivity_unit: 1.5
+  labor_productivity_unit_total: 1.5
+  last_line_number: 1
+  remarks: MyString
+  construction_type: 1
+  piping_wiring_flag: 1
+  equipment_mounting_flag: 1
+  labor_cost_flag: 1
