@@ -1,0 +1,361 @@
+<!-- javascriptに本番環境とテスト環境の切り分け部があるので(２箇所)、移行時注意！-->
+
+<%= stylesheet_link_tag 'application', media:'all','data-turbolinks-track' => true %>
+<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>  
+<%= yield(:head) %> 
+<%= csrf_meta_tags %>
+
+<!-- -->
+<script src="http://cdn.webix.com/edge/webix.js"></script>
+<link rel="stylesheet" href="http://cdn.webix.com/edge/webix.css" />
+<!-- -->
+
+<%= stylesheet_link_tag 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css' %>
+<script src="https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js" type="text/javascript"></script>
+<script src="http://export.dhtmlx.com/gantt/api.js" type="text/javascript"></script>
+
+
+<style>
+.gantt_task_content{overflow:visible; color:black}
+
+.gantt_task_line.gantt_task_inline_color .gantt_task_progress {
+    background-color: rgb(54, 54, 54);
+    opacity: 0.2;
+}
+
+.baseline{
+position: absolute;
+border-radius: 3px !important;
+opacity: 0.6;
+margin-top: -10px;
+height: 5px;
+background: #4EA248;
+borderLeftWidth: 3px ;
+}
+
+/*週末カラー表示*/
+
+/*薄グレー*/
+/*.weekend{ background: #f4f7f4 !important;}*/
+.weekend{ background: #d8d8d8 !important;}
+
+/*薄水色*/
+/*.weekend{ background: #E0F2F7 !important;}*/
+
+/*印刷したい領域(うまくいかず・・・)*/
+.content-print{
+        top:0 !IMPORTANT;
+        left:0 !IMPORTANT;
+        width:172mm !IMPORTANT;
+        height:251mm !IMPORTANT;
+}
+
+
+/*進捗率を左端に出すためのcss*/
+.gantt_task_progress{
+  text-align:left;
+  padding-left:10px;
+  box-sizing: border-box;
+  color:white;
+  font-weight: bold;
+}
+
+
+/*動作しない..*/
+.gantt_multiline {
+    white-space: normal;
+    background-color: #FFE0F9;
+    line-height: 110% !important;
+    font-size:8pt !important;
+}
+</style>
+
+<div class="page-header" , style="width:1280px" >
+  
+  <!--ヘッダに必要なパラメータを取得-->
+  <% if params[:construction_id].present? %>
+    <% construction_id = params[:construction_id] %>
+    <% construction_data = ConstructionDatum.where("id >= ?", construction_id).first %>
+	<% if construction_data.present? %>
+      <!--件名-->
+	  <% @construction_name = construction_data.construction_name %>
+	  
+	  <!--顧客名-->
+	  <% if construction_data.CustomerMaster.present? %>
+	    <% @customer_name = construction_data.CustomerMaster.customer_name %>
+	  <% end %>
+	  
+	  <!--工期FromTo-->
+	  <% if params[:start_date] != $CONSTRUCTION_NULL_DATE && params[:start_date] != $CONSTRUCTION_QUERY_NULL_DATE%>
+	    <% @start_date = params[:start_date] %>
+	  <% end %>
+	  <% if params[:end_date] != $CONSTRUCTION_NULL_DATE && params[:end_date] != $CONSTRUCTION_QUERY_NULL_DATE%>
+	    <% @end_date = params[:end_date] %>
+	  <% end %>
+	<% end %>
+  <% end %>
+  
+  
+  <h1>工程表</h1>
+  <%= link_to t('.cancel', :default => t("helpers.links.back")),
+                tasks_path(construction_id: params[:construction_id], move_flag: params[:move_flag],
+                  start_date: params[:start_date],
+                   end_date: params[:end_date] ), 
+                    :class => 'btn btn-bluegrey500_rsd' %>
+				
+  <input value="ＰＤＦ出力" type="button" class= 'btn btn-red400_ftg' 
+     onclick='exportGantt()'>
+	
+  <input value="ＰＮＧ出力" type="button" class= 'btn btn-yellow400_ftg' onclick='gantt.exportToPNG({ skin:"skyblue", locale:"jp" })' >
+  
+  <!--<input value="エクセル出力" type="button" class= 'btn btn-pink400_ftg' onclick='gantt.exportToExcel()' >-->
+  
+  <!--"skin" are [terrace] [meadow] [broadway] [skyblue]-->
+  
+  <!--日毎、月毎に表示を変えるラジオボタン-->
+  <label for="scale_unit">表示単位</label>
+  <input type="radio" value="1" checked=true name="scale[unit]" id="scale_unit_1" onclick='changeScale()' > <label for="scale_unit_1">日毎</label>
+  <input type="radio" value="2" name="scale[unit]" id="scale_unit_2" onclick='changeScale()' > <label for="scale_unit_2">月毎</label>
+  <!---->
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <!--<input value="最新の状態に更新" type="button", class= 'btn btn-deeppurple400_rsd btn-xs',  onclick="location.reload()">-->
+  
+  <!-- <h3>ア　デ　ュ　ー　ス　電　気　　　工　程　表</h3> -->
+  
+  <!--<%= button_tag "Export to PDF", :type => 'link', name: "clear",  
+               :onclick => "gantt.exportToPDF()" %>-->
+  
+  <!--工事IDをセット　うまく機能しない・・・-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  
+</div>
+
+<% content_for :head do %>
+    <!--<%= stylesheet_link_tag 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.css' %>-->
+    <!--<%= javascript_include_tag 'https://cdn.dhtmlx.com/gantt/edge/dhtmlxgantt.js' %>-->
+
+<% end %>
+
+
+<!--<div id="gantt_here" style='width:200%; height:700px;'></div>-->
+<div id="gantt_here" style='width:1880px; height:1080px;'></div>
+ 
+ 
+<script type="text/javascript">
+  $(document).ready(function(){
+    //ガントチャート初期設定
+	initGantt(1);
+  });
+  
+ 
+  function initGantt(scaleFlag){
+  //ガントチャート初期設定
+    
+    //gantt.config.xml_date = "%Y-%m-%d %H:%i:%s";
+	gantt.config.xml_date = "%Y-%m-%d";
+	
+	//ライトボックスの日付フォーマット  うまく機能せず
+	//gantt.config.date_grid = "%Y/%m/%d";
+	//gantt.config.api_date = "%Y-%m-%d %H:%i";
+	
+	if (scaleFlag == 1){
+	  //日付単位の場合
+      gantt.config.scale_unit = "day";
+      ////gantt.config.date_scale = "%F, %d"; 
+	  //これが今のところベター
+	  //gantt.config.date_scale = "%M%d";
+	  gantt.config.date_scale = "%m/%d";
+      //gantt.config.date_scale = "%d";
+	  
+	  gantt.config.subscales = [
+	    {unit:"day", step:1, date:"%D" },
+      ];
+    }
+ 
+ 
+    if (scaleFlag == 2){
+      //月単位の場合
+	  gantt.config.scale_unit = "month";
+	  gantt.config.date_scale = "%Y/%m"; 
+	  
+	  //gantt.config.subscales.clearAll;
+	  //イマイチ
+	  //gantt.config.subscales = [
+	  //  {unit:"week", step:1, template:weekScaleTemplate },
+      //];
+	  gantt.config.subscales = [
+	    {unit:"week", step:1, date:"%W" },
+      ];
+	 
+	}
+	
+    //可変スパンも設定可能
+    //gantt.config.step = 2; 
+	
+	gantt.config.columns=[
+    {name:"text",       label:"内容",  tree:true, align: "left", width:'200' },
+    {name:"start_date", label:"開始日", align: "center" },
+    {name:"end_date",   label:"終了日",   align: "center" , width:'80', template: EnddateTemplate },
+	{name:"add",        label:"", width:44 }
+    ];
+	
+	//{name:"duration",   label:"期間(日)",   align: "center" },
+	
+	//gantt.config.subscales = [
+	//  {unit:"day", step:1, date:"%D" },
+    //];
+	
+	//日本語用設定
+     gantt.locale={date:{month_full:["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],month_short:["1月","2月","3月","4月","5月","6月","7月","8月","9月","10月","11月","12月"],day_full:["日曜日","月曜日","火曜日","水曜日","木曜日","金曜日","土曜日"],day_short:["日","月","火","水","木","金","土"]},labels:{dhx_cal_today_button:"今日",day_tab:"日",week_tab:"週",month_tab:"月",new_event:"新イベント",icon_save:"保存",icon_cancel:"キャンセル",icon_details:"詳細",icon_edit:"編集",icon_delete:"削除",confirm_closing:"",confirm_deleting:"イベント完全に削除されます、宜しいですか？",section_description:"内容",section_priority:"優先度",section_time:"期間",section_type:"Type",column_text:"Task name",column_start_date:"Start time",column_duration:"Duration",column_add:"",link:"Link",confirm_link_deleting:"will be deleted",link_start:" (start)",link_end:" (end)",type_task:"Task",type_project:"Project",type_milestone:"Milestone",minutes:"Minutes",hours:"Hours",days:"Days",weeks:"Week",months:"Months",years:"Years"}};
+	
+	gantt.config.layout = {
+    css: "gantt_container" }
+	
+	
+	//色の設定（機能せず）
+    //gantt.templates.task_class  = function(start, end, task){
+    //switch (task.priority){
+    //    case "1":
+    //        return "high";
+    //        break;
+    //    case "2":
+    //        return "medium";
+    //        break;
+    //    case "3":
+    //        return "low";
+    //        break;
+    //  }
+    //};
+	
+	//リサイズ（機能せず）
+	//gantt.config.autosize = "xy";
+	
+	//ソート用設定
+    gantt.config.order_branch = true;
+    gantt.config.order_branch_free = true;
+
+    //pdfに色つける？？
+	gantt.config.smart_scales = false;
+	gantt.ignore_time = function (date) {
+    if (date.getDay() == 0 || date.getDay() == 6)
+  	  return true;
+      return false;
+    };
+
+    //週末に色をつける
+    gantt.templates.scale_cell_class = function(date){
+      if(date.getDay()==0||date.getDay()==6){
+        return "weekend";
+      }
+    };
+    gantt.templates.task_cell_class = function(item,date){
+      if(date.getDay()==0||date.getDay()==6){ 
+        return "weekend" ;
+      }
+    };
+    //
+    
+    //ライトボックスの期間設定後の日付は-1にする(開始日を含まないので、日付がずれている為）
+	gantt.templates.task_date= function(date){
+      
+	  var afterDate = new Date(date);
+      afterDate.setDate(afterDate.getDate() - 1);
+	  
+	  return gantt.date.date_to_str(gantt.config.task_date)(afterDate);
+	  
+	  //return gantt.date.date_to_str(gantt.config.task_date)(date);  //デフォルト（＋１日になる）
+      //return "";  //何も表示させたくない場合
+    };
+    //
+
+    //初期化
+    gantt.init("gantt_here");
+    
+    //本番環境（centos）用
+    //gantt.load("/rails/api/data");
+    
+    //テスト環境( local ) 用
+    gantt.load("/api/data");
+    
+    //バー内に値を埋め込む場合
+	gantt.templates.progress_text=function(start, end, task){
+	   return Math.round(task.progress*100)+"%" ;
+	};
+	//左側に値を出す場合
+	//gantt.templates.leftside_text = function(start, end, task){
+    //  return "<b>Priority: </b>" +task.progress;
+    //};
+
+    //優先度をライトボックス(ダイアログ)に出す
+    var opts = [
+      { key: 1, label: '常' },
+      { key: 2, label: '高' },
+      { key: 3, label: '低' }
+    ];
+    //ライトボックスの項目
+    gantt.config.lightbox.sections = [
+      {name:"description", height:38, map_to:"text", type:"textarea", focus:true},
+      {name:"priority",    height:22, map_to:"priority", type:"select", options:opts},
+	  {name:"time",        height:72, map_to:"auto", type:"duration"}
+	  
+    ];
+    
+	
+	//日付がずれるのであと一歩・・
+	//{name: "deadline",    height: 72, type: "time", 
+    //    map_to:{start_date:"start_date",end_date:"end_date"}}
+		
+	//
+    //{name:"period", height:72, map_to:"auto", type:"time"} 
+	//{name:"time",        height:72, map_to:"auto", type:"duration"}
+	//gantt.locale.labels.section_period = "期日";
+	
+    //ガント直接編集可能にする
+    
+	//本番環境（centos）用
+	//var dp = new gantt.dataProcessor("/rails/api");
+    //テスト環境( local ) 用
+	var dp = new gantt.dataProcessor("/api");
+	//
+	
+    dp.init(gantt);
+    dp.setTransactionMode("REST",false );
+	
+   }
+  
+  var weekScaleTemplate = function(date){
+        var dateToStr = gantt.date.date_to_str("%d %M");
+        var endDate = gantt.date.add(gantt.date.add(date, 1, "week"), -1, "day");
+        return dateToStr(date) + " - " + dateToStr(endDate);
+    };
+  
+  
+  function changeScale(){
+    if (document.getElementById("scale_unit_1").checked == true){
+	//日単位
+      initGantt(1);
+	}else if (document.getElementById("scale_unit_2").checked == true){
+    //月単位
+	  initGantt(2);
+	}
+  }
+  
+  var EnddateTemplate = function (obj) {
+   var MyDate = obj.end_date.toISOString().substr(0, 10);
+   return MyDate;
+   //return ('<input type="text" id="cal1" class="form-control" style="Width:250px" value="' + MyDate + '">');
+  }
+  
+  function exportGantt(){
+     //gantt.exportToPDF({ skin:"skyblue", locale:"jp", raw:true, 
+     //header: "<style>.gantt_task_progress{text-align:left;} .baseline{border: 3px solid rgb(255,153,0);}</style><h1>　</h1><h3></br></br></br>　　　ア　デ　ュ　ー　ス　電　気　　　工　程　表　　　</br>　　　件名：<%= @construction_name%>　　　　顧客名：<%= @customer_name %>　　　　　開始日：<%= @start_date %>  　　　完了予定日：<%= @end_date %> 　　　　　　 </h3>" ,
+     //  footer: ""
+     //});
+	 gantt.exportToPDF({ skin:"skyblue", locale:"jp", raw:true,
+     header: "<style>.baseline{borderLeftWidth: 3px;} .gantt_task_progress{text-align:left;}</style><h1>　</h1><h3></br></br></br>　　　ア　デ　ュ　ー　ス　電　気　　　工　程　表　　　</br>　　　件名：<%= @construction_name%>　　　　顧客名：<%= @customer_name %>　　　　　開始日：<%= @start_date %>  　　　完了予定日：<%= @end_date %> 　　　　　　 </h3>" ,
+       footer: ""
+     });
+  } 
+  
+</script>

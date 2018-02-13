@@ -1,0 +1,96 @@
+<%- model_class = WorkingSubcategory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+   <%= search_form_for @q do |f| %>
+    <%= f.label :working_category_id, 'カテゴリー(主)：：' %>
+    <%= f.select :working_category_id_eq, WorkingCategory.all.map{|st| [st.category_name, st.id]},
+           {include_blank: true}, {style: 'width:220px' , class: "searchableCategory"}  %>
+  	<div>
+    	<%= f.submit '検索する', :class => 'btn btn-bluegrey50_rsd' %>
+        <%= link_to t('.back', :default => t("カテゴリー(主)へ")), working_categories_path, :class => 'btn btn-green300_rsd'  %>
+    </div>
+   <% end %>
+
+</div>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_working_subcategory_path(working_category_id: params[:working_category_id]),
+            :class => 'btn btn-primary' %>
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+  <!--見出し固定用設定追加-->
+  <style>
+    table { }
+    table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
+      <th style="width:55px;"><%= sort_link(@q, :seq, model_class.human_attribute_name(:seq), default_order: :desc ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:working_category_id) %></th>-->
+      <th><%= sort_link(@q, :working_category_id, model_class.human_attribute_name(:working_category_id) ) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody id="sortable", style="font-size : 12px;" >
+    <% @working_subcategories.order("seq asc").each do |working_subcategory| %>
+      <tr id="<%= working_subcategory.id%>">
+        <!--<td><%= link_to working_subcategory.id, working_subcategory_path(working_subcategory,
+             working_category_id: params[:working_category_id]) %></td>-->
+        <td><%= working_subcategory.seq %></td>     
+        <td><%= working_subcategory.working_category.category_name %></td>
+        <td><%= working_subcategory.name %></td>
+        <td><%=l working_subcategory.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_working_subcategory_path(working_subcategory,
+                           working_category_id: params[:working_category_id]), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      working_subcategory_path(working_subcategory,
+                       working_category_id: params[:working_category_id]),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+        $(".searchableCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    
+    $( "#sortable" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 
+         
+		 $.post("<%= working_subcategoriez_reorder_path %>",
+           { row: row },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	 },
+	        
+    });
+    
+    $(".sortable td").each(function () {
+            $(this).css("width", $(this).width());
+     });  
+    
+    $( ".sortable" ).disableSelection();
+  
+  });
+</script>
+

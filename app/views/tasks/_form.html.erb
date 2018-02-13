@@ -1,0 +1,191 @@
+<%= simple_form_for @task, :html => { :class => 'well form-horizontal' } do |f| %>
+  <!--<%= f.input :construction_datum_id, input_html:{id:"construction_datum_id", style: 'width:320px', :tabindex=>"0"} %>-->
+  
+  <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
+  <% if @construction_data.present? %>
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , 
+           {id:"construction_datum_id",  class: "searchableSelect2_1" , style: 'width:400px' } %>
+  <% else %>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
+           {id:"construction_datum_id",  class: "searchableSelect2_1" , style: 'width:400px'} %>
+  <% end %>
+  </br>
+  
+  <div class="col-md-6", style="margin-left : -15px;margin-top : 0px">
+  <%= f.input :text, input_html:{id:"text", :tabindex=>"1", style: 'width:300px' } %>
+  </div>
+  <div style="margin-left : 0px;margin-top : 35px">
+  <%= f.check_box :master_save_flag, {id:"master_save_flag", :tabindex=>"2", :onclick => "setMasterInsertFlag()" } %> 
+  <%= f.label :master_save_flag, "内容をマスターへ保存する", {  style: 'color: purple'} %>
+  </div>
+  </br>
+  
+  <%= f.label :内容参照用：, {:class => "my-custom-class-l", style: 'width:80px;font-size : 12px;'}  %>
+  <%= f.collection_select :task_content_name_refer, TaskContent.all, :id, :name, {:include_blank => true } , 
+           {id:"task_content_name_refer",  class: "searchableSelect2_2" , style: 'width:400px;' } %>
+  </br>
+		   
+  <%= f.label :内容参照用（工事）：, {:class => "my-custom-class-l", style: 'width:80px;font-size : 12px;'}  %>
+  <%= f.collection_select :construction_datum_id_refer, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_alias_name, {:include_blank => true } , 
+           {id:"construction_datum_id_refer",  class: "searchableSelect2_3" , style: 'width:400px;' } %>
+  
+  <%= f.input :start_date, :include_blank => true,  input_html:{id:"start_date", :tabindex=>"5", :onchange => "setDuration(this.form)" }, 
+        as: :date, date_separator: '', time_separator: '' %>
+  <%= f.input :end_date , :include_blank => true, input_html:{id:"end_date", :tabindex=>"6", :onchange => "setDuration(this.form)" }, 
+         as: :date, date_separator: '', time_separator: '' %>
+  
+  <%= f.input :duration , :include_blank => true, :hint => "*自動計算するので入力不要です。",
+       input_html:{id:"duration", :tabindex=>"7", :readonly => true, style: 'width:70px;' }  %>
+  
+  <%if f.object.progress.present? %>
+    <% @percent = f.object.progress * 100 %>
+  <% else %>
+    <% @percent = 0 %>
+  <% end %>
+  
+  <!-- 整数に変換 -->
+  <% @percent = @percent.to_i %>
+  
+  <%= f.input :progress , :include_blank => true,  
+                 input_html:{:tabindex=>"7", :value => @percent, style: 'width:70px;' } %>
+  
+  <%= f.label :優先度, {:class => "my-custom-class-l"}  %></br>
+  <%= f.select :priority, Task.priority_name,  {:selected => f.object.priority || 1}, 
+       {id:'searchableSelect2_3', :class => "my-custom-class", style: 'width:50px;height:30px;margin-left:-15px;margin-top:-30px;font-size:14px;', :tabindex=>"8" } %>
+  </br></br>
+  
+  <!--<%= f.input :work_start_date , :include_blank => true, input_html:{:tabindex=>"5"} %>-->
+  <!--<%= f.input :work_end_date , :include_blank => true, input_html:{:tabindex=>"6"}  %>-->
+  
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  
+  <!--ガント直接編集との切り分け用-->
+  <%= hidden_field_tag(:form_edit_flag, "1") %>
+  
+  <!--内容マスターへの保管フラグ -->
+  <%= f.input :master_insert_flag , input_html:{ id:"master_insert_flag"}, as: :hidden %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <!--<%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                tasks_path, :class => 'btn btn-default' %>-->
+  
+  <%= link_to t('.back', :default => t("helpers.links.cancel")),
+                tasks_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+                :class => 'btn btn-white_rsd' %>
+				
+<% end %>
+
+<!--css-->
+<style>
+.myFont{
+  font-size:9px !important;
+}
+</style>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+    
+	
+    $(".searchableSelect2_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+       $(this).prop('tabindex',0)}).trigger('load');
+	
+	//工程表項目リスト
+	$(".searchableSelect2_2").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST}).on("load", function(e) { 
+       $(this).prop('tabindex',3)}).trigger('load');   
+	$(".searchableSelect2_2").change(function(e) {
+       setContentName();
+    }); 
+	
+	//工事件名リスト
+    $(".searchableSelect2_3").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST}).on("load", function(e) { 
+       $(this).prop('tabindex',4)}).trigger('load');   
+    $(".searchableSelect2_3").change(function(e) {
+       setConstructionName();
+    }); 
+    
+	 
+    //not work...
+	//$("#searchableSelect2_2 option").addClass("myFont");
+	
+  });
+  
+  //項目名をセット
+  function setContentName(){
+    if ($('.searchableSelect2_2').select2('data')[0].text != "") {
+	
+	  var text = $('.searchableSelect2_2').select2('data')[0].text;
+	
+	  var text_name = $('.searchableSelect2_2').select2('data')[0].text;
+	
+	  document.getElementById("text").value = text_name;
+	}
+  }
+  
+  //工事件名をセット
+  function setConstructionName(){
+    
+	if ($('.searchableSelect2_3').select2('data')[0].text != "") {
+	
+	  var text = $('.searchableSelect2_3').select2('data')[0].text;
+	
+	  var text_position = text.indexOf(":") + 1 ;
+      var text_name = $('.searchableSelect2_3').select2('data')[0].text.slice(text_position);
+	
+	  document.getElementById("text").value = text_name;
+	}
+  }
+  
+  function setDuration(){
+    if (document.getElementById("start_date").value != ""){
+      
+	  //開始日を日付用変数へセット
+	  var year = parseInt(document.getElementsByName("task[start_date(1i)]")[0].value);
+	  var month = parseInt(document.getElementsByName("task[start_date(2i)]")[0].value);
+	  var day = parseInt(document.getElementsByName("task[start_date(3i)]")[0].value);
+	  var start_date = new Date(year,month,day,0,0);
+
+     //終了日を日付用変数へセット
+	  var year = parseInt(document.getElementsByName("task[end_date(1i)]")[0].value);
+	  var month = parseInt(document.getElementsByName("task[end_date(2i)]")[0].value);
+	  var day = parseInt(document.getElementsByName("task[end_date(3i)]")[0].value);
+	  var end_date = new Date(year,month,day,0,0);	
+	  
+	  // getTimeメソッドで経過ミリ秒を取得し、２つの日付の差を求める
+	  var msDiff = end_date.getTime() - start_date.getTime();
+ 
+	  // 求めた差分（ミリ秒）を日付へ変換します（経過ミリ秒÷(1000ミリ秒×60秒×60分×24時間)。端数切り捨て）
+	  var daysDiff = Math.floor(msDiff / (1000 * 60 * 60 *24));
+ 
+	  // 差分へ1日分加算してセット
+	  daysDiff = daysDiff + 1;
+	  
+	  document.getElementById("duration").value = daysDiff;
+	  
+	
+	
+	}
+  }
+  
+ 
+ //登録時、マスター登録するか否かのメッセージを出す
+ function setMasterInsertFlag() {
+   
+   var input_flag = false;
+   
+   if (document.getElementById("master_save_flag").checked == true ){
+     input_flag = true;
+   }
+   
+   if (input_flag == true){
+     document.getElementById("master_insert_flag").value = "true";
+   }
+   
+ }
+  
+</script>
+
+
+

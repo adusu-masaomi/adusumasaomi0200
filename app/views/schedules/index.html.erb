@@ -1,0 +1,146 @@
+<%- model_class = Schedule -%>
+<div class="page-header" , style="width:1920px" >
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  
+  <%= search_form_for @q do |f| %>
+  
+  <%= f.label :construction_code, '工事名　' %>
+  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, 
+       {style: 'width:400px' , class: "searchableSelect2_1" } %>
+  </br>
+  
+  <%= f.label :working_date, '予定日' %>
+  <%= f.date_select :estimated_start_date_gteq, {include_blank: true} ,  {id: "estimated_start_date"}   %>
+  <%= f.label :working_date, '〜' %>
+  <%= f.date_select :estimated_end_date_lteq, {include_blank: true} ,  {id: "estimated_end_date"}   %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <!-- 実施日 -->
+  <%= f.label :working_date, '実施日' %>
+  <%= f.date_select :work_start_date_gteq, {include_blank: true} ,  {id: "work_start_date"}   %>
+  <%= f.label :working_date, '〜' %>
+  <%= f.date_select :work_end_date_lteq, {include_blank: true} ,  {id: "work_end_date"}   %>
+  
+  &nbsp;&nbsp;
+  <%= button_tag "クリア", type: 'button', :class => 'btn btn-indigo100_rsd btn-xs', onclick: "clearDate()" %>
+  </br>
+  <!-- -->
+  
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+    </div>
+   <% end %>
+  
+  
+</div>
+
+<!--<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_schedule_path,
+            :class => 'btn btn-primary' %>-->
+			
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_schedule_path(:new_flag => "0", construction_id: params[:construction_id], move_flag: params[:move_flag] ),
+            :class => 'btn btn-primary' %>
+			
+</br></br>
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : -20px;", class="span11 table-scrollable" >
+ 
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+
+<!--<table class="table table-striped">-->
+<!--見出し固定用設定追加-->
+<table id="tablefix", class="table  table-striped">
+
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th>工事名</th>
+      <th><%= model_class.human_attribute_name(:content_name) %></th>
+      <th><%= model_class.human_attribute_name(:estimated_start_date) %></th>
+      <th><%= model_class.human_attribute_name(:estimated_end_date) %></th>
+      <th><%= model_class.human_attribute_name(:work_start_date) %></th>
+      <th><%= model_class.human_attribute_name(:work_end_date) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @schedules.each do |schedule| %>
+      <tr>
+	  
+	    <td><%= link_to schedule.id, schedule_path(schedule, construction_id: params[:construction_id], 
+                               move_flag: params[:move_flag]) %></td>
+        <!--<td><%= link_to schedule.id, schedule_path(schedule) %></td>-->
+        <!--<td><%= schedule.construction_datum_id %></td>-->
+		
+		<% if schedule.construction_datum.present? %>
+          <td><%= schedule.construction_datum.construction_name %></td>
+		<% else %>
+		  <td></td>
+		<% end %>
+		
+        <td><%= schedule.content_name %></td>
+        <td><%= schedule.estimated_start_date %></td>
+        <td><%= schedule.estimated_end_date %></td>
+        <td><%= schedule.work_start_date %></td>
+        <td><%= schedule.work_end_date %></td>
+        <td><%=l schedule.created_at %></td>
+        <td>
+          <!--<%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_schedule_path(schedule), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      schedule_path(schedule),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>-->
+		
+		
+		  <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_schedule_path(schedule, construction_id: params[:construction_id], 
+                               move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      schedule_path(schedule, construction_id: params[:construction_id], move_flag: params[:move_flag]),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //var massageList = "指定無し";
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableSelect2_1").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+  });
+  
+  //検索項目をリセットする
+  function clearDate(){
+  
+    //プルダウンをリセット
+    //$(".searchableSelect2_1").val(null).trigger("change");
+	
+    //予定日from
+	document.getElementsByName("q[estimated_start_date_gteq(1i)]")[0].value = "";
+	document.getElementsByName("q[estimated_start_date_gteq(2i)]")[0].value = "";
+	document.getElementsByName("q[estimated_start_date_gteq(3i)]")[0].value = "";
+	//予定日to
+	document.getElementsByName("q[estimated_end_date_lteq(1i)]")[0].value = "";
+	document.getElementsByName("q[estimated_end_date_lteq(2i)]")[0].value = "";
+	document.getElementsByName("q[estimated_end_date_lteq(3i)]")[0].value = "";
+	
+  
+  }
+</script>

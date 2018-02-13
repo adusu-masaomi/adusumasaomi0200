@@ -1,0 +1,1359 @@
+{
+  "version": "0.9.1",
+  "items": [
+    {
+      "id": "default",
+      "type": "list",
+      "display": true,
+      "description": "",
+      "x": 36.2,
+      "y": 125,
+      "width": 559,
+      "height": 581.9,
+      "header": {
+        "enabled": true,
+        "height": 8,
+        "translate": {
+          "x": 2.2,
+          "y": -32
+        },
+        "items": []
+      },
+      "detail": {
+        "height": 20,
+        "translate": {
+          "x": 2.2,
+          "y": -72.2
+        },
+        "items": [
+          {
+            "id": "purchase_order_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 46.4,
+            "y": 209.2,
+            "width": 79.3,
+            "height": 12.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "supplier_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 173.5,
+            "y": 209.2,
+            "width": 110.1,
+            "height": 12.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "purchase_order_code",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 304.8,
+            "y": 209.9,
+            "width": 49.1,
+            "height": 12.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "purchase_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 209.9,
+            "width": 75,
+            "height": 12.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          }
+        ]
+      },
+      "page-footer": {
+        "enabled": true,
+        "height": 40.5,
+        "translate": {
+          "x": 2.2,
+          "y": -100.4
+        },
+        "items": []
+      },
+      "footer": {
+        "enabled": true,
+        "height": 161.6,
+        "translate": {
+          "x": 2.2,
+          "y": -96.1
+        },
+        "items": [
+          {
+            "id": "purchase_amount",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 298.8,
+            "width": 75,
+            "height": 12.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 327.8,
+            "y": 299.6,
+            "width": 34.6,
+            "height": 13.1,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "小計"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 44.3,
+            "y": 321.2,
+            "width": 93.1,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "消耗品雑材料"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 45,
+            "y": 361.9,
+            "width": 56.4,
+            "height": 15.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "労務費"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 46,
+            "y": 401.1,
+            "width": 58,
+            "height": 19.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "諸経費"
+            ]
+          },
+          {
+            "id": "supplies_expense",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 320.1,
+            "width": 75,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "subtotal2",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 341.1,
+            "width": 75,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "labor_cost",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 361.1,
+            "width": 75,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "subtotal3",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 381.1,
+            "width": 75,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "misellaneous_expense",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 381,
+            "y": 401.1,
+            "width": 75,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 11,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "¥{value}",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 43,
+            "y1": 294.5,
+            "x2": 593,
+            "y2": 294.5
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 43,
+            "y1": 338.1,
+            "x2": 593,
+            "y2": 338.1
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 43,
+            "y1": 376.1,
+            "x2": 593,
+            "y2": 376.1
+          }
+        ]
+      },
+      "content-height": 573.9,
+      "auto-page-break": true
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 302,
+      "y": 117,
+      "width": 59.8,
+      "height": 18.3,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "注文Ｎｏ．"
+      ]
+    },
+    {
+      "id": "construction_code",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 45,
+      "y": 19,
+      "width": 125,
+      "height": 11,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "underline"
+        ],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "customer_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 120,
+      "y": 45,
+      "width": 229,
+      "height": 11,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 120,
+      "y": 61,
+      "width": 229.2,
+      "height": 11,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 45,
+      "y": 90,
+      "width": 108.8,
+      "height": 18.5,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "工事費集計表"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 2,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 112,
+      "x2": 590,
+      "y2": 112
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 2,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 134.5,
+      "x2": 590,
+      "y2": 135.3
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 79,
+      "y": 117,
+      "width": 47.5,
+      "height": 16.7,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "名　称"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 188,
+      "y": 117,
+      "width": 90.4,
+      "height": 16.7,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "仕入先／外注先"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 399.7,
+      "y": 117,
+      "width": 47.5,
+      "height": 16.7,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "金額"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 519,
+      "y": 117,
+      "width": 35.1,
+      "height": 16.7,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "備考"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 416.1,
+      "y": 20,
+      "width": 47.3,
+      "height": 21,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "発行日："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 395,
+      "y": 35,
+      "width": 69.1,
+      "height": 18,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "最終作業日："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 45,
+      "y": 45,
+      "width": 46.1,
+      "height": 16.4,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "得意先："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 45,
+      "y": 61.5,
+      "width": 45.5,
+      "height": 14,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "件名："
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 727,
+      "x2": 590,
+      "y2": 727
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 753.2,
+      "x2": 590,
+      "y2": 753.2
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 782.2,
+      "x2": 590,
+      "y2": 782.2
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 2,
+        "border-style": "solid"
+      },
+      "x1": 40,
+      "y1": 808.2,
+      "x2": 590,
+      "y2": 808.2
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 284,
+      "y": 732.2,
+      "width": 86,
+      "height": 22,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "実行金額 計"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 303.9,
+      "y": 760.2,
+      "width": 68,
+      "height": 19,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "請負金額"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 331.9,
+      "y": 788.2,
+      "width": 38,
+      "height": 18,
+      "style": {
+        "font-family": [
+          "IPAGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "差額"
+      ]
+    },
+    {
+      "id": "construction_end_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 484,
+      "y": 35,
+      "width": 106,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "underline"
+        ],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 115,
+      "y1": 58.3,
+      "x2": 352,
+      "y2": 58.3
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 115,
+      "y1": 75,
+      "x2": 352,
+      "y2": 75
+    },
+    {
+      "id": "issue_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 484,
+      "y": 19,
+      "width": 106,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "underline"
+        ],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "execution_amount",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 404,
+      "y": 732,
+      "width": 108,
+      "height": 14.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "¥{value}",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "constructing_amount",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 404,
+      "y": 760,
+      "width": 108,
+      "height": 14.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "¥{value}",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "difference",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 404,
+      "y": 789,
+      "width": 108,
+      "height": 14.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "¥{value}",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 168,
+      "y1": 112,
+      "x2": 168,
+      "y2": 727
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 290,
+      "y1": 112,
+      "x2": 290,
+      "y2": 727
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 364.5,
+      "y1": 112,
+      "x2": 364.5,
+      "y2": 727
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 466,
+      "y1": 112,
+      "x2": 466,
+      "y2": 727
+    }
+  ],
+  "state": {
+    "layout-guides": []
+  },
+  "title": "",
+  "report": {
+    "paper-type": "A4",
+    "orientation": "portrait",
+    "margin": [
+      0,
+      0,
+      0,
+      40
+    ]
+  }
+}

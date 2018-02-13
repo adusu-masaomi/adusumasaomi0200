@@ -1,0 +1,12 @@
+<%= simple_form_for @working_subcategory, :html => { :class => 'well form-horizontal' } do |f| %>
+  <!--<%= f.input :working_category_id %>-->
+  <%= f.collection_select :working_category_id, WorkingCategory.all, :id, :category_name, 
+     {:prompt => "どれか一つを選択して下さい"} , {id:"working_category_id", 
+  class: "searchableSelect2_1" , style: 'width:440px' } %>
+  
+  <%= f.input :name , input_html:{ :tabindex=>"1", id:"name" }%>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                working_subcategories_path(working_category_id: params[:working_category_id]), :class => 'btn btn-default' %>
+<% end %>

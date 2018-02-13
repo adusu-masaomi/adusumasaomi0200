@@ -1,0 +1,82 @@
+<%= simple_form_for @schedule, :html => { :class => 'well form-horizontal' } do |f| %>
+  <!--<%= f.input :construction_datum_id, input_html:{id:"construction_datum_id", style: 'width:320px', :tabindex=>"0"} %>-->
+  
+  <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
+  <% if @construction_data.present? %>
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , 
+           {id:"construction_datum_id",  class: "searchableSelect2_1" , style: 'width:400px' } %>
+  <% else %>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
+           {id:"construction_datum_id",  class: "searchableSelect2_1" , style: 'width:400px'} %>
+  <% end %>
+  </br>
+  
+  <%= f.input :content_name, input_html:{id:"content_name", :tabindex=>"1"} %>
+  
+  <%= f.label :内容参照用：, {:class => "my-custom-class-l", style: 'width:80px;font-size : 12px;'}  %>
+  <%= f.collection_select :construction_datum_id_refer, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:include_blank => true } , 
+           {id:"construction_datum_id_refer",  class: "searchableSelect2_2" , style: 'width:400px;' } %>
+  
+  <%= f.input :estimated_start_date, :include_blank => true,  input_html:{id:"estimated_start_date", :tabindex=>"3"} %>
+  <%= f.input :estimated_end_date , :include_blank => true, input_html:{:tabindex=>"4"}  %>
+  <%= f.input :work_start_date , :include_blank => true, input_html:{:tabindex=>"5"} %>
+  <%= f.input :work_end_date , :include_blank => true, input_html:{:tabindex=>"6"}  %>
+  
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  <!-- -->
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <!--<%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                schedules_path, :class => 'btn btn-default' %>-->
+  
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                schedules_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+                :class => 'btn btn-white_rsd' %>
+				
+<% end %>
+
+<!--css-->
+<style>
+.myFont{
+  font-size:9px !important;
+}
+</style>
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+  
+    $(".searchableSelect2_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+       $(this).prop('tabindex',0)}).trigger('load');
+	
+    $(".searchableSelect2_2").select2({ theme: "classic"}).on("load", function(e) { 
+       $(this).prop('tabindex',2)}).trigger('load');   
+    $(".searchableSelect2_2").change(function(e) {
+       setConstructionName();
+    }); 
+    
+	 
+    //not work...
+	//$("#searchableSelect2_2 option").addClass("myFont");
+	
+  });
+  
+  function setConstructionName(){
+    
+	if ($('.searchableSelect2_2').select2('data')[0].text != "") {
+	
+	  var content = $('.searchableSelect2_2').select2('data')[0].text;
+	
+	  var content_name_position = content.indexOf(":") + 1 ;
+      var content_name = $('.searchableSelect2_2').select2('data')[0].text.slice(content_name_position);
+	
+	  document.getElementById("content_name").value = content_name;
+	}
+  }
+  
+</script>
+
+
+
