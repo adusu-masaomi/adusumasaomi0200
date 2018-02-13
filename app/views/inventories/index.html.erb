@@ -20,17 +20,25 @@
 
 	<div>
        <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
-	   <%= link_to "在庫一覧表",
-            inventories_path(@inventory, format: "pdf", :print_flag => "1"),
-            :class => 'btn  btn-success', :target=>["_blank"] %>
-	   <%= link_to "棚卸表(記入用)",
-            inventories_path(@inventory, format: "pdf", :print_flag => "2"),
-            :class => 'btn  btn-info', :target=>["_blank"] %>
-			
 	   <%= link_to t('.new', :default => t("helpers.links.new")),
             new_inventory_path,
             :class => 'btn btn-primary' %>
 			
+	   
+	   <%= link_to "在庫一覧表(画像付)",
+            inventories_path(@inventory, format: "pdf", :print_flag => "1"),
+            :class => 'btn  btn-teal500_ftg', :target=>["_blank"] %>
+	   <%= link_to "在庫一覧表",
+            inventories_path(@inventory, format: "pdf", :print_flag => "2"),
+            :class => 'btn  btn-success', :target=>["_blank"] %>
+	   <%= link_to "棚卸表(記入用／画像付)",
+            inventories_path(@inventory, format: "pdf", :print_flag => "3"),
+            :class => 'btn  btn-lightblue700_ftg', :target=>["_blank"] %>
+	   <%= link_to "棚卸表(記入用)",
+            inventories_path(@inventory, format: "pdf", :print_flag => "4"),
+            :class => 'btn  btn-info', :target=>["_blank"] %>
+			
+	   
 	 </div>
    <% end %>
    <!-- kaminari用追加箇所開始 -->
@@ -57,6 +65,7 @@
   <thead>
     <tr>
       <th><%= model_class.human_attribute_name(:id) %></th>
+	  <th>画像</th>
       <!--<th><%= model_class.human_attribute_name(:warehouse_id) %></th>-->
       <!--<th><%= model_class.human_attribute_name(:location_id) %></th>-->
       <th><%= sort_link(@q, :material_master_material_code, model_class.human_attribute_name(:material_code) ) %></th>
@@ -75,6 +84,15 @@
     <% @inventories.order("id desc").each do |inventory| %>
       <tr>
         <td><%= link_to inventory.id, inventory_path(inventory) %></td>
+		<!--画像追加-->
+		<% if inventory.image? %>
+          <!--<td><%= image_tag inventory.image_url(:thumb)%></td>-->
+          <td><%= link_to image_tag(inventory.image_url(:thumb)), inventory %></td>
+        <% else %>
+          <td><%= image_tag 'noimage.gif' %></td>
+        <% end %>
+		<!-- -->
+		
         <!--<td><%= inventory.warehouse_id %></td>-->
         <!--<td><%= inventory.location_id %></td>-->
         <!--<td><%= inventory.material_master_id %></td>-->

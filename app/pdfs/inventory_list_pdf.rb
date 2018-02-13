@@ -5,12 +5,19 @@ class InventoryListPDF
 	#入出庫表PDF発行
       
        # tlfファイルを読み込む
-	   if $print_flag == "1"
-       #在庫一覧表
-         report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_pdf.tlf")
-       else
-	   #棚卸表（手書き用)
-	     report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_pdf.tlf")
+       case $print_flag 
+         when "1"
+           #在庫一覧表(画像付)
+           report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_with_pic_pdf.tlf")
+		 when "2"
+           #在庫一覧表
+           report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_pdf.tlf")
+         when "3"
+	       #棚卸表（手書き用-画像付)
+	       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_with_pic_pdf.tlf")
+		 when "4"
+	       #棚卸表（手書き用)
+	       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_pdf.tlf")
 	   end
 	   
         # 1ページ目を開始
@@ -113,8 +120,17 @@ class InventoryListPDF
 			 else
 			   unit_name = ""
 			 end
+			 
+			 #画像をセット
+			 if inventory.image.present?
+	           image_pic = "#{Rails.root}/public" + inventory.image_url(:thumb)
+			 else
+			   image_pic = nil
+			 end
+			 ##
 			
-			 row.values material_code: material_code,
+			 row.values image: image_pic, 
+			            material_code: material_code,
                         material_name: material_name,
 					    unit_name: unit_name,
 						inventory_quantity: inventory_quantity,

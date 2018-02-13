@@ -1,27 +1,71 @@
 class WorkingMiddleItemsController < ApplicationController
   before_action :set_working_middle_item, only: [:show, :edit, :update, :destroy]
-  
   before_action :set_move_flag, only: [:new, :edit]
+  
+  #労務単価定数
+  LABOR_COST = 11000
+  
+  #新規画面への引継ぎ用クラス変数
+  @@working_category_id = ""
+  @@working_subcategory_id = ""
   
   # GET /working_middle_items
   # GET /working_middle_items.json
   def index
     #ransack保持用コード
     query = params[:q]
-    query ||= eval(cookies[:recent_search_history].to_s)
+    #query ||= eval(cookies[:recent_search_history].to_s)
+    #クッキーは個別に持てる
+    query ||= eval(cookies[:recent_search_history_wmi].to_s)
    
+    #SEQのソート時、検索したクッキーが上書きされてしまうので、再び連想配列へ加える
+    #add180131
+    #if (cookies[:recent_search_history_wmi].present?  && query.present? && params[:q].nil?) || 
+    #   (params[:q].present? && params[:q]["working_category_id_eq"].blank?)
+    if cookies[:recent_search_history_wmi].present?  && query.present? && params[:q].nil?
+        #クッキー有＆パラメータ無し？ or 
+        #パラメータ有＆カテゴリー検索無の状態？
+        
+        if cookies[:recent_search_history_wmi].present? && query.present?
+          if eval(cookies[:recent_search_history_wmi].to_s)["working_category_id_eq"].present?
+            query.store("working_category_id_eq", eval(cookies[:recent_search_history_wmi].to_s)["working_category_id_eq"])
+          end
+          if eval(cookies[:recent_search_history_wmi].to_s)["working_subcategory_id_eq"].present?
+            query.store("working_subcategory_id_eq", eval(cookies[:recent_search_history_wmi].to_s)["working_subcategory_id_eq"])
+          end
+        end
+    end
+    #
+    
+    ###
+    #新規画面にて、検索パラメータを引き継ぐ
+    if query.present?
+      if query["working_category_id_eq"].present?
+        @@working_category_id = query["working_category_id_eq"]
+      end
+      if query["working_subcategory_id_eq"].present?
+        @@working_subcategory_id = query["working_subcategory_id_eq"]
+      else
+        @@working_subcategory_id = ""
+      end
+    end
+    ###
+    
     
     #@working_middle_items = WorkingMiddleItem.all
 	#@q = WorkingMiddleItem.ransack(params[:q])   
     #ransack保持用--上記はこれに置き換える
     @q = WorkingMiddleItem.ransack(query)
 	
+    
 	#ransack保持用コード
     search_history = {
     value: params[:q],
     expires: 24.hours.from_now
     }
-    cookies[:recent_search_history] = search_history if params[:q].present?
+    #cookies[:recent_search_history] = search_history if params[:q].present?
+    #upd180131
+    cookies[:recent_search_history_wmi] = search_history if params[:q].present?
     #
 	
 	@working_middle_items  = @q.result(distinct: true)
@@ -29,38 +73,45 @@ class WorkingMiddleItemsController < ApplicationController
 	
 	$sort = nil
 	
-	if params["q"].nil?  #upd170714
-	  #binding.pry
+	#if params["q"].nil?  #upd170714
+    if query.nil?  #upd180131
 	  @working_middle_items  = @working_middle_items.order('seq DESC') 
 	else
-	  if params["q"]["s"].present?
-	     if params["q"]["s"] == "seq asc"
+	  
+      #upd180131  params["q"] to query
+      if query["s"].present?
+	     if query["s"] == "seq asc"
 		   $sort = "normal"
-		 elsif params["q"]["s"] == "seq desc"
+		 elsif query["s"] == "seq desc"
 		   $sort = "reverse"
 		 end
 	  end
 	  
-	  #binding.pry
 	end
 	
-	
+    
 	#@working_middle_items = @working_middle_items.order('working_middle_items.position ASC')
   end
   
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
   def reorder
     
-	if $sort.nil? || $sort == "reverse"  #upd170714
+	#if $sort.nil? || $sort == "reverse"  #upd170714
+    if $sort == "reverse"  #upd180131
 	  row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
-	elsif $sort == "normal"
+	elsif $sort.nil? || $sort == "normal"  #upd180131
 	  row = params[:row].split(",")
 	end
 	
+    #binding.pry
+    
     #row.each_with_index {|row, i| WorkingMiddleItem.update(row, {:seq => i})}
+    
+    
 	#upd171122
 	row.each_with_index {|row, i| WorkingMiddleItem.update(row, {:seq => params[:category].to_i + i})}
-    render :text => "OK"
+	
+	render :text => "OK"
   end
   
   # GET /working_middle_items/1
@@ -83,9 +134,20 @@ class WorkingMiddleItemsController < ApplicationController
 	  
 	  $working_middle_item = nil
 	end
-	
+    
+	###
+    #検索パラメータの引継ぎ
+    if @@working_category_id.present?
+      @working_middle_item.working_middle_item_category_id = @@working_category_id
+    end
+    if @@working_subcategory_id.present?
+      @working_middle_item.working_subcategory_id = @@working_subcategory_id
+    end
+    ###
+    
+    
 	#労務単価の初期値をセットする
-	@working_middle_item.labor_unit_price_standard ||= 11000
+	@working_middle_item.labor_unit_price_standard ||= LABOR_COST
 	
   end
 
@@ -94,12 +156,16 @@ class WorkingMiddleItemsController < ApplicationController
     
 	
 	#労務単価の初期値をセットする
-    @working_middle_item.labor_unit_price_standard ||= 11000
+    @working_middle_item.labor_unit_price_standard ||= LABOR_COST
   end
 
   # POST /working_middle_items
   # POST /working_middle_items.json
   def create
+    
+    #明細マスターのパラメータ補正 add180201
+    set_params_replenishment
+  
     if params[:move_flag].blank?
 	#upd171128
 	  #マスター画面からの遷移の場合、モーダルのため、別ルーチンにて処理する。
@@ -128,6 +194,7 @@ class WorkingMiddleItemsController < ApplicationController
 		  elsif action_flag == "edit"
 	        #更新の場合
 	        if @working_middle_item.present?
+              
 	          status = @working_middle_item.update(working_middle_item_params)
 	        else
 	 	    #該当なしの場合（ボタン誤操作など）は、新規登録する
@@ -188,6 +255,9 @@ class WorkingMiddleItemsController < ApplicationController
   # PATCH/PUT /working_middle_items/1.json
   def update
     
+    #明細マスターのパラメータ補正 add180201
+    set_params_replenishment
+    
 	if params[:move_flag].blank?
 	#upd171128
 	  #マスター画面からの遷移の場合、モーダルのため、別ルーチンにて処理する。
@@ -232,6 +302,8 @@ class WorkingMiddleItemsController < ApplicationController
 		  
 		  elsif action_flag == "edit"
 		  #更新ボタン押下の場合
+            
+          
             status = @working_middle_item.update(working_middle_item_params)
 	      end
 		
@@ -300,7 +372,7 @@ class WorkingMiddleItemsController < ApplicationController
 	  if action_flag == "update"
 	  #更新ボタン押下の場合
     	
-		status = @working_middle_item.update(working_middle_item_params)
+        status = @working_middle_item.update(working_middle_item_params)
 	  elsif action_flag == "create"
 	  #新規ボタン押下の場合
 	    @working_middle_item = WorkingMiddleItem.new(working_middle_item_params) 
@@ -360,25 +432,37 @@ class WorkingMiddleItemsController < ApplicationController
 		  
 		  if item[:_destroy] != "1"
 		  
-		    if item[:working_small_item_id] == "1"
+            if item[:working_small_item_id] == "1"
 		    #手入力の場合→新規登録
 			  material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
 			     maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
-				 standard_labor_productivity_unit: item[:labor_productivity_unit]}
+				 standard_labor_productivity_unit: item[:labor_productivity_unit],
+                 maker_id: item[:maker_master_id], 
+                 unit_id: item[:unit_master_id] }
 			     
-                 @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
-                 if @material_master.blank?  #更新はないものとする
-				   @material_master = MaterialMaster.create(material_master_params)
-				 end
+                 if item[:working_small_item_code].present?  #add180131 品番がなければマスター反映させない。
+                   @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
+                   
+                   if @material_master.blank?  #更新はないものとする
+				     @material_master = MaterialMaster.create(material_master_params)
+                     
+                     #新規登録後、作成された資材Mの品番IDをセットする
+                     item[:working_small_item_id] = @material_master.id
+                     ##
+                     
+				   end
+                 end
 		    else
 		    #手入力以外--特定のデータを更新
 		      @material_master = MaterialMaster.find(item[:working_small_item_id])
-			
+			  
 			  if @material_master.present?
 			    material_master_params = {standard_quantity: item[:quantity], 
 			     standard_labor_productivity_unit: item[:labor_productivity_unit], 
 				 material_name: item[:working_small_item_name], 
-				 standard_quantity: item[:quantity], list_price: item[:unit_price]}
+				 standard_quantity: item[:quantity], list_price: item[:unit_price],
+                 maker_id: item[:maker_master_id], 
+                 unit_id: item[:unit_master_id] }
 			  
 			      @material_master.update(material_master_params)
 			  end
@@ -415,18 +499,22 @@ class WorkingMiddleItemsController < ApplicationController
   
   end
 
-  #パラメータを補充(今のところ未使用)
+  #パラメータを補充
   def set_params_replenishment
      if params[:working_middle_item][:working_small_items_attributes].present?
 	
+        i = 0
+    
 	    params[:working_middle_item][:working_small_items_attributes].values.each do |item|
-		
+		  #binding.pry
 		  #varidate用のために、本来の箇所から離れたパラメータを再セットする
-		  #item[:material_price] = params[:material_price][i]
+		  item[:material_price] = params[:material_price][i]
 		  #item[:material_id] = params[:material_id][i]
+          
+          i += 1
 		end
 		
-		i += 1
+		#i += 1
 	end
   
   end
@@ -450,7 +538,7 @@ class WorkingMiddleItemsController < ApplicationController
   end
 
   #ajax
-  #メーカーから該当する商品を取得
+  #カテゴリーから該当する商品を取得
   def item_extract
     #if params[:working_middle_item_category_id] != "0"
 	#upd171113
@@ -458,6 +546,9 @@ class WorkingMiddleItemsController < ApplicationController
       #初期値として、”手入力”も選択できるようにする
 	  @item_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
         pluck("working_middle_item_name, id")
+        
+      #binding.pry
+        
 	  #カテゴリー別のアイテムをセット
 	  @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
         pluck("working_middle_item_name, id")
@@ -468,6 +559,56 @@ class WorkingMiddleItemsController < ApplicationController
 	  #カテゴリー別のアイテムをセット
 	  @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
         pluck("working_middle_item_short_name, id")
+    else
+	#カテゴリーがデフォルト（指定なし）の場合
+	  @item_extract = WorkingMiddleItem.all.order(:seq).
+        pluck("working_middle_item_name, id")
+	
+	  @item_short_name_extract = WorkingMiddleItem.all.order(:seq).
+        pluck("working_middle_item_short_name, id")
+	end
+	
+  end
+  
+  #カテゴリー＆サブカテゴリーから該当する商品を取得
+  def item_extract_subcategory
+  
+     #if params[:working_middle_item_category_id] != ""
+    #upd180208
+    if params[:working_middle_item_category_id] != "" && params[:working_subcategory_id] != ""
+      
+      #初期値として、”手入力”も選択できるようにする
+	  @item_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
+        pluck("working_middle_item_name, id")
+	  #カテゴリー別のアイテムをセット(以下のみ、”item_extract”ファンクションと異なる。)
+      if params[:working_subcategory_id] == "1"
+      #サブカテゴリーが１の場合は、サブカテゴリー未選択とみなす。
+        @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => 
+           params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
+          pluck("working_middle_item_name, id")
+      else
+        @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => 
+           params[:working_middle_item_category_id]).where(:working_subcategory_id => 
+           params[:working_subcategory_id]).where("id is NOT NULL").order(:seq).
+          pluck("working_middle_item_name, id")
+      end
+      ##
+      
+	  #初期値として、”手入力”も選択できるようにする
+	  @item_short_name_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
+        pluck("working_middle_item_short_name, id")
+	  #カテゴリー別のアイテムをセット
+      if params[:working_subcategory_id] == "1"
+      #サブカテゴリーが１の場合は、サブカテゴリー未選択とみなす。
+	    @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => 
+          params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
+          pluck("working_middle_item_short_name, id")
+      else
+        @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => 
+          params[:working_middle_item_category_id]).where(:working_subcategory_id => 
+           params[:working_subcategory_id]).where("id is NOT NULL").order(:seq).
+          pluck("working_middle_item_short_name, id")
+      end
     else
 	#カテゴリーがデフォルト（指定なし）の場合
 	  @item_extract = WorkingMiddleItem.all.order(:seq).
@@ -502,20 +643,12 @@ class WorkingMiddleItemsController < ApplicationController
 	
     # Never trust parameters from the scary internet, only allow the white list through.
     def working_middle_item_params
-	  #170714 ver
-	  #params.require(:working_middle_item).permit(:working_middle_item_name, :working_middle_item_short_name, 
-      #      :working_middle_specification, :working_unit_id, :working_unit_price, :execution_unit_price, :material_id, 
-      #      :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, 
-      #      :labor_unit_price, :labor_unit_price_standard, :labor_productivity_unit, :material_quantity,
-      #      :accessory_cost, :material_cost_total, :labor_cost_total, :other_cost, :seq)
-	  
-	  #170715
-      params.require(:working_middle_item).permit(:working_middle_item_name, :working_middle_item_short_name, 
-            :working_middle_item_category_id, :working_middle_specification, :working_unit_id, :working_unit_name, :working_unit_price, :execution_unit_price, :material_id, 
+	  params.require(:working_middle_item).permit(:working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id,
+            :working_subcategory_id, :working_middle_specification, :working_unit_id, :working_unit_name, :working_unit_price, :execution_unit_price, :material_id, 
             :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, 
             :labor_unit_price, :labor_unit_price_standard, :labor_productivity_unit, :material_quantity,
             :accessory_cost, :material_cost_total, :labor_cost_total, :other_cost, :seq, 
 	     	working_small_items_attributes:   [:id, :working_specific_middle_item_id, :working_small_item_id, :working_small_item_code, :working_small_item_name, 
-			:unit_price, :rate, :quantity, :labor_productivity_unit, :_destroy] )
+			:unit_price, :rate, :quantity, :material_price, :maker_master_id, :unit_master_id, :labor_productivity_unit, :_destroy] )
     end
 end

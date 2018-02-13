@@ -709,6 +709,20 @@
               "base": "",
               "type": ""
             }
+          },
+          {
+            "id": "image",
+            "type": "image-block",
+            "display": false,
+            "description": "",
+            "x": 84.4,
+            "y": 143,
+            "width": 14.1,
+            "height": 13,
+            "style": {
+              "position-x": "left",
+              "position-y": "top"
+            }
           }
         ]
       },

@@ -1,4 +1,24 @@
 Rails.application.routes.draw do
+  resources :working_subcategories
+  resources :working_subcatefories
+  resources :task_contents
+  resources :tasks
+  
+  #add180110
+  scope '/api' do
+    get "/data", :to => "tasks#data"
+    
+    post "/task", :to => "tasks#add"
+    put "/task/:id", :to => "tasks#update"
+    delete "/task/:id", :to => "tasks#delete"
+	
+    post "/link", :to => "links#add"
+    put "/link/:id", :to => "links#update"
+    delete "/link/:id", :to => "links#delete"
+  end
+  #add end
+  
+  resources :schedules
   resources :working_categories
   resources :working_specific_small_items
   resources :working_specific_middle_items
@@ -150,6 +170,12 @@ Rails.application.routes.draw do
   #インデックスのdrag&dropによるソート用
   post '/working_middle_itemz/reorder' => 'working_middle_items#reorder'
   post '/working_large_itemz/reorder' => 'working_large_items#reorder'
+  
+  #add180206
+  post '/working_categoriez/reorder' => 'working_categories#reorder'
+  #add180207
+  post '/working_subcategoriez/reorder' => 'working_subcategories#reorder'
+  
   #add170421
   post '/working_unitz/reorder' => 'working_units#reorder'
   post '/quotation_detail_large_classificationz/reorder' => 'quotation_detail_large_classifications#reorder'
@@ -229,6 +255,9 @@ Rails.application.routes.draw do
   get '/construction_daily_reports_graph' => "construction_daily_reports#index2"
   
   
+  #add180110 工程表画面
+  get '/tasks_schedule' => "tasks#index2"
+    
   get '/construction_costz/construction_name_select' => 'construction_costs#construction_name_select'
   get '/construction_costz/construction_labor_cost_select' => 'construction_costs#construction_labor_cost_select'
   get '/construction_costz/purchase_order_amount_select' => 'construction_costs#purchase_order_amount_select'
@@ -484,35 +513,29 @@ Rails.application.routes.draw do
   get '/delivery_slip_detail_middle_classificationz/delivery_slip_detail_large_classification_id_select' => 'delivery_slip_detail_middle_classifications#delivery_slip_detail_large_classification_id_select'
   ########
   
+  get "/quotation_material_headerz/material_select" => 'quotation_material_headers#material_select'
   
   #見積内訳M,資材M連動用
   get '/working_middle_itemz/working_material_name_select' => 'working_middle_items#working_material_name_select'
   get '/working_middle_itemz/material_unit_price_select' => 'working_middle_items#material_unit_price_select'
   
-  
-  #add170712
   get '/working_small_itemz/material_standard_select' => 'working_small_items#material_standard_select'
-  
-  #add171113
   get '/working_small_itemz/material_code_standard_select' => 'working_small_items#material_code_standard_select'
   
    #会社休日取得用
   get '/business_holidayz/get_business_holiday' => 'business_holidays#get_business_holiday'
   
-  #在庫単価取得用 170419
+  #在庫単価取得用 1
   get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
   get '/inventoriez/get_quantity' => 'inventories#get_quantity'
-  
   get '/working_middle_itemz/item_extract' => 'working_middle_items#item_extract'
-  
-  #add171110
   get '/working_specific_middle_itemz/working_material_info_select' => 'working_specific_middle_items#working_material_info_select'
-  
-  #add171115
   get '/working_middle_itemz/working_material_info_select' => 'working_middle_items#working_material_info_select'
-  
   get '/working_unitz/working_unit_name_select' => 'working_units#working_unit_name_select'
   
+  #add180202
+  get '/working_subcategoriez/subcategory_extract' => 'working_subcategories#subcategory_extract'
+  get '/working_middle_itemz/item_extract_subcategory' => 'working_middle_items#item_extract_subcategory'
   
   #del170707
   #get '/construction_daily_reportz/staff_pay_select' => 'construction_daily_reports#staff_pay_select'
@@ -535,6 +558,12 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :working_subcategories
+  resources :working_subcatefories
+  resources :task_contents
+  resources :tasks
+  resources :tasks
+  resources :schedules
   resources :working_categories
   resources :working_specific_small_items
   resources :working_specific_middle_items

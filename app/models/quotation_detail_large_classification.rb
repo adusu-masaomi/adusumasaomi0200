@@ -24,22 +24,40 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   #add 1711004
   attr_accessor :quotation_large_item_id
   attr_accessor :master_insert_flag
+  
   #ajax用（リスト）
-  #attr_accessor :working_middle_item_category_id 
-  attr_accessor :working_middle_item_category_id_call
+  
+  #del180213
+  #attr_accessor :working_middle_item_category_id_call
+  #attr_accessor :working_middle_item_subcategory_id_call
+  #
+  
   attr_accessor :working_middle_item_id_select_hide
   attr_accessor :working_middle_item_short_name_select_hide
+  
+  attr_accessor :working_subcategory_select_hide
+  
+  #add180210
+  attr_accessor :category_save_flag_child
   #
   
   #金額合計(見積)
   def self.sumpriceQuote  
     #工事種別が通常かまたは値引の場合のみ合算。
-    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
+    #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
+    
+    #upd180105
+    #工事種別が小計以外は加算する
+    where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:quote_price)
   end
   #金額合計(実行)
   def self.sumpriceExecution  
     #工事種別が通常かまたは値引の場合のみ合算。
-    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
+    #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
+	
+	#upd180105
+    #工事種別が小計以外は加算する
+    where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:execution_price)
   end
   
   #合計(歩掛り)
@@ -49,7 +67,11 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   #合計(歩掛り計)
   def self.sumLaborProductivityUnitTotal  
     #工事種別が通常かまたは値引の場合のみ合算。
-    where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total)
+    #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total)
+    #upd180105
+    #工事種別が小計以外は加算する
+    where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:labor_productivity_unit_total)
+	
   end
   
   #合計(歩掛り-配管配線集計用)
@@ -70,6 +92,40 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   #合計(歩掛り-労務費集計用)
   scope :sum_LPUT_labor_cost, -> quotation_header_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
                                    sum(:labor_productivity_unit_total)}
+  
+  
+  ######
+  #add180105
+  #配管・機器・労務集計において、金額の計も算出する
+  
+  #見積金額計
+  
+  #(配管配線集計用)
+  scope :sum_quote_price_PipingWiring, -> quotation_header_id {where(:piping_wiring_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:quote_price)}
+  #(機器取付集計用)
+  scope :sum_quote_price_equipment_mounting, -> quotation_header_id {where(:equipment_mounting_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:quote_price)}
+  
+  #(労務費集計用)
+  scope :sum_quote_price_labor_cost, -> quotation_header_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:quote_price)}
+  
+  #実行金額計
+  
+  #(配管配線集計用)
+  scope :sum_execution_price_PipingWiring, -> quotation_header_id {where(:piping_wiring_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:execution_price)}
+  
+  #(機器取付集計用)
+  scope :sum_execution_price_equipment_mounting, -> quotation_header_id {where(:equipment_mounting_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:execution_price)}
+  
+  #(労務費集計用)
+  scope :sum_execution_price_labor_cost, -> quotation_header_id {where(:labor_cost_flag => 1).where(quotation_header_id: quotation_header_id ).
+                                   sum(:execution_price)}
+  ######
+  
   
   scope :with_header_id, -> (quotation_detail_large_classifications_quotation_header_id=1) { joins(:QuotationHeader).where("quotation_headers.id = ?", quotation_detail_large_classifications_quotation_header_id )}
    

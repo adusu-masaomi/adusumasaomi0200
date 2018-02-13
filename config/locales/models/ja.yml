@@ -186,6 +186,9 @@ ja:
        stocktake: 棚卸データ
        contact: 連絡先マスター
        working_category: カテゴリーマスター
+       working_subcategory: カテゴリーサブマスター
+       task: 工程表データ
+       task_content: 工程表項目マスター
     attributes:
        delivery_slip_header:
          delivery_slip_date: 納品日
@@ -250,6 +253,16 @@ ja:
          next_unit_price_2: 次々回単価
        business_holiday:
          holiday_flag: 休日フラグ
+       task:
+         text: 内容
+         start_date: 予定開始日
+         end_date: 予定終了日
+         work_start_date: 実施開始日
+         work_end_date: 実施終了日
+         duration: 期間(日)
+         progress: 進捗(%)
+       task_content:
+         name: 項目名
        stocktake:
          stocktake_date: 棚卸日
          physical_quantity: 実地数量
@@ -266,6 +279,11 @@ ja:
          partner_division_id: 取引区分
        working_category:
          category_name: カテゴリー名
+       working_subcategory:
+         working_category_id: カテゴリー
+         name: サブカテゴリー名
+       working_middle_item:
+         working_subcategory_id: サブカテゴリー
     errors:
       messages:
         record_invalid: "バリデーションに失敗しました: %{errors}"

@@ -31,8 +31,31 @@ class ConstructionDatum < ActiveRecord::Base
     validates :construction_code, presence: true, uniqueness: true
 	validates :alias_name, presence: true
     
-	#緯度経度の自動登録
-	#add170620
+	##add180123
+    #住所に番地等を入れないようにするためのバリデーション(冗長だが他に方法が見当たらない)
+    ADDRESS_ERROR_MESSAGE = "番地（番地）は入力できません。"
+    ADDRESS_ERROR_MESSAGE_2 = "番地（丁目）は入力できません。"
+	ADDRESS_ERROR_MESSAGE_3 = "番地（ハイフン）は入力できません。"
+	ADDRESS_ERROR_MESSAGE_4 = "番地（数字）は入力できません。"
+   
+    validates :address, format: {without: /丁目/ , :message => ADDRESS_ERROR_MESSAGE_2 }
+    validates :address, format: {without: /番地/ , :message => ADDRESS_ERROR_MESSAGE }
+    #「流通センター」などの地名も有るため、許可する。
+    #validates :address, format: {without: /ー/ , :message => ADDRESS_ERROR_MESSAGE_3 }
+    #validates :address, format: {without: /−/ , :message => ADDRESS_ERROR_MESSAGE_3 }
+    validates :address, format: {without: /-/ , :message => ADDRESS_ERROR_MESSAGE_3 }
+   
+    #住所に数値が混じっていた場合も禁止する
+    validate  :address_regex
+    def address_regex
+      if address.match(/[0-9０-９]+$/)
+        errors.add :address, ADDRESS_ERROR_MESSAGE_4
+      end
+    end
+    ##add end 
+
+    #緯度経度の自動登録
+    #add170620
     geocoded_by :address_with_house_number
     after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
@@ -72,6 +95,23 @@ class ConstructionDatum < ActiveRecord::Base
 
         #self.construction_code + ':' + self.construction_name
         construction_code + ':' + construction_name 
+    end
+	
+	#リスト表示用(CD/短縮名称)
+	def p_cd_alias_name
+        if self.construction_code.nil?
+           construction_code = "-"
+        else 
+           construction_code = self.construction_code
+        end
+        if self.alias_name.nil?
+           alias_name = "-"
+        else 
+           alias_name = self.alias_name
+        end        
+
+        #self.construction_code + ':' + self.construction_name
+        construction_code + ':' + alias_name 
     end
 	
 	def self.bills_check_list 

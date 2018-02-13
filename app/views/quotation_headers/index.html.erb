@@ -101,9 +101,10 @@
         <td>
 		  <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_quotation_header_path(quotation_header), :class => 'btn btn-white_rsd btn-xs' %>
-		  <%= link_to "履歴",
+		  
+          <!--<%= link_to "履歴",
             quotation_header_histories_list_path(quotation_header_id: quotation_header.id),
-            :class => 'btn btn-purple300_rsd btn-xs' %>
+            :class => 'btn btn-purple300_rsd btn-xs' %>-->
 			
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       quotation_header_path(quotation_header),

@@ -8,8 +8,19 @@
   <!--<dd><%= @inventory.warehouse_id %></dd>-->
   <!--<dt><strong><%= model_class.human_attribute_name(:location_id) %>:</strong></dt>-->
   <!--<dd><%= @inventory.location_id %></dd>-->
+  
+  <!--画像表示 171218-->
+  <% if @inventory.image? %>
+    <dd><%= image_tag @inventory.image.to_s %></dd>
+  <% else %>
+    <dd><%= image_tag 'noimage.gif' %></dd>
+  <% end %>
+ 
+ <dt><strong><%= model_class.human_attribute_name(:material_code) %>:</strong></dt>
+  <dd><%= @inventory.material_master.material_code %></dd> 
   <dt><strong><%= model_class.human_attribute_name(:material_name) %>:</strong></dt>
   <dd><%= @inventory.material_master.material_name %></dd>
+  
   <dt><strong><%= model_class.human_attribute_name(:inventory_quantity) %>:</strong></dt>
   <dd><%= @inventory.inventory_quantity %></dd>
   <dt><strong><%= model_class.human_attribute_name(:current_unit_price) %>:</strong></dt>

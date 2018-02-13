@@ -74,6 +74,15 @@ class InvoiceHeadersController < ApplicationController
     @invoice_header = InvoiceHeader.new
 	#顧客Mをビルド
     @invoice_header.build_customer_master
+    
+     #add180206
+    #顧客Mで絞られている場合は、初期値としてセットする
+    if eval(cookies[:recent_search_history].to_s).present?
+      if eval(cookies[:recent_search_history].to_s)["customer_id_eq"].present?
+        @invoice_header.customer_id = eval(cookies[:recent_search_history].to_s)["customer_id_eq"]
+      end
+    end
+    ##
   end
 
   # GET /invoice_headers/1/edit

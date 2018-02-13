@@ -36,19 +36,46 @@
   <div class="col-xs-3" , style="margin-left : -15px">
   <%= f.label :"(呼出用)カテゴリー" , {:class => "my-custom-class-l"} %></br>
   
-  <%= f.select :working_middle_item_category_id_call, WorkingCategory.all.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
-    {id:'working_middle_item_category_id_call', :class => "my-custom-class", style: 'width:190px;font-size:14px;', :onchange => "setItemExtractByCategory()",:tabindex=>"3" } %>
+  <%= f.select :working_middle_item_category_id_call, WorkingCategory.order('seq').all.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
+    {id:'working_middle_item_category_id_call', :class => "my-custom-class", style: 'width:190px;font-size:14px;', :onchange => "setItemExtractByCategory(1)",:tabindex=>"3" } %>
 
   </div>
   <div class="col-xs-3" , style="margin-left : 10px">
   <%= f.label :"(登録用)カテゴリー" , {:class => "my-custom-class-l"} %></br>
   
-  <%= f.select :working_middle_item_category_id, WorkingCategory.all.map{|t| [t.category_name, t.id]}, {:selected => @delivery_slip_detail_large_classification.working_middle_item_category_id || 1}, 
-    {id:'working_middle_item_category_id', :class => "my-custom-class", style: 'width:190px;font-size:14px;',:tabindex=>"4" } %>
+  <%= f.select :working_middle_item_category_id, WorkingCategory.order('seq').all.map{|t| [t.category_name, t.id]}, {:selected => @delivery_slip_detail_large_classification.working_middle_item_category_id || 1}, 
+    {id:'working_middle_item_category_id', :class => "my-custom-class", style: 'width:190px;font-size:14px;',:tabindex=>"4", 
+     :onchange => "setSubacategoryExtractByParent(2)" } %>
 	
   </div>
   </br></br></br>
   <!-- -->
+  
+  <!--カテゴリー（子） add180131-->
+  <div class="col-xs-3" , style="margin-left : -15px">
+  <%= f.label :"(呼出用)サブカテゴリー" , {:class => "my-custom-class-l"} %></br>
+  
+  <%= f.select :working_middle_item_subcategory_id_call, WorkingSubcategory.all.map{|t| [t.name, t.id]}, {:include_blank => true}, 
+    {id:'working_middle_item_subcategory_id_call', :class => "my-custom-class", style: 'width:190px;font-size:14px;', :onchange => "setItemExtractBySubCategory()",:tabindex=>"5" } %>
+
+  </div>
+  <div class="col-xs-3" , style="margin-left : 10px">
+  <%= f.label :"(登録用)サブカテゴリー" , {:class => "my-custom-class-l"} %></br>
+  
+  <%= f.select :working_middle_item_subcategory_id, WorkingSubcategory.all.map{|t| [t.name, t.id]}, {:include_blank => true}, 
+    {id:'working_middle_item_subcategory_id', :class => "my-custom-class", style: 'width:190px;font-size:14px;',:tabindex=>"6" } %>
+	
+  </div>
+  </br>
+  
+  <!--add180210-->
+  <%= f.label :　 %><br>
+  <%= f.radio_button :category_save_flag_child, 1 %> <%= f.label :カテゴリー引継, 1 %>
+  <%= f.radio_button :category_save_flag_child, 2 %> <%= f.label :引継停止, 2 %>
+  </br>
+  
+  <!-- -->
+  
   
   <!--upd171106-->
   <div class="col-xs-3" , style="margin-left : -15px">
@@ -68,15 +95,15 @@
   </br></br></br>
   <!--upd end-->
   
-  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "7"}  %>
-  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"8" }  %>
+  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "9"}  %>
+  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"10" }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
-  <%= f.input :quantity, label: "納品数量", :input_html => {id:'quantity', :tabindex=>"9", style: 'width:120px', 
+  <%= f.input :quantity, label: "納品数量", :input_html => {id:'quantity', :tabindex=>"11", style: 'width:120px', 
                 :value => @delivery_slip_detail_large_classification.quantity || 1, :onchange => "changeQuantity(0)" } %>
   </div>
   <div style="margin-left : -50px">
-  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"10", style: 'width:120px',
+  <%= f.input :execution_quantity, :input_html => {id:'execution_quantity', :tabindex=>"12", style: 'width:120px',
                 :value => @delivery_slip_detail_large_classification.execution_quantity || 1 , :onchange => "changeQuantity(1)" } %>
   </div>
   
@@ -88,22 +115,22 @@
      :class => "searchableSelect2_4",  style: 'width:120px' } %></br>
   </div>
   <div style="margin-left : -50px;margin-top : -15px">
-  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", :tabindex=>"12", style: 'width:120px',  :value => @delivery_slip_detail_large_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name)   }  %>
+  <%= f.input :working_unit_name , label: "単位名(手入力可)", input_html:{id:"working_unit_name", :tabindex=>"14", style: 'width:120px',  :value => @delivery_slip_detail_large_classification.working_unit_name || WorkingUnit.where(:id => 1).pluck(:working_unit_name)   }  %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
-  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"13", :onchange => "calcTotalPrice()" } %>
+  <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:120px', :tabindex=>"15", :onchange => "calcTotalPrice()" } %>
   </div>
   <div style="margin-left : -50px;margin-top : -15px">
-  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"14", :onchange => "calcTotalPrice()"} %>
+  <%= f.input :execution_unit_price, input_html:{id:"execution_unit_price", style: 'width:120px', :tabindex=>"16", :onchange => "calcTotalPrice()"} %>
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :delivery_slip_price,  :input_html => {id:'delivery_slip_price', :tabindex=>"15", style: 'width:120px'} %>
+  <%= f.input :delivery_slip_price,  :input_html => {id:'delivery_slip_price', :tabindex=>"17", style: 'width:120px'} %>
   </div>
   <!--<div style="margin-left : -50px;margin-top : -20px">-->
   <div class="col-xs-2",  style="margin-left : -0px;margin-top : -20px">
-  <%= f.input :execution_price, :input_html => {id:'execution_price', :tabindex=>"16", style: 'width:120px'} %>
+  <%= f.input :execution_price, :input_html => {id:'execution_price', :tabindex=>"18", style: 'width:120px'} %>
   </div>
   
   <div style="margin-top : 25px">
@@ -112,11 +139,11 @@
   </br></br></br>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -15px">
-  <%= f.input :labor_productivity_unit,  :input_html => {id:"labor_productivity_unit", :tabindex=>"17", style: 'width:120px', :onchange => "calcLaborTotal()"}  %>
+  <%= f.input :labor_productivity_unit,  :input_html => {id:"labor_productivity_unit", :tabindex=>"19", style: 'width:120px', :onchange => "calcLaborTotal()"}  %>
   </div>
   <!--<div style="margin-top : -15px">-->
   <div class="col-xs-2", style="margin-left : -0px;margin-top : -20px">
-  <%= f.input :labor_productivity_unit_total,  :input_html => {id:"labor_productivity_unit_total", :tabindex=>"18", style: 'width:120px'}  %>
+  <%= f.input :labor_productivity_unit_total,  :input_html => {id:"labor_productivity_unit_total", :tabindex=>"20", style: 'width:120px'}  %>
   </div>
   
   <div style="margin-top : 10px">
@@ -133,7 +160,7 @@
   <%= f.label_tag :labor_cost_flag, '労務費' %>
   <!--add end-->
   
-  <%= f.input :remarks,  :input_html => {:tabindex=>"19", style: 'width:420px'}  %>
+  <%= f.input :remarks,  :input_html => {:tabindex=>"21", style: 'width:420px'}  %>
   
   <%= f.check_box :check_update_item, {id:"check_update_item"}, "true", "false" %>
   <%= f.label_tag :check_update_item, '品名・仕様・単位のみマスター反映　　　' %> 
@@ -143,6 +170,9 @@
   <%= hidden_field_tag(:delivery_slip_header_id, 'index') %>
   <%= hidden_field_tag(:working_large_item_id, 'index') %>
   
+  <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
+         {id:"working_subcategory_select_hide",  hidden: true  } %>
+  
   <!--add171104-->
   <%= f.input :master_insert_flag , input_html:{ id:"master_insert_flag"}, as: :hidden %>
   <%= f.collection_select :working_middle_item_id_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name,  {} , 
@@ -150,6 +180,9 @@
   <%= f.collection_select :working_middle_item_short_name_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name,  {} , 
     {id:"working_middle_item_short_name_select_hide",  hidden: true   } %>
   <!---->
+  
+  <!-- add180210 -->
+  <%= f.input :action_flag, input_html:{id:'action_flag', :value => @action_flag} , as: :hidden %>
   
   <%= f.button :submit, :class => 'btn-primary', :onclick => "submitAfterValidation()" %>
   <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
@@ -205,7 +238,7 @@
 	 });
 	 //項目名--select2のタブインデックスはここで指定。
      $(".searchableSelect2_3").select2({ theme: "bootstrap" }).on("load", function(e) { 
-        $(this).prop('tabindex',5)}).trigger('load');
+        $(this).prop('tabindex',7)}).trigger('load');
 	 $( ".searchableSelect2_3" ).on("select2:close", function (e) {
 	   nextControlSelect2(this);
      });
@@ -217,12 +250,15 @@
 		  setExecutionUnitPrice();
 		  //金額も計算
 		  calcTotalPrice();
-		  setLaborProductivityUnit();
-		  setLaborProductivityUnitTotal();
+		  obj = document.getElementById("construction_type").value;
+	      if (obj == "0") {
+	        setLaborProductivityUnit();
+		    setLaborProductivityUnitTotal();
+		  }
      });
 	 //単位--select2のタブインデックスはここで指定。
 	 $(".searchableSelect2_4").select2({ theme: "bootstrap"}).on("load", function(e) { 
-        $(this).prop('tabindex',11)}).trigger('load');
+        $(this).prop('tabindex',13)}).trigger('load');
 	  $( ".searchableSelect2_4" ).on("select2:close", function (e) {
 	   nextControlSelect2(this);
      });
@@ -233,7 +269,7 @@
     
 	 //項目名(固有)--select2のタブインデックスはここで指定。
 	 $(".searchableSelect2_5").select2({ theme: "bootstrap" }).on("load", function(e) { 
-        $(this).prop('tabindex',6)}).trigger('load');
+        $(this).prop('tabindex',8)}).trigger('load');
 	 $( ".searchableSelect2_5" ).on("select2:close", function (e) {
        nextControlSelect2(this);
      });
@@ -272,6 +308,10 @@
 	 //add170822
      //記号(短縮)名を最新の情報にする
 	 setShortName();
+     
+     //add180210
+     //呼出用カテゴリーの初期設定
+     setItemExtractByCategoryInitial();
 	
    });
   
@@ -318,7 +358,7 @@
 
   
   //カテゴリー別にアイテムを抽出する処理
-  function setItemExtractByCategory(){
+  function setItemExtractByCategory(controlFlag){
     var category_id = document.activeElement.value;
    
     //if (category_id != "1"){
@@ -335,10 +375,117 @@
 		    //一旦手入力で選択する
 		    //document.getElementById("working_large_item_short_name").value = "1"; 
 		    //$(".searchableSelect2_2").trigger("change"); 
+            
+            //カテゴリー別のサブカテゴリーを抽出する
+            setSubacategoryExtractByParent(controlFlag);
+           
       });
     //}
   }
+ 
+ //add180210
+ //カテゴリー別にアイテムを抽出する処理(引継用)
+ function setItemExtractByCategoryInitial(){
+     var category_id = document.getElementById("working_middle_item_category_id_call").value;
+     
+     if (category_id != ""){
+     
+       $.get("<%= working_middle_itemz_item_extract_path %>",
+          {working_middle_item_category_id: category_id},
+           function(data){
+		     //アイテムのリストを再配置
+             document.getElementById("working_large_item_id").innerHTML = document.getElementById("working_middle_item_id_select_hide").innerHTML;
+		     
+             //短縮名のリストを再配置
+		     document.getElementById("working_large_item_short_name").innerHTML = document.getElementById("working_middle_item_short_name_select_hide").innerHTML;
+	       
+           //編集モードならば、カテゴリー別のサブカテゴリーを抽出。
+           //if (document.getElementById("action_flag").value == "edit"){
+             var selectIndex = document.getElementById("working_middle_item_subcategory_id_call").value;
+             setSubCategoryExtractByParentInitial(selectIndex);
+           //}
+           //サブカテゴリーがあれば、更にアイテムを絞り込む
+           setItemExtractBySubCategory();
+       });
+     }
+ }
+ 
+  //カテゴリー&サブカテゴリー別にアイテムを抽出する処理
+ function setItemExtractBySubCategory(){
+   
+   var category_id = document.getElementById("working_middle_item_category_id_call").value;
+   //var working_subcategory_id = document.activeElement.value;
+   //upd180208
+   var working_subcategory_id = document.getElementById("working_middle_item_subcategory_id_call").value;
+   
+   //add condition 180208
+   if (working_subcategory_id != ""){
+     $.get("<%= working_middle_itemz_item_extract_subcategory_path %>",
+        {working_middle_item_category_id: category_id, working_subcategory_id: working_subcategory_id},
+         function(data){
+		   //アイテムのリストを再配置
+           document.getElementById("working_large_item_id").innerHTML = document.getElementById("working_middle_item_id_select_hide").innerHTML;
+		   
+		   //短縮名のリストを再配置
+		   document.getElementById("working_large_item_short_name").innerHTML = document.getElementById("working_middle_item_short_name_select_hide").innerHTML;
+		   //一旦手入力で選択する
+		   //document.getElementById("working_large_item_short_name").value = "1"; 
+		   //$(".searchableSelect2_2").trigger("change"); 
+           
+           
+     });
+   }
+ }
   
+  //カテゴリー別のサブカテゴリーを抽出する
+  //add180205
+  function setSubacategoryExtractByParent(controlFlag){
+    
+    var category_id = document.activeElement.value;
+    
+    //var category_id = document.activeElement.value;
+      $.get("<%= working_subcategoriez_subcategory_extract_path %>",
+        {working_category_id: category_id},
+         function(data){
+		   //アイテムのリストを再配置
+           if (controlFlag == 1){
+             //呼出用
+             document.getElementById("working_middle_item_subcategory_id_call").innerHTML = document.getElementById("working_subcategory_select_hide").innerHTML;
+		     //リストを未選択状態にする
+		     document.getElementById("working_middle_item_subcategory_id_call").value = "";
+             $('#working_middle_item_subcategory_id_call').trigger('change');
+           
+           }else{
+             //登録用
+             document.getElementById("working_middle_item_subcategory_id").innerHTML = document.getElementById("working_subcategory_select_hide").innerHTML;
+             //リストを未選択状態にする
+		     document.getElementById("working_middle_item_subcategory_id").value = "";
+             $('#working_middle_item_subcategory_id').trigger('change');
+           }
+		  
+	  });
+  }
+  
+  //カテゴリー別のサブカテゴリーを抽出する
+  //add180210
+  function setSubCategoryExtractByParentInitial(selectIndex){
+    
+    var category_id = document.getElementById("working_middle_item_category_id_call").value;
+    
+      $.get("<%= working_subcategoriez_subcategory_extract_path %>",
+        {working_category_id: category_id},
+         function(data){
+		   //アイテムのリストを再配置
+             //呼出用
+             document.getElementById("working_middle_item_subcategory_id_call").innerHTML = document.getElementById("working_subcategory_select_hide").innerHTML;
+		     //リストを未選択状態にする
+		     document.getElementById("working_middle_item_subcategory_id_call").value = selectIndex;
+             $('#working_middle_item_subcategory_id_call').trigger('change');
+           
+           }
+		  
+      );
+  }
   
   //add170822
   //短縮名をテキストへセット
@@ -434,6 +581,14 @@
 	  //歩掛り計へセット
       obj = document.getElementById("labor_productivity_unit_total").textContent;
       document.getElementById("labor_productivity_unit_total").value = obj;
+	  
+	  //add180105
+	  //納品金額計
+	  obj = document.getElementById("delivery_slip_price").textContent;
+      document.getElementById("delivery_slip_price").value = obj;
+	  //実行金額計
+	  obj = document.getElementById("execution_price").textContent;
+      document.getElementById("execution_price").value = obj;
   }
   //add end 
   
@@ -503,6 +658,8 @@
         function(data){
           obj = document.getElementById("labor_productivity_unit_total").textContent;
           document.getElementById("labor_productivity_unit_total").value = obj;
+		  
+		  //debugger;
 		  }
       );      
   }
@@ -630,6 +787,7 @@
   function clearLaborProductivityUnit(){
     document.getElementById("labor_productivity_unit").value = "";
     document.getElementById("labor_productivity_unit_total").value = "";
+	
   }
   //
 

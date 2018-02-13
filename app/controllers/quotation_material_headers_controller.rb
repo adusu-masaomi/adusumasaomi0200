@@ -232,7 +232,11 @@ class QuotationMaterialHeadersController < ApplicationController
 		else 
 		#昇順の場合
 		  $seq_exists = 1
-		  $seq_max = @details.maximum(:sequential_id)
+		  if @details.present?
+		    $seq_max = @details.maximum(:sequential_id)
+		  else
+		    $seq_max = 1
+		  end
 		end
 		##
   
@@ -285,6 +289,22 @@ class QuotationMaterialHeadersController < ApplicationController
 	 $quotation_material_header = QuotationMaterialHeader.find(params[:quotation_header_origin_id])
   end
   
+  
+  #商品名などを取得
+  def material_select
+  
+     @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
+	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
+	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
+     @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+	 
+	 @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+                 params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
+	 #add170914 該当なければひとまず”個”にする
+	 if @unit_id.blank?
+	   @unit_id = "3"
+	 end
+  end
   
   #見積コードの最終番号(+1)を取得する
   def get_last_quotation_code_select

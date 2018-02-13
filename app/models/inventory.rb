@@ -7,6 +7,9 @@ class Inventory < ActiveRecord::Base
   #add171026
   belongs_to :supplier_master
   
+  #ファイルのアップローダー追加 add 171218
+  mount_uploader :image, ImagesUploader
+  
   #add171026
   #バリデーション追加
   validates_numericality_of :inventory_quantity, :only_integer => true, :allow_nil => false

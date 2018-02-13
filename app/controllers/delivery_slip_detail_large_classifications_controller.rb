@@ -3,7 +3,10 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 
   #add171016
   before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
-
+  
+  #add180210
+  before_action :set_action_flag, only: [:new, :edit ]
+  
   @@new_flag = []
   max_line_number = 0
 
@@ -200,11 +203,17 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	#行番号を取得する
 	get_line_number
 	
-	
+	#カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
+    get_category_id
   end
 
   # GET /delivery_slip_detail_large_classifications/1/edit
   def edit
+    #カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
   end
 
   # POST /delivery_slip_detail_large_classifications
@@ -234,6 +243,10 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     
     #行番号の最終を書き込む
     delivery_slip_headers_set_last_line_number
+
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
 
     #手入力用IDの場合は、単位マスタへも登録する。
     if @delivery_slip_detail_large_classification.working_unit_id == 1
@@ -334,6 +347,10 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
       
     #行番号の最終を書き込む
     delivery_slip_headers_set_last_line_number
+  
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
   
     #####
     #手入力用IDの場合は、単位マスタへも登録する。
@@ -465,6 +482,7 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
                                     working_middle_item_short_name: working_large_item_short_name_manual, 
                                     working_middle_specification:  params[:delivery_slip_detail_large_classification][:working_large_specification] , 
                                     working_middle_item_category_id: params[:delivery_slip_detail_large_classification][:working_middle_item_category_id], 
+                                    working_subcategory_id: params[:delivery_slip_detail_large_classification][:working_middle_item_subcategory_id], 
 									working_unit_id: @working_unit_id_params, 
                                     working_unit_price: params[:delivery_slip_detail_large_classification][:working_unit_price] ,
                                     execution_unit_price: params[:delivery_slip_detail_large_classification][:execution_unit_price] ,
@@ -481,6 +499,7 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 		         large_item_params = { working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
                  working_middle_item_short_name: working_large_item_short_name_manual, 
                  working_middle_item_category_id: params[:delivery_slip_detail_large_classification][:working_middle_item_category_id], 
+                 working_subcategory_id: params[:delivery_slip_detail_large_classification][:working_middle_item_subcategory_id], 
 				 working_middle_specification: params[:delivery_slip_detail_large_classification][:working_large_specification] ,
                  working_unit_id: @working_unit_id_params } 
 		   
@@ -715,6 +734,50 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 
 	return status
   end
+  
+  #カテゴリー保持フラグの取得
+  #add180210
+  def get_category_save_flag
+    if @delivery_slip_detail_large_classification.delivery_slip_header_id.present?
+        @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
+        if @delivery_slip_headers.present?
+            @category_save_flag = @delivery_slip_headers.category_saved_flag
+            #未入力なら、１をセット。
+            if @category_save_flag.nil?
+              @category_save_flag = 1
+            end
+            @delivery_slip_detail_large_classification.category_save_flag_child = @category_save_flag
+        end
+    end
+  end
+  #カテゴリー、サブカテゴリーの取得
+  #add180210
+  def get_category_id
+      
+    if @delivery_slip_headers.present? && @category_save_flag == 1
+        category_id = @delivery_slip_headers.category_saved_id
+        subcategory_id = @delivery_slip_headers.subcategory_saved_id
+        @delivery_slip_detail_large_classification.working_middle_item_category_id_call = category_id
+        @delivery_slip_detail_large_classification.working_middle_item_subcategory_id_call = subcategory_id
+        
+    end
+  end
+    
+  #カテゴリー保持フラグの保存
+  #add180210
+  def set_category_save_flag
+    if @delivery_slip_detail_large_classification.delivery_slip_header_id.present?
+      @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
+        if @delivery_slip_headers.present?
+          delivery_slip_header_params = { category_saved_flag: params[:delivery_slip_detail_large_classification][:category_save_flag_child], 
+                                       category_saved_id: params[:delivery_slip_detail_large_classification][:working_middle_item_category_id_call],
+                                       subcategory_saved_id: params[:delivery_slip_detail_large_classification][:working_middle_item_subcategory_id_call]}
+          @delivery_slip_headers.attributes = delivery_slip_header_params
+          @delivery_slip_headers.save(:validate => false)
+      end
+    end
+  end
+  
 
  # ajax
   def working_large_item_select
@@ -758,22 +821,35 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
      @labor_productivity_unit_total = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:labor_productivity_unit_total).flatten.join(" ")
   end
   
-  #add170223
   #歩掛り(配管配線集計用)
   def LPU_piping_wiring_select
     @labor_productivity_unit = DeliverySlipDetailLargeClassification.sum_LPU_PipingWiring(params[:delivery_slip_header_id])
     @labor_productivity_unit_total = DeliverySlipDetailLargeClassification.sum_LPUT_PipingWiring(params[:delivery_slip_header_id])
+	
+	#add180105金額計追加
+    @delivery_slip_price = DeliverySlipDetailLargeClassification.sum_delivery_slip_price_PipingWiring(params[:delivery_slip_header_id])
+    @execution_price = DeliverySlipDetailLargeClassification.sum_execution_price_PipingWiring(params[:delivery_slip_header_id])
+    ###
   end
   #歩掛り(機器取付集計用)
   def LPU_equipment_mounting_select
     @labor_productivity_unit = DeliverySlipDetailLargeClassification.sum_LPU_equipment_mounting(params[:delivery_slip_header_id])
 	@labor_productivity_unit_total = DeliverySlipDetailLargeClassification.sum_LPUT_equipment_mounting(params[:delivery_slip_header_id])
+	
+	#add180105金額計追加
+	@delivery_slip_price = DeliverySlipDetailLargeClassification.sum_delivery_slip_price_equipment_mounting(params[:delivery_slip_header_id])
+	@execution_price = DeliverySlipDetailLargeClassification.sum_execution_price_equipment_mounting(params[:delivery_slip_header_id])
+    ###
   end
   #歩掛り(労務費集計用)
   def LPU_labor_cost_select
-  
     @labor_productivity_unit = DeliverySlipDetailLargeClassification.sum_LPU_labor_cost(params[:delivery_slip_header_id])
 	@labor_productivity_unit_total = DeliverySlipDetailLargeClassification.sum_LPUT_labor_cost(params[:delivery_slip_header_id])
+	
+	#add180105金額計追加
+	@delivery_slip_price = DeliverySlipDetailLargeClassification.sum_delivery_slip_price_labor_cost(params[:delivery_slip_header_id])
+	@execution_price = DeliverySlipDetailLargeClassification.sum_execution_price_labor_cost(params[:delivery_slip_header_id])
+    ###
   end
   
   
@@ -841,6 +917,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	  $not_sort_dl = true
     end
 	
+    #add180210
+    #新規か編集かの判定フラグ
+    def set_action_flag
+	  @action_flag = params[:action]
+	end
+    
     #以降のレコードの行番号を全てインクリメントする
     def line_insert
       DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ? and line_number >= ? and id != ?", @delivery_slip_detail_large_classification.delivery_slip_header_id,
@@ -912,11 +994,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	  @delivery_slip_detail_large_classification.line_number = @line_number
     end
     
-	#ストロングパラメータ
+    #ストロングパラメータ
     # Never trust parameters from the scary internet, only allow the white list through.
     def delivery_slip_detail_large_classification_params
       params.require(:delivery_slip_detail_large_classification).permit(:delivery_slip_header_id, :delivery_slip_items_division_id, :working_large_item_id, :working_specific_middle_item_id,
-                     :working_large_item_name, :working_large_item_short_name, :working_middle_item_category_id, :working_large_specification, :line_number, :quantity, :execution_quantity, :working_unit_id, :working_unit_name, :working_unit_price, :delivery_slip_price, :execution_unit_price, :execution_price, :labor_productivity_unit, :labor_productivity_unit_total, 
+                     :working_large_item_name, :working_large_item_short_name, :working_middle_item_category_id, :working_middle_item_category_id_call, 
+                     :working_middle_item_subcategory_id, :working_middle_item_subcategory_id_call, :working_large_specification, :line_number, :quantity, :execution_quantity, :working_unit_id, :working_unit_name, :working_unit_price, :delivery_slip_price, :execution_unit_price, :execution_price, :labor_productivity_unit, :labor_productivity_unit_total, 
                      :last_line_number, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag )
     end
 	
@@ -980,6 +1063,11 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
           if @invoice_header.save!(:validate => false)
 		    #add170629
             @success_flag = true
+            
+            #add180213
+            #ここで追加されたIDを保持する
+            @invoice_header_id = @invoice_header.id
+            
 		  else
 		    @success_flag = false
           end 
@@ -991,10 +1079,13 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	  
 	  if @success_flag == true
 	    ##見出しIDをここで取得
-	    @invoice_header = InvoiceHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
-	    @invoice_header_id = nil
-	    if @invoice_header.present?
-	      @invoice_header_id = @invoice_header.id
+	    #@invoice_header = InvoiceHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
+	    #@invoice_header_id = nil
+	    #if @invoice_header.present?
+        
+        if @invoice_header_id.present?   #upd180213
+          
+          #@invoice_header_id = @invoice_header.id
 	  
           #内訳データのコピー
 	      @d_s_d_l_c = DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: params[:delivery_slip_header_id])
@@ -1117,6 +1208,11 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
           if @quotation_header.save!(:validate => false)
 		    #add170629
             @success_flag = true
+            
+            #add180213
+            #ここで追加されたIDを保持する
+            @quotation_header_id = @quotation_header.id
+            
 		  else
 		    @success_flag = false
           end
@@ -1127,16 +1223,19 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	  end 
 	  
 	  if @success_flag == true
-	    ##見出しIDをここで取得
-	    @quotation_header = nil
-	  
-	    if params[:delivery_slip_code].present?
-	      @quotation_header = QuotationHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
-	    end
-	  
-	    @quotation_header_id = nil
-	    if @quotation_header.present?
-	      @quotation_header_id = @quotation_header.id
+	    
+        #del180213
+        ##見出しIDをここで取得
+	    #@quotation_header = nil
+	    #if params[:delivery_slip_code].present?
+	    #  @quotation_header = QuotationHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
+	    #end
+	    #@quotation_header_id = nil
+	    
+        #if @quotation_header.present?
+        if @quotation_header_id.present?   #upd180213
+	      
+          #@quotation_header_id = @quotation_header.id
 	  
           #内訳データのコピー
 	      @d_s_d_l_c = DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: params[:delivery_slip_header_id])
@@ -1151,7 +1250,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
             quotation_detail_large_classification_params = {quotation_header_id: @quotation_header_id, quotation_items_division_id: d_s_d_l_c.delivery_slip_items_division_id, 
               working_large_item_id: d_s_d_l_c.working_large_item_id, working_large_item_name: d_s_d_l_c.working_large_item_name, 
               working_large_item_short_name: d_s_d_l_c.working_large_item_short_name,
-              working_large_specification: d_s_d_l_c.working_large_specification, line_number: d_s_d_l_c.line_number, quantity: d_s_d_l_c.quantity, 
+              working_middle_item_category_id: d_s_d_l_c.working_middle_item_category_id,
+              working_middle_item_category_id_call: d_s_d_l_c.working_middle_item_category_id_call,
+              working_middle_item_subcategory_id: d_s_d_l_c.working_middle_item_subcategory_id,
+              working_middle_item_subcategory_id_call: d_s_d_l_c.working_middle_item_subcategory_id_call,
+              working_large_specification: d_s_d_l_c.working_large_specification, 
+              line_number: d_s_d_l_c.line_number, quantity: d_s_d_l_c.quantity, 
               execution_quantity: d_s_d_l_c.execution_quantity, working_unit_id: d_s_d_l_c.working_unit_id, working_unit_name: d_s_d_l_c.working_unit_name, 
               working_unit_price: d_s_d_l_c.working_unit_price, quote_price: d_s_d_l_c.delivery_slip_price, execution_unit_price: d_s_d_l_c.execution_unit_price, 
               execution_price: d_s_d_l_c.execution_price, labor_productivity_unit: d_s_d_l_c.labor_productivity_unit, 
@@ -1190,7 +1294,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
           
            quotation_detail_middle_classification_params = {quotation_header_id: @quotation_header_id, quotation_detail_large_classification_id: @quotation_detail_large_classification_id, 
              quotation_items_division_id: d_s_d_m_c.delivery_slip_item_division_id, working_middle_item_id: d_s_d_m_c.working_middle_item_id, working_middle_item_name: d_s_d_m_c.working_middle_item_name, 
-             working_middle_item_short_name: d_s_d_m_c.working_middle_item_short_name, line_number: d_s_d_m_c.line_number, working_middle_specification: d_s_d_m_c.working_middle_specification,
+             working_middle_item_short_name: d_s_d_m_c.working_middle_item_short_name, 
+             working_middle_item_category_id: d_s_d_m_c.working_middle_item_category_id,
+             working_middle_item_category_id_call: d_s_d_m_c.working_middle_item_category_id_call,
+             working_middle_item_subcategory_id: d_s_d_m_c.working_middle_item_subcategory_id,
+             working_middle_item_subcategory_id_call: d_s_d_m_c.working_middle_item_subcategory_id_call,
+             line_number: d_s_d_m_c.line_number, working_middle_specification: d_s_d_m_c.working_middle_specification,
              quantity: d_s_d_m_c.quantity, execution_quantity: d_s_d_m_c.execution_quantity, working_unit_id: d_s_d_m_c.working_unit_id, working_unit_name: d_s_d_m_c.working_unit_name,
              working_unit_price: d_s_d_m_c.working_unit_price, quote_price: d_s_d_m_c.delivery_slip_price, execution_unit_price: d_s_d_m_c.execution_unit_price, execution_price: d_s_d_m_c.execution_price,
              material_id: d_s_d_m_c.material_id, quotation_material_name: d_s_d_m_c.working_material_name, material_unit_price: d_s_d_m_c.material_unit_price, 

@@ -136,9 +136,13 @@ class InventoriesController < ApplicationController
                                    }
 		
         #在庫マスターへ更新用の数・金額
-		@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i
-		@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i
-		#
+		#@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i
+		#@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i
+		
+		#upd171228 マイナス入庫の登録もあるので、絶対値とする
+		@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i.abs
+		@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i.abs
+	    #
 		
 		@inventory_history = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
         if @inventory_history.blank?
@@ -147,12 +151,27 @@ class InventoriesController < ApplicationController
 		  @inventory_history = InventoryHistory.new(inventory_history_params)
 		  @inventory_history.save!
 		  
-		  @differ_inventory_quantity = params[:purchase_datum][:quantity].to_i
-		  
+		  #@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i
+		  #upd171228 マイナス入庫の登録もあるので、絶対値とする
+	      quantity = params[:purchase_datum][:quantity].to_i.abs
+		  @differ_inventory_quantity = quantity 
+		  ##
+			 
 		else
 		#更新
+          if  @inventory_history.quantity.blank?
+            @inventory_history.quantity = 0
+          end 
+
 		  if params[:purchase_datum][:quantity].to_i != @inventory_history.quantity then
-             @differ_inventory_quantity = params[:purchase_datum][:quantity].to_i - @inventory_history.quantity
+             
+			 
+			 #@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i - @inventory_history.quantity
+			 
+			 #upd171228 マイナス入庫の登録もあるので、絶対値とする
+			 quantity = params[:purchase_datum][:quantity].to_i.abs
+			 @differ_inventory_quantity = quantity - @inventory_history.quantity
+			 ##
 		  else 
 		  #add170413
 		  #数量の違いがなければ、在庫を増減させない
@@ -161,7 +180,12 @@ class InventoriesController < ApplicationController
 		  
 		  #if params[:purchase_datum][:price].to_i != @inventory_history.price then
 		  if ( params[:purchase_datum][:price].to_i != @inventory_history.price ) && @inventory_history.price.present? then
-             @differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i - @inventory_history.price
+             #@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i - @inventory_history.price
+			 
+			 #upd171228 マイナス入庫の登録もあるので、絶対値とする
+			 purchase_amount = params[:purchase_datum][:purchase_amount].to_i.abs
+			 @differ_inventory_price = purchase_amount - @inventory_history.price
+			 ##
 		  else
 		  #add170413
 		  #単価の違いがなければ、在庫を増減させない(???不要???)
@@ -260,10 +284,12 @@ class InventoriesController < ApplicationController
 		current_warehousing_date = @inventory_history.inventory_date
         #add170508
         last_warehousing_date = @inventory_history.inventory_date
-		current_quantity += @inventory_history.quantity    #数は加算する
+		#current_quantity += @inventory_history.quantity    #数は加算する
+		current_quantity += @inventory_history.quantity.abs    #数は加算する(絶対値)
 	  else
 	  #出庫がまず先に登録された場合
-	    current_quantity -= @inventory_history.quantity    #数はマイナスする
+	    #current_quantity -= @inventory_history.quantity    #数はマイナスする
+		current_quantity -= @inventory_history.quantity.abs    #数はマイナスする(絶対値)
 	  end
 	  
 	  #仕入業者
@@ -308,9 +334,9 @@ class InventoriesController < ApplicationController
 	    #単価が同じ場合
 		  #そのまま加算する（未使用のロットと考える）
 		  if @inventory_division_id == $INDEX_INVENTORY_STOCK
-		    current_quantity += @inventory_history.quantity     #数は加算する
+		    current_quantity += @inventory_history.quantity.abs     #数は加算する(絶対値)
 		  else
-		    current_quantity -= @inventory_history.quantity
+		    current_quantity -= @inventory_history.quantity.abs     #数は減産する(絶対値)
 		  end 
 		  
 		else
@@ -515,13 +541,13 @@ class InventoriesController < ApplicationController
 	
 	if @inventory.present?
 	  if @inventory_history.inventory_division_id == $INDEX_INVENTORY_STOCK
-	  #入庫 -> 数をマイナスさせる
-	    differ_quantity = @inventory.inventory_quantity - @inventory_history.quantity
-		differ_amount = @inventory.inventory_amount - @inventory_history.price
+	  #入庫 -> 数をマイナスさせる(絶対値)
+	    differ_quantity = @inventory.inventory_quantity - @inventory_history.quantity.abs
+		differ_amount = @inventory.inventory_amount - @inventory_history.price.abs
 	  elsif @inventory_history.inventory_division_id == $INDEX_INVENTORY_SHIPPING
-	  #出庫 -> 数をプラスさせる。
-	    differ_quantity = @inventory.inventory_quantity + @inventory_history.quantity
-		differ_amount = @inventory.inventory_amount + @inventory_history.price
+	  #出庫 -> 数をプラスさせる(絶対値)
+	    differ_quantity = @inventory.inventory_quantity + @inventory_history.quantity.abs
+		differ_amount = @inventory.inventory_amount + @inventory_history.price.abs
 	  end
       
 	  ###
@@ -654,6 +680,6 @@ class InventoriesController < ApplicationController
     def inventory_params
       params.require(:inventory).permit(:warehouse_id, :location_id, :material_master_id, :inventory_quantity, :unit_master_id, :inventory_amount, :supplier_master_id,
       :current_history_id, :current_warehousing_date, :current_quantity, :current_unit_price, :last_unit_price, :last_warehousing_date, :next_history_id_1, :next_warehousing_date_1, :next_quantity_1, 
-      :next_unit_price_1, :next_history_id_2, :next_warehousing_date_2, :next_quantity_2, :next_unit_price_2 )
+      :next_unit_price_1, :next_history_id_2, :next_warehousing_date_2, :next_quantity_2, :next_unit_price_2 , :image)
     end
 end

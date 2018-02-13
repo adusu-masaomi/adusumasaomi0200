@@ -56,6 +56,9 @@
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   <!-- -->
   
+  <!--印刷切り分けフラグ button_tag使用しているため -->
+  <%= f.input :print_flag_hide, input_html:{id:'print_flag_hide'} , as: :hidden %>
+  
   <!--<%= f.button :submit, name: "upd", :class => 'btn-primary' , :tabindex=>"5" %>-->
   
   <!--<%= f.submit "更新する", name: "upd", class: "btn btn-blue500_rsd"  %>-->
@@ -66,8 +69,8 @@
             :class => 'btn  btn-lime500_ftg', :target=>["_blank"], :onclick => "return submitAfterValidation()", :method=> :put %>-->
   
   <!--upd170922-->
-  <%= button_tag( '工事費集計表', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , formtarget: "_blank", :onclick => "return submitAfterValidation()" ) %>
-  
+  <%= button_tag( '工事費集計表', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , formtarget: "_blank", :onclick => "resetPrintFlag()" ) %>
+  <%= button_tag( 'ＰＤＦ発行・集計完了', :value => 'pdf', :name => 'format', :class => "btn btn-purple500_ftg" , formtarget: "_blank", :onclick => "return submitAfterValidation()" ) %>
   
   <%= link_to t('.cancel', :default => t("helpers.links.back")),
                 construction_data_path(construction_id: params[:construction_id], 
@@ -379,7 +382,10 @@
        //}
    //}
 
-  
+  //プリントフラグを初期化する
+  function resetPrintFlag(){
+    document.getElementById("print_flag_hide").value = "";
+  }
   
   //印刷時の確認＆集計フラグをセット。
   function submitAfterValidation() {
@@ -412,10 +418,16 @@
    
 	
 	
-	if (window.confirm('工事集計表を発行しますか？')) {
+	//if (window.confirm('工事集計表を発行しますか？')) {
+	if (window.confirm('ＰＤＦ発行して集計完了しますか？')) {
+	  
+	  //印刷フラグをセットしておく
+	  document.getElementById("print_flag_hide").value = "1";
+	  
 	  //ここでajax発動しコントローラで履歴保存する
 	  var id = 0;
 	  construction_datum_id = document.getElementById("construction_datum_id").value;
+	  
 	  $.get("<%= construction_costz_set_caluculated_flag_path %>",
          { construction_datum_id: construction_datum_id },
          function(data){

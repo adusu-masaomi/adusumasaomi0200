@@ -112,9 +112,9 @@
   <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
   <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"13" , style: 'width:110px;' , :class => "searchableUnit"} %>
   <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
-  <%= f.check_box :check_unit, {id:"check_unit"}, "true", "false" %>
-  <%= f.label_tag :check_unit, '単価マスタを更新しない場合はチェック' %> 
-  <%= f.input :purchase_amount ,label: "金額" , input_html:{:tabindex=>"15"} %>
+  <%= f.check_box :unit_price_not_update_flag, {id:"unit_price_not_update_flag"}, '1', '0' %>
+  <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック' %> 
+  <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"15"} %>
   <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
   <%= f.label :仕入区分 , {:class => "my-custom-class-l", style: 'width:190px;'} %><%= f.label :入出庫区分 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , 
@@ -183,8 +183,8 @@
 	   //単価をセット
 	    setUnitPrice();
 		
-		//入庫の場合に工事IDをセット
-		setConstructionOnStocked();
+		//入庫の場合に工事IDをセット(マイナス登録も有るので保留・・)
+		//setConstructionOnStocked();
 		
 		 //if (e.added) {
           // You can add other filters here like
@@ -250,7 +250,6 @@
      
 	 //select2読み込んだ場合の処理
 	 //$( ".searchableSupplier" ).on("select2:loaded", function (e) {
-	 //  debugger;
 	 //  setSupplierItem();
 	 //});
 	 
@@ -342,8 +341,11 @@
      index = obj.selectedIndex;
      setItem(index);
 	 
+	 
+	 //del171214  
+	 //フィールド化。
 	 //入庫・出庫などは単価更新をさせない
-	 uncheckUnitPrice();
+	 //uncheckUnitPrice();
    }
    
    //入庫・出庫は「単価マスタを更新しない」フラグにチェックを入れる)
@@ -355,7 +357,7 @@
 	 inventory_division_id = parseInt(inventory_division_id);
 	 
 	 if (division_id == INDEX_DIVISION_SHIPPING) {
-	   document.getElementById("check_unit").checked = true;
+	   document.getElementById("unit_price_not_update_flag").checked = true;
 	   //在庫区分も”出庫”にする
 	   //document.getElementById("inventory_division_id").selectedIndex = INDEX_INVENTORY_SHIPPING;
 	   document.getElementById("inventory_division_id").value = INDEX_INVENTORY_SHIPPING;
@@ -367,9 +369,9 @@
 	   
 	   if (inventory_division_id == INDEX_INVENTORY_STOCK){
 	   //add171011入庫の場合もチェック入れる
-	     document.getElementById("check_unit").checked = true;
+	     document.getElementById("unit_price_not_update_flag").checked = true;
 	   }else{
-	     document.getElementById("check_unit").checked = false;
+	     document.getElementById("unit_price_not_update_flag").checked = false;
 	   }
 	 }
    }
@@ -390,15 +392,19 @@
 	   document.getElementById("division_id").value = INDEX_DIVISION_PURCHASE;
 	 }
 	 
+	 
 	 if (inventory_division_id != "" && inventory_division_id == INDEX_INVENTORY_STOCK || 
 	     inventory_division_id == INDEX_INVENTORY_SHIPPING) {
-	   document.getElementById("check_unit").checked = true;
-	 }else{
-	   document.getElementById("check_unit").checked = false;
+	   document.getElementById("unit_price_not_update_flag").checked = true;
 	 }
 	 
-	 //在庫品目なら件名を自動セットする
-	 setConstructionOnStocked();
+	 //del171214 入出庫以外でも単価更新しないケースもあるので、フィールド化した。
+	 //}else{
+	 //  document.getElementById("unit_price_not_update_flag").checked = false;
+	 //}
+	 
+	 //在庫品目なら件名を自動セットする(マイナス登録もあるので保留)
+	 //setConstructionOnStocked();
    }
    
    //在庫Mより現在単価を取得する（出庫の場合に取得する）--ajax利用
@@ -435,7 +441,6 @@
    
    //注文番号のパラメータがある場合の初期値
    //function test(){
-   //  debugger;
    //}
    
    //村山電気等、外注用の入力自動化
@@ -561,9 +566,19 @@
 			  obj = document.getElementById("unit_price_hide").textContent;
 			  
               document.getElementById("purchase_unit_price").value = obj;
-			
-              //debugger;
-             //var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;
+			 
+			  //金額の計算も行う
+			  //add171216
+			  if (document.getElementById("quantity") != undefined && document.getElementById("purchase_unit_price") != undefined){
+   	             
+				var num = document.getElementById("quantity").value * document.getElementById("purchase_unit_price").value ;
+                //小数点以下を切り捨て
+                document.getElementById("purchase_amount").value = Math.floor(num);
+                //
+			  }
+			  //
+			  
+              //var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;
                  var purchase_date_set = document.getElementsByName("purchase_datum[purchase_date][]")[0].value + "/" + document.getElementsByName("purchase_datum[purchase_date][]")[1].value + "/" 
                                     + document.getElementsByName("purchase_datum[purchase_date][]")[2].value; 
                
@@ -651,7 +666,8 @@
 	//upd170307
 	var num = document.getElementById("quantity").value * f.purchase_unit_price.value ;
     //小数点以下を切り捨て
-    f.purchase_datum_purchase_amount.value = Math.floor(num);
+    //f.purchase_datum_purchase_amount.value = Math.floor(num);
+	document.getElementById("purchase_amount").value  = Math.floor(num);
 
     // 仕入単価をセット
     if (f.unit_price != undefined) {
@@ -660,7 +676,7 @@
     //単価Mの直近単価も更新
     var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
    
-     //debugger;
+   
    
     if (f.last_unit_price_update_at.value <= purchase_date_set){
      f.last_unit_price.value = f.purchase_unit_price.value;

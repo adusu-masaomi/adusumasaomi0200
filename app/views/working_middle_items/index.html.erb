@@ -26,8 +26,15 @@
 	            {id:"working_middle_item_short_name_select_hide", style: 'width:220px' , class: "searchableCategory", :onchange => "setItemSyncronize(2)"  } %></br>
 	
     <%= f.label :working_middle_item_name, 'カテゴリー：' %>
-	<%= f.select :working_category_id_eq, WorkingCategory.all.map{|st| [st.category_name, st.id]}, {include_blank: true}, {id:'working_middle_item_category_for_call', style: 'width:220px' , class: "searchableCategory", 
+	<%= f.select :working_category_id_eq, WorkingCategory.order('seq').all.map{|st| [st.category_name, st.id]}, {include_blank: true}, {id:'working_middle_item_category_for_call', style: 'width:220px' , class: "searchableCategory", 
       :onchange => "setItemExtractByCategory()" } %>
+      
+    <%= f.label :working_subcategory_id, 'サブカテゴリー：' %>
+	
+    <%= f.select :working_subcategory_id_eq, WorkingSubcategory.where(:working_category_id => f.object.working_category_id_eq).order('seq').map{|st| [st.name, st.id]}, {include_blank: true}, {id:'working_subcategory_select_hide', 
+               style: 'width:220px' , class: "searchableSubcategory", 
+       } %>
+    
     <!--スペース空ける-->
     &nbsp;&nbsp;
     <%= button_tag "クリア", type: 'button', :class => 'btn btn-yellow300_ftg btn-xs', onclick: "clearList()" %>
@@ -40,6 +47,7 @@
   
  
 </div>
+
 
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_working_middle_item_path(move_flag: "", new_flag: "1"), remote: true,
@@ -58,6 +66,7 @@
     <tr>
       <th><%= sort_link(@q, :seq, 'seq') %></th>
 	  <th><%= model_class.human_attribute_name(:working_middle_item_category_id) %></th>
+      <th><%= model_class.human_attribute_name(:working_subcategory_id) %></th>
 	  <th><%= model_class.human_attribute_name(:working_middle_item_short_name) %></th>
 	  <th><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
       <th><%= model_class.human_attribute_name(:working_middle_specification) %></th>
@@ -102,6 +111,9 @@
 	$(".searchableLargeItem").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	//カテゴリー
 	$(".searchableCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    
+    //サブカテゴリー
+	$(".searchableSubcategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	
 	//見出し固定用設定追加
 		var sz = window.parent.screen.width;
@@ -126,13 +138,26 @@
 	     ui.item.css("background-color", "white");
 		 
          //working_middle_item_category_for_call
-		 //add171122 カテゴリーをseqに含める。(下3桁はゼロ）
+		 //カテゴリーをseqに含める。(下4桁はゼロ）
 		 var category = document.getElementById("working_middle_item_category_for_call").value;
-		 if (category == ""){ 
+		 //add180202
+         var subCategory = document.getElementById("working_subcategory_select_hide").value;
+         
+         if (category == ""){ 
 		    //category = 99000
 			category = 0;
 		 }else{
-		    category = parseInt(category) * 1000;
+		    //category = parseInt(category) * 1000;
+            //upd180202
+            category = parseInt(category) * 1000000;
+            
+            //add180202 サブカテゴリー追加
+            if (subCategory == ""){
+              subCategory = 0;
+            }else{
+              subCategory = parseInt(subCategory) * 1000;
+            }
+            category += subCategory;
 		 }
 		 //
 		 
@@ -185,8 +210,24 @@
 		   //短縮名のリストを再配置
 		   //document.getElementById("working_large_item_short_name_for_call").innerHTML = document.getElementById("working_middle_item_short_name_select_hide").innerHTML;
 		   
+           //カテゴリー別のサブカテゴリーを抽出する
+           setSubacategoryExtractByParent(category_id);
      });
    //}
+  }
+  
+  //カテゴリー別のサブカテゴリーを抽出する
+  //add180202
+  function setSubacategoryExtractByParent(category_id){
+    //var category_id = document.activeElement.value;
+      $.get("<%= working_subcategoriez_subcategory_extract_path %>",
+        {working_category_id: category_id},
+         function(data){
+         
+           //リストを未選択状態にする
+		   document.getElementById("working_subcategory_select_hide").value = "";
+           $('#working_subcategory_select_hide').trigger('change');
+        });
   }
   
   //リストをリセットする
@@ -203,6 +244,10 @@
 	 //カテゴリー
      document.getElementById("working_middle_item_category_for_call").value = "";
      $('#working_middle_item_category_for_call').trigger('change');
+     
+     //サブカテゴリー
+     document.getElementById("working_subcategory_select_hide").value = "";
+     $('#working_subcategory_select_hide').trigger('change');
   }
   
   

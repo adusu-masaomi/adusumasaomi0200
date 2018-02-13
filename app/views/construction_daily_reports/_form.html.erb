@@ -248,10 +248,13 @@
    }else if (end_time >= 28800 && (start_time >= 0 && start_time <= 28800) || (end_time <= 61200 && end_time >= 28800) && start_time >= 61200 ) {
    //終了時間８時以降かつ開始時間８時前、または、終了時間８時から１７時、開始時間１７時以降の場合
 	overtime_25 = 28800 - 18000;
+   
    }
    //
    
    //残業時間(18:00~22:00)の計算
+   
+   
    if (end_time > 64800 && start_time < 79200) {
      tmp_time = 0;
 	 if (end_time < 79200 && start_time >= 64800) {
@@ -273,6 +276,10 @@
 	   tmp_time = 79200 - 64800;
 	 }
      
+	 overtime_25 += tmp_time;
+   }else if (start_time >= 64800 && end_time <= 18000 ) {
+     //開始時１８時以降、終了時間５時前の場合(add171228)
+       tmp_time = 79200 - start_time;
 	 overtime_25 += tmp_time;
    }
    
@@ -299,6 +306,9 @@
 	 //開始０時以降で終了時間が２２時以降
 	   overtime_50 = end_time - 79200;
 	 }
+   }else if (start_time >= 64800 && end_time <= 18000) {
+	  //開始18時以降で終了時間が５時以前 add171228
+	   overtime_50 = end_time + 7200;   //(22:00~24:00分を足す。)
    }
    
    //労務費の加算分を算出

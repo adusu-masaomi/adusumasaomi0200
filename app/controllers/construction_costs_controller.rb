@@ -165,8 +165,10 @@ class ConstructionCostsController < ApplicationController
     
 	#集計表発行時にデータの初期値をセットする
     $construction_costs = @construction_cost 
-
-
+    
+	#プリントフラグをセット（赤ラインか黒ライン（PDF）の切り分け用）
+	$print_type_costs = params[:construction_cost][:print_flag_hide]
+	
     format.html { render :edit }
     format.pdf do
       	
@@ -181,8 +183,9 @@ class ConstructionCostsController < ApplicationController
          disposition: "inline")
     end
 	
+    #del180117
 	#集計済みフラグ（工事データ）をセットする
-	set_caluculated_flag
+	#set_caluculated_flag
   end
   
   
@@ -288,15 +291,19 @@ class ConstructionCostsController < ApplicationController
   #集計済みフラグ（工事データ）をセットする
   def set_caluculated_flag
      #construction_data = ConstructionDatum.find(params[:construction_datum_id])
-	 construction_data = ConstructionDatum.find(@construction_cost.construction_datum_id)
+	 if params[:construction_datum_id].present? 
 	 
-	 if construction_data.present?
+	   construction_data = ConstructionDatum.find(params[:construction_datum_id])
+	   #construction_data = ConstructionDatum.find(@construction_cost.construction_datum_id)
 	 
-	   construction_data_params = { calculated_flag: 1 }
+	   if construction_data.present?
+	 
+	     construction_data_params = { calculated_flag: 1 }
 	   
-	   #工事データを更新
-	   construction_data.update(construction_data_params)
+	     #工事データを更新
+	     construction_data.update(construction_data_params)
 	   
+	   end
 	 end
   end
   

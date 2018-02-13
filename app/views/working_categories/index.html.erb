@@ -1,3 +1,4 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <%- model_class = WorkingCategory -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
@@ -6,24 +7,41 @@
             new_working_category_path,
             :class => 'btn btn-primary' %>
 
-<table class="table table-striped">
+<!--<table class="table table-striped">-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+  <style>
+    table { }
+    table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <!--見出し固定用設定追加-->
+  <!--<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;">-->
+  <table class="table  table-striped", style="font-size : 12px;">
+  
   <thead>
     <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
+      <!--<th style="width:55px;"><%= model_class.human_attribute_name(:seq) %></th>-->
+      <th style="width:55px;"><%= sort_link(@q, :seq, model_class.human_attribute_name(:seq), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:category_name) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
-  <tbody>
-    <% @working_categories.each do |working_category| %>
-      <tr>
-        <td><%= link_to working_category.id, working_category_path(working_category) %></td>
+  <tbody  id="sortable", style="font-size : 12px;" >
+    <% @working_categories.order("seq asc").each do |working_category| %>
+      <!--<tr>-->
+      <tr id="<%= working_category.id%>">
+      
+        <!--<td><%= link_to working_category.id, working_category_path(working_category) %></td>-->
+        <td><%= working_category.seq %></td>
         <td><%= working_category.category_name %></td>
         <td><%=l working_category.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_working_category_path(working_category), :class => 'btn btn-default btn-xs' %>
+                      edit_working_category_path(working_category), :class => 'btn btn-white_rsd btn-xs' %>
+          <%= link_to "サブ",
+            working_subcategories_path(working_category_id: working_category.id),
+            :class => 'btn btn-cyan300_rsd btn-xs' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       working_category_path(working_category),
                       :method => :delete,
@@ -34,4 +52,51 @@
     <% end %>
   </tbody>
 </table>
+</div>
 
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+     
+     
+    //見出し固定用設定追加
+	var sz = window.parent.screen.width;
+	var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+	if (sz != 1920) {
+	//画面サイズ1920px(社長PC基準)以外は、列固定させる。
+      fc = 1;  //固定列数
+	  ht -= 108;
+	}
+	
+    //$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1});
+    //$( "#tablefix tbody" ).sortable({
+    $( "#sortable" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 
+         
+		 $.post("<%= working_categoriez_reorder_path %>",
+           { row: row },
+           function(data){
+		     //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	 },
+	        
+    });
+    
+    $(".sortable td").each(function () {
+            $(this).css("width", $(this).width());
+     });  
+    
+    $( ".sortable" ).disableSelection();
+    
+  });
+</script>

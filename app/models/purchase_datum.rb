@@ -17,7 +17,7 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
 	
     #単価M更新切り分け用
-    attr_accessor :check_unit
+    #attr_accessor :check_unit
     #仕入先品番選択用
 	attr_accessor :supplier_material_code
 	attr_accessor :supplier_id_hide

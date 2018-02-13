@@ -5,7 +5,7 @@ class PurchaseListBySupplierPDF
 	#仕入表(仕入先別)PDF発行
  
        # tlfファイルを読み込む
-       report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/purchase_list_by_supplier_pdf.tlf")
+       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/purchase_list_by_supplier_pdf.tlf")
        
         # 1ページ目を開始
         report.start_new_page
@@ -108,6 +108,14 @@ class PurchaseListBySupplierPDF
                        end
                        #
 					   
+					   #upd171227 入庫の場合は入庫と表示
+					   if purchase_datum.inventory_division_id.present? && InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][1] == 0
+					     division_name = InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][0]
+					   else
+					     division_name = purchase_datum.PurchaseDivision.purchase_division_name
+					   end
+					   #
+					   
 			           row.values purchase_date: purchase_datum.purchase_date,
                                   construction_code: purchase_datum.construction_datum.construction_code,
 								  construction_name: purchase_datum.construction_datum.construction_name,
@@ -122,7 +130,7 @@ class PurchaseListBySupplierPDF
 								  purchase_amount: purchase_amount,
                                   list_price: list_price,
                                   supplier_name: purchase_datum.SupplierMaster.supplier_name,
-								  purchase_division_name: purchase_datum.PurchaseDivision.purchase_division_name
+								  purchase_division_name: division_name
 	                    
             end 
 

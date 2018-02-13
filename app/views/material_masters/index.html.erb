@@ -13,8 +13,15 @@
            {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode"}  %>
    <%= f.label :material_code, '　品番(キーワード)：' %>
    <%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>
+   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemKeyWords()" %>
+   
    <%= f.label :material_code, '品名：' %>
-   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %></br>
+   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %>
+   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %></br>
+  
+   <%= f.label :maker_code, 'メーカー：：' %>
+   <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, 
+         {style: 'width:220px' , class: "searchableMaker" } %>
   
   	<div>
     	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
@@ -80,6 +87,8 @@
   //検索可能なリストボックス
   $(document).ready(function(){
         $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        $(".searchableMaker").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        
 		//見出し固定用設定追加
 	    var sz = window.parent.screen.width;
 	    var fc = 1;    //デフォルトの固定列数(社長PC基準)
@@ -93,4 +102,15 @@
 	    //
         //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});
   });
+  
+  //品番キーワード検索ボックスを空にする
+  function clearItemKeyWords(){
+    document.getElementById("material_code").value = "";
+  }
+  //品名検索ボックスを空にする
+  function clearItemName(){
+    document.getElementById("material_name").value = "";
+  }
+  
+  
 </script>

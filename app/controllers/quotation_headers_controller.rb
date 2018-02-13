@@ -36,6 +36,14 @@ class QuotationHeadersController < ApplicationController
     @quotation_header = QuotationHeader.new
     #顧客Mをビルド
     @quotation_header.build_customer_master
+    #add180206
+    #顧客Mで絞られている場合は、初期値としてセットする
+    if eval(cookies[:recent_search_history].to_s).present?
+      if eval(cookies[:recent_search_history].to_s)["customer_id_eq"].present?
+        @quotation_header.customer_id = eval(cookies[:recent_search_history].to_s)["customer_id_eq"]
+      end
+    end
+    ##
   end
 
   # GET /quotation_headers/1/edit

@@ -26,9 +26,12 @@
 	  <!--<%= f.select :purchase_order_code_cont,options_for_select(PurchaseOrderDatum.header_numbers), {include_blank: true }, {style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader" } %>-->
       </br>
 	  <%= f.label :construction_datum_id, '工事名：：' %>
+	  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, { style: 'width:440px' , class: "searchableConstructionCode"}  %>
 	  
-	  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, { style: 'width:440px' , class: "searchableConstructionCode"}  %></br>
-	  
+      <%= f.label :supplier_master_id, '仕入先：：' %>
+      <%= f.select :supplier_master_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+      </br>
+  
       <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
 	  <div>
     	  <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
@@ -140,6 +143,8 @@
         $(".searchablePurchaseOrderCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 		$(".searchablePurchaseOrderCodeHeader").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 		$(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        $(".searchableSupplierName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        
 		
 		//見出し固定用設定追加
 		var sz = window.parent.screen.width;

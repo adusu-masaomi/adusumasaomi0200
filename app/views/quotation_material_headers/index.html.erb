@@ -143,9 +143,9 @@
   //検索可能なリストボックス
   $(document).ready(function(){
 
-        //$(".searchablePurchaseOrderCode").select2({ theme: "classic" });
-		$(".searchableConstructionCode").select2({ theme: "classic" });
-		
+        //$(".searchableConstructionCode").select2({ theme: "classic" });
+        $(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        
 		//見出し固定用設定追加
 		var sz = window.parent.screen.width;
 		var fc = 1;    //デフォルトの固定列数(社長PC基準)

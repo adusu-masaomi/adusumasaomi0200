@@ -9,11 +9,14 @@ class ConstructionCostSummaryPDF
 	  
 	   
        # tlfファイルを読み込む
-       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_pdf.tlf")
+       if $print_type_costs != "1"
+         report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_pdf.tlf")
+       else
+	   #工事集計PDF用  add180118
+	     report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_black_pdf.tlf")
+	   
+	   end
        #report = ThinReports::Report.create do |r|
-
-	   
-	   
 	  
 	  # 1ページ目を開始
       report.start_new_page

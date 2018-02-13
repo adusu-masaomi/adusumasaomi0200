@@ -765,6 +765,20 @@
             "y1": 141.2,
             "x2": 540,
             "y2": 155.5
+          },
+          {
+            "id": "image",
+            "type": "image-block",
+            "display": false,
+            "description": "",
+            "x": 84,
+            "y": 141.7,
+            "width": 12.5,
+            "height": 12.5,
+            "style": {
+              "position-x": "left",
+              "position-y": "top"
+            }
           }
         ]
       },

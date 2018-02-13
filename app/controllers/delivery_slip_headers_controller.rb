@@ -10,6 +10,8 @@ class DeliverySlipHeadersController < ApplicationController
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  	
 
+    #binding.pry
+
     #@q = DeliverySlipHeader.ransack(params[:q])  
     #ransack保持用--上記はこれに置き換える
     @q = DeliverySlipHeader.ransack(query)
@@ -37,6 +39,16 @@ class DeliverySlipHeadersController < ApplicationController
     @delivery_slip_header = DeliverySlipHeader.new
     #顧客Mをビルド
     @delivery_slip_header.build_customer_master
+    
+    #add180206
+    #顧客Mで絞られている場合は、初期値としてセットする
+    if eval(cookies[:recent_search_history].to_s).present?
+      if eval(cookies[:recent_search_history].to_s)["customer_id_eq"].present?
+        @delivery_slip_header.customer_id = eval(cookies[:recent_search_history].to_s)["customer_id_eq"]
+      end
+    end
+    ##
+    
   end
 
   # GET /delivery_slip_headers/1/edit

@@ -682,7 +682,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 if @unit_id.blank?
 	   @unit_id = "3"
 	 end
-	
+	 
   end
   
   #メーカーから該当する商品を取得

@@ -168,21 +168,17 @@
   
   //入力チェック後の、更新処理
  function submitAfterValidation() {
-    if (window.confirm('履歴データへ保存しますか？（保存すると、後から復元させることができます。）')) {
-	  //ここでajax発動しコントローラで履歴保存する
-	  
-	  var id = 0;
-	  
-	  quotation_header_id = document.getElementById("quotation_header_id").innerText;
-	  
-	  $.get("<%= quotation_header_historiez_set_history_path %>",
-         { quotation_header_id: quotation_header_id },
-           function(data){
-           }
-      );
-	  
-	//     document.forms[0].submit();
-    }
+    //180201 必要なくなったので保留・・・
+    //if (window.confirm('履歴データへ保存しますか？（保存すると、後から復元させることができます。）')) {
+	//  //ここでajax発動しコントローラで履歴保存する
+	//  var id = 0;
+	//  quotation_header_id = document.getElementById("quotation_header_id").innerText;
+	//  $.get("<%= quotation_header_historiez_set_history_path %>",
+    //     { quotation_header_id: quotation_header_id },
+    //       function(data){
+    //       }
+    //  );
+    //}
  }
  
   //履歴へ保存させる処理(ajax)

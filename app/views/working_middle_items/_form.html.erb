@@ -36,7 +36,7 @@
 		  </br>
 		  <div style="margin-top : 0px;margin-left :-30px">
 		    <%= f.label :"(呼出用)共通カテゴリー" , {:class => "my-custom-class-l", style: 'margin-left : 14.5px' } %></br>
-            <%= f.select :working_middle_item_category_for_call, WorkingCategory.all.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
+            <%= f.select :working_middle_item_category_for_call, WorkingCategory.order('seq').all.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
                {id:'working_middle_item_category_for_call', :onchange => "setItemExtractByCategory()", :class => "my-custom-class", 
                  style: 'width:190px;margin-left : 14.5px;height:25px;font-size:16;', :tabindex=> "2" } %>
 		  </div>
@@ -49,7 +49,7 @@
 		<div style="margin-top : 10px;">
 		<%= f.label :"カテゴリー" , {:class => "my-custom-class-l", style: 'margin-left : 14px' } %></br>
         
-		<%= f.select :working_middle_item_category_id, WorkingCategory.all.map{|t| [t.category_name, t.id]}, {:selected => @working_middle_item.working_middle_item_category_id || 1}, 
+		<%= f.select :working_middle_item_category_id, WorkingCategory.all.order('seq').map{|t| [t.category_name, t.id]}, {:selected => @working_middle_item.working_middle_item_category_id || 1}, 
            {id:'working_middle_item_category_id', :class => "my-custom-class", style: 'width:190px;height:25px;margin-top:10px;margin-left : 14.5px;font-size:16;', :tabindex=> "4" } %>
 		   
 		</div>

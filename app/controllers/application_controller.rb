@@ -78,4 +78,7 @@ class ApplicationController < ActionController::Base
   $INVENTORY_CATEGORY_ID_CABLE = 2
   #$INVENTORY_LIGHTING_EQUIPMENT = 3               #照明器具 add170915
   
+  $CONSTRUCTION_NULL_DATE = "2021/01/01"         #工事開始日などの、NULL値として扱う日付(add180113)
+  $CONSTRUCTION_QUERY_NULL_DATE = "//"           #(add180113)
+  
 end

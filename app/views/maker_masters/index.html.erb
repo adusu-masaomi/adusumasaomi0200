@@ -60,7 +60,8 @@
   
   //検索可能なリストボックス
   $(document).ready(function(){
-        $(".searchableMakerName").select2({ theme: "classic" });
+        //$(".searchableMakerName").select2({ theme: "classic" });
+		$(".searchableMakerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 		
 		//見出し固定用設定追加
 	    //var sz = window.parent.screen.width;

@@ -17,7 +17,12 @@
   
   <!--</br>-->
   <%= f.label :staff_id, '社員' %>
-  <%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {style: 'width:220px' } %>
+  <!--<%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {id: 'staff_id_eq', style: 'width:220px' } %>-->
+  
+  <%= f.select :staff_id_eq, Staff.all.map{|st| [st.staff_name, st.id]}, {include_blank: true}, { id: 'staff_id_eq', style: 'width:220px'} %>
+  
+  
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStaff()" %>
   
   </br>
   
@@ -172,4 +177,10 @@
 		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
         //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});
   });
+  
+ //社員の検索リストを空にする
+ function clearStaff(){
+   document.getElementById("staff_id_eq").value = "";
+ }
+  
 </script>

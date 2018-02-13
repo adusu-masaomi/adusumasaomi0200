@@ -1,4 +1,10 @@
 source 'https://rubygems.org'
+#画像表示用
+gem 'carrierwave'
+#画像圧縮用
+#gem 'rmagick', require: 'RMagick'
+#上記だとcentosでエラー
+gem 'rmagick', require: false
 
 #グラフ用
 gem "chartkick"

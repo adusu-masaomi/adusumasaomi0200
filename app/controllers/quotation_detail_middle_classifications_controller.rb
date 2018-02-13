@@ -4,6 +4,9 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   #add171016
   before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
   
+  #add180210
+  before_action :set_action_flag, only: [:new, :edit ]
+  
   @@new_flag = []
   
     # GET /quotation_detail_middle_classifications
@@ -135,7 +138,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   # GET /quotation_detail_middle_classifications/new
   def new
   
-      @quotation_detail_middle_classification = QuotationDetailMiddleClassification.new
+    @quotation_detail_middle_classification = QuotationDetailMiddleClassification.new
     @quotation_detail_large_classification = QuotationDetailLargeClassification.all
     
     ###
@@ -157,12 +160,19 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     
 	#行番号を取得する
     get_line_number
-    ###
+    
+    #カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
+    get_category_id
+    
   end
 
   # GET /quotation_detail_middle_classifications/1/edit
   def edit
-   
+    #カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
   end
 
   # POST /quotation_detail_middle_classifications
@@ -208,6 +218,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #行番号の最終を書き込む
     quotation_dlc_set_last_line_number
 	
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
+    
 	if params[:quotation_detail_middle_classification][:quotation_header_id].present?
       @quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
     end
@@ -242,6 +256,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #品目データの金額を更新
 	save_price_to_large_classifications
 	
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
+    
 	#行挿入する 
 	@max_line_number = @quotation_detail_middle_classification.line_number
     if (params[:quotation_detail_middle_classification][:check_line_insert] == 'true')
@@ -481,6 +499,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
                                     working_middle_item_short_name: working_middle_item_short_name_manual, 
                                     working_middle_specification:  params[:quotation_detail_middle_classification][:working_middle_specification] , 
                                     working_middle_item_category_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id], 
+                                    working_subcategory_id: params[:quotation_detail_middle_classification][:working_middle_item_subcategory_id], 
 									working_unit_id: @working_unit_id_params, 
                                     working_unit_price: params[:quotation_detail_middle_classification][:working_unit_price] ,
                                     execution_unit_price: params[:quotation_detail_middle_classification][:execution_unit_price] ,
@@ -507,6 +526,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
                  working_middle_item_short_name: working_middle_item_short_name_manual, 
                  working_middle_specification: params[:quotation_detail_middle_classification][:working_middle_specification] ,
                  working_middle_item_category_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id], 
+                 working_subcategory_id: params[:quotation_detail_middle_classification][:working_middle_item_subcategory_id], 
 				 working_unit_id: @working_unit_id_params } 
 		   
 		     end
@@ -835,16 +855,34 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   def LPU_piping_wiring_select
     @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
     @labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    
+    #add180105金額計追加
+    @quote_price = QuotationDetailMiddleClassification.sum_quote_price_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    @execution_price = QuotationDetailMiddleClassification.sum_execution_price_PipingWiring(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    ###
+
   end
   #歩掛り(機器取付集計用)
   def LPU_equipment_mounting_select
     @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
 	@labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+  
+    #add180105金額計追加
+	@quote_price = QuotationDetailMiddleClassification.sum_quote_price_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+	@execution_price = QuotationDetailMiddleClassification.sum_execution_price_equipment_mounting(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    ###
+	
+	
   end
   #歩掛り(労務費集計用)
   def LPU_labor_cost_select
     @labor_productivity_unit = QuotationDetailMiddleClassification.sum_LPU_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
 	@labor_productivity_unit_total = QuotationDetailMiddleClassification.sum_LPUT_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+  
+    #add180105金額計追加
+	@quote_price = QuotationDetailMiddleClassification.sum_quote_price_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+	@execution_price = QuotationDetailMiddleClassification.sum_execution_price_labor_cost(params[:quotation_header_id], params[:quotation_detail_large_classification_id])
+    ###
   end
   
   #歩掛りの集計を最新のもので書き換える。
@@ -889,6 +927,11 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	  $not_sort_qm = true
     end
 	
+    #add180210
+    #新規か編集かの判定フラグ
+    def set_action_flag
+	  @action_flag = params[:action]
+	end
 
     #以降のレコードの行番号を全てインクリメントする
     def line_insert
@@ -991,13 +1034,54 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	  
 	  @quotation_detail_middle_classification.line_number = @line_number
     end
-	
+    
+    #カテゴリー保持フラグの取得
+    #add180210
+    def get_category_save_flag
+      if @quotation_detail_middle_classification.quotation_header_id.present?
+        @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_middle_classification.quotation_header_id)
+        if @quotation_headers.present?
+            @category_save_flag = @quotation_headers.category_saved_flag
+            #未入力なら、１をセット。
+            if @category_save_flag.nil?
+              @category_save_flag = 1
+            end
+            @quotation_detail_middle_classification.category_save_flag_child = @category_save_flag
+        end
+      end
+    end
+    #カテゴリー、サブカテゴリーの取得
+    #add180210
+    def get_category_id
+      if @quotation_headers.present? && @category_save_flag == 1
+        category_id = @quotation_headers.category_saved_id
+        subcategory_id = @quotation_headers.subcategory_saved_id
+        @quotation_detail_middle_classification.working_middle_item_category_id_call = category_id
+        @quotation_detail_middle_classification.working_middle_item_subcategory_id_call = subcategory_id
+      end
+    end
+    #カテゴリー保持フラグの保存
+    #add180210
+    def set_category_save_flag
+      if @quotation_detail_large_classification.quotation_header_id.present?
+        @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_large_classification.quotation_header_id)
+        if @quotation_headers.present?
+           quotation_header_params = { category_saved_flag: params[:quotation_detail_middle_classification][:category_save_flag_child], 
+                                       category_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id_call],
+                                       subcategory_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_subcategory_id_call]}
+           @quotation_headers.attributes = quotation_header_params
+           @quotation_headers.save(:validate => false)
+		end
+      end
+    end
+    
 	#ストロングパラメータ
 	# Never trust parameters from the scary internet, only allow the white list through.
     def quotation_detail_middle_classification_params
       params.require(:quotation_detail_middle_classification).permit(:quotation_header_id, :quotation_detail_large_classification_id, :line_number, 
                                                                      :quotation_items_division_id, :working_middle_item_id, :working_specific_middle_item_id, :working_middle_item_name, 
-                                                                     :working_middle_item_short_name, :working_middle_item_category_id, :working_middle_specification, :execution_quantity, :quantity,
+                                                                     :working_middle_item_short_name, :working_middle_item_category_id, :working_middle_item_category_id_call, 
+                                                                     :working_middle_item_subcategory_id, :working_middle_item_subcategory_id_call, :working_middle_specification, :execution_quantity, :quantity,
                                                                      :working_unit_id, :working_unit_name, :working_unit_price, :quote_price, :execution_unit_price,
                                                                      :execution_price, :material_id, :quotation_material_name, :material_unit_price, :labor_unit_price,
                                                                      :labor_productivity_unit, :labor_productivity_unit_total, :material_quantity, :accessory_cost, 

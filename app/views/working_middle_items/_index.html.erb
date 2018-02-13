@@ -1,12 +1,19 @@
-<% @working_middle_items.order("seq desc").each do |working_middle_item| %>
-	  <tr id="<%= working_middle_item.id%>">
+<% @working_middle_items.order("seq asc").each do |working_middle_item| %>
+     <tr id="<%= working_middle_item.id%>">
 	  
 	    <!--<td><%= link_to working_middle_item.id, working_middle_item_path(working_middle_item) %></td>-->
 		<!--ここはIDではなくソート用のseqをセット(その代わり、閲覧不可。)-->
-		<td><%= working_middle_item.seq %></td>
+		<td style="font-size : 10px;"><%= working_middle_item.seq %></td>
 	    
 		<% if working_middle_item.working_middle_item_category_id.present? && working_middle_item.working_category.present? %>
           	  <td><%= working_middle_item.working_category.category_name %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+        
+        <!--サブカテゴリー add180202 -->
+        <% if working_middle_item.working_subcategory_id.present? && working_middle_item.working_subcategory.present? %>
+          	  <td><%= working_middle_item.working_subcategory.name %></td>
         <% else %>
           <td></td>
         <% end %>

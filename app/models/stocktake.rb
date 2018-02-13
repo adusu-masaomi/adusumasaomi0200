@@ -15,5 +15,18 @@ class Stocktake < ActiveRecord::Base
   
   #棚卸日＆アイテムの重複登録防止。
   validates :stocktake_date,  presence: true, uniqueness: { scope: [:material_master_id] }
-
+  
+ scope :with_material_category_include, -> (inventory_material_category=1) {
+    #idが１以上でないと呼び出されないため、viewで１をプラスしているので、ここでマイナスしてあげる。
+    category_id = inventory_material_category.to_i 
+	category_id -= 1
+	 
+    joins(:inventory).joins(:material_master).where("material_masters.inventory_category_id = ?", category_id )
+	
+	#binding.pry
+  }
+  
+  def self.ransackable_scopes(auth_object=nil)
+      [ :with_material_category_include]
+  end
 end

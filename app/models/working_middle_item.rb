@@ -7,32 +7,35 @@ class WorkingMiddleItem < ActiveRecord::Base
    has_many :working_small_items
    accepts_nested_attributes_for :working_small_items, allow_destroy: true
    
-   #add171113
    belongs_to :working_category, :foreign_key => "working_middle_item_category_id"
-      
+   #add180202
+   belongs_to :working_subcategory
+  
    #明細（小）フォームajax用
    attr_accessor :material_code_hide
    attr_accessor :material_name_hide
    attr_accessor :quantity_hide
    attr_accessor :unit_price_hide
    attr_accessor :labor_productivity_unit_hide
+   attr_accessor :material_price_hide  #add180201
+   attr_accessor :maker_id_hide        #add180201
+   attr_accessor :unit_master_id_hide  #add180201
+   attr_accessor :working_subcategory_select_hide #add180202
    
    #明細合計用
    attr_accessor :material_cost_total
    attr_accessor :labor_productivity_unit_sum
-   #attr_accessor :labor_unit_price_standard
    attr_accessor :labor_cost
    
    #
    attr_accessor :master_insert_flag
    #活動フラグ判定用
    attr_accessor :action_flag
-   #add171208モーダル画面で利用（上記と用途が異なる）
-   #attr_accessor :action_flag_modal
    
-   #マスター呼出用  add171109
+   #マスター呼出用  
    attr_accessor :working_middle_item_for_call
    attr_accessor :working_middle_item_category_for_call
+   #attr_accessor :working_subcategory_for_call  #add180202
    attr_accessor :working_middle_item_short_name_for_call
    attr_accessor :working_middle_item_id_select_hide
    attr_accessor :working_middle_item_short_name_select_hide

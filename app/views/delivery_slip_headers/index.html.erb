@@ -67,7 +67,11 @@
         <td><%= link_to delivery_slip_header.id, delivery_slip_header_path(delivery_slip_header) %></td>
         <td><%= delivery_slip_header.delivery_slip_code %></td>
         <td><%= delivery_slip_header.delivery_slip_date %></td>
-        <td><%= delivery_slip_header.customer_master.customer_name %></td>
+		<% if delivery_slip_header.customer_master.present? %>
+          <td><%= delivery_slip_header.customer_master.customer_name %></td>
+		<% else %>
+          <td>-</td>
+		<% end %>
         <td><%= delivery_slip_header.construction_name %></td>
         <td align="right"><%= number_to_currency(delivery_slip_header.delivery_amount,  precision: 0) %></td>
         <td align="right"><%= number_to_currency(delivery_slip_header.execution_amount,  precision: 0) %></td>

@@ -79,15 +79,20 @@ class WorkingSmallItemsController < ApplicationController
        @quantity = 1
      end
 	 
-	 #単価
-	 #@unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:last_unit_price).flatten.join(",")
-	 #upd171113 定価に変更
+	 #単価（定価）
 	 @unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
 	 
 	 #歩掛
 	 @labor_productivity_unit = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:standard_labor_productivity_unit).flatten.join(",")
 	 
-	 #binding.pry
+     #メーカー add1802021
+     @maker_master_id = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+     
+     #単位  add1802021
+     @unit_master_id = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:unit_id).flatten.join(" ")
+     
+     #資材費（最終単価）add180201
+     @material_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:last_unit_price).flatten.join(",")
   end
   
   #add171113
@@ -106,14 +111,22 @@ class WorkingSmallItemsController < ApplicationController
          @quantity = 1
        end
 	 
-	 #単価
-	 #@unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:last_unit_price).flatten.join(",")
-	 #upd171113 定価に変更
+	   #単価(定価)
 	   @unit_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
 	 
 	   #歩掛
 	   @labor_productivity_unit = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:standard_labor_productivity_unit).flatten.join(",")
-	 else
+	 
+       #メーカー add1802021
+       @maker_master_id = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+       
+       #単位    add1802021
+       @unit_master_id = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:unit_id).flatten.join(" ")
+       
+       #資材費（最終単価）add180201
+       @material_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:last_unit_price).flatten.join(",")
+       
+     else
 	 #該当なければそのまま・・・
 	   @material_code =  params[:material_code]
 	 end

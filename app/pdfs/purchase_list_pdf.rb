@@ -142,6 +142,17 @@ class PurchaseListPDF
                        end
                        #
 					   
+					   #binding.pry
+					   #InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][0]
+					   
+					   #upd171227 入庫の場合は入庫と表示
+					   if purchase_datum.inventory_division_id.present? && InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][1] == 0
+					     division_name = InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][0]
+					   else
+					     division_name = purchase_datum.PurchaseDivision.purchase_division_name
+					   end
+					   #
+					   
 			           row.values purchase_date: purchase_datum.purchase_date,
                                   purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              material_code: material_code,
@@ -153,7 +164,7 @@ class PurchaseListPDF
 								  purchase_amount: purchase_amount,
                                   list_price: list_price,
                                   supplier_name: purchase_datum.SupplierMaster.supplier_name,
-								  purchase_division_name: purchase_datum.PurchaseDivision.purchase_division_name
+								  purchase_division_name: division_name
 	                    
             end 
 

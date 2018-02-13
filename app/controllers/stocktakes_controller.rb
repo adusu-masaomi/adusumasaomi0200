@@ -30,6 +30,29 @@ class StocktakesController < ApplicationController
 	#在庫マスター・履歴マスターへの反映（一括更新）
 	if params[:update_flag] == "1"
 	  update_inventory
+	elsif params[:update_flag] == "2"
+	#在庫マスターからのコピー
+	#add171221
+	  
+	  calcFlag = true
+	  
+	  if params[:q].blank?
+	    calcFlag = false
+	  else
+	    if params[:q][:stocktake_date_gteq].blank?
+	      calcFlag = false
+	    end
+	    if params[:q][:with_material_category_include].blank?
+	      calcFlag = false
+	    end
+	  end
+	  
+	  if calcFlag == true
+	    copyFromInventory
+	  else
+	    flash[:notice] = "集計開始日もしくはカテゴリーで選択・集計されていません。処理を中止しました。"
+	  end
+	
 	end
 	
 	
@@ -38,12 +61,21 @@ class StocktakesController < ApplicationController
 	
 	#棚卸日をセット
 	$stocktake_date = nil
+    $stocktake_list_header_subtitle = nil
+    
     if query.present?
 	  if query["stocktake_date_gteq"].present?
         $stocktake_date = query["stocktake_date_gteq"]
 	  end
-	end
-	
+	  
+      #add180210
+      #エアコン、配線器具などのサブタイトルをセットする
+      if query["with_material_category_include"].present?
+        $stocktake_list_header_subtitle = Inventory.category[(query["with_material_category_include"].to_i)-1][0]
+      end
+    end
+    
+    
 	respond_to do |format|
 	  format.html
 	  #pdf
@@ -63,6 +95,38 @@ class StocktakesController < ApplicationController
 	end
 	#
 	
+  end
+  
+  #在庫マスターから対象のデータをコピー
+  def copyFromInventory
+  
+    #最初にデータを一旦抹消させる。
+    Stocktake.where(stocktake_date: params[:q][:stocktake_date_gteq]).destroy_all
+    
+	#検索用のカテゴリーは１つずれているので、マイナスさせる
+    category = params[:q][:with_material_category_include].to_i 
+    category -= 1
+  
+    Inventory.all.each do |iv|
+      if  iv.material_master.inventory_category_id == category
+	  #カテゴリー一致？
+	    
+		stocktake_params = { stocktake_date: params[:q][:stocktake_date_gteq], material_master_id: iv.material_master_id, 
+                             inventory_id: iv.id, physical_quantity: iv.current_quantity, unit_price: iv.current_unit_price, 
+                             physical_amount: iv.inventory_amount, book_quantity: iv.current_quantity, book_amount: iv.inventory_amount }
+		
+		#データへ新規登録
+		@stocktake = Stocktake.new(stocktake_params)
+        if @stocktake.save!(:validate => false)
+		  @success_flag = true
+		else
+		  @success_flag = false
+		end
+		
+		#binding.pry
+		
+	  end
+	end
   end
   
   #在庫マスターへの反映
@@ -108,20 +172,25 @@ class StocktakesController < ApplicationController
 	#在庫マスターを更新
 		if inventory.present?
 		  
-		  #在庫Mへ差異数量を加える
-		  inventory_quantity = inventory.inventory_quantity + differ_quantity
-		  #
-		  current_quantity = inventory.current_quantity + differ_quantity
-		  #別ロット分数量への影響（先入先出）あり！！！！！
-		  #
+		  #在庫数量・在庫現在数量へ棚卸数量をそのまま上書き
+		  inventory_quantity = stocktake.physical_quantity
+		  current_quantity = stocktake.physical_quantity
+		  #上記同様に金額も上書き
+		  inventory_amount = stocktake.physical_amount
 		  
-		  #差異金額
-		  differ_amount =  stocktake.physical_amount - stocktake.book_amount
-		  #在庫Mへ上記差異金額を加える
-		  inventory_amount = inventory.inventory_amount + differ_amount
+		  ##差異を加えるVer(元々の在庫が狂っている場合もあるので、これは使えないかも・・・)
+		  ##在庫Mへ差異数量を加える
+		  #inventory_quantity = inventory.inventory_quantity + differ_quantity
+		  ##
+		  #current_quantity = inventory.current_quantity + differ_quantity
+		  ##別ロット分数量への影響（先入先出）あり！！！！！
+		  ##
+		  ##差異金額
+		  #differ_amount =  stocktake.physical_amount - stocktake.book_amount
+		  ##在庫Mへ上記差異金額を加える
+		  #inventory_amount = inventory.inventory_amount + differ_amount
 		  #別ロット分数量への影響（先入先出）あり！！！！！
-		  #
-		  #
+		  ###########
 		  
 		  #本来なら現在数量、現在単価にも影響する！！（今のところはそのままとする！！）
 	      inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
@@ -129,15 +198,20 @@ class StocktakesController < ApplicationController
 	  
           inventory.update(inventory_update_params)
 	    end
-	  
+	    
+		
+		#棚卸しの在庫更新フラグを１にセット
+		stocktake.update(:inventory_update_flag => 1)
+		
 	  end
 	  
 	end
     
 	##
 	#在庫更新フラグを全て１にセットする。(コールバック考慮してないので今一かも・・)
-    @stocktakes.where(inventory_update_flag: nil).update_all(:inventory_update_flag => 1)
-    
+    #これだとなぜかundefined mapのエラー発生するので保留(171226)
+	#@stocktakes.where(inventory_update_flag: nil).update_all(:inventory_update_flag => 1)
+	
   end
   
   def get_construction_datum_id

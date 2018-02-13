@@ -203,14 +203,18 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     #行番号を取得する
     get_line_number
 	
-	
-	#binding.pry
-    ###
+	#カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
+    get_category_id
+	###
   end
 
   # GET /delivery_slip_detail_middle_classifications/1/edit
   def edit
-   
+    #カテゴリー保持フラグを取得
+    #add180210
+    get_category_save_flag
   end
 
   # POST /delivery_slip_detail_middle_classifications
@@ -243,69 +247,6 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
 		  @working_unit = @check_unit
 	   end
     end
-	
-#    #明細(中分類)マスターへ登録する。
-#    if @delivery_slip_detail_middle_classification.working_middle_item_id == 1
-#	#手入力用IDの場合
-#      @check_item = WorkingMiddleItem.find_by(working_middle_item_name: @delivery_slip_detail_middle_classification.working_middle_item_name , working_middle_specification: @delivery_slip_detail_middle_classification.working_middle_specification)
-#    else
-#	#手入力以外の場合 add170729
-#	  @check_item = WorkingMiddleItem.find(@delivery_slip_detail_middle_classification.working_middle_item_id)
-#	end
-	
-#	@working_unit_id_params = @delivery_slip_detail_middle_classification.working_unit_id
-#    if @working_unit.present?
-#      @working_unit_all_params = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_middle_classification.working_unit_name)
-#	  @working_unit_id_params = @working_unit_all_params.id
-#	end 
-    
-    #if @check_item.nil?
-   
-#    large_item_params = nil   #add170714
-          
-    # 全選択の場合
-#	if params[:delivery_slip_detail_middle_classification][:check_update_all] == "true" 
-#		      large_item_params = { working_middle_item_name:  @delivery_slip_detail_middle_classification.working_middle_item_name, 
-#              working_middle_item_short_name: @delivery_slip_detail_middle_classification.working_middle_item_short_name, 
-#              working_middle_specification:  @delivery_slip_detail_middle_classification.working_middle_specification, 
-#              working_unit_id: @working_unit_id_params, 
-#              working_unit_price: @delivery_slip_detail_middle_classification.working_unit_price,
-#              execution_unit_price: @delivery_slip_detail_middle_classification.execution_unit_price,
-#              material_id: @delivery_slip_detail_middle_classification.material_id,
-#              working_material_name: @delivery_slip_detail_middle_classification.working_material_name,
-#              material_unit_price: @delivery_slip_detail_middle_classification.material_unit_price,
-#              labor_unit_price: @delivery_slip_detail_middle_classification.labor_unit_price,
-#              labor_productivity_unit: @delivery_slip_detail_middle_classification.labor_productivity_unit,
-#              labor_productivity_unit_total: @delivery_slip_detail_middle_classification.labor_productivity_unit_total,
-#              material_quantity: @delivery_slip_detail_middle_classification.material_quantity,
-#              accessory_cost: @delivery_slip_detail_middle_classification.accessory_cost,
-#              material_cost_total: @delivery_slip_detail_middle_classification.material_cost_total,
-#              labor_cost_total: @delivery_slip_detail_middle_classification.labor_cost_total,
-#              other_cost: @delivery_slip_detail_middle_classification.other_cost }
-        #@working_middle_item = WorkingMiddleItem.create(large_item_params)   del170729
-#    else
-	  # アイテムのみ更新の場合
-#	  if params[:delivery_slip_detail_middle_classification][:check_update_item] == "true" 
-#		large_item_params = { working_middle_item_name:  @delivery_slip_detail_middle_classification.working_middle_item_name, 
-#        working_middle_item_short_name: @delivery_slip_detail_middle_classification.working_middle_item_short_name, 
-#        working_middle_specification:  @delivery_slip_detail_middle_classification.working_middle_specification,
-#        working_unit_id: @working_unit_id_params } 
-
-        #@working_middle_item = WorkingMiddleItem.create(large_item_params)  del170729
-#	  end
-#    end
-
-#    #upd170729
-#    if large_item_params.present?
-#	  if @check_item.nil?
-#		@working_middle_item = WorkingMiddleItem.create(large_item_params)
-#	  else
-#        @working_middle_item = @check_item.update(large_item_params)
-#	  end
-#    end
-   #      end
-   #end
-
     
 
      #品目データの金額を更新
@@ -318,7 +259,11 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     
     #行番号の最終を書き込む
     delivery_slip_dlc_set_last_line_number
-	
+
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
+    
 	#add170626
 	if params[:delivery_slip_detail_middle_classification][:delivery_slip_header_id].present?
       @delivery_slip_header_id = params[:delivery_slip_detail_middle_classification][:delivery_slip_header_id]
@@ -356,6 +301,10 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     #品目データの金額を更新
 	save_price_to_large_classifications
 	
+    #add 180210
+    #カテゴリー保持状態の保存
+    set_category_save_flag
+    
 	#行挿入する 
 	@max_line_number = @delivery_slip_detail_middle_classification.line_number
     if (params[:delivery_slip_detail_middle_classification][:check_line_insert] == 'true')
@@ -511,6 +460,7 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
                                     working_middle_item_short_name: working_middle_item_short_name_manual, 
                                     working_middle_specification:  params[:delivery_slip_detail_middle_classification][:working_middle_specification] , 
                                     working_middle_item_category_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_category_id] ,
+                                    working_subcategory_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_subcategory_id], 
 									working_unit_id: @working_unit_id_params, 
                                     working_unit_price: params[:delivery_slip_detail_middle_classification][:working_unit_price] ,
                                     execution_unit_price: params[:delivery_slip_detail_middle_classification][:execution_unit_price] ,
@@ -537,6 +487,7 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
                  working_middle_item_short_name: working_middle_item_short_name_manual, 
                  working_middle_specification: params[:delivery_slip_detail_middle_classification][:working_middle_specification] ,
 				 working_middle_item_category_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_category_id] ,
+                 working_subcategory_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_subcategory_id], 
                  working_unit_id: @working_unit_id_params } 
 		   
 		     end
@@ -940,16 +891,31 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
   def LPU_piping_wiring_select
     @labor_productivity_unit = DeliverySlipDetailMiddleClassification.sum_LPU_PipingWiring(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
     @labor_productivity_unit_total = DeliverySlipDetailMiddleClassification.sum_LPUT_PipingWiring(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+  
+    #add180105金額計追加
+    @delivery_slip_price = DeliverySlipDetailMiddleClassification.sum_delivery_slip_price_PipingWiring(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+    @execution_price = DeliverySlipDetailMiddleClassification.sum_execution_price_PipingWiring(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+    ###
   end
   #歩掛り(機器取付集計用)
   def LPU_equipment_mounting_select
     @labor_productivity_unit = DeliverySlipDetailMiddleClassification.sum_LPU_equipment_mounting(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
 	@labor_productivity_unit_total = DeliverySlipDetailMiddleClassification.sum_LPUT_equipment_mounting(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+  
+    #add180105金額計追加
+	@delivery_slip_price = DeliverySlipDetailMiddleClassification.sum_delivery_slip_price_equipment_mounting(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+	@execution_price = DeliverySlipDetailMiddleClassification.sum_execution_price_equipment_mounting(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+    ###
   end
   #歩掛り(労務費集計用)
   def LPU_labor_cost_select
     @labor_productivity_unit = DeliverySlipDetailMiddleClassification.sum_LPU_labor_cost(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
 	@labor_productivity_unit_total = DeliverySlipDetailMiddleClassification.sum_LPUT_labor_cost(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+  
+    #add180105金額計追加
+	@delivery_slip_price = DeliverySlipDetailMiddleClassification.sum_delivery_slip_price_labor_cost(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+	@execution_price = DeliverySlipDetailMiddleClassification.sum_execution_price_labor_cost(params[:delivery_slip_header_id], params[:delivery_slip_detail_large_classification_id])
+    ###
   end
   
   #歩掛りの集計を最新のもので書き換える。
@@ -1007,6 +973,46 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
 	 
   end
   #add end
+  
+  #カテゴリー保持フラグの取得
+  #add180210
+  def get_category_save_flag
+    if @delivery_slip_detail_middle_classification.delivery_slip_header_id.present?
+      @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_middle_classification.delivery_slip_header_id)
+      if @delivery_slip_headers.present?
+        @category_save_flag = @delivery_slip_headers.category_saved_flag
+        #未入力なら、１をセット。
+        if @category_save_flag.nil?
+          @category_save_flag = 1
+        end
+        @delivery_slip_detail_middle_classification.category_save_flag_child = @category_save_flag
+      end
+    end
+  end
+  #カテゴリー、サブカテゴリーの取得
+  #add180210
+  def get_category_id
+    if @delivery_slip_headers.present? && @category_save_flag == 1
+      category_id = @delivery_slip_headers.category_saved_id
+      subcategory_id = @delivery_slip_headers.subcategory_saved_id
+      @delivery_slip_detail_middle_classification.working_middle_item_category_id_call = category_id
+      @delivery_slip_detail_middle_classification.working_middle_item_subcategory_id_call = subcategory_id
+    end
+  end
+  #カテゴリー保持フラグの保存
+  #add180210
+  def set_category_save_flag
+    if @delivery_slip_detail_large_classification.delivery_slip_header_id.present?
+      @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
+      if @delivery_slip_headers.present?
+        delivery_slip_header_params = { category_saved_flag: params[:delivery_slip_detail_middle_classification][:category_save_flag_child], 
+                                       category_saved_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_category_id_call],
+                                       subcategory_saved_id: params[:delivery_slip_detail_middle_classification][:working_middle_item_subcategory_id_call]}
+        @delivery_slip_headers.attributes = delivery_slip_header_params
+        @delivery_slip_headers.save(:validate => false)
+      end
+    end
+  end
   
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -1129,8 +1135,8 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def delivery_slip_detail_middle_classification_params
       params.require(:delivery_slip_detail_middle_classification).permit(:delivery_slip_header_id, :delivery_slip_detail_large_classification_id, 
-      :delivery_slip_item_division_id, :working_middle_item_id, :working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id, 
-      :line_number, :working_middle_specification, :quantity, :execution_quantity, :working_unit_id, :working_unit_name, :working_unit_price, :delivery_slip_price,
+      :delivery_slip_item_division_id, :working_middle_item_id, :working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id, :working_middle_item_category_id_call, 
+      :working_middle_item_subcategory_id, :working_middle_item_subcategory_id_call, :line_number, :working_middle_specification, :quantity, :execution_quantity, :working_unit_id, :working_unit_name, :working_unit_price, :delivery_slip_price,
       :execution_unit_price, :execution_price, :material_id, :material_id, :working_material_name, :material_unit_price, 
       :labor_unit_price, :labor_productivity_unit, :labor_productivity_unit_total, :material_quantity, :accessory_cost, :material_cost_total, 
       :labor_cost_total, :other_cost, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, 

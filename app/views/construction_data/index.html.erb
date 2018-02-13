@@ -18,18 +18,20 @@
     <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id:'id', style: 'width:400px' , class: "searchableConstructionName" } %>
     
     <%= f.label :construction_code, '工事コード(範囲)' %>
-    <%= f.text_field :construction_code_cont, include_blank: true  %>
-	
+    <%= f.text_field :construction_code_cont, include_blank: true , id: 'construction_code_range' %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstructionCode()" %>
+    
 	<%= f.label :customer_name, '得意先名　' %>
     <!--<%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
     <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {id: 'customer_id', style: 'width:330px' , 
 	     class: "searchableCustomerName", :onchange => "setConstructionExtractByCutomer()" } %>
 
-	</br><%= f.label :billed_flag, '請求済' %>
-	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
-	<!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
-	<%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {style: 'width:150px'} %>
-	
+    </br><%= f.label :billed_flag, '請求済' %>
+    <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
+    <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
+    <%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'billed_flag', style: 'width:150px'} %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearBilledFlag()" %>
+    
 	<div>
         <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
         <%= link_to "一覧表",
@@ -72,6 +74,7 @@
       <th></th>
 	  <th></th>
 	  <th></th>
+      <!--<th></th>-->
       <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:reception_date) %></th>
@@ -97,7 +100,7 @@
       <% else %>
          <tr bgcolor="white">
       <% end %>
-	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum) %></td>
+	    <td><%= link_to construction_datum.id, construction_datum_path(construction_datum), :class => 'keep-disp' %></td>
         <td><%= link_to t('.edit', :default => t("指示書")),
                       edit2_construction_datum_path(construction_datum),  :class => 'btn btn-pink300_ftg btn-xs keep-disp' , :style => "width: 50px; height: 10px;" %></td>
         
@@ -109,6 +112,11 @@
                                    :class => 'btn btn-green600_rsd btn-xs keep-disp'  %></td>
         <td><%= link_to t('.back', :default => t("労務")), construction_daily_reports_path(construction_id: construction_datum.id, move_flag: "1"), 
                                    :class => 'btn btn-blue500_rsd btn-xs keep-disp'  %></td>
+        <!--<td><%= link_to t('.back', :default => t("工程")), tasks_path(construction_id: construction_datum.id, 
+                                     start_date: construction_datum.construction_period_start,
+                                     end_date: construction_datum.construction_period_end,
+                                     move_flag: "1"), 
+                                     :class => 'btn btn-orange800_rsd btn-xs keep-disp'  %></td>-->
         <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
 			
 		<% if @search.present? %>
@@ -138,8 +146,14 @@
         <td><%= construction_datum.construction_code %></td>
         <td><%= construction_datum.construction_name %></td>
         <td><%= construction_datum.reception_date %></td>
-        <td><%= @customer_masters[(construction_datum.customer_id)-1].customer_name %></td>
-        <!--del170915 工事着工・完了日は非表示にする
+        
+		<% if construction_datum.CustomerMaster.present? %>
+          <td><%= construction_datum.CustomerMaster.customer_name %></td>
+        <% else %>
+		  <td>-</td>
+        <% end %>
+		
+		<!--del170915 工事着工・完了日は非表示にする
 		<% if construction_datum.construction_period_start.present? && construction_datum.construction_period_start.strftime("%Y/%m/%d") != "2021/01/01" then %>
            <td><%= construction_datum.construction_period_start %></td>
 		<% else %>
@@ -189,8 +203,8 @@
   $(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
 
-        $(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
-        $(".searchableCustomerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableCustomerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	
 	
      // $('.scrolltable').scrolltable()
@@ -216,8 +230,16 @@
        //実行
        $('form').keepPosition();
 	   //$('ul.nav-tabs a').keepPosition();
-
   });
+  
+  //工事コードを空にする
+  function clearConstructionCode(){
+    document.getElementById("construction_code_range").value = "";
+  }
+  //請求済を空にする
+  function clearBilledFlag(){
+    document.getElementById("billed_flag").selectedIndex = 0;
+  }
   
   
   //プラグイン化

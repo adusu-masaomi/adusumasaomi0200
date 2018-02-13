@@ -12,16 +12,27 @@
 	<%= f.label :stocktake_date, '〜' %>
     <%= f.text_field :stocktake_date_lteq, class:"input-append date datepicker", include_blank: true ,  
               id: 'stocktake_date_end'   %>
+	<%= f.label :inventory_category, 'カテゴリー：' %>
+    <%= f.select :with_material_category_include, Inventory.category.map{ |value, key| [value, key+1] }, {include_blank: true}, 
+	      {style: 'width:220px' , class: "searchableCategory" } %></br>
 			  
     <div>
       <%= f.submit '検索(集計)', :class => 'btn btn-default' %>
       <%= link_to t('.new', :default => t("helpers.links.new")),
             new_stocktake_path,
             :class => 'btn btn-primary' %>
-      <%= link_to "棚卸表",
+	  
+	  <%= link_to "在庫データよりコピー",
+            stocktakes_path(update_flag: "2", q: params[:q] ),
+            :class => 'btn btn-purple300_rsd' , :data => {:confirm => "在庫データからそのまま\n棚卸データへ全コピーします。\n(日付・カテゴリーで選択・集計\nされていることを確認して\nください。)\n本当に実行しますか？？"} %>
+			
+	  <%= link_to "棚卸表(画像付)",
             stocktakes_path(@stocktake, format: "pdf", :print_flag => "1" ),
-            :class => 'btn btn-info' , :target=>["_blank"] %>
-	    <%= link_to "在庫データ一括更新",
+            :class => 'btn btn-lightgreen500_ftg' , :target=>["_blank"] %>
+      <%= link_to "棚卸表",
+            stocktakes_path(@stocktake, format: "pdf", :print_flag => "2" ),
+            :class => 'btn btn-lightblue200_ftg' , :target=>["_blank"] %>
+	    <%= link_to "在庫データへ一括更新",
             stocktakes_path(update_flag: "1" ),
             :class => 'btn btn-warning' , :data => {:confirm => "在庫データが一括更新されます！！\n本当に実行しますか？？"} %>
 	  
@@ -57,7 +68,8 @@
     <tr>
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
       <th><%= model_class.human_attribute_name(:stocktake_date) %></th>
-      <th><%= model_class.human_attribute_name(:material_code) %></th>
+	  <th><%= sort_link(@q, :material_master_material_code, model_class.human_attribute_name(:material_code) ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:material_code) %></th>-->
 	  <th><%= model_class.human_attribute_name(:material_name) %></th>
       <th><%= model_class.human_attribute_name(:physical_quantity) %></th>
       <th><%= model_class.human_attribute_name(:unit_price) %></th>
@@ -105,11 +117,18 @@
 
 <script type="text/javascript">
  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+   $(".searchableCategory").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+  });
+ 
  //入力チェック後の、更新処理
  function submitAfterValidation() {
    if (window.confirm('在庫データが一括更新されます！！\n本当に実行しますか？')) {
 	 document.forms[0].submit();
    }
  }
+ 
+ 
  
 </script>

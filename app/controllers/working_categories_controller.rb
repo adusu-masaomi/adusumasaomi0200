@@ -4,7 +4,27 @@ class WorkingCategoriesController < ApplicationController
   # GET /working_categories
   # GET /working_categories.json
   def index
-    @working_categories = WorkingCategory.all
+    #@working_categories = WorkingCategory.all
+    
+    #ransack保持用コード
+    query = params[:q]
+    query ||= eval(cookies[:recent_search_history].to_s)  	
+		
+	 
+	#@q = ConstructionDailyReport.ransack(params[:q])  
+    #ransack保持用--上記はこれに置き換える
+	@q = WorkingCategory.ransack(query)
+     
+	#ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 24.hours.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+	 
+    @working_categories = @q.result(distinct: true)
+     
   end
 
   # GET /working_categories/1
@@ -15,6 +35,7 @@ class WorkingCategoriesController < ApplicationController
   # GET /working_categories/new
   def new
     @working_category = WorkingCategory.new
+    
   end
 
   # GET /working_categories/1/edit
@@ -60,7 +81,29 @@ class WorkingCategoriesController < ApplicationController
       format.json { head :no_content }
     end
   end
+  
+  #ajax
+  #add180206
+  #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
+  def reorder
+    
+	#$not_sort_ql = true               
+	
+	#if $sort_ql != "asc"              
+	#  row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+	#else                              
+	  row = params[:row].split(",")   
+	#end
+	
+	#行番号へセットするため、配列は１から開始させる。
+	row.each_with_index {|row, i| WorkingCategory.update(row, {:seq => i + 1})}
+    render :text => "OK"
 
+    #小計を全て再計算する
+    #recalc_subtotal_all
+
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_working_category
@@ -69,6 +112,6 @@ class WorkingCategoriesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def working_category_params
-      params.require(:working_category).permit(:category_name)
+      params.require(:working_category).permit(:category_name, :seq)
     end
 end

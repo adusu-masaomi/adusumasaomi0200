@@ -274,16 +274,16 @@
 		 
 		 <!--注文金額合計（１〜３）-->
 		 <%= f.input :total_order_price_1 , label:"注文金額計１", label_html: { style: 'color:black;' }, 
-                     input_html:{ id:"total_order_price_1", style: 'width:100px;font-weight:bold;'} %>
+                     input_html:{ id:"total_order_price_1", :type=>"text",  style: 'width:100px;font-weight:bold;', :onkeydown => "checkBytesAmount(event,1)" } %>
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
          <%= f.input :total_order_price_2 , label:"注文金額計２", label_html: { style: 'color:black;' }, 
-                     input_html:{ id:"total_order_price_2", style: 'width:100px;font-weight:bold;'} %>
+                     input_html:{ id:"total_order_price_2", :type=>"text",  style: 'width:100px;font-weight:bold;', :onkeydown => "checkBytesAmount(event,2)" } %>
 
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
          <%= f.input :total_order_price_3 , label:"注文金額計３", label_html: { style: 'color:black;' }, 
-                     input_html:{ id:"total_order_price_3", style: 'width:100px;font-weight:bold;'} %>
+                     input_html:{ id:"total_order_price_3", :type=>"text",  style: 'width:100px;font-weight:bold;', :onkeydown => "checkBytesAmount(event,3)" } %>
          
          <!-- -->
 	   </div> 
@@ -466,7 +466,6 @@
 		 //コード、名称などを自動セット
 		 setItem(gMaterial_id, selectedIndex);
          
-		 
          //手入力以外はグローバルへセット
          //if (gMaterial_id != 0) {
          //   gSelectedIndex = selectedIndex;
@@ -785,6 +784,39 @@ function dispDiv() {
     
   //}
 
+
+  //注文金額計が全角になっていたら半角に変換する
+  //add180120
+  function checkBytesAmount(e, amountIndex){
+     if (e.keyCode == 13 || e.keyCode == 9) {
+	 } else {
+       return false;
+	 }
+	 
+	 var value = ""
+	 switch (amountIndex){
+      case 1:
+        value = document.getElementById("total_order_price_1").value;
+        if (value != ""){
+	      document.getElementById("total_order_price_1").value = toHalfWidth(value);
+	    }
+		break;
+      case 2:
+        value = document.getElementById("total_order_price_2").value;
+        if (value != ""){
+	      document.getElementById("total_order_price_2").value = toHalfWidth(value);
+	    }
+        break;
+      case 3:
+        value = document.getElementById("total_order_price_3").value;
+        if (value != ""){
+	      document.getElementById("total_order_price_3").value = toHalfWidth(value);
+	    }
+        break;
+     }
+	 
+	
+  }
 
 function reloadDiv(){
   //画面再ロードする

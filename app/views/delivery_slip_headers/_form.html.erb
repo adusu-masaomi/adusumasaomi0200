@@ -1,4 +1,16 @@
 <%= simple_form_for @delivery_slip_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  <% if @delivery_slip_header.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @delivery_slip_header.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @delivery_slip_header.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
   <div class="col-md-3" , style="margin-left : -15px">
   <%= f.input :delivery_slip_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
   </div>
@@ -34,7 +46,7 @@
   <!--<%= f.input :address, input_html:{id:"address", name:"address", :tabindex=>"10"} %>-->
   
   <div class="col-lg-6" , style="margin-left : -15px">
-  <%= f.input :address, hint: "＊都道府県のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"11",
+  <%= f.input :address, hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"11",
                         :onkeydown => "setPostAuto($(this).val(), 'post', event)"} %>
   </div>
   
@@ -54,7 +66,7 @@
       :tabindex=>"17"}  %>
 
   <div class="col-lg-6" , style="margin-left : -15px">
-    <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県のみ入力して下さい。", 
+    <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県市区町村のみ入力して下さい。", 
 	    input_html:{id:"construction_place", style: 'width:320px;', name:"construction_place", :tabindex=>"18", 
 		   :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
   </div>
@@ -121,13 +133,35 @@
 	 //
    });
    
-   //フォームロード時のイベント
+  //フォームロード時のイベント
   window.onload = function(){
   	//得意先名を最新の情報にする
 	var index = document.getElementById("customer_id").selectedIndex;
 	document.getElementById("customer_name").value = 
 	  document.getElementById("customer_id").options[index].innerText;
+    
+    
+    //顧客情報の初期値もセットする(未入力の場合)
+	//add180206
+    setCustomerDefaultBySearch();
+    
   }
+  
+  //顧客情報のセット add180206
+  function setCustomerDefaultBySearch(){
+    index = parseInt(document.getElementById("customer_id").value);
+    
+    if (index > 0){
+      var blnExist = false;
+      if (document.getElementById("address").value != ""){
+        blnExist = true;
+      }
+      if (blnExist == false){
+        $(".searchableCustomerName").val(index).trigger("change");
+      }
+    }
+  }
+  
    //工事情報のセット
   function setConstructionDateDefault()
   {  
@@ -156,13 +190,18 @@
 		  obj = document.getElementById("construction_place2").textContent;
           document.getElementById("construction_place2").value = obj;
 		  
-		  //add170218
 		  //顧客情報も合わせてセットする
-		  obj = document.getElementById("customer_id_hide").textContent;
-		  if (obj != null){
-		    index = parseInt(obj);
+		  obj = document.getElementById("customer_id_hide").textContent; 
+          if (obj != null){
+            index = parseInt(obj);
             $(".searchableCustomerName").val(index).trigger("change");
-	      }
+          }
+          
+          //obj = document.getElementById("customer_id_hide").textContent;
+		  //if (obj != null){
+		  //  index = parseInt(obj);
+          //  $(".searchableCustomerName").val(index).trigger("change");
+	     // }
 		  
 	      }
 	  );

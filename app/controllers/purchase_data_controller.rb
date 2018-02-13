@@ -193,6 +193,8 @@ class PurchaseDataController < ApplicationController
 	@@purchase_datum_notes = @purchase_datum.notes
 	@@purchase_datum_division_id = @purchase_datum.division_id
 	@@purchase_datum_inventory_division_id = @purchase_datum.inventory_division_id
+	#add171216
+	@@purchase_datum_unit_price_not_update_flag = @purchase_datum.unit_price_not_update_flag
     
   end
 
@@ -225,6 +227,8 @@ class PurchaseDataController < ApplicationController
          @purchase_datum.notes ||= @@purchase_datum_notes
 		 @purchase_datum.division_id ||= @@purchase_datum_division_id
 		 @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
+         #add171216
+		 @purchase_datum.unit_price_not_update_flag ||= @@purchase_datum_unit_price_not_update_flag
 	   end
 	   
   end
@@ -250,13 +254,18 @@ class PurchaseDataController < ApplicationController
     
 	
     #仕入単価を更新
-    if (params[:purchase_datum][:check_unit] == 'false')
-      @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
-              params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
-      if @purchase_unit_prices.present?
-        purchase_unit_prices_create_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
-        @purchase_unit_prices.update(purchase_unit_prices_create_params)
-	  end
+    #if (params[:purchase_datum][:unit_price_not_update_flag] == 'false')
+	if (params[:purchase_datum][:unit_price_not_update_flag] == '0')
+      
+	  #仕入先単価マスターへの新規追加又は更新
+	  create_or_update_purchase_unit_prices
+	 
+	  #@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+      #        params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
+      #if @purchase_unit_prices.present?
+      #  purchase_unit_prices_create_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
+      #  @purchase_unit_prices.update(purchase_unit_prices_create_params)
+	  #end
 	
 	    #資材Mも更新
       update_params_list_price_and_maker
@@ -296,23 +305,34 @@ class PurchaseDataController < ApplicationController
     end
   end
 
+  #単価更新フラグのパラメータ書き換え
+  #真偽型がないため、int型に変換する
+  #def change_unit_price_update_flag_params
+  #  if (params[:purchase_datum][:unit_price_not_update_flag] == '')
+  #  else
+  #  end
+  #end
+
    # PATCH/PUT /purchase_data/1
   # PATCH/PUT /purchase_data/1.json
   def update
-    
+  
    #viewで分解されたパラメータを、正常更新できるように復元させる。
    adjust_purchase_date_params
    
    #仕入単価Mも更新する 
-   if (params[:purchase_datum][:check_unit] == 'false')
-	
-     @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
-              params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
-     if @purchase_unit_prices.present?
-
-	   purchase_unit_prices_update_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
-	     @purchase_unit_prices.update(purchase_unit_prices_update_params)
-     end     
+   #if (params[:purchase_datum][:unit_price_not_update_flag] == 'false')
+   if (params[:purchase_datum][:unit_price_not_update_flag] == '0')
+	 
+	 #仕入先単価マスターへの新規追加又は更新
+	 create_or_update_purchase_unit_prices
+	 
+     #@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+     #         params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
+     #if @purchase_unit_prices.present?
+	 #  purchase_unit_prices_update_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
+	 #    @purchase_unit_prices.update(purchase_unit_prices_update_params)
+     #end     
 
      #定価・メーカーID、品番品名も更新
      update_params_list_price_and_maker
@@ -368,6 +388,31 @@ class PurchaseDataController < ApplicationController
 	  end
   end
   
+  #仕入先単価マスターへの新規追加又は更新
+  def create_or_update_purchase_unit_prices
+    @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+    params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
+
+    if @purchase_unit_prices.present?
+      purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+                        unit_price: params[:purchase_datum][:purchase_unit_price]}
+      @purchase_unit_prices.update(purchase_unit_prices_params)
+    else
+    #該当なしの場合は新規追加  add180120
+	   #仕入先用CDをセット
+	   if params[:purchase_datum][:supplier_material_code].present?
+		  supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+	   else
+		  #仕入先品番が未入力の場合は、品番をそのままセットする
+		  supplier_masterial_code = params[:purchase_datum][:material_code]
+	   end
+	
+      purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+                        supplier_material_code: supplier_masterial_code, 
+                        unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
+      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_prices_params)
+    end
+  end
   
   def set_construction_and_order_default
   #工事一覧画面等から遷移した場合に、フォームに初期値をセットさせる    
@@ -640,7 +685,7 @@ class PurchaseDataController < ApplicationController
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
                      :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
-                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :notes )
+                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :notes )
     end
     
     def purchase_unit_prices_params

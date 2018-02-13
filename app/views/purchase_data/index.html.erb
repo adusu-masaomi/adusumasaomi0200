@@ -11,13 +11,20 @@
   <%= search_form_for @q, :html => {:style=> 'width:1920px' } do |f| %>
   <%= f.label :purchase_date, '仕入日' %>
   <%= f.text_field :purchase_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'purchase_date_start'   %>
+  
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartDate()" %>
+  
   <%= f.label :purchase_date, '～' %>
   <%= f.text_field :purchase_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'purchase_date_end'  %>
+
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndDate()" %>
 
   <%= f.label :maker_code, 'メーカー：：' %>
   <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %>
   <%= f.label :slip_code, '伝票No' %>
   <%= f.text_field :slip_code_cont, include_blank: true, id: 'slip_code'  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSlipCode()" %>
+  
   <%= f.label :supplier_id, '仕入先：：' %>
   <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
   <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
@@ -31,9 +38,15 @@
   <%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
   
   <%= f.label :division_id, '仕入区分' %>
-  <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true}, { id: 'division_id', style: 'width:220px' , class: "searchablePurchaseDivision"}  %>
+  <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true},
+       { id: 'division_id', style: 'width:120px' , class: "searchablePurchaseDivision"}  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseDivision()" %>
+  
   <%= f.label :division_id, '入出庫区分' %>
-  <%= f.select :inventory_division_id_eq, InventoryHistory.inventory_division.map{ |value, key| [value, key] }, {include_blank: true}, { id: 'inventory_division_id', style: 'width:150px'} %>
+  <%= f.select :inventory_division_id_eq, InventoryHistory.inventory_division.map{ |value, key| [value, key] }, {include_blank: true}, 
+       { id: 'inventory_division_id', style: 'width:120px'} %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearInventoryDivision()" %>
+       
   <%= f.label :construction_code, '件名：：' %>
   <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
   <%= f.select :with_construction, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
@@ -46,14 +59,26 @@
   <!--<%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
   <!--<%= f.select :with_material, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
   <%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
+  
   <%= f.label :material_code, '　品番(キーワード)：' %>
   <!--<%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>-->
   <%= f.text_field :with_material_code_include, include_blank: true , id: 'material_code' %>
+  
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemCodeKeyWords()" %>
+  
   <%= f.label :material_code, '品名：' %>
   <!--<%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %>-->
   <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:220px', id: 'material_name'  %>
+  
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %>
+  
   <%= f.label :material_code, '品名（手入力）：' %>
-  <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %></br>
+  <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %>
+
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemNameManual()" %></br>
   
       <div>
        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
@@ -155,7 +180,8 @@
 		<% else %>
            <td class="col-md-24">-</td>
         <% end %>
-        <% if purchase_datum.construction_datum_id.present? && purchase_datum.construction_datum.present? %>
+        <% if purchase_datum.construction_datum_id.present? && purchase_datum.construction_datum.present? && 
+                purchase_datum.construction_datum.CustomerMaster.present? %>
            <td align="left", style="font-size : 12px;"><%= purchase_datum.construction_datum.CustomerMaster.customer_name %></td>
         <% else %>
            <td>-</td>
@@ -296,5 +322,38 @@
 	
  }
 
+ //開始日を空にする
+ function clearStartDate(){
+   document.getElementById("purchase_date_start").value = "";
+ }
+ //開始日を空にする
+ function clearEndDate(){
+   document.getElementById("purchase_date_end").value = "";
+ }
+ 
+ //キーワードの品番を空にする
+ function clearItemCodeKeyWords(){
+   document.getElementById("material_code").value = "";
+ }
+ //キーワードの品名を空にする
+ function clearItemName(){
+   document.getElementById("material_name").value = "";
+ }
+ //手入力の品名を空にする
+ function clearItemNameManual(){
+   document.getElementById("material_name_free").value = "";
+ }
+ //手入力の伝票番号を空にする
+ function clearSlipCode(){
+   document.getElementById("slip_code").value = "";
+ }
+ //仕入区分を空にする
+ function clearPurchaseDivision(){
+   document.getElementById("division_id").selectedIndex = 0;
+ }
+ //入出庫区分を空にする
+ function clearInventoryDivision(){
+   document.getElementById("inventory_division_id").selectedIndex = 0;
+ }
   
 </script>

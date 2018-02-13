@@ -26,16 +26,16 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;
   
-  <%= f.input :quotation_unit_price_1,  label: "見積単価１", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_1",  style: 'width:100px;color:purple' , 
-       class: "quotation_unit_price_1", :tabindex=>"10", :onkeydown => "checkQuotationUnitPriceAll(1,event)" } %>
+  <%= f.input :quotation_unit_price_1,  label: "見積単価１", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_1",  style: 'width:100px;color:purple;' , 
+       class: "quotation_unit_price_1", :type=>"text", :tabindex=>"10", :onkeydown => "checkQuotationUnitPriceAll(1,event)" } %>
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.input :quotation_unit_price_2,  label: "見積単価２", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_2",  style: 'width:100px;color:purple' , 
-       class: "quotation_unit_price_2", :tabindex=>"12",:onkeydown => "checkQuotationUnitPriceAll(2,event)"  } %>
+       class: "quotation_unit_price_2", :type=>"text", :tabindex=>"12",:onkeydown => "checkQuotationUnitPriceAll(2,event)"  } %>
 	   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.input :quotation_unit_price_3,  label: "見積単価３", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_3",  style: 'width:100px;color:purple' , 
-       class: "quotation_unit_price_3", :tabindex=>"14", :onkeydown => "checkQuotationUnitPriceAll(3,event)"  } %>
+       class: "quotation_unit_price_3", :type=>"text", :tabindex=>"14", :onkeydown => "checkQuotationUnitPriceAll(3,event)"  } %>
   
   
   </br>
@@ -48,7 +48,7 @@
   
   <%= f.label :数量, {style: 'width:28px'}  %>
   <!--<%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>-->
-  <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2"  %>
+  <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2" , :onkeydown => "checkBytesQuantity(event)"  %>
   <td>&nbsp;&nbsp;</td>
   <!--<%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
      { id: "unit_master_id", name:"unit_master_id[]", class: "searchableSelect1_2" , style: 'width:50px' } %>-->
@@ -99,7 +99,7 @@
       {class: "searchableSelect1_3 form-control" , id: "maker_id" ,  style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>
   
   <!--<%= f.input :list_price,  input_html:{ id: "list_price", name: "list_price[]", style: 'width:100px' , :tabindex=>"4" } %>-->
-  <%= f.input :list_price,  input_html:{ id: "list_price", style: 'width:100px' , :tabindex=>"4" } %>
+  <%= f.input :list_price, input_html:{ id: "list_price", style: 'width:100px' , :type=>"text", :tabindex=>"4" , :onkeydown => "checkBytesListPrice(event)" } %>
   
   <!--落札フラグ-->
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -163,12 +163,11 @@
   
 </div>
 </div>
- 
+  
  <script type="text/javascript">
 
   //cIndex = 0;
   //var i = 0;
-  
   
   //$(document).ready(function(){
   //$(document).on('turbolinks:load', function(){
@@ -259,12 +258,12 @@
   //見積単価から金額を算出
   function checkQuotationUnitPriceAll(Flag,e){
      
+	 
 	 if (e.keyCode == 13 || e.keyCode == 9) {
 	 //  return false;
-     } else {
+	 } else {
        return false;
 	 }
-	 
 	 
 	 var unit_price;
 	 var num = 0;
@@ -276,8 +275,11 @@
 	switch (Flag){
       case 1:
         num = 1;
-		unit_price = document.querySelectorAll("#quotation_unit_price_1");
+	    
+	  	unit_price = document.querySelectorAll("#quotation_unit_price_1");
 		price = document.querySelectorAll("#quotation_price_1");
+		
+	 	
 		break;
       case 2:
 	    num = 2;
@@ -291,10 +293,18 @@
 		break;
     }
 	
-	
-	for (var index = 0; index < unit_price.length  ; index ++) {
+	for (var index = 0; index < unit_price.length  ; index ++)
+ {
+	  
+	  //
+	   
+	  //add180120
+	  //全角入力→半角にする
+	  unit_price[index].value =  toHalfWidth(unit_price[index].value);
+	  
 	  if (unit_price[index].value > 0 && quantity[index].value > 0){
-	    price[index].value = parseInt(unit_price[index].value * quantity[index].value);
+	    
+		price[index].value = parseInt(unit_price[index].value * quantity[index].value);
 		
 		//落札のチェックも行う
 		checkQuotationPriceAll(num);
@@ -302,7 +312,7 @@
 	}
      
   }
-  
+ 
   //落札のチェックを行う。
   function checkBidAll(){
   
@@ -556,7 +566,7 @@
 		 
 		 if (id != 1 ) {
 		 //手入力は除外&明細に同一品番はないものとする(ある場合は正常動作しない）
-			$.get("<%= purchase_order_historiez_material_select_path %>",
+			$.get("<%= quotation_material_headerz_material_select_path %>",
              {id: id , supplier_master_id: supplier_master_id },
               function(data){
 		        
@@ -575,6 +585,8 @@
 				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][material_name]";
 				document.getElementsByName(nm)[0].value = obj;
 				//document.getElementsByName("material_name[]")[selected_index].value = obj;
+				
+				//debugger;
 				
 				//単位をセット
 				obj = document.getElementById("unit_id_hide").textContent;
@@ -823,6 +835,33 @@
 	return false;
     
   }
+  
+  
+  //数量が全角になっていたら半角に変換する
+  //add180120
+  function checkBytesQuantity(e){
+     if (e.keyCode == 13 || e.keyCode == 9) {
+	 } else {
+       return false;
+	 }
+	 if (document.getElementById("quantity").value != ""){
+	   var str = document.getElementById("quantity").value;
+	   document.getElementById("quantity").value = toHalfWidth(str);
+	 }
+  }
+  //定価が全角になっていたら半角に変換する
+  //add180120
+  function checkBytesListPrice(e){
+     if (e.keyCode == 13 || e.keyCode == 9) {
+	 } else {
+       return false;
+	 }
+	 if (document.getElementById("list_price").value != ""){
+	   var str = document.getElementById("list_price").value;
+	   document.getElementById("list_price").value = toHalfWidth(str);
+	 }
+  }
+  
   
    //ENTERキーを無効にする（タブが設定されてない場合）
    $("input"). keydown(function(e) {

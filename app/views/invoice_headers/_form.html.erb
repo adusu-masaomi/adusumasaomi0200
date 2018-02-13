@@ -1,4 +1,17 @@
 <%= simple_form_for @invoice_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @invoice_header.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @invoice_header.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @invoice_header.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
   <div class="col-md-3" , style="margin-left : -15px">
   <%= f.input :invoice_code, input_html:{:tabindex=>"0", style: 'width:150px', :class => 'sbc_field'} %>
   </div>
@@ -41,7 +54,7 @@
   <%= f.input :post, input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"12", :class => 'sbc_field'} %>
   
   <div class="col-lg-6" , style="margin-left : -15px">
-    <%= f.input :address, hint: "＊都道府県のみ入力して下さい。", input_html:{id:"address", name:"address", :tabindex=>"13", style: 'width:320px', 
+    <%= f.input :address, hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{id:"address", name:"address", :tabindex=>"13", style: 'width:320px', 
                   :onkeydown => "setPostAuto($(this).val(), 'post', event)" } %>
   </div>
   
@@ -145,8 +158,27 @@
 	 var index = document.getElementById("customer_id").selectedIndex;
 	 document.getElementById("customer_name").value = 
 	   document.getElementById("customer_id").options[index].innerText;
-	
+     
+     //顧客情報の初期値もセットする(未入力の場合)
+	 //add180206
+     setCustomerDefaultBySearch();
+    
    }
+   
+  //顧客情報のセット add180206
+  function setCustomerDefaultBySearch(){
+    index = parseInt(document.getElementById("customer_id").value);
+    
+    if (index > 0){
+      var blnExist = false;
+      if (document.getElementById("address").value != ""){
+        blnExist = true;
+      }
+      if (blnExist == false){
+        $(".searchableCustomerName").val(index).trigger("change");
+      }
+    }
+  }
    
    //工事情報のセット
   function setConstructionDateDefault()

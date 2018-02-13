@@ -6,7 +6,13 @@ class InventoryActionListPDF
       
        # tlfファイルを読み込む
 	   #棚卸表
-	   report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_action_list_pdf.tlf")
+	   if $print_flag == "1"
+	   #画像付Ver
+         report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_action_list_with_pic_pdf.tlf")
+	   else
+	   #画像無し用紙節約Ver
+	     report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_action_list_pdf.tlf")
+	   end
 	   
         # 1ページ目を開始
         report.start_new_page
@@ -27,6 +33,12 @@ class InventoryActionListPDF
 		
         #---見出し---
 		 
+         #カテゴリー add180210
+         if $stocktake_list_header_subtitle.present?
+           category = "（" + $stocktake_list_header_subtitle + "）"
+           report.page.item(:category).value(category)
+         end
+         
 		 #棚卸日
 		 if $stocktake_date.present?
 		 #画面指定した日付を出力
@@ -103,9 +115,15 @@ class InventoryActionListPDF
              #  inventory_quantity = sprintf("%.0f", inventory.inventory_quantity)
              #end
              #
+			 if stocktake.inventory.present? && stocktake.inventory.image.present?
+			   image_pic = "#{Rails.root}/public" + stocktake.inventory.image_url(:thumb)
+			 else
+			   image_pic = nil
+			 end
 			
 			 row.values material_code: material_code,
                         material_name: material_name,
+						image: image_pic,
 					    unit_name: unit_name,
                         book_quantity: stocktake.book_quantity,
                         physical_quantity: stocktake.physical_quantity,

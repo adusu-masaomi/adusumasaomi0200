@@ -11,7 +11,37 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171113081044) do
+ActiveRecord::Schema.define(version: 20180131030534) do
+
+  create_table "account_accounttitle", force: :cascade do |t|
+    t.string  "name",              limit: 255, null: false
+    t.integer "trade_division_id", limit: 4,   null: false
+  end
+
+  create_table "account_partner", force: :cascade do |t|
+    t.string  "name",              limit: 255, null: false
+    t.integer "trade_division_id", limit: 4,   null: false
+    t.integer "account_title_id",  limit: 4,   null: false
+    t.integer "payment_method_id", limit: 4,   null: false
+    t.string  "bank_name",         limit: 255, null: false
+    t.string  "branch_name",       limit: 255, null: false
+    t.integer "account_type",      limit: 4,   null: false
+    t.integer "account_number",    limit: 4,   null: false
+    t.integer "pay_day",           limit: 4,   null: false
+    t.boolean "pay_month_flag_1",              null: false
+    t.boolean "pay_month_flag_10",             null: false
+    t.boolean "pay_month_flag_11",             null: false
+    t.boolean "pay_month_flag_12",             null: false
+    t.boolean "pay_month_flag_2",              null: false
+    t.boolean "pay_month_flag_3",              null: false
+    t.boolean "pay_month_flag_4",              null: false
+    t.boolean "pay_month_flag_5",              null: false
+    t.boolean "pay_month_flag_6",              null: false
+    t.boolean "pay_month_flag_7",              null: false
+    t.boolean "pay_month_flag_8",              null: false
+    t.boolean "pay_month_flag_9",              null: false
+    t.integer "pay_day_division",  limit: 4,   null: false
+  end
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -24,6 +54,59 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "created"
     t.datetime "modified"
   end
+
+  create_table "auth_group", force: :cascade do |t|
+    t.string "name", limit: 80, null: false
+  end
+
+  add_index "auth_group", ["name"], name: "name", unique: true, using: :btree
+
+  create_table "auth_group_permissions", force: :cascade do |t|
+    t.integer "group_id",      limit: 4, null: false
+    t.integer "permission_id", limit: 4, null: false
+  end
+
+  add_index "auth_group_permissions", ["group_id", "permission_id"], name: "auth_group_permissions_group_id_0cd325b0_uniq", unique: true, using: :btree
+  add_index "auth_group_permissions", ["permission_id"], name: "auth_group_permissi_permission_id_84c5c92e_fk_auth_permission_id", using: :btree
+
+  create_table "auth_permission", force: :cascade do |t|
+    t.string  "name",            limit: 255, null: false
+    t.integer "content_type_id", limit: 4,   null: false
+    t.string  "codename",        limit: 100, null: false
+  end
+
+  add_index "auth_permission", ["content_type_id", "codename"], name: "auth_permission_content_type_id_01ab375a_uniq", unique: true, using: :btree
+
+  create_table "auth_user", force: :cascade do |t|
+    t.string   "password",     limit: 128,               null: false
+    t.datetime "last_login",               precision: 6
+    t.boolean  "is_superuser",                           null: false
+    t.string   "username",     limit: 30,                null: false
+    t.string   "first_name",   limit: 30,                null: false
+    t.string   "last_name",    limit: 30,                null: false
+    t.string   "email",        limit: 254,               null: false
+    t.boolean  "is_staff",                               null: false
+    t.boolean  "is_active",                              null: false
+    t.datetime "date_joined",              precision: 6, null: false
+  end
+
+  add_index "auth_user", ["username"], name: "username", unique: true, using: :btree
+
+  create_table "auth_user_groups", force: :cascade do |t|
+    t.integer "user_id",  limit: 4, null: false
+    t.integer "group_id", limit: 4, null: false
+  end
+
+  add_index "auth_user_groups", ["group_id"], name: "auth_user_groups_group_id_97559544_fk_auth_group_id", using: :btree
+  add_index "auth_user_groups", ["user_id", "group_id"], name: "auth_user_groups_user_id_94350c0c_uniq", unique: true, using: :btree
+
+  create_table "auth_user_user_permissions", force: :cascade do |t|
+    t.integer "user_id",       limit: 4, null: false
+    t.integer "permission_id", limit: 4, null: false
+  end
+
+  add_index "auth_user_user_permissions", ["permission_id"], name: "auth_user_user_perm_permission_id_1fbb5f2c_fk_auth_permission_id", using: :btree
+  add_index "auth_user_user_permissions", ["user_id", "permission_id"], name: "auth_user_user_permissions_user_id_14a6b632_uniq", unique: true, using: :btree
 
   create_table "business_holidays", force: :cascade do |t|
     t.date     "working_date"
@@ -235,6 +318,39 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "updated_at",                            null: false
   end
 
+  create_table "django_admin_log", force: :cascade do |t|
+    t.datetime "action_time",                        precision: 6, null: false
+    t.text     "object_id",       limit: 4294967295
+    t.string   "object_repr",     limit: 200,                      null: false
+    t.integer  "action_flag",     limit: 2,                        null: false
+    t.text     "change_message",  limit: 4294967295,               null: false
+    t.integer  "content_type_id", limit: 4
+    t.integer  "user_id",         limit: 4,                        null: false
+  end
+
+  add_index "django_admin_log", ["content_type_id"], name: "django_admin__content_type_id_c4bce8eb_fk_django_content_type_id", using: :btree
+  add_index "django_admin_log", ["user_id"], name: "django_admin_log_user_id_c564eba6_fk_auth_user_id", using: :btree
+
+  create_table "django_content_type", force: :cascade do |t|
+    t.string "app_label", limit: 100, null: false
+    t.string "model",     limit: 100, null: false
+  end
+
+  add_index "django_content_type", ["app_label", "model"], name: "django_content_type_app_label_76bd3d3b_uniq", unique: true, using: :btree
+
+  create_table "django_migrations", force: :cascade do |t|
+    t.string   "app",     limit: 255,               null: false
+    t.string   "name",    limit: 255,               null: false
+    t.datetime "applied",             precision: 6, null: false
+  end
+
+  create_table "django_session", primary_key: "session_key", force: :cascade do |t|
+    t.text     "session_data", limit: 4294967295,               null: false
+    t.datetime "expire_date",                     precision: 6, null: false
+  end
+
+  add_index "django_session", ["expire_date"], name: "django_session_de54fa62", using: :btree
+
   create_table "employee_master", force: :cascade do |t|
     t.string   "name",             limit: 18
     t.string   "furigana",         limit: 18
@@ -267,8 +383,9 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.date     "next_warehousing_date_2"
     t.integer  "next_quantity_2",          limit: 4
     t.float    "next_unit_price_2",        limit: 24
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.string   "image",                    limit: 255
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
   end
 
   create_table "inventory_histories", force: :cascade do |t|
@@ -393,6 +510,15 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "updated_at",                            null: false
   end
 
+  create_table "links", force: :cascade do |t|
+    t.integer  "construction_datum_id", limit: 4
+    t.integer  "source",                limit: 4
+    t.integer  "target",                limit: 4
+    t.string   "link_type",             limit: 255
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
   create_table "maker_masters", force: :cascade do |t|
     t.string   "maker_name", limit: 255
     t.datetime "created_at",             null: false
@@ -434,26 +560,27 @@ ActiveRecord::Schema.define(version: 20171113081044) do
 
   create_table "purchase_data", force: :cascade do |t|
     t.date     "purchase_date"
-    t.string   "slip_code",               limit: 255
-    t.integer  "purchase_order_datum_id", limit: 4
-    t.integer  "construction_datum_id",   limit: 4
-    t.integer  "material_id",             limit: 4
-    t.string   "material_code",           limit: 255
-    t.string   "material_name",           limit: 255
-    t.integer  "maker_id",                limit: 4
-    t.string   "maker_name",              limit: 255
-    t.float    "quantity",                limit: 24
-    t.integer  "unit_id",                 limit: 4
-    t.float    "purchase_unit_price",     limit: 24
-    t.integer  "purchase_amount",         limit: 4
-    t.integer  "list_price",              limit: 4
-    t.integer  "purchase_id",             limit: 4
-    t.integer  "division_id",             limit: 4
-    t.integer  "supplier_id",             limit: 4
-    t.integer  "inventory_division_id",   limit: 4
-    t.string   "notes",                   limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "update_at",                           null: false
+    t.string   "slip_code",                  limit: 255
+    t.integer  "purchase_order_datum_id",    limit: 4
+    t.integer  "construction_datum_id",      limit: 4
+    t.integer  "material_id",                limit: 4
+    t.string   "material_code",              limit: 255
+    t.string   "material_name",              limit: 255
+    t.integer  "maker_id",                   limit: 4
+    t.string   "maker_name",                 limit: 255
+    t.float    "quantity",                   limit: 24
+    t.integer  "unit_id",                    limit: 4
+    t.float    "purchase_unit_price",        limit: 24
+    t.integer  "purchase_amount",            limit: 4
+    t.integer  "list_price",                 limit: 4
+    t.integer  "purchase_id",                limit: 4
+    t.integer  "division_id",                limit: 4
+    t.integer  "supplier_id",                limit: 4
+    t.integer  "inventory_division_id",      limit: 4
+    t.integer  "unit_price_not_update_flag", limit: 4
+    t.string   "notes",                      limit: 255
+    t.datetime "created_at",                             null: false
+    t.datetime "update_at",                              null: false
   end
 
   create_table "purchase_divisions", force: :cascade do |t|
@@ -793,6 +920,17 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "updated_at",                      null: false
   end
 
+  create_table "schedules", force: :cascade do |t|
+    t.integer  "construction_datum_id", limit: 4
+    t.string   "content_name",          limit: 255
+    t.date     "estimated_start_date"
+    t.date     "estimated_end_date"
+    t.date     "work_start_date"
+    t.date     "work_end_date"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
   create_table "staffs", force: :cascade do |t|
     t.string   "staff_name",     limit: 255
     t.string   "furigana",       limit: 255
@@ -830,6 +968,29 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.string   "email3",        limit: 255
     t.datetime "created_at",                null: false
     t.datetime "update_at",                 null: false
+  end
+
+  create_table "task_contents", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "tasks", force: :cascade do |t|
+    t.integer  "construction_datum_id", limit: 4
+    t.string   "text",                  limit: 255
+    t.datetime "start_date"
+    t.datetime "end_date"
+    t.datetime "work_start_date"
+    t.datetime "work_end_date"
+    t.integer  "duration",              limit: 4
+    t.integer  "parent",                limit: 4
+    t.float    "progress",              limit: 24
+    t.integer  "sortorder",             limit: 4,   default: 0, null: false
+    t.integer  "priority",              limit: 4
+    t.string   "color",                 limit: 255
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
   end
 
   create_table "test", id: false, force: :cascade do |t|
@@ -963,6 +1124,13 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "updated_at",                                  null: false
   end
 
+  create_table "working_subcategories", force: :cascade do |t|
+    t.integer  "working_category_id", limit: 4
+    t.string   "name",                limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
   create_table "working_times_detail_data", force: :cascade do |t|
     t.integer  "employee_id",                               limit: 4
     t.date     "working_date"
@@ -1022,4 +1190,13 @@ ActiveRecord::Schema.define(version: 20171113081044) do
     t.datetime "updated_at",                    null: false
   end
 
+  add_foreign_key "auth_group_permissions", "auth_group", column: "group_id", name: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id"
+  add_foreign_key "auth_group_permissions", "auth_permission", column: "permission_id", name: "auth_group_permissi_permission_id_84c5c92e_fk_auth_permission_id"
+  add_foreign_key "auth_permission", "django_content_type", column: "content_type_id", name: "auth_permissi_content_type_id_2f476e4b_fk_django_content_type_id"
+  add_foreign_key "auth_user_groups", "auth_group", column: "group_id", name: "auth_user_groups_group_id_97559544_fk_auth_group_id"
+  add_foreign_key "auth_user_groups", "auth_user", column: "user_id", name: "auth_user_groups_user_id_6a12ed8b_fk_auth_user_id"
+  add_foreign_key "auth_user_user_permissions", "auth_permission", column: "permission_id", name: "auth_user_user_perm_permission_id_1fbb5f2c_fk_auth_permission_id"
+  add_foreign_key "auth_user_user_permissions", "auth_user", column: "user_id", name: "auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id"
+  add_foreign_key "django_admin_log", "auth_user", column: "user_id", name: "django_admin_log_user_id_c564eba6_fk_auth_user_id"
+  add_foreign_key "django_admin_log", "django_content_type", column: "content_type_id", name: "django_admin__content_type_id_c4bce8eb_fk_django_content_type_id"
 end
