@@ -145,6 +145,7 @@ ja:
     models:
        material_master: 資材マスター
        purchase_datum: 仕入データ
+       purchase_header: 仕入見出データ
        purchase_order_datum: 注文Ｎｏデータ
        purchase_order_history: 注文データ
        supplier_master: 仕入先マスター
@@ -226,6 +227,8 @@ ja:
          search_character: 検索文字
        purchase_datum:
          purchase_amount: 金額
+       purchase_header:
+         complete_flag: 完了フラグ
        purchase_unit_price:
          unit_price: 仕入単価
        inventory_history:

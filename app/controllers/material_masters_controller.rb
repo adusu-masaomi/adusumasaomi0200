@@ -95,6 +95,12 @@ class MaterialMastersController < ApplicationController
   #資材の自動セット用（コード→ID取得）
   def get_material_id
     @material_id = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:id).flatten.join(" ")
+    
+    #add180215
+    #コードの該当がなければ、手入力とみなす。
+    if @material_id == ""
+      @material_id = 1
+    end
   end
   
   

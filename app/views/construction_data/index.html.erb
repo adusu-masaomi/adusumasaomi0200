@@ -29,8 +29,12 @@
     </br><%= f.label :billed_flag, '請求済' %>
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
-    <%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'billed_flag', style: 'width:150px'} %>
+    <%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'billed_flag', style: 'width:80px'} %>
     <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearBilledFlag()" %>
+    <%= f.label :calculated_flag, '集計済' %>
+    <%= f.select :calculated_flag_eq, ConstructionDatum.calculated_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'calculated_flag', style: 'width:80px'} %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCalculatedFlag()" %>
+    </br>
     
 	<div>
         <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
@@ -239,6 +243,10 @@
   //請求済を空にする
   function clearBilledFlag(){
     document.getElementById("billed_flag").selectedIndex = 0;
+  }
+  //集計済を空にする
+  function clearCalculatedFlag(){
+    document.getElementById("calculated_flag").selectedIndex = 0;
   }
   
   

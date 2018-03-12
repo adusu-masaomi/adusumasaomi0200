@@ -12,6 +12,7 @@ class WorkingMiddleItem < ActiveRecord::Base
    belongs_to :working_subcategory
   
    #明細（小）フォームajax用
+   attr_accessor :material_id_hide     #add180214
    attr_accessor :material_code_hide
    attr_accessor :material_name_hide
    attr_accessor :quantity_hide
@@ -35,6 +36,7 @@ class WorkingMiddleItem < ActiveRecord::Base
    #マスター呼出用  
    attr_accessor :working_middle_item_for_call
    attr_accessor :working_middle_item_category_for_call
+   attr_accessor :working_middle_item_subcategory_for_call
    #attr_accessor :working_subcategory_for_call  #add180202
    attr_accessor :working_middle_item_short_name_for_call
    attr_accessor :working_middle_item_id_select_hide

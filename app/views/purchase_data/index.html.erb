@@ -144,7 +144,7 @@
       <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
       <th style="width:90px;"><%=t '.actions', :default => t("helpers.actions") %></th>
 	  <th style="width:160px;"><%= model_class.human_attribute_name(:created_at) %></th>
-      
+      <th style="width:25px;">完</th>
     </tr>
   </thead>
   <tbody >
@@ -255,6 +255,12 @@
                       :class => 'btn btn-xs btn-danger' %>
         </td>
         <td><%=l purchase_datum.created_at.in_time_zone('Tokyo') %></td>
+        <% if purchase_datum.purchase_header.present? %>
+          <td><%= check_box("complete_flag", "active", {checked: check_if_true(purchase_datum.purchase_header.complete_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
       </tr>
     <% end %>
    

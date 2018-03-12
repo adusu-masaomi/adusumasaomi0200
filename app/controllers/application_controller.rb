@@ -81,4 +81,6 @@ class ApplicationController < ActionController::Base
   $CONSTRUCTION_NULL_DATE = "2021/01/01"         #工事開始日などの、NULL値として扱う日付(add180113)
   $CONSTRUCTION_QUERY_NULL_DATE = "//"           #(add180113)
   
+  #労務単価定数
+  $LABOR_COST = 11000
 end

@@ -12,7 +12,7 @@
       </div>
     <% end %>
 	
-	<div class="field">
+	<div class="field" id="users">
 	
 	<div class="row">
       <div class="col-md-5">
@@ -88,12 +88,20 @@
         <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:500px', :tabindex=>"16" }   %>
 		
 		<!-- ajax用 -->
+        <%= f.input :material_id_hide, input_html:{id:'material_id_hide'}, as: :hidden  %>
 		<%= f.input :material_code_hide, input_html:{id:'material_code_hide'}, as: :hidden  %>
 		<%= f.input :material_name_hide, input_html:{id:'material_name_hide'}, as: :hidden  %>
         <%= f.input :quantity_hide, input_html:{id:'quantity_hide'}, as: :hidden  %>
 		<%= f.input :unit_price_hide, input_html:{id:'unit_price_hide'}, as: :hidden  %>
 		<%= f.input :labor_productivity_unit_hide, input_html:{id:'labor_productivity_unit_hide'}, as: :hidden  %>
-		
+		<!--add180310-->
+        <%= f.input :material_price_hide, input_html:{id:'material_price_hide'}, as: :hidden  %>
+        <%= f.input :maker_id_hide, input_html:{id:'maker_id_hide'}, as: :hidden  %>
+        <%= f.input :unit_master_id_hide, input_html:{id:'unit_master_id_hide'}, as: :hidden  %>
+        <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
+            {id:"working_subcategory_select_hide",  hidden: true  } %>
+        <!--add end-->
+        
 		<!--共通マスターを更新するか否かのフラグ-->
 		<%= f.input :master_insert_flag , input_html:{ id:"master_insert_flag"}, as: :hidden %>
 		
@@ -144,6 +152,8 @@
 	  <font color=blue><%= f.label :material_cost_total, "資材費計:" %></font>
 	  <font color=blue><b><%= f.text_field :material_cost_total , :style => 'width:50px; text-align:right;' , id:'material_cost_total' , 
            :tabindex=>"17"  %></b></font> 
+       
+      <!--労務単価-初期値はコントローラ側でセットしている-->
       <font color=green><%= f.label :labor_unit_price_standard, "労務単価:" %></font>
 	  <font color=green><b><%= f.text_field :labor_unit_price_standard , :style => 'width:60px; text-align:right;' ,  id:'labor_unit_price_standard', 
                      :onchange => "calcLaborCostTotal()" ,:tabindex=>"18"  %></b></font>
@@ -195,12 +205,16 @@
                  :class => 'btn btn-white_rsd' %>
 	  <% end %>
   <% end %>  
+
 <script type="text/javascript">
   //$(document).on('ready page:load', function(){
   
   var sub_form_visivle;
   
   $(document).ready(function(){
+  
+     //$("#users").trigger("users:loaded");
+  
      //単位--select2のタブインデックスはここで指定しておく。
      $(".searchableSelect2_1").select2({ theme: "bootstrap" }).on("load", function(e) { 
         $(this).prop('tabindex',8)}).trigger('load');
@@ -301,17 +315,56 @@
                { material_id: material_id },
 			   function(data){ 
 			     //資材の各種初期値をセット
-                 setAllItemInfo(child_index);
-			     
+                 //setMaterialDetail(child_index);
+			     setWorkingSmallItemDetail(child_index, 2)
 			   }
              );
 		   }
 		   
        
        });
+       
+       //入力用アイテムコード欄
+       $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+       $(".searchInsertMaterial").change(function(e) {
+         searchItemCode(this);
+       });
+       
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	   //次のコントロールへフォーカスを移す処理
+          //name属性に埋め込まれているIDを抜き出す
+	      var controlName = $(this)[0].name;
+	      var child_index = 0;
+	      child_index = controlName.slice(70);
+          child_index = child_index.slice(0,-26);
+          
+         
+          var nm = "working_specific_middle_item[working_specific_small_items_attributes][" + child_index + "][working_small_item_name]"
+          
+          if (nm != undefined){
+		     if (document.getElementsByName(nm)[0] != undefined){
+               document.getElementsByName(nm)[0].focus();
+               
+                //e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+                //return false;
+               //debugger;
+	         }
+	      }
+         
+          //e.preventDefault();
+          e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
        //
-		//return event.preventDefault();
-		return false;
+       
+       //メーカーのselect2
+       $(".searchableMaker").select2({ theme: "classic" });
+       //単位のselect2
+       $(".searchableUnit").select2({ theme: "classic"}).on("load", function(e) { 
+        $(this).prop('tabindex',19)}).trigger('load');
+         
+       
+       
+       return false;
 	  })
   });
   
@@ -851,9 +904,12 @@
       calcTotal(t, e, this_id, next_id);  
 	//}
 	
-	 if (e.keyCode == 13) {
-	//フォーカス移動はenterキー押下時のみ
-	  //debugger;
+     if (e.keyCode == 13 && this_id != "modal_working_small_item_name"  ) {
+     //フォーカス移動はenterキー押下時のみ
+     //但しアイテムの移動はうまくいかないのでひとまず除外する(入力途中のENTERでも移動してしまう)
+	 
+     //if (e.keyCode == 13) {
+	 //フォーカス移動はenterキー押下時のみ
 	  
       var child_index = t.id;
 	  value = this_id;
@@ -926,7 +982,7 @@
 	   
 	   //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
 	   //child_index = child_index.slice(23);
-	   child_index = child_index.slice(29);  //upd171208
+	   child_index = child_index.slice(29);  
 	   
 	  
 	   //child_index = child_index.replace(new RegExp(value, 'g'), "" ) ;
@@ -939,56 +995,40 @@
              {material_code: itemCode},
           function(data){
 		    //資材の各種初期値をセット
-            setAllItemInfo(child_index);
+            //setMaterialDetail(child_index);
+            setWorkingSmallItemDetailCode(child_index, 2);
 		  }
        );
   }	
-
-  //資材の各種初期値をセット
-  function setAllItemInfo(child_index){
-    //品番をセット
-	obj = document.getElementById("material_code_hide");
-	var working_small_item_code = "modal_working_small_item_code" + child_index;
-    document.getElementById(working_small_item_code).value = obj.innerText;
-				 
-	//品名をセット
-	obj = document.getElementById("material_name_hide");
-	var working_small_item_name = "modal_working_small_item_name" + child_index;
-	document.getElementById(working_small_item_name).value = obj.innerText;
-				 
-	//数量をセット
-	obj = document.getElementById("quantity_hide");
-	var quantity = "modal_quantity" + child_index;
-	document.getElementById(quantity).value = obj.innerText;
-				 
-	//単価をセット
-	obj = document.getElementById("unit_price_hide");
-	var unit_price = "modal_unit_price" + child_index;
-	document.getElementById(unit_price).value = obj.innerText;
-				 
-	//資材費を算出
-	//del171118 基本手入力になる（単純に数量×単価にならない）
-	//calcMaterialPrice(child_index, document.getElementById(quantity).value, 
-    //                  document.getElementById(unit_price).value);
-	//歩掛をセット
-	obj = document.getElementById("labor_productivity_unit_hide");
-	var labor_productivity_unit = "modal_labor_productivity_unit" + child_index;
-	document.getElementById(labor_productivity_unit).value = obj.innerText;
-				 
-	//歩掛り計を算出
-	calcLaborProductivityUnitTotal(child_index, document.getElementById(quantity).value, 
-		document.getElementById(labor_productivity_unit).value);
-				
-	//資材費合計を算出
-	CalcLaborMaterialCostTotal("modal_material_price");
-				
-	//歩掛計を算出
-	CalcLaborLaborProductivityUnitSum("modal_labor_productivity_unit_total");
-				 
-	//労務費を算出
-	calcLaborCostTotal();
+  
+  //品番選択後の、各種アイテム情報のセット
+  function setWorkingSmallItemDetailCode(child_index, form_flag){
+  //idをセット 
+  obj = document.getElementById("material_id_hide").textContent;
+  if (obj != null){
+	var index = parseInt(obj);
+	
+    var attributes_name = getAttributesName(form_flag);
     
+    nm = attributes_name + "[" + child_index + "][working_small_item_id]"
+	document.getElementsByName(nm)[0].value = index; 
+        
+    if (index != undefined){
+	  material_id =  parseInt(index);
+	  //ajax
+	  $.get("<%= working_small_itemz_material_standard_select_path %>",
+        { material_id: material_id },
+	    function(data){ 
+        //各種アイテム情報のセット
+        //setMaterialDetail(child_index);
+        setWorkingSmallItemDetail(child_index, form_flag);
+      });
+    }   
   }
+}
+
+  
   
 	
 </script>
+

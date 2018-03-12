@@ -100,8 +100,13 @@ class WorkingSmallItemsController < ApplicationController
      #品番
      @material_code = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:material_code).flatten.join(",")
      
+     
 	 if @material_code.present?
-	   #品名
+	   
+       #id
+       @material_id =  MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:id).flatten.join(",")
+       
+       #品名
        @material_name = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:material_name).flatten.join(",")
 	 
 	   #数量
@@ -127,8 +132,12 @@ class WorkingSmallItemsController < ApplicationController
        @material_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:last_unit_price).flatten.join(",")
        
      else
-	 #該当なければそのまま・・・
-	   @material_code =  params[:material_code]
+	   #id
+       @material_id = 1  #手入力用とする
+       
+       #該当なければそのまま・・・
+       params[:material_code]
+       
 	 end
 	
   end

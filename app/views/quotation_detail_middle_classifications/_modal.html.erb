@@ -245,7 +245,7 @@
 	    nextControlSelect2(this);
      });
      $( ".searchableSelect2_3" ).change(function(e) {
-         setWorkingMiddleItemName();
+         setWorkingMiddleItem();
      });
 	 //単位--select2のタブインデックスはここで指定。
      $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
@@ -475,15 +475,18 @@
   }
   
   //各値の自動セット-ajax
-  function setWorkingMiddleItemName()
+  function setWorkingMiddleItem()
   {  
      obj = document.getElementById("working_middle_item_id");
      working_middle_item_id = parseInt(obj.value);
      
-	 //add170626
 	 obj = parseInt(document.getElementById("construction_type").value);
 	 var construction_type = obj
 	 
+     //数量をクリアする
+     //add180219
+     //clearQuantity();
+     
       //項目名
       $.get("<%= quotation_detail_middle_classificationz_working_middle_item_select_path %>",
        {id: working_middle_item_id },
@@ -495,9 +498,9 @@
 		  //document.getElementById("working_middle_item_short_name").value = obj;
 		  }
       );
-　　　
+     
       //仕様
-　　　$.get("<%= quotation_detail_middle_classificationz_working_middle_specification_select_path %>",
+      $.get("<%= quotation_detail_middle_classificationz_working_middle_specification_select_path %>",
        {id: working_middle_item_id },
         function(data){
           obj = document.getElementById("working_middle_specification").textContent;
@@ -804,13 +807,15 @@
              $(".searchableSelect2_4").select2("val","1");
           }
    }
-   //品名→短縮名へコピー
-   //function set_working_middle_item_short_name()
-   //{
-   //  obj = document.getElementById("working_middle_item_name");
-//	 document.getElementById("working_middle_item_short_name").value = obj.value;
-  // }
-   
+  
+  //add180219
+  //数量をクリアする(保留中)
+  function clearQuantity(){
+    document.getElementById("quantity").value = "";
+    document.getElementById("execution_quantity").value = "";
+  }
+  
+  
   //見積→実行数量の自動変更
   function changeQuantity()
   {  

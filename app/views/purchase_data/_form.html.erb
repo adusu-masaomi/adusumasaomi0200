@@ -18,7 +18,7 @@
   <!--</br></br></br></br>-->  
 
   <%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date", name: "purchase_datum[purchase_date][]" , style: 'width:220px;', :tabindex=>"0"} %>
-  <%= f.input :slip_code, label: "伝票番号", input_html: { style: 'width:220px;', :tabindex=>"1" }  %>
+  <%= f.input :slip_code, label: "伝票番号", input_html: { id:"slip_code", style: 'width:220px;', :tabindex=>"1", :onchange => "setHeaderId()" }  %>
   <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
   <% if @purchase_order_data.present? %>
     <%= f.collection_select :purchase_order_datum_id, @purchase_order_data, :id, :p_num_cd, {} , {id:"purchase_datum", 
@@ -122,13 +122,19 @@
        {id: "division_id", :tabindex=>"17", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
   <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {:include_blank => true}, 
        {id:'inventory_division_id', :onchange => "uncheckUnitPriceInventory()", :class => "my-custom-class",
-          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"18" } %></br>
+          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"18" } %>
+  <%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"19", :readonly=> true} %> 
+  <%= f.label :complete_flag, "入力完了", {} %> 
+  </br>
 	   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
   <!--外注工事判定用-->
   <%= f.input :outsourcing, :value => "1", input_html:{id:'outsourcing', :value => @outsourcing_flag} , as: :hidden %>
   <!--工事ID自動切り替え用-->
   <%= f.input :construction_datum_id_hide, input_html:{id:'construction_datum_id_hide', :value => @outsourcing_flag} , as: :hidden %>
+  
+  <!--add180223-->
+  <%= f.input :complete_flag_hide, input_html:{id:'complete_flag_hide'}, as: :hidden  %>
   
   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
@@ -293,8 +299,13 @@
           {purchase_order_code: purchase_order_code },
           function(data){
             //
+              
+              //debugger;
+              
 			  //外注・機材借入の場合の入力自動化
-              if (purchase_order_code_header == "M" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+              //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+              //upd180220
+              if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
 			    setForOursourcing(purchase_order_code_header);
 			  }
 			  
@@ -324,28 +335,62 @@
 	
    });
    
+   function initialMurayama(){
+     //upd180220
+     obj = document.getElementById("purchase_datum");
+     index = obj.selectedIndex;
+     var str = obj.options[index].innerText;
+     purchase_order_code = str.substr(0, searchIndex) ;
+     //指定文字を抜き出す。区切り文字はモデル内に記述
+     var searchIndex = obj.options[index].innerText.search("<");
+        
+     //add170306 注文Noの頭文字を抜き出す
+     purchase_order_code_header = str.substr(0, 1) ;
+     
+     if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+	    setDefaultOursourcing();
+     }
+   }
+   
    //フォームロード時のイベント
    window.onload = function(){
   //    $(".searchableSupplier").val(index).trigger("change");
      setSupplierItem();
 	 
-	 //外注なら、各種パラメータを自動でセットする
-	 var out = document.getElementById("outsourcing").value;
-	 if (out == "1"){
-	   setDefaultOursourcing();
-	 }
 	 
+     
 	 //品名をデフォルトでセット（フリー入力以外はマスターから取得)
 	 //$(".searchableItem").trigger("change");
 	 obj = document.getElementById("material_id");
      index = obj.selectedIndex;
      setItem(index);
 	 
-	 
+     //外注なら、各種パラメータを自動でセットする
+	 var out = document.getElementById("outsourcing").value;
+	 if (out == "1"){
+	   setDefaultOursourcing();
+	 }
+     
+	 //add180220
+     //initialMurayama();
+     
 	 //del171214  
 	 //フィールド化。
 	 //入庫・出庫などは単価更新をさせない
 	 //uncheckUnitPrice();
+   }
+   
+   //伝票番号が入力されたら、見出しIDをセットする（存在する場合）
+   function setHeaderId(){
+     slip_code = document.getElementById("slip_code").value;  
+     $.get("<%= purchase_datum_get_header_id_path %>",
+          {slip_code: slip_code },
+          function(data){
+//            obj = document.getElementById("purchase_header_id_hide").textContent;
+//			document.getElementById("purchase_header_id").value = obj;
+            obj = document.getElementById("complete_flag_hide").textContent;
+			document.getElementById("complete_flag").checked = obj;
+	 });
    }
    
    //入庫・出庫は「単価マスタを更新しない」フラグにチェックを入れる)
@@ -445,12 +490,15 @@
    
    //村山電気等、外注用の入力自動化
    function setForOursourcing(purchase_order_code_header){
-     if (purchase_order_code_header == "M" || purchase_order_code_header == "O" ) {
+     //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" ) {
+     
+     //upd180220
+     if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" ) {
        //品番を切り替え
        $(".searchableItem").val(1).trigger("change");
 	   //品名を切り替え
 	   document.getElementById("lstMaterialName").value = 1;
-	   if (purchase_order_code_header == "M"){
+	   if (purchase_order_code_header == "M" || purchase_order_code_header == "N"){
          document.getElementById("material_name").value = "外注費";
 	   }
 	 

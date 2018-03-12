@@ -206,7 +206,8 @@
 	     var selectedIndex = 0;
 		 selectedIndex = controlName.slice(42);
 		 selectedIndex = selectedIndex.slice(0,-14);
-		 //
+		 
+         //
 		 setItem(gMaterial_id, selectedIndex);
        });
 	   
@@ -258,9 +259,27 @@
 			setNextControlOnSelect(e,1);
        });
 	  
-	   ///////
-	   
-	   
+	   //add 180213
+       $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+	   $(".searchInsertMaterial").change(function(e) {
+          searchItemCode(this);
+       });
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	   //次のコントロールへフォーカスを移す処理
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var child_index = 0;
+	     child_index = controlName.slice(42);
+         child_index = child_index.slice(0,-16);
+         var nm = "purchase_order_history[orders_attributes][" + child_index + "][material_name]"
+         if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+	     }
+         e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
+       //add end
  });  
 
 //$(".message-class").on('click', function(){
@@ -294,10 +313,7 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
     
 	 $( ".searchableSelect1_1" ).change(function(e) {
      	
-         //gMaterial_id = $(this).val();
-         //selectedIndex  = getSelectedChildIndex(gMaterial_id);
-         
-		 //171028 インデックスが取れないので
+         //171028 インデックスが取れないので
 		 // 大幅改修中！！！！！！！！！！！！
 		 
 		 //品番IDを取得
@@ -366,10 +382,7 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 		 gSelectedIndex = selectedIndex;
 		 //
 		 
-		 
-		 //debugger;
-	    
-	     //次のコントロールへフォーカスを移す
+		 //次のコントロールへフォーカスを移す
 	     setNextControlOnSelect(e,2);
 		
 	   //     setTimeout(function() {
@@ -400,6 +413,27 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
          //次のコントロールへフォーカスを移す
 			setNextControlOnSelect(e,1);
 	   });
+       //add 180213
+       $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+       $(".searchInsertMaterial").change(function(e) {
+          searchItemCode(this);
+       });
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	   //次のコントロールへフォーカスを移す処理
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var child_index = 0;
+	     child_index = controlName.slice(42);
+         child_index = child_index.slice(0,-16);
+         var nm = "purchase_order_history[orders_attributes][" + child_index + "][material_name]"
+         if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+	     }
+         e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
+       //add end
     
 	//商品コードクリック時にインデックスを取得、更にプルダウンと照合する
 	//新規登録の、商品コードを変更した場合。

@@ -61,7 +61,11 @@
         <td><%= link_to material_master.id, material_master_path(material_master) %></td>
         <td><%= material_master.material_code %></td>
         <td><%= material_master.material_name %></td>
-	<td><%= material_master.MakerMaster.maker_name %></td>
+        <% if material_master.MakerMaster.present? %>
+          <td><%= material_master.MakerMaster.maker_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
 	<td><%= number_to_currency(material_master.list_price, precision: 0) %></td>
         <td><%=l material_master.created_at %></td>
         <td>

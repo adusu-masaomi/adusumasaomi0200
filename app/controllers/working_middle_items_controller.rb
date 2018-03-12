@@ -2,9 +2,6 @@ class WorkingMiddleItemsController < ApplicationController
   before_action :set_working_middle_item, only: [:show, :edit, :update, :destroy]
   before_action :set_move_flag, only: [:new, :edit]
   
-  #労務単価定数
-  LABOR_COST = 11000
-  
   #新規画面への引継ぎ用クラス変数
   @@working_category_id = ""
   @@working_subcategory_id = ""
@@ -22,7 +19,8 @@ class WorkingMiddleItemsController < ApplicationController
     #add180131
     #if (cookies[:recent_search_history_wmi].present?  && query.present? && params[:q].nil?) || 
     #   (params[:q].present? && params[:q]["working_category_id_eq"].blank?)
-    if cookies[:recent_search_history_wmi].present?  && query.present? && params[:q].nil?
+    if (cookies[:recent_search_history_wmi].present?  && query.present? && params[:q].nil?) ||
+       (params[:q].present? && params[:q][:s].present? && params[:q][:working_category_id_eq].nil?)  #add180306
         #クッキー有＆パラメータ無し？ or 
         #パラメータ有＆カテゴリー検索無の状態？
         
@@ -57,6 +55,7 @@ class WorkingMiddleItemsController < ApplicationController
     #ransack保持用--上記はこれに置き換える
     @q = WorkingMiddleItem.ransack(query)
 	
+    #binding.pry
     
 	#ransack保持用コード
     search_history = {
@@ -73,7 +72,7 @@ class WorkingMiddleItemsController < ApplicationController
 	
 	$sort = nil
 	
-	#if params["q"].nil?  #upd170714
+   #if params["q"].nil?  #upd170714
     if query.nil?  #upd180131
 	  @working_middle_items  = @working_middle_items.order('seq DESC') 
 	else
@@ -82,16 +81,56 @@ class WorkingMiddleItemsController < ApplicationController
       if query["s"].present?
 	     if query["s"] == "seq asc"
 		   $sort = "normal"
+           #@working_middle_items  = @working_middle_items.order('seq DESC') #add180306
 		 elsif query["s"] == "seq desc"
 		   $sort = "reverse"
+           #@working_middle_items  = @working_middle_items.order('seq ASC') #add180306
 		 end
-	  end
-	  
+	     
+      end
+      
 	end
 	
+    if params[:all_sort] == "true"
+      #画面のデータを一括で並び替える
+      set_seq_reverse
+      params[:all_sort] == "false"
+    end
     
 	#@working_middle_items = @working_middle_items.order('working_middle_items.position ASC')
   end
+  
+  
+  #画面のデータを並び替える
+  #add180306
+  def set_seq_reverse
+    @working_middle_items_after = @working_middle_items  #逆順用のモデル作成
+    
+    seq = []
+    i = 0
+    
+    @working_middle_items.order("seq").each do |working_middle_item|
+      seq[i] = working_middle_item.seq
+      i += 1
+    end
+    
+    i = 0
+    newSeq = seq.reverse
+    
+    
+    @working_middle_items.order("seq").each do |working_middle_item|
+      #binding.pry
+      
+      #更新する
+      working_middle_item.update(seq: newSeq[i])
+      
+      i += 1
+    end
+    
+   
+         
+  end
+  
   
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
   def reorder
@@ -103,7 +142,6 @@ class WorkingMiddleItemsController < ApplicationController
 	  row = params[:row].split(",")
 	end
 	
-    #binding.pry
     
     #row.each_with_index {|row, i| WorkingMiddleItem.update(row, {:seq => i})}
     
@@ -128,11 +166,10 @@ class WorkingMiddleItemsController < ApplicationController
 	#作成中  171115
 	#呼び出した場合
 	if $working_middle_item.present?
-	  #binding.pry
-	
+	  
 	  @working_middle_item = $working_middle_item
 	  
-	  $working_middle_item = nil
+      $working_middle_item = nil
 	end
     
 	###
@@ -147,7 +184,7 @@ class WorkingMiddleItemsController < ApplicationController
     
     
 	#労務単価の初期値をセットする
-	@working_middle_item.labor_unit_price_standard ||= LABOR_COST
+	@working_middle_item.labor_unit_price_standard ||= $LABOR_COST
 	
   end
 
@@ -156,14 +193,14 @@ class WorkingMiddleItemsController < ApplicationController
     
 	
 	#労務単価の初期値をセットする
-    @working_middle_item.labor_unit_price_standard ||= LABOR_COST
+    @working_middle_item.labor_unit_price_standard ||= $LABOR_COST
   end
 
   # POST /working_middle_items
   # POST /working_middle_items.json
   def create
     
-    #明細マスターのパラメータ補正 add180201
+    #明細マスターのパラメータ補正 
     set_params_replenishment
   
     if params[:move_flag].blank?
@@ -255,7 +292,7 @@ class WorkingMiddleItemsController < ApplicationController
   # PATCH/PUT /working_middle_items/1.json
   def update
     
-    #明細マスターのパラメータ補正 add180201
+    #明細マスターのパラメータ補正 
     set_params_replenishment
     
 	if params[:move_flag].blank?
@@ -434,7 +471,9 @@ class WorkingMiddleItemsController < ApplicationController
 		  
             if item[:working_small_item_id] == "1"
 		    #手入力の場合→新規登録
-			  material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
+			  
+              
+              material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
 			     maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
 				 standard_labor_productivity_unit: item[:labor_productivity_unit],
                  maker_id: item[:maker_master_id], 
@@ -444,7 +483,12 @@ class WorkingMiddleItemsController < ApplicationController
                    @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
                    
                    if @material_master.blank?  #更新はないものとする
-				     @material_master = MaterialMaster.create(material_master_params)
+				     
+                     #upd 180214
+                     @material_master = MaterialMaster.new(material_master_params)
+                     @material_master.save!(:validate => false)
+                     
+                     #@material_master = MaterialMaster.create(material_master_params)
                      
                      #新規登録後、作成された資材Mの品番IDをセットする
                      item[:working_small_item_id] = @material_master.id
@@ -452,11 +496,16 @@ class WorkingMiddleItemsController < ApplicationController
                      
 				   end
                  end
+                 
+                 #binding.pry
+                 
 		    else
 		    #手入力以外--特定のデータを更新
 		      @material_master = MaterialMaster.find(item[:working_small_item_id])
 			  
 			  if @material_master.present?
+                #定価は更新しない
+                
 			    material_master_params = {standard_quantity: item[:quantity], 
 			     standard_labor_productivity_unit: item[:labor_productivity_unit], 
 				 material_name: item[:working_small_item_name], 
@@ -626,7 +675,7 @@ class WorkingMiddleItemsController < ApplicationController
     
 	#固有マスターより取得
     $working_middle_item = WorkingMiddleItem.find(params[:id])
- 
+  
   end
   
   private

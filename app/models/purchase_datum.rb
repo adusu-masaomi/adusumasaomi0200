@@ -15,7 +15,8 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :SupplierMaster,  :foreign_key => "supplier_id"
 	belongs_to :CustomerMaster,  :foreign_key => "customer_id"
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
-	
+    belongs_to :purchase_header  #add180223
+    
     #単価M更新切り分け用
     #attr_accessor :check_unit
     #仕入先品番選択用
@@ -23,6 +24,12 @@ class PurchaseDatum < ActiveRecord::Base
 	attr_accessor :supplier_id_hide
     attr_accessor :unit_price_hide
     attr_accessor :supplier_material_code
+    
+    #add180223登録フラグ
+    attr_accessor :complete_flag
+    attr_accessor :complete_flag_hide
+    
+    #attr_accessor :purchase_header_id_hide
     
     #外注判定用
     attr_accessor :outsourcing
@@ -41,8 +48,10 @@ class PurchaseDatum < ActiveRecord::Base
 	validates_numericality_of :purchase_amount, :only_integer => true, :allow_nil => false
     #validates: purchase_amount, numericality: { only_integer: true }
 	
-	validate :purchase_order_code_check   #add171108
+	validate :purchase_order_code_check   
 	
+    validate :check_complete    #add180223
+    
     def purchase_order_code_check
 	#注文番号のチェック（既に集計済みなら除外する）
     #add171108  
@@ -52,6 +61,13 @@ class PurchaseDatum < ActiveRecord::Base
       end 
 	end
 	
+    #add180223
+    def check_complete
+      if purchase_header.present? && purchase_header.complete_flag == 1
+        errors.add(:slip_code, ": 既に入力済みです。納品伝票を確認してください。")
+      end
+    end
+    
 # scope 
 
 	scope :with_purchase_order, -> (purchase_order_data_construction_datum_id=1) { joins(:purchase_order_datum).where("purchase_order_data.construction_datum_id = ?", purchase_order_data_construction_datum_id )}

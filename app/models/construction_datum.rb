@@ -118,6 +118,11 @@ class ConstructionDatum < ActiveRecord::Base
       [["未", 0], ["済", 1]] 
     end
     
+    #add180305
+    def self.calculated_check_list 
+      [["未", 0], ["済", 1]] 
+    end
+    
     #在庫品目によって、工事IDを自動取得する
     def self.get_construction_on_inventory_category(inventory_category_id)
       ret_id = 1

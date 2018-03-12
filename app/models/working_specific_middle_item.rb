@@ -23,11 +23,16 @@ class WorkingSpecificMiddleItem < ActiveRecord::Base
   
    
    #明細（小）フォームajax用
+   attr_accessor :material_id_hide     #add180310
    attr_accessor :material_code_hide
    attr_accessor :material_name_hide
    attr_accessor :quantity_hide
    attr_accessor :unit_price_hide
    attr_accessor :labor_productivity_unit_hide
+   attr_accessor :material_price_hide  #add180310
+   attr_accessor :maker_id_hide        #add180310
+   attr_accessor :unit_master_id_hide  #add180310
+   attr_accessor :working_subcategory_select_hide #add180310
    
    #明細合計用
    attr_accessor :material_cost_total

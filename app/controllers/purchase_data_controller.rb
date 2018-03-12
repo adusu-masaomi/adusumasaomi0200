@@ -21,6 +21,9 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_notes = ""
   @@purchase_datum_division_id = []
   
+  @@purchase_datum_inventory_division_id = ""   #fix180223
+  @@purchase_datum_unit_price_not_update_flag = ""
+  
   @@new_flag = []
   
   # GET /purchase_data
@@ -225,12 +228,26 @@ class PurchaseDataController < ApplicationController
 	     @purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
 		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id
          @purchase_datum.notes ||= @@purchase_datum_notes
-		 @purchase_datum.division_id ||= @@purchase_datum_division_id
-		 @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
+         @purchase_datum.division_id ||= @@purchase_datum_division_id
+         @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
          #add171216
 		 @purchase_datum.unit_price_not_update_flag ||= @@purchase_datum_unit_price_not_update_flag
 	   end
 	   
+       
+      #add180223
+      #伝票が登録済みかチェック
+      check_complete_flag
+  end
+
+  #add180224
+  def check_complete_flag
+    if @purchase_datum.slip_code.present?
+      purchase_header = PurchaseHeader.where(["slip_code = ?" , @purchase_datum.slip_code]).first
+      if purchase_header.present?
+        @purchase_datum.complete_flag = purchase_header.complete_flag
+      end
+    end
   end
 
   # GET /purchase_data/1/edit
@@ -239,8 +256,11 @@ class PurchaseDataController < ApplicationController
     @material_masters = MaterialMaster.where(["id = ?", @purchase_datum.material_id]).pluck(:list_price)
 	@maker_masters = MakerMaster.where(["id = ?", @purchase_datum.material_id])
 	
-	#.pry
 	@outsourcing_flag = "0"
+    
+    #add180223
+    #伝票が登録済みかチェック
+    check_complete_flag
   end
 
   # POST /purchase_data
@@ -249,10 +269,14 @@ class PurchaseDataController < ApplicationController
     
     #viewで分解されたパラメータを、正常更新できるように復元させる。
     adjust_purchase_date_params
-	   
+	 
+    #登録済みフラグをセット(伝票重複防止のため)
+    #add180223
+    get_registerd_flag_param
+  
 	@purchase_datum = PurchaseDatum.new(purchase_datum_params)
     
-	
+    
     #仕入単価を更新
     #if (params[:purchase_datum][:unit_price_not_update_flag] == 'false')
 	if (params[:purchase_datum][:unit_price_not_update_flag] == '0')
@@ -260,14 +284,7 @@ class PurchaseDataController < ApplicationController
 	  #仕入先単価マスターへの新規追加又は更新
 	  create_or_update_purchase_unit_prices
 	 
-	  #@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
-      #        params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
-      #if @purchase_unit_prices.present?
-      #  purchase_unit_prices_create_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], unit_price: params[:purchase_datum][:purchase_unit_price]}
-      #  @purchase_unit_prices.update(purchase_unit_prices_create_params)
-	  #end
-	
-	    #資材Mも更新
+	  #資材Mも更新
       update_params_list_price_and_maker
 	  @purchase_datum.update_attributes(material_masters_params)
 	else
@@ -279,9 +296,18 @@ class PurchaseDataController < ApplicationController
     
 	#資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
 	update_material_master
-	  
+	
+    
     respond_to do |format|
+      
+      #binding.pry
+    
 	  if @purchase_datum.save
+      #if @purchase_datum.create(purchase_datum_params)
+  
+        #伝票が重複しないように登録フラグをセット
+        set_registerd_flag_to_headers
+  
         #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully created.' }
         #format.json { render :show, status: :created, location: @purchase_datum }
         
@@ -289,8 +315,7 @@ class PurchaseDataController < ApplicationController
         format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], 
          :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
          :move_flag => params[:move_flag])}
-		 
-       
+		
        
        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
        #takano
@@ -304,7 +329,7 @@ class PurchaseDataController < ApplicationController
        
     end
   end
-
+  
   #単価更新フラグのパラメータ書き換え
   #真偽型がないため、int型に変換する
   #def change_unit_price_update_flag_params
@@ -319,6 +344,11 @@ class PurchaseDataController < ApplicationController
   
    #viewで分解されたパラメータを、正常更新できるように復元させる。
    adjust_purchase_date_params
+   
+    #登録済みフラグをセット(伝票重複防止のため)
+    #add180223
+   get_registerd_flag_param
+		
    
    #仕入単価Mも更新する 
    #if (params[:purchase_datum][:unit_price_not_update_flag] == 'false')
@@ -345,20 +375,26 @@ class PurchaseDataController < ApplicationController
 	   
    end 
    
+   
    #資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
    update_material_master
-	 
+
    respond_to do |format|
       
       if @purchase_datum.update(purchase_datum_params)
+        
+        #伝票が重複しないように登録フラグをセット
+        set_registerd_flag_to_headers
+        
+        
         #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
         #format.json { render :show, status: :ok, location: @purchase_datum }
         
-		
 	    format.html {redirect_to purchase_datum_path(@purchase_datum, :construction_id => params[:construction_id], 
          :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
          :move_flag => params[:move_flag])}
-
+       
+   
         #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
         #takano
 		InventoriesController.set_inventory_history(params, @purchase_datum)
@@ -370,6 +406,58 @@ class PurchaseDataController < ApplicationController
   
     end
   end
+  
+  #add180223
+  #伝票が重複しないための登録フラグを見出しから取得
+  def get_registerd_flag_param
+    
+    if params[:purchase_datum][:slip_code].present?
+      #更新
+      @purchase_header = PurchaseHeader.where(["slip_code = ?" , params[:purchase_datum][:slip_code]]).first
+      
+      if @purchase_header.present?
+         #つくられたIDをセット
+         params[:purchase_datum][:purchase_header_id] =  @purchase_header.id
+      end
+    end
+  end 
+  
+  #add180223
+  #伝票が重複しないように登録フラグをセット
+  def set_registerd_flag_to_headers
+    
+    if params[:purchase_datum][:slip_code].present?
+      #更新
+      @purchase_header = PurchaseHeader.where(["slip_code = ?" , params[:purchase_datum][:slip_code]]).first
+      
+      if @purchase_header.present?
+        
+        if params[:purchase_datum][:complete_flag] == "1"   #更新は、済チェック入れた場合のみ登録する。(解除は、上手くできない..)
+          purchase_header_params = {complete_flag: params[:purchase_datum][:complete_flag] }
+          @purchase_header.update(purchase_header_params)
+        end
+      else
+        #新規
+         purchase_header_params = {slip_code: params[:purchase_datum][:slip_code], complete_flag: params[:purchase_datum][:complete_flag] }
+	     @purchase_header = PurchaseHeader.create(purchase_header_params)
+         
+         #つくられたIDをセット
+         #purchase_data_params = {purchase_header_id: @purchase_header.id }
+         #@purchase_datum.update(purchase_data_params)
+         
+         #つくられたIDをセット(ヴァリデーションスキップ)
+         @purchase_datum.purchase_header_id = @purchase_header.id 
+         @purchase_datum.save(:validate => false)
+      
+      end
+      
+      #つくられたIDをセット
+      #purchase_data_params = {purchase_header_id: @purchase_header.id }
+      #@purchase_datum.update(purchase_data_params)
+      
+    end
+  end 
+  
   
   #資材マスターへ品名などを反映させる処理(手入力以外)
   def update_material_master
@@ -435,7 +523,9 @@ class PurchaseDataController < ApplicationController
 	   #外注の注文Noの判定
 	   
 	   str = purchase_order_code
-	   if str[0,1] == "M" || str[0,1] == "O"
+	   #if str[0,1] == "M" || str[0,1] == "O"
+       #upd180220
+       if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
 	     #binding.pry
 		 @outsourcing_flag = "1"
 	   end
@@ -655,6 +745,12 @@ class PurchaseDataController < ApplicationController
    @supplier_id  = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("supplier_master_id")
   end
   
+  #見出しデータを取得(伝票番号確認用）
+  def get_header_id
+    #@purchase_header_id = PurchaseHeader.where(:slip_code => params[:slip_code]).pluck(:id).flatten.join(",")
+    @complete_flag = PurchaseHeader.where(:slip_code => params[:slip_code]).pluck(:complete_flag).flatten.join(",")
+  end
+  
   #入庫の場合、件名（工事No.）を自動取得する
   #add170428
   def construction_select_on_stocked
@@ -671,7 +767,6 @@ class PurchaseDataController < ApplicationController
   
 	  end
 	end
-	
   end
   
   private
@@ -685,7 +780,7 @@ class PurchaseDataController < ApplicationController
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
                      :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
-                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :notes )
+                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :notes, :purchase_header_id )
     end
     
     def purchase_unit_prices_params
@@ -693,7 +788,7 @@ class PurchaseDataController < ApplicationController
     end
 
     def material_masters_params
-         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at, :list_price, :maker_id ])
+         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at, :list_price, :maker_id])
     end
     
 	#資材Mへ最終単価・日付を更新用

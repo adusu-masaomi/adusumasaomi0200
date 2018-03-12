@@ -11,37 +11,79 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180131030534) do
+ActiveRecord::Schema.define(version: 20180223022929) do
 
-  create_table "account_accounttitle", force: :cascade do |t|
-    t.string  "name",              limit: 255, null: false
-    t.integer "trade_division_id", limit: 4,   null: false
+  create_table "account_account_title", force: :cascade do |t|
+    t.string   "name",              limit: 255,               null: false
+    t.integer  "trade_division_id", limit: 4,                 null: false
+    t.datetime "created_at",                    precision: 6
+    t.datetime "update_at",                     precision: 6
   end
+
+  create_table "account_bank", force: :cascade do |t|
+    t.string   "name",       limit: 255,               null: false
+    t.datetime "created_at",             precision: 6
+    t.datetime "update_at",              precision: 6
+  end
+
+  create_table "account_bank_branch", force: :cascade do |t|
+    t.string   "name",       limit: 255,               null: false
+    t.integer  "bank_id",    limit: 4
+    t.datetime "created_at",             precision: 6
+    t.datetime "update_at",              precision: 6
+  end
+
+  add_index "account_bank_branch", ["bank_id"], name: "account_bank_branch_0b0af02d", using: :btree
 
   create_table "account_partner", force: :cascade do |t|
-    t.string  "name",              limit: 255, null: false
-    t.integer "trade_division_id", limit: 4,   null: false
-    t.integer "account_title_id",  limit: 4,   null: false
-    t.integer "payment_method_id", limit: 4,   null: false
-    t.string  "bank_name",         limit: 255, null: false
-    t.string  "branch_name",       limit: 255, null: false
-    t.integer "account_type",      limit: 4,   null: false
-    t.integer "account_number",    limit: 4,   null: false
-    t.integer "pay_day",           limit: 4,   null: false
-    t.boolean "pay_month_flag_1",              null: false
-    t.boolean "pay_month_flag_10",             null: false
-    t.boolean "pay_month_flag_11",             null: false
-    t.boolean "pay_month_flag_12",             null: false
-    t.boolean "pay_month_flag_2",              null: false
-    t.boolean "pay_month_flag_3",              null: false
-    t.boolean "pay_month_flag_4",              null: false
-    t.boolean "pay_month_flag_5",              null: false
-    t.boolean "pay_month_flag_6",              null: false
-    t.boolean "pay_month_flag_7",              null: false
-    t.boolean "pay_month_flag_8",              null: false
-    t.boolean "pay_month_flag_9",              null: false
-    t.integer "pay_day_division",  limit: 4,   null: false
+    t.string   "name",              limit: 255,               null: false
+    t.integer  "trade_division_id", limit: 4,                 null: false
+    t.integer  "account_title_id",  limit: 4,                 null: false
+    t.integer  "payment_method_id", limit: 4,                 null: false
+    t.string   "bank_name",         limit: 255,               null: false
+    t.string   "branch_name",       limit: 255,               null: false
+    t.integer  "account_type",      limit: 4,                 null: false
+    t.integer  "account_number",    limit: 4,                 null: false
+    t.integer  "pay_day",           limit: 4,                 null: false
+    t.boolean  "pay_month_flag_1",                            null: false
+    t.boolean  "pay_month_flag_10",                           null: false
+    t.boolean  "pay_month_flag_11",                           null: false
+    t.boolean  "pay_month_flag_12",                           null: false
+    t.boolean  "pay_month_flag_2",                            null: false
+    t.boolean  "pay_month_flag_3",                            null: false
+    t.boolean  "pay_month_flag_4",                            null: false
+    t.boolean  "pay_month_flag_5",                            null: false
+    t.boolean  "pay_month_flag_6",                            null: false
+    t.boolean  "pay_month_flag_7",                            null: false
+    t.boolean  "pay_month_flag_8",                            null: false
+    t.boolean  "pay_month_flag_9",                            null: false
+    t.integer  "pay_day_division",  limit: 4,                 null: false
+    t.integer  "bank_id",           limit: 4
+    t.integer  "bank_branch_id",    limit: 4
+    t.datetime "created_at",                    precision: 6
+    t.datetime "update_at",                     precision: 6
   end
+
+  add_index "account_partner", ["bank_branch_id"], name: "account_partner_a5ad8034", using: :btree
+  add_index "account_partner", ["bank_id"], name: "account_partner_0b0af02d", using: :btree
+
+  create_table "account_payment", force: :cascade do |t|
+    t.date     "billing_year_month",                           null: false
+    t.integer  "trade_division_id",  limit: 4
+    t.integer  "billing_amount",     limit: 4,                 null: false
+    t.integer  "payment_method_id",  limit: 4,                 null: false
+    t.date     "payment_due_date"
+    t.date     "payment_date"
+    t.boolean  "fixed_cost",                                   null: false
+    t.string   "note",               limit: 255,               null: false
+    t.datetime "created_at",                     precision: 6
+    t.datetime "update_at",                      precision: 6
+    t.integer  "account_title_id",   limit: 4
+    t.integer  "partner_id",         limit: 4
+  end
+
+  add_index "account_payment", ["account_title_id"], name: "account_pa_account_title_id_de8d3cfe_fk_account_account_title_id", using: :btree
+  add_index "account_payment", ["partner_id"], name: "account_payment_partner_id_efa46d84_fk_account_partner_id", using: :btree
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -220,33 +262,36 @@ ActiveRecord::Schema.define(version: 20180131030534) do
   end
 
   create_table "delivery_slip_detail_large_classifications", force: :cascade do |t|
-    t.integer  "delivery_slip_header_id",         limit: 4
-    t.integer  "delivery_slip_items_division_id", limit: 4
-    t.integer  "working_large_item_id",           limit: 4
-    t.integer  "working_specific_middle_item_id", limit: 4
-    t.string   "working_large_item_name",         limit: 255
-    t.string   "working_large_item_short_name",   limit: 255
-    t.integer  "working_middle_item_category_id", limit: 4
-    t.string   "working_large_specification",     limit: 255
-    t.integer  "line_number",                     limit: 4
-    t.integer  "quantity",                        limit: 4
-    t.integer  "execution_quantity",              limit: 4
-    t.integer  "working_unit_id",                 limit: 4
-    t.string   "working_unit_name",               limit: 255
-    t.integer  "working_unit_price",              limit: 4
-    t.string   "delivery_slip_price",             limit: 255
-    t.integer  "execution_unit_price",            limit: 4
-    t.string   "execution_price",                 limit: 255
-    t.float    "labor_productivity_unit",         limit: 24
-    t.float    "labor_productivity_unit_total",   limit: 24
-    t.integer  "last_line_number",                limit: 4
-    t.string   "remarks",                         limit: 255
-    t.integer  "construction_type",               limit: 4
-    t.integer  "piping_wiring_flag",              limit: 4
-    t.integer  "equipment_mounting_flag",         limit: 4
-    t.integer  "labor_cost_flag",                 limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.integer  "delivery_slip_header_id",                 limit: 4
+    t.integer  "delivery_slip_items_division_id",         limit: 4
+    t.integer  "working_large_item_id",                   limit: 4
+    t.integer  "working_specific_middle_item_id",         limit: 4
+    t.string   "working_large_item_name",                 limit: 255
+    t.string   "working_large_item_short_name",           limit: 255
+    t.integer  "working_middle_item_category_id",         limit: 4
+    t.integer  "working_middle_item_category_id_call",    limit: 4
+    t.integer  "working_middle_item_subcategory_id",      limit: 4
+    t.integer  "working_middle_item_subcategory_id_call", limit: 4
+    t.string   "working_large_specification",             limit: 255
+    t.integer  "line_number",                             limit: 4
+    t.integer  "quantity",                                limit: 4
+    t.integer  "execution_quantity",                      limit: 4
+    t.integer  "working_unit_id",                         limit: 4
+    t.string   "working_unit_name",                       limit: 255
+    t.integer  "working_unit_price",                      limit: 4
+    t.string   "delivery_slip_price",                     limit: 255
+    t.integer  "execution_unit_price",                    limit: 4
+    t.string   "execution_price",                         limit: 255
+    t.float    "labor_productivity_unit",                 limit: 24
+    t.float    "labor_productivity_unit_total",           limit: 24
+    t.integer  "last_line_number",                        limit: 4
+    t.string   "remarks",                                 limit: 255
+    t.integer  "construction_type",                       limit: 4
+    t.integer  "piping_wiring_flag",                      limit: 4
+    t.integer  "equipment_mounting_flag",                 limit: 4
+    t.integer  "labor_cost_flag",                         limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   create_table "delivery_slip_detail_middle_classifications", force: :cascade do |t|
@@ -258,6 +303,9 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.string   "working_middle_item_name",                     limit: 255
     t.string   "working_middle_item_short_name",               limit: 255
     t.integer  "working_middle_item_category_id",              limit: 4
+    t.integer  "working_middle_item_category_id_call",         limit: 4
+    t.integer  "working_middle_item_subcategory_id",           limit: 4
+    t.integer  "working_middle_item_subcategory_id_call",      limit: 4
     t.integer  "line_number",                                  limit: 4
     t.string   "working_middle_specification",                 limit: 255
     t.integer  "quantity",                                     limit: 4
@@ -314,6 +362,9 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.integer  "delivery_amount",           limit: 4
     t.integer  "execution_amount",          limit: 4
     t.integer  "last_line_number",          limit: 4
+    t.integer  "category_saved_flag",       limit: 4
+    t.integer  "category_saved_id",         limit: 4
+    t.integer  "subcategory_saved_id",      limit: 4
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
   end
@@ -590,6 +641,13 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.datetime "update_at",                               null: false
   end
 
+  create_table "purchase_headers", force: :cascade do |t|
+    t.string   "slip_code",         limit: 255
+    t.integer  "registration_flag", limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "purchase_order_data", force: :cascade do |t|
     t.string   "purchase_order_code",   limit: 255
     t.integer  "construction_datum_id", limit: 4
@@ -650,33 +708,36 @@ ActiveRecord::Schema.define(version: 20180131030534) do
   end
 
   create_table "quotation_detail_large_classifications", force: :cascade do |t|
-    t.integer  "quotation_header_id",             limit: 4
-    t.integer  "quotation_items_division_id",     limit: 4
-    t.integer  "working_large_item_id",           limit: 4
-    t.integer  "working_specific_middle_item_id", limit: 4
-    t.string   "working_large_item_name",         limit: 255
-    t.string   "working_large_item_short_name",   limit: 255
-    t.integer  "working_middle_item_category_id", limit: 4
-    t.string   "working_large_specification",     limit: 255
-    t.integer  "line_number",                     limit: 4
-    t.integer  "quantity",                        limit: 4
-    t.integer  "execution_quantity",              limit: 4
-    t.integer  "working_unit_id",                 limit: 4
-    t.string   "working_unit_name",               limit: 255
-    t.integer  "working_unit_price",              limit: 4
-    t.string   "quote_price",                     limit: 255
-    t.integer  "execution_unit_price",            limit: 4
-    t.string   "execution_price",                 limit: 255
-    t.float    "labor_productivity_unit",         limit: 24
-    t.float    "labor_productivity_unit_total",   limit: 24
-    t.integer  "last_line_number",                limit: 4
-    t.string   "remarks",                         limit: 255
-    t.integer  "construction_type",               limit: 4
-    t.integer  "piping_wiring_flag",              limit: 4
-    t.integer  "equipment_mounting_flag",         limit: 4
-    t.integer  "labor_cost_flag",                 limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.integer  "quotation_header_id",                     limit: 4
+    t.integer  "quotation_items_division_id",             limit: 4
+    t.integer  "working_large_item_id",                   limit: 4
+    t.integer  "working_specific_middle_item_id",         limit: 4
+    t.string   "working_large_item_name",                 limit: 255
+    t.string   "working_large_item_short_name",           limit: 255
+    t.integer  "working_middle_item_category_id",         limit: 4
+    t.integer  "working_middle_item_category_id_call",    limit: 4
+    t.integer  "working_middle_item_subcategory_id",      limit: 4
+    t.integer  "working_middle_item_subcategory_id_call", limit: 4
+    t.string   "working_large_specification",             limit: 255
+    t.integer  "line_number",                             limit: 4
+    t.integer  "quantity",                                limit: 4
+    t.integer  "execution_quantity",                      limit: 4
+    t.integer  "working_unit_id",                         limit: 4
+    t.string   "working_unit_name",                       limit: 255
+    t.integer  "working_unit_price",                      limit: 4
+    t.string   "quote_price",                             limit: 255
+    t.integer  "execution_unit_price",                    limit: 4
+    t.string   "execution_price",                         limit: 255
+    t.float    "labor_productivity_unit",                 limit: 24
+    t.float    "labor_productivity_unit_total",           limit: 24
+    t.integer  "last_line_number",                        limit: 4
+    t.string   "remarks",                                 limit: 255
+    t.integer  "construction_type",                       limit: 4
+    t.integer  "piping_wiring_flag",                      limit: 4
+    t.integer  "equipment_mounting_flag",                 limit: 4
+    t.integer  "labor_cost_flag",                         limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
   end
 
   create_table "quotation_detail_middle_classifications", force: :cascade do |t|
@@ -688,6 +749,9 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.string   "working_middle_item_name",                 limit: 255
     t.string   "working_middle_item_short_name",           limit: 255
     t.integer  "working_middle_item_category_id",          limit: 4
+    t.integer  "working_middle_item_category_id_call",     limit: 4
+    t.integer  "working_middle_item_subcategory_id",       limit: 4
+    t.integer  "working_middle_item_subcategory_id_call",  limit: 4
     t.integer  "line_number",                              limit: 4
     t.string   "working_middle_specification",             limit: 255
     t.integer  "quantity",                                 limit: 4
@@ -805,6 +869,9 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.integer  "execution_amount",           limit: 4
     t.integer  "net_amount",                 limit: 4
     t.integer  "last_line_number",           limit: 4
+    t.integer  "category_saved_flag",        limit: 4
+    t.integer  "category_saved_id",          limit: 4
+    t.integer  "subcategory_saved_id",       limit: 4
     t.date     "invoice_period_start_date"
     t.date     "invoice_period_end_date"
     t.datetime "created_at",                             null: false
@@ -1016,6 +1083,7 @@ ActiveRecord::Schema.define(version: 20180131030534) do
 
   create_table "working_categories", force: :cascade do |t|
     t.string   "category_name", limit: 255
+    t.integer  "seq",           limit: 4
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
   end
@@ -1042,6 +1110,7 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.string   "working_middle_item_name",        limit: 255
     t.string   "working_middle_item_short_name",  limit: 255
     t.integer  "working_middle_item_category_id", limit: 4
+    t.integer  "working_subcategory_id",          limit: 4
     t.string   "working_middle_specification",    limit: 255
     t.integer  "working_unit_id",                 limit: 4
     t.string   "working_unit_name",               limit: 255
@@ -1080,6 +1149,9 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.float    "unit_price",              limit: 24
     t.float    "rate",                    limit: 24
     t.integer  "quantity",                limit: 4
+    t.float    "material_price",          limit: 24
+    t.integer  "maker_master_id",         limit: 4
+    t.integer  "unit_master_id",          limit: 4
     t.float    "labor_productivity_unit", limit: 24
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
@@ -1127,6 +1199,7 @@ ActiveRecord::Schema.define(version: 20180131030534) do
   create_table "working_subcategories", force: :cascade do |t|
     t.integer  "working_category_id", limit: 4
     t.string   "name",                limit: 255
+    t.integer  "seq",                 limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
   end
@@ -1190,6 +1263,11 @@ ActiveRecord::Schema.define(version: 20180131030534) do
     t.datetime "updated_at",                    null: false
   end
 
+  add_foreign_key "account_bank_branch", "account_bank", column: "bank_id", name: "account_bank_branch_bank_id_5343d462_fk_account_bank_id"
+  add_foreign_key "account_partner", "account_bank", column: "bank_id", name: "account_partner_bank_id_4b4698ec_fk_account_bank_id"
+  add_foreign_key "account_partner", "account_bank_branch", column: "bank_branch_id", name: "account_partne_bank_branch_id_89ec6121_fk_account_bank_branch_id"
+  add_foreign_key "account_payment", "account_account_title", column: "account_title_id", name: "account_pa_account_title_id_de8d3cfe_fk_account_account_title_id"
+  add_foreign_key "account_payment", "account_partner", column: "partner_id", name: "account_payment_partner_id_efa46d84_fk_account_partner_id"
   add_foreign_key "auth_group_permissions", "auth_group", column: "group_id", name: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id"
   add_foreign_key "auth_group_permissions", "auth_permission", column: "permission_id", name: "auth_group_permissi_permission_id_84c5c92e_fk_auth_permission_id"
   add_foreign_key "auth_permission", "django_content_type", column: "content_type_id", name: "auth_permissi_content_type_id_2f476e4b_fk_django_content_type_id"

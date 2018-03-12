@@ -110,7 +110,7 @@
     obj = document.getElementById("purchase_order_code").value;
 	if (obj != ""){
 	  purchase_order_code_header = obj.substr(0, 1) ;
-	  if (purchase_order_code_header == "M"){
+	  if (purchase_order_code_header == "M" || purchase_order_code_header == "N"){
 	  //仕入先を村山電気にする
          index = 37;
          $(".searchableSupplier").val(index).trigger("change"); 

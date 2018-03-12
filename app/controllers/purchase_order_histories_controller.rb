@@ -559,6 +559,13 @@ class PurchaseOrderHistoriesController < ApplicationController
 				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
                                         maker_id: item[:maker_id], list_price: item[:list_price] }
                   @material_master = MaterialMaster.create(material_master_params)
+                  
+                  #add180215
+                  #生成された商品ＩＤをorderへセットする。
+                  if @material_master.present?
+                    item[:material_id] = @material_master.id
+                  end
+                  
                 end
 
                 #仕入先単価マスターへも登録。

@@ -24,17 +24,22 @@ class WorkingSpecificMiddleItemsController < ApplicationController
 	  $working_specific_middle_item = nil
 	end
 	
-	
+	#労務単価の初期値をセットする
+	@working_specific_middle_item.labor_unit_price_standard ||= $LABOR_COST
   end
 
   # GET /working_specific_middle_items/1/edit
   def edit
+    #労務単価の初期値をセットする
+	@working_specific_middle_item.labor_unit_price_standard ||= $LABOR_COST
   end
 
   # POST /working_specific_middle_items
   # POST /working_specific_middle_items.json
   def create
     
+    #明細マスターのパラメータ補正 add180310
+    set_params_replenishment
 	
 	master_insert_flag = false
 	#共通マスターへ更新する場合
@@ -192,6 +197,10 @@ class WorkingSpecificMiddleItemsController < ApplicationController
   # PATCH/PUT /working_specific_middle_items/1.json
   def update
     
+    #明細マスターのパラメータ補正 
+    #add180310
+    set_params_replenishment
+    
 	respond_to do |format|
       #見積一覧IDをセット
 	  set_quotation_and_delivery_header
@@ -199,9 +208,7 @@ class WorkingSpecificMiddleItemsController < ApplicationController
       #品目マスターへの追加・更新
 	  create_or_update_material
 	
-	  #binding.pry
-	
-      #新規か更新かの判定処理追加 add171114
+	  #新規か更新かの判定処理追加 add171114
 	  status = nil
 	  
 	    action_flag = params[:working_specific_middle_item][:action_flag]
@@ -226,7 +233,8 @@ class WorkingSpecificMiddleItemsController < ApplicationController
 		    status = @working_specific_middle_item.update(working_specific_middle_item_params)
 		  end
 	    elsif action_flag == "edit"
-	      status = @working_specific_middle_item.update(working_specific_middle_item_params)
+        
+          status = @working_specific_middle_item.update(working_specific_middle_item_params)
 	    end
 	  #
 
@@ -358,7 +366,19 @@ class WorkingSpecificMiddleItemsController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+  
+  #パラメータを補充
+  def set_params_replenishment
+     if params[:working_specific_middle_item][:working_specific_small_items_attributes].present?
+        i = 0
+	    params[:working_specific_middle_item][:working_specific_small_items_attributes].values.each do |item|
+		  #varidate用のために、本来の箇所から離れたパラメータを再セットする
+		  item[:material_price] = params[:material_price][i]
+          i += 1
+		end
+	end
+  end
+  
   #ajax
   #メーカーから該当する商品を取得
   #作成中！！！
@@ -398,7 +418,7 @@ class WorkingSpecificMiddleItemsController < ApplicationController
 	  :execution_unit_price, :material_id, :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, 
 	  :labor_unit_price, :labor_unit_price_standard, :labor_productivity_unit, :labor_productivity_unit_total, :material_cost_total, :seq,
 	  working_specific_small_items_attributes:   [:id, :working_specific_middle_item_id, :working_small_item_id, :working_small_item_id, :working_small_item_code, :working_small_item_name, 
-			:unit_price, :rate, :quantity, :labor_productivity_unit, :_destroy])
+			:unit_price, :rate, :quantity, :material_price, :maker_master_id, :unit_master_id, :labor_productivity_unit, :_destroy])
     end
 	
 	

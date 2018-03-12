@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :purchase_headers
   resources :working_subcategories
   resources :working_subcatefories
   resources :task_contents
@@ -202,6 +203,9 @@ Rails.application.routes.draw do
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
   #add170428
   get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
+  
+  #add180221
+  get '/purchase_datum/get_header_id' => 'purchase_data#get_header_id'
   
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   
@@ -558,6 +562,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :purchase_headers
   resources :working_subcategories
   resources :working_subcatefories
   resources :task_contents

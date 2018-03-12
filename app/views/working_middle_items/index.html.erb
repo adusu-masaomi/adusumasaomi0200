@@ -53,6 +53,10 @@
             new_working_middle_item_path(move_flag: "", new_flag: "1"), remote: true,
             :class => 'btn btn-primary' %>
 
+<%= link_to "順番一括並び替え",
+            working_middle_items_path(all_sort: "true" ),
+            :class => 'btn btn-warning' , :data => {:confirm => 'データの一括並び替えを行いますか？'} %>
+
 <div id="working_middle_item-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>
 
 <div class="span11 table-scrollable ">

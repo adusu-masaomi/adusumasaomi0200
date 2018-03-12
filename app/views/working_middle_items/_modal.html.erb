@@ -123,7 +123,8 @@
         <%= f.input :working_unit_price, input_html:{id:"working_unit_price", style: 'width:400px', :tabindex=>"16" }   %>
 		
 		<!-- ajax用 -->
-		<%= f.input :material_code_hide, input_html:{id:'material_code_hide'}, as: :hidden  %>
+		<%= f.input :material_id_hide, input_html:{id:'material_id_hide'}, as: :hidden  %>
+        <%= f.input :material_code_hide, input_html:{id:'material_code_hide'}, as: :hidden  %>
 		<%= f.input :material_name_hide, input_html:{id:'material_name_hide'}, as: :hidden  %>
         <%= f.input :quantity_hide, input_html:{id:'quantity_hide'}, as: :hidden  %>
 		<%= f.input :unit_price_hide, input_html:{id:'unit_price_hide'}, as: :hidden  %>
@@ -337,7 +338,8 @@
                { material_id: material_id },
 			   function(data){ 
                  //各種アイテム情報のセット
-			     setMaterialDetail(child_index);
+			     //setMaterialDetail(child_index);
+                 setWorkingSmallItemDetail(child_index, 1);
 			   }
              );
 		   }
@@ -345,6 +347,31 @@
        //add180201
        $(".searchableMaker").select2({ theme: "classic" });
        $(".searchableUnit").select2({ theme: "classic" });
+       
+       //add 180213
+       $(".searchInsertMaterial").select2({ theme: "classic" , tags: true});
+       $(".searchInsertMaterial").change(function(e) {
+         searchItemCode(this);
+       });
+       
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	     //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var child_index = 0;
+	     child_index = controlName.slice(52);
+         child_index = child_index.slice(0,-26);
+         
+         var nm = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_name]"
+         if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+		 }
+         
+         e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
+     
+       //add end
        
        //
 		//return event.preventDefault();
@@ -403,70 +430,99 @@
 	 
   })
   
-  //品番選択後の、各種アイテム情報のセット
+  
+  //アイテム選択後の、各種アイテム情報のセット
   function setMaterialDetail(child_index){
+      
       //品番をセット
 	  obj = document.getElementById("material_code_hide");
-	  var working_small_item_code = "modal_working_small_item_code" + child_index;
-      document.getElementById(working_small_item_code).value = obj.innerText;
-				 
-	  //品名をセット
-	  obj = document.getElementById("material_name_hide");
-	  var working_small_item_name = "modal_working_small_item_name" + child_index;
-	  document.getElementById(working_small_item_name).value = obj.innerText;
-	
-      //メーカー名をセット add180201
-	  obj = document.getElementById("maker_id_hide").textContent;
-	  if (obj != null){
-	    var index = parseInt(obj);
-	    nm = "working_middle_item[working_small_items_attributes][" + child_index + "][maker_master_id]"
-	    document.getElementsByName(nm)[0].value = index; 
-        $(".searchableMaker").trigger("change"); 
+      
+      //upd180214
+      var itemIdName = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_id]"
+        
+      
+      //if (obj.innerText != "＜手入力用＞"){
+      
+       var working_small_item_code = "modal_working_small_item_code" + child_index;
+      if (document.getElementsByName(itemIdName)[0].value != "1"){
+      //手入力品番以外の場合のみ、品番をセット  add 180214
+        document.getElementById(working_small_item_code).value = obj.innerText;
 	  }
       
-      //単位名をセット add180201
-      obj = document.getElementById("unit_master_id_hide").textContent;
-      if (obj != null){
-        var index = parseInt(obj);
-        nm = "working_middle_item[working_small_items_attributes][" + child_index + "][unit_master_id]"
-        document.getElementsByName(nm)[0].value = index; 
-        $(".searchableUnit").trigger("change"); 
-      }
- 
-	  //数量をセット
-	  obj = document.getElementById("quantity_hide");
-	  //var quantity = "quantity" + child_index;
-	  //upd171205
-	  var quantity = "modal_quantity" + child_index;
-	  document.getElementById(quantity).value = obj.innerText;
+      //add condition 180214
+      //品番有、手入力以外の場合
+      if (document.getElementById(working_small_item_code).value != "" && 
+          document.getElementsByName(itemIdName)[0].value != "1"){   
+        
+	    //品名をセット
+	    obj = document.getElementById("material_name_hide");
+	    var working_small_item_name = "modal_working_small_item_name" + child_index;
+	    document.getElementById(working_small_item_name).value = obj.innerText;
+	
+        //メーカー名をセット add180201
+	    obj = document.getElementById("maker_id_hide").textContent;
+	    if (obj != null){
+	      var index = parseInt(obj);
+	      nm = "working_middle_item[working_small_items_attributes][" + child_index + "][maker_master_id]"
+	      document.getElementsByName(nm)[0].value = index; 
+          $(".searchableMaker").trigger("change"); 
+	    }
+      
+        //単位名をセット add180201
+        obj = document.getElementById("unit_master_id_hide").textContent;
+        if (obj != null){
+          var index = parseInt(obj);
+          nm = "working_middle_item[working_small_items_attributes][" + child_index + "][unit_master_id]"
+          document.getElementsByName(nm)[0].value = index; 
+          $(".searchableUnit").trigger("change"); 
+        }
+        
+        //数量をセット
+	    obj = document.getElementById("quantity_hide");
+	    var quantity = "modal_quantity" + child_index;
+	    document.getElementById(quantity).value = obj.innerText;
 				 
-	  //単価をセット
-	  obj = document.getElementById("unit_price_hide");
-	  //var unit_price = "unit_price" + child_index;
-	  //upd171205
-	  var unit_price = "modal_unit_price" + child_index;
-	  document.getElementById(unit_price).value = obj.innerText;
+	    //定価をセット
+	    obj = document.getElementById("unit_price_hide");
+	    //var unit_price = "unit_price" + child_index;
+	    //upd171205
+	    var unit_price = "modal_unit_price" + child_index;
+	    document.getElementById(unit_price).value = obj.innerText;
 				 
-	  //資材費を算出
-	  //add180201フィールド化
-      obj = document.getElementById("material_price_hide");
-	  var material_price = "modal_material_price" + child_index;
-	  document.getElementById(material_price).value = obj.innerText;
-                 
-      //del171118 基本手入力になる（単純に数量×単価にならない）
-	  //資材費を算出
-	  //calcMaterialPrice(child_index, document.getElementById(quantity).value, 
-      //                  document.getElementById(unit_price).value);
-	  //歩掛をセット
+	    //資材費を算出
+	    //add180201フィールド化
+        obj = document.getElementById("material_price_hide");
+	    var material_price = "modal_material_price" + child_index;
+	    document.getElementById(material_price).value = obj.innerText;
+      }         
+      
+      //既に入力しているものがクリアされてしまうケースがあるので、以下は保留中。。。
+      //手入力の場合、既存の値をクリアする  add 180214
+      //nm = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_id]"
+	  //if (document.getElementsByName(nm)[0].value == 1 && document.getElementById(working_small_item_code).value != "") { 
+      //  //品名
+      //  var working_small_item_name = "modal_working_small_item_name" + child_index;
+	  //  document.getElementById(working_small_item_name).value = "";
+      //  //定価
+      //  var unit_price = "modal_unit_price" + child_index;
+	  //  document.getElementById(unit_price).value = "";
+      //  //資材費
+      //  var material_price = "modal_material_price" + child_index;
+	  //  document.getElementById(material_price).value = "";
+      //}
+      //
+      
+      //歩掛をセット
 	  obj = document.getElementById("labor_productivity_unit_hide");
-	  //var labor_productivity_unit = "labor_productivity_unit" + child_index;
-      var labor_productivity_unit = "modal_labor_productivity_unit" + child_index;
+	  var labor_productivity_unit = "modal_labor_productivity_unit" + child_index;
 	  document.getElementById(labor_productivity_unit).value = obj.innerText;
 				 
 	  //歩掛り計を算出
-	  calcLaborProductivityUnitTotal(child_index, document.getElementById(quantity).value, 
+      if (document.getElementById(quantity) != undefined){
+      //add condition 180215
+	    calcLaborProductivityUnitTotal(child_index, document.getElementById(quantity).value, 
 								   document.getElementById(labor_productivity_unit).value);
-				
+	  }
 	  //資材費合計を算出
 	  CalcLaborMaterialCostTotal("modal_material_price");
 				
@@ -475,8 +531,37 @@
 				 
 	  //労務費を算出
 	  calcLaborCostTotal();
+      
     
   }
+  
+  //品番選択後の、各種アイテム情報のセット
+  function setMaterialDetailCode(child_index){
+    //idをセット add180201
+      obj = document.getElementById("material_id_hide").textContent;
+	  if (obj != null){
+	    var index = parseInt(obj);
+	    nm = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_id]"
+	    document.getElementsByName(nm)[0].value = index; 
+        
+        //ここでsetMaterialDetailがコールされる。
+        //$(".searchableMaterial").trigger("change"); 
+        
+        //upd180308上記だと、複数行が全て手入力のものが上塗りされてしまう
+        if (index != undefined){
+			 material_id =  parseInt(index);
+			 //ajax
+		     $.get("<%= working_small_itemz_material_standard_select_path %>",
+               { material_id: material_id },
+			   function(data){ 
+                  //各種アイテム情報のセット
+			     setMaterialDetail(child_index);
+             });
+        }   
+        //upd end
+	  }
+  }
+  
   
   //更新前の確認
   function confirmBeforeSave(){
@@ -954,7 +1039,7 @@
     //"modal_working_small_item_name"
     
 	 if (e.keyCode == 13 && this_id != "modal_working_small_item_name"  ) {
-     //アイテムの移動はうまくいかないのでひとまず除外する
+     //アイテムの移動はうまくいかないのでひとまず除外する(入力途中のENTERでも移動してしまう)
      
      //if (e.keyCode == 13) {
 	//フォーカス移動はenterキー押下時のみ
@@ -1030,8 +1115,6 @@
   
   
   //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
-  //add171113
-  //ajax部分はサブルーチンにしたほうがいいかも？？
   function searchItemCode(t){
    
        child_index = t.id;
@@ -1049,10 +1132,35 @@
 		
              {material_code: itemCode},
           function(data){
-          
-		      //各種アイテム情報のセット
-              setMaterialDetail(child_index);
+            
+              //各種アイテム情報のセット
+              //setMaterialDetail(child_index);
+              setMaterialDetailCode(child_index);
 
+          }
+       );
+  }	
+  
+  //商品選択時にインデックスを取得、更にプルダウンと照合する
+  //add180213
+  function searchItemId(t){
+   
+       child_index = t.id;
+	   
+	   //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+	   child_index = child_index.slice(29);  //upd171208
+	      
+	   var itemId = t.value;
+	   
+    	//商品コードからマスターより一致するコード検索し、あれば自動でセットする。
+        $.get("<%= working_small_itemz_material_standard_select_path %>",
+		
+             {material_id: itemId},
+          function(data){
+          
+		      //各種アイテム情報のセット(共通js)
+              //setMaterialDetail(child_index);
+              setWorkingSmallItemDetail(child_index, 1);
           }
        );
   }	
