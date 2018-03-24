@@ -76,6 +76,7 @@ gem 'jquery-ui-rails'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.6'
+#gem 'rails', '5.0.1'
 # Use mysql as the database for Active Record
 gem 'mysql2', '>= 0.3.13', '< 0.5'
 # Use SCSS for stylesheets
@@ -99,8 +100,12 @@ gem 'rails-assets-typehead.js', source:'https://rails-assets.org'
 
 # 日時を操作するためのライブラリ
 gem 'momentjs-rails'
+#gem 'momentjs-rails', '2.11.1',  :github => 'derekprior/momentjs-rails'
+
 # DateTimePicker
 gem 'datetimepicker-rails', github:'zpaulovics/datetimepicker-rails', branch:'master', submodules: true
+#gem 'datetimepicker-rails', git: 'git://github.com/zpaulovics/datetimepicker-rails', tag: 'v1.0.0'
+
 # gem 'bootstrap3-datetimepicker-rails', '~> 4.17.42'
 
 # シンプルフォーム

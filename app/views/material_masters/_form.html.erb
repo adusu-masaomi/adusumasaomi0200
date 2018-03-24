@@ -30,23 +30,29 @@
   <%= f.label :メーカー, {:class => "my-custom-class-l", :id => 'MakerMaster'} %></br>
   <%= f.collection_select :maker_id,  MakerMaster.all, :id, :maker_name, {:prompt => "どれか一つを選択して下さい",:validate => true} ,
       {:id => 'maker_id', class: "searchableSelect2_1",  style: 'width:220px'} %></br>
-  <!--<%= f.label :単位, {:class => "my-custom-class-l"} %></br>-->
-  <!--<%= f.collection_select :unit_id,  UnitMaster.all, :id, :unit_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , { :class => "my-custom-class" } %>-->
-  <%= f.input :list_price, input_html:{ :tabindex=>"3" } %>
+  
+  </br>
+  <!--upd180316 標準単位としてリストア-->
+  <%= f.label :標準単位, {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :unit_id,  UnitMaster.all, :id, :unit_name, {:prompt => "どれか一つを選択して下さい",:validate => true} , 
+       { :id => 'unit_id', class: "searchableSelect2_2",  style: 'width:220px' } %>
+  <!---->
+  
+  <%= f.input :list_price, input_html:{ :tabindex=>"4" } %>
   
   <%= f.label_tag :inventory_category_id, '在庫品目(*在庫管理する場合のみ登録して下さい。)' , { style: 'margin-left:-15px' }%></br>
   <%= f.select :inventory_category_id, Inventory.category, {:include_blank => true}, 
-      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"4", 
+      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"5", 
        style: 'width:140px;margin-left:-15px;font-size:16px;background-color:#ffffff;' } %>
 	   
-   <%= f.input :standard_quantity, input_html:{ :tabindex=>"5" } %>
-   <%= f.input :standard_labor_productivity_unit, input_html:{ :tabindex=>"6" } %>
+   <%= f.input :standard_quantity, input_html:{ :tabindex=>"6" } %>
+   <%= f.input :standard_labor_productivity_unit, input_html:{ :tabindex=>"7" } %>
 	
-  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので（原則的に）入力不要です。", input_html:{ :tabindex=>"7"} %>
+  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので（原則的に）入力不要です。", input_html:{ :tabindex=>"8"} %>
   <%= f.input :last_unit_price_update_at, default: Date.strptime("2000/01/01", "%Y/%m/%d"), 
      hint: "*仕入データ登録後に自動反映されるので入力不要です。", input_html:{ :readonly => true } %>
 
-  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"8" %>
+  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"9" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 material_masters_path, :class => 'btn btn-white_rsd' %>
     
@@ -61,6 +67,9 @@
 	   //メーカー--select2のタブインデックスはここで指定しておく。
        $(".searchableSelect2_1").select2({ theme: "bootstrap" }).on("load", function(e) { 
         $(this).prop('tabindex',2)}).trigger('load');
+       //単位
+       $(".searchableSelect2_2").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',3)}).trigger('load');
 
   });
 

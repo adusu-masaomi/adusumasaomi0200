@@ -21,7 +21,7 @@
   <!--<%= f.text_field :working_small_item_code , :style => 'width:100px', :tabindex=> (16 + (f.options[:child_index] *7)).to_s , :onkeyup => "focusNextModal(this, event, 'modal_working_small_item_code', 'modal_working_small_item_name')",  
      :id => "modal_working_small_item_code" << f.options[:child_index].to_s, :onchange =>  "searchItemCode(this)" %>-->
   
-  <%= f.collection_select :working_small_item_code, MaterialMaster.all, :material_code, :material_code, {:include_blank => true} , 
+  <%= f.collection_select :working_small_item_code, MaterialMaster.all, :material_code, :material_code, {:include_blank => true, :selected => f.object.working_small_item_code || nil} , 
     {class: "searchInsertMaterial" , id: "modal_working_small_item_code" << f.options[:child_index].to_s ,  style: 'width:150px;ime-mode:inactive' } %>
   
   

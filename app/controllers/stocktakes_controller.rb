@@ -111,8 +111,14 @@ class StocktakesController < ApplicationController
       if  iv.material_master.inventory_category_id == category
 	  #カテゴリー一致？
 	    
-		stocktake_params = { stocktake_date: params[:q][:stocktake_date_gteq], material_master_id: iv.material_master_id, 
-                             inventory_id: iv.id, physical_quantity: iv.current_quantity, unit_price: iv.current_unit_price, 
+		#stocktake_params = { stocktake_date: params[:q][:stocktake_date_gteq], material_master_id: iv.material_master_id, 
+        #                     inventory_id: iv.id, physical_quantity: iv.current_quantity, unit_price: iv.current_unit_price, 
+        #                     physical_amount: iv.inventory_amount, book_quantity: iv.current_quantity, book_amount: iv.inventory_amount }
+        
+        #upd180322
+        #在庫数は"現在数量"ではなく"在庫数"を持ってくるようにする
+        stocktake_params = { stocktake_date: params[:q][:stocktake_date_gteq], material_master_id: iv.material_master_id, 
+                             inventory_id: iv.id, physical_quantity: iv.inventory_quantity, unit_price: iv.current_unit_price, 
                              physical_amount: iv.inventory_amount, book_quantity: iv.current_quantity, book_amount: iv.inventory_amount }
 		
 		#データへ新規登録

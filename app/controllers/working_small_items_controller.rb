@@ -111,7 +111,7 @@ class WorkingSmallItemsController < ApplicationController
 	 
 	   #数量
 	   @quantity = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:standard_quantity).flatten.join(",")
-	 
+	   #
        if @quantity.blank?   #未登録(null)なら１をセット
          @quantity = 1
        end

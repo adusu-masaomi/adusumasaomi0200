@@ -63,13 +63,13 @@
 			
         <!--実行材料費 -->
         <b><%= f.input :execution_material_unit_price, input_html:{id:'execution_material_unit_price',
-               :tabindex=>"10", style: 'width:500px;color:blue', :onchange => "calcMaterialUnitPrice()"} %>
+               :tabindex=>"10", style: 'width:500px;color:blue', :onchange => "calcWorkingMiddleItemMaterialUnitPrice()"} %>
 		<%= link_to "明細", "#" ,
             :class => 'btn btn-teal500_rsd btn-xs' , :style => "width:70px;margin-top:-15px;margin-left:415px;", :onclick => 'dispDiv()' %>	 
         </b>
         <!--歩掛り-->
 		<b><%= f.input :labor_productivity_unit, input_html:{id:"labor_productivity_unit", style: 'width:500px;color:brown', 
-			:onchange => "calcLaborCost()", :tabindex=>"11" } %>
+			:onchange => "calcWorkingMiddleItemLaborCost()", :tabindex=>"11" } %>
 		<%= link_to "明細", "#" ,
             :class => 'btn btn-teal500_rsd btn-xs' , :style => "width:70px;margin-top:-15px;margin-left:415px;", :onclick => 'dispDiv()' %>
         </b>
@@ -447,7 +447,7 @@
 	  }
 	  
 	  //add171031
-	  calcMaterialUnitPrice();
+	  calcWorkingMiddleItemMaterialUnitPrice();
 	}
   }
   
@@ -508,7 +508,10 @@
 	    //
 		
 		
-		calcMaterialPrice(child_index,quantity,unit_price);
+		//calcMaterialPrice(child_index,quantity,unit_price);
+        //upd180316
+        //共通jsへ移行。
+        calcWorkingSmallItemMaterialPrice(child_index,quantity,unit_price);
     }
   }
   
@@ -728,62 +731,53 @@
     }   
   }
   
+  //共通化
   //金額計算(材料費)
-  function calcMaterialUnitPrice()
-  {
-     var obj = document.getElementById("execution_material_unit_price").value;
-     var num = obj * 1.35;
-     num = floatFormat( num, 4 ) ;
-	 
-	 document.getElementById("material_unit_price").value = num;
-     
-     var obj2 = document.getElementById("labor_productivity_unit").value;
-	 //if (obj2 > 0){  del171107 歩掛なくても計算するケース有り
-	   //金額計算(実行労務単価、労務単価)
-       calcLaborCost();
-	 //}
-  }
+  //function calcMaterialUnitPrice()
+  //{
+  //   var obj = document.getElementById("execution_material_unit_price").value;
+  //   var num = obj * 1.35;
+  //   num = floatFormat( num, 4 ) ;
+//	 
+//	 document.getElementById("material_unit_price").value = num;
+  //   
+  //   var obj2 = document.getElementById("labor_productivity_unit").value;
+//	 //if (obj2 > 0){  del171107 歩掛なくても計算するケース有り
+//	   //金額計算(実行労務単価、労務単価)
+  //     calcLaborCost();
+//	 //}
+  //}
   
   //金額計算(実行労務単価、労務単価)
-  function calcLaborCost()
-  {
-    var obj = document.getElementById("labor_productivity_unit").value;
-    //del171107 歩掛なくても計算するケース有り
-	if (obj == "") {
-	  obj = 0;
-	}
-	
-	//if (obj > 0) {
-	  //実行労務単価
-	  document.getElementById("execution_labor_unit_price").value = obj * 11000;
-      //労務単価
-      document.getElementById("labor_unit_price").value = obj * 15000;
-      //実行単価
-	  //add171107
-	  if (document.getElementById("execution_labor_unit_price").value == ""){
-	    document.getElementById("execution_labor_unit_price").value = 0;
-      }
-      document.getElementById("execution_unit_price").value =
-      parseFloat(document.getElementById("execution_material_unit_price").value) + 
-	  parseFloat(document.getElementById("execution_labor_unit_price").value);
-	  //単価
-	  //add171107
-	  if (document.getElementById("labor_unit_price").value == ""){
-	    document.getElementById("labor_unit_price").value = 0;
-      }
-	  document.getElementById("working_unit_price").value =
-	  parseFloat(document.getElementById("material_unit_price").value) + parseFloat(document.getElementById("labor_unit_price").value);
-	  
-	//}
-	
-    //var num = f.labor_unit_price.value * f.labor_productivity_unit.value;
-    //小数点以下を四捨五入
-    //f.labor_cost_total.value = Math.round(num);
-    
-    //if (f.material_cost_total.value > 0){
-    //   calcOtherCost(f);
-    //}  
-  }
+  //function calcLaborCost()
+  //{
+  //  var obj = document.getElementById("labor_productivity_unit").value;
+  //  //del171107 歩掛なくても計算するケース有り
+//	if (obj == "") {
+//	  obj = 0;
+//	}
+//	
+//	  //実行労務単価
+//	  document.getElementById("execution_labor_unit_price").value = obj * 11000;
+  //    //労務単価
+//      document.getElementById("labor_unit_price").value = obj * 15000;
+//      //実行単価
+//	  //add171107
+//	  if (document.getElementById("execution_labor_unit_price").value == ""){
+//	    document.getElementById("execution_labor_unit_price").value = 0;
+  //    }
+//      document.getElementById("execution_unit_price").value =
+//      parseFloat(document.getElementById("execution_material_unit_price").value) + 
+//	  parseFloat(document.getElementById("execution_labor_unit_price").value);
+//	  //単価
+//	  //add171107
+//	  if (document.getElementById("labor_unit_price").value == ""){
+//	    document.getElementById("labor_unit_price").value = 0;
+  //    }
+//	  document.getElementById("working_unit_price").value =
+//	  parseFloat(document.getElementById("material_unit_price").value) + parseFloat(document.getElementById("labor_unit_price").value);
+//  }
+
   //金額計算(実行単価、単価のみ--労務単価が無いケースもあり)  add171107
   function calcUnitPriceOnly()
   {
@@ -943,7 +937,11 @@
 	var child_index = t.id;
 	value = this_id;
 	child_index = child_index.replace(new RegExp(value, 'g'), "" ) ;
-	  
+	
+    //add180318
+    //掛率を逆算
+    calcWorkingSmallItemBackRate(child_index, value);
+    
 	//数量・単価の変更の場合は資材費を再計算させる
 	PrepareCalcMaterialPrice(child_index, value);
 		
@@ -1008,7 +1006,8 @@
   if (obj != null){
 	var index = parseInt(obj);
 	
-    var attributes_name = getAttributesName(form_flag);
+    //var attributes_name = getAttributesName(form_flag);
+    var attributes_name = getWorkingSmallItemAttributesName(form_flag);
     
     nm = attributes_name + "[" + child_index + "][working_small_item_id]"
 	document.getElementsByName(nm)[0].value = index; 

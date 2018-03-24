@@ -322,13 +322,13 @@ class WorkingSpecificMiddleItemsController < ApplicationController
 		  
 		    if item[:working_small_item_id] == "1"
 		    #手入力の場合→新規登録
+			 
+              material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
+			     list_price: item[:unit_price], maker_id: item[:maker_master_id] }
+                 
 			  #material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
-			  #   maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], last_unit_price: item[:unit_price], 
-			#	 standard_labor_productivity_unit: item[:labor_productivity_unit]}
-			  
-			  material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
-			     maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
-				 standard_labor_productivity_unit: item[:labor_productivity_unit]}
+			  #   maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
+			  #  standard_labor_productivity_unit: item[:labor_productivity_unit]}
 				 
 			     
                  @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
@@ -340,10 +340,16 @@ class WorkingSpecificMiddleItemsController < ApplicationController
 		      @material_master = MaterialMaster.find(item[:working_small_item_id])
 			
 			  if @material_master.present?
-			    material_master_params = {standard_quantity: item[:quantity], 
-			     standard_labor_productivity_unit: item[:labor_productivity_unit],
-				 material_name: item[:working_small_item_name], 
-				 standard_quantity: item[:quantity], list_price: item[:unit_price]}
+			    
+                #upd180316
+                #品名・メーカーのみ登録とする
+                material_master_params = {material_name: item[:working_small_item_name], 
+				 maker_id: item[:maker_master_id] }
+                 
+                #material_master_params = {standard_quantity: item[:quantity], 
+			    # standard_labor_productivity_unit: item[:labor_productivity_unit],
+				# material_name: item[:working_small_item_name], 
+				# standard_quantity: item[:quantity], list_price: item[:unit_price]}
 			  
 			      @material_master.update(material_master_params)
 			  end

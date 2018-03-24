@@ -11,70 +11,111 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180223022929) do
+ActiveRecord::Schema.define(version: 20180226013239) do
 
   create_table "account_account_title", force: :cascade do |t|
+    t.integer  "order",             limit: 4,                 null: false
     t.string   "name",              limit: 255,               null: false
     t.integer  "trade_division_id", limit: 4,                 null: false
     t.datetime "created_at",                    precision: 6
     t.datetime "update_at",                     precision: 6
   end
 
+  create_table "account_authuser", force: :cascade do |t|
+    t.string   "password",     limit: 128,               null: false
+    t.datetime "last_login",               precision: 6
+    t.boolean  "is_superuser",                           null: false
+    t.string   "username",     limit: 30,                null: false
+    t.string   "last_name",    limit: 30,                null: false
+    t.string   "first_name",   limit: 30,                null: false
+    t.string   "email",        limit: 254
+    t.datetime "date_joined",              precision: 6, null: false
+    t.boolean  "is_active",                              null: false
+    t.boolean  "is_staff",                               null: false
+  end
+
+  add_index "account_authuser", ["username"], name: "username", unique: true, using: :btree
+
+  create_table "account_authuser_groups", force: :cascade do |t|
+    t.integer "authuser_id", limit: 4, null: false
+    t.integer "group_id",    limit: 4, null: false
+  end
+
+  add_index "account_authuser_groups", ["authuser_id", "group_id"], name: "account_authuser_groups_authuser_id_468b0d77_uniq", unique: true, using: :btree
+  add_index "account_authuser_groups", ["group_id"], name: "account_authuser_groups_group_id_b724de06_fk_auth_group_id", using: :btree
+
+  create_table "account_authuser_user_permissions", force: :cascade do |t|
+    t.integer "authuser_id",   limit: 4, null: false
+    t.integer "permission_id", limit: 4, null: false
+  end
+
+  add_index "account_authuser_user_permissions", ["authuser_id", "permission_id"], name: "account_authuser_user_permissions_authuser_id_ade6be9f_uniq", unique: true, using: :btree
+  add_index "account_authuser_user_permissions", ["permission_id"], name: "account_authuser_us_permission_id_6812ac4a_fk_auth_permission_id", using: :btree
+
   create_table "account_bank", force: :cascade do |t|
+    t.integer  "order",      limit: 4,                 null: false
     t.string   "name",       limit: 255,               null: false
     t.datetime "created_at",             precision: 6
     t.datetime "update_at",              precision: 6
   end
 
   create_table "account_bank_branch", force: :cascade do |t|
+    t.integer  "order",      limit: 4,                 null: false
     t.string   "name",       limit: 255,               null: false
-    t.integer  "bank_id",    limit: 4
     t.datetime "created_at",             precision: 6
     t.datetime "update_at",              precision: 6
+    t.integer  "bank_id",    limit: 4
   end
 
-  add_index "account_bank_branch", ["bank_id"], name: "account_bank_branch_0b0af02d", using: :btree
+  add_index "account_bank_branch", ["bank_id"], name: "account_bank_branch_bank_id_5343d462_fk_account_bank_id", using: :btree
 
   create_table "account_partner", force: :cascade do |t|
-    t.string   "name",              limit: 255,               null: false
-    t.integer  "trade_division_id", limit: 4,                 null: false
-    t.integer  "account_title_id",  limit: 4,                 null: false
-    t.integer  "payment_method_id", limit: 4,                 null: false
-    t.string   "bank_name",         limit: 255,               null: false
-    t.string   "branch_name",       limit: 255,               null: false
-    t.integer  "account_type",      limit: 4,                 null: false
-    t.integer  "account_number",    limit: 4,                 null: false
-    t.integer  "pay_day",           limit: 4,                 null: false
-    t.boolean  "pay_month_flag_1",                            null: false
-    t.boolean  "pay_month_flag_10",                           null: false
-    t.boolean  "pay_month_flag_11",                           null: false
-    t.boolean  "pay_month_flag_12",                           null: false
-    t.boolean  "pay_month_flag_2",                            null: false
-    t.boolean  "pay_month_flag_3",                            null: false
-    t.boolean  "pay_month_flag_4",                            null: false
-    t.boolean  "pay_month_flag_5",                            null: false
-    t.boolean  "pay_month_flag_6",                            null: false
-    t.boolean  "pay_month_flag_7",                            null: false
-    t.boolean  "pay_month_flag_8",                            null: false
-    t.boolean  "pay_month_flag_9",                            null: false
-    t.integer  "pay_day_division",  limit: 4,                 null: false
-    t.integer  "bank_id",           limit: 4
-    t.integer  "bank_branch_id",    limit: 4
-    t.datetime "created_at",                    precision: 6
-    t.datetime "update_at",                     precision: 6
+    t.integer  "order",               limit: 4,                 null: false
+    t.string   "administrative_name", limit: 255,               null: false
+    t.string   "name",                limit: 255,               null: false
+    t.integer  "trade_division_id",   limit: 4,                 null: false
+    t.integer  "payment_method_id",   limit: 4
+    t.string   "bank_name",           limit: 255,               null: false
+    t.string   "branch_name",         limit: 255,               null: false
+    t.integer  "account_type",        limit: 4
+    t.string   "account_number",      limit: 16,                null: false
+    t.integer  "pay_day",             limit: 4,                 null: false
+    t.integer  "pay_day_division",    limit: 4,                 null: false
+    t.boolean  "pay_month_flag_1",                              null: false
+    t.boolean  "pay_month_flag_2",                              null: false
+    t.boolean  "pay_month_flag_3",                              null: false
+    t.boolean  "pay_month_flag_4",                              null: false
+    t.boolean  "pay_month_flag_5",                              null: false
+    t.boolean  "pay_month_flag_6",                              null: false
+    t.boolean  "pay_month_flag_7",                              null: false
+    t.boolean  "pay_month_flag_8",                              null: false
+    t.boolean  "pay_month_flag_9",                              null: false
+    t.boolean  "pay_month_flag_10",                             null: false
+    t.boolean  "pay_month_flag_11",                             null: false
+    t.boolean  "pay_month_flag_12",                             null: false
+    t.integer  "fixed_content_id",    limit: 4
+    t.integer  "rough_estimate",      limit: 4
+    t.integer  "fixed_cost",          limit: 4
+    t.datetime "created_at",                      precision: 6
+    t.datetime "update_at",                       precision: 6
+    t.integer  "account_title_id",    limit: 4
+    t.integer  "bank_id",             limit: 4
+    t.integer  "bank_branch_id",      limit: 4
   end
 
-  add_index "account_partner", ["bank_branch_id"], name: "account_partner_a5ad8034", using: :btree
-  add_index "account_partner", ["bank_id"], name: "account_partner_0b0af02d", using: :btree
+  add_index "account_partner", ["account_title_id"], name: "account_pa_account_title_id_83c0e560_fk_account_account_title_id", using: :btree
+  add_index "account_partner", ["bank_branch_id"], name: "account_partne_bank_branch_id_89ec6121_fk_account_bank_branch_id", using: :btree
+  add_index "account_partner", ["bank_id"], name: "account_partner_bank_id_4b4698ec_fk_account_bank_id", using: :btree
 
   create_table "account_payment", force: :cascade do |t|
+    t.integer  "order",              limit: 4,                 null: false
     t.date     "billing_year_month",                           null: false
     t.integer  "trade_division_id",  limit: 4
-    t.integer  "billing_amount",     limit: 4,                 null: false
-    t.integer  "payment_method_id",  limit: 4,                 null: false
+    t.integer  "billing_amount",     limit: 4
+    t.integer  "rough_estimate",     limit: 4
+    t.integer  "payment_method_id",  limit: 4
     t.date     "payment_due_date"
     t.date     "payment_date"
-    t.boolean  "fixed_cost",                                   null: false
     t.string   "note",               limit: 255,               null: false
     t.datetime "created_at",                     precision: 6
     t.datetime "update_at",                      precision: 6
@@ -380,7 +421,7 @@ ActiveRecord::Schema.define(version: 20180223022929) do
   end
 
   add_index "django_admin_log", ["content_type_id"], name: "django_admin__content_type_id_c4bce8eb_fk_django_content_type_id", using: :btree
-  add_index "django_admin_log", ["user_id"], name: "django_admin_log_user_id_c564eba6_fk_auth_user_id", using: :btree
+  add_index "django_admin_log", ["user_id"], name: "django_admin_log_user_id_c564eba6_fk_account_authuser_id", using: :btree
 
   create_table "django_content_type", force: :cascade do |t|
     t.string "app_label", limit: 100, null: false
@@ -629,6 +670,7 @@ ActiveRecord::Schema.define(version: 20180223022929) do
     t.integer  "supplier_id",                limit: 4
     t.integer  "inventory_division_id",      limit: 4
     t.integer  "unit_price_not_update_flag", limit: 4
+    t.integer  "purchase_header_id",         limit: 4
     t.string   "notes",                      limit: 255
     t.datetime "created_at",                             null: false
     t.datetime "update_at",                              null: false
@@ -642,10 +684,10 @@ ActiveRecord::Schema.define(version: 20180223022929) do
   end
 
   create_table "purchase_headers", force: :cascade do |t|
-    t.string   "slip_code",         limit: 255
-    t.integer  "registration_flag", limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.string   "slip_code",     limit: 255
+    t.integer  "complete_flag", limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
   create_table "purchase_order_data", force: :cascade do |t|
@@ -1191,6 +1233,9 @@ ActiveRecord::Schema.define(version: 20180223022929) do
     t.float    "unit_price",                      limit: 24
     t.float    "rate",                            limit: 24
     t.integer  "quantity",                        limit: 4
+    t.float    "material_price",                  limit: 24
+    t.integer  "maker_master_id",                 limit: 4
+    t.integer  "unit_master_id",                  limit: 4
     t.float    "labor_productivity_unit",         limit: 24
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
@@ -1263,7 +1308,12 @@ ActiveRecord::Schema.define(version: 20180223022929) do
     t.datetime "updated_at",                    null: false
   end
 
+  add_foreign_key "account_authuser_groups", "account_authuser", column: "authuser_id", name: "account_authuser_gro_authuser_id_e424ce42_fk_account_authuser_id"
+  add_foreign_key "account_authuser_groups", "auth_group", column: "group_id", name: "account_authuser_groups_group_id_b724de06_fk_auth_group_id"
+  add_foreign_key "account_authuser_user_permissions", "account_authuser", column: "authuser_id", name: "account_authuser_use_authuser_id_6e7eeb5d_fk_account_authuser_id"
+  add_foreign_key "account_authuser_user_permissions", "auth_permission", column: "permission_id", name: "account_authuser_us_permission_id_6812ac4a_fk_auth_permission_id"
   add_foreign_key "account_bank_branch", "account_bank", column: "bank_id", name: "account_bank_branch_bank_id_5343d462_fk_account_bank_id"
+  add_foreign_key "account_partner", "account_account_title", column: "account_title_id", name: "account_pa_account_title_id_83c0e560_fk_account_account_title_id"
   add_foreign_key "account_partner", "account_bank", column: "bank_id", name: "account_partner_bank_id_4b4698ec_fk_account_bank_id"
   add_foreign_key "account_partner", "account_bank_branch", column: "bank_branch_id", name: "account_partne_bank_branch_id_89ec6121_fk_account_bank_branch_id"
   add_foreign_key "account_payment", "account_account_title", column: "account_title_id", name: "account_pa_account_title_id_de8d3cfe_fk_account_account_title_id"
@@ -1275,6 +1325,6 @@ ActiveRecord::Schema.define(version: 20180223022929) do
   add_foreign_key "auth_user_groups", "auth_user", column: "user_id", name: "auth_user_groups_user_id_6a12ed8b_fk_auth_user_id"
   add_foreign_key "auth_user_user_permissions", "auth_permission", column: "permission_id", name: "auth_user_user_perm_permission_id_1fbb5f2c_fk_auth_permission_id"
   add_foreign_key "auth_user_user_permissions", "auth_user", column: "user_id", name: "auth_user_user_permissions_user_id_a95ead1b_fk_auth_user_id"
-  add_foreign_key "django_admin_log", "auth_user", column: "user_id", name: "django_admin_log_user_id_c564eba6_fk_auth_user_id"
+  add_foreign_key "django_admin_log", "account_authuser", column: "user_id", name: "django_admin_log_user_id_c564eba6_fk_account_authuser_id"
   add_foreign_key "django_admin_log", "django_content_type", column: "content_type_id", name: "django_admin__content_type_id_c4bce8eb_fk_django_content_type_id"
 end

@@ -33,7 +33,7 @@
      :id => "modal_working_small_item_code" << f.options[:child_index].to_s , :onchange =>  "searchItemCode(this)" %>-->
   
   <!--upd 180213-->
-  <%= f.collection_select :working_small_item_code, MaterialMaster.all, :material_code, :material_code, {:include_blank => true} , 
+  <%= f.collection_select :working_small_item_code, MaterialMaster.all, :material_code, :material_code, {:include_blank => true , :selected => f.object.working_small_item_code || nil} , 
     {class: "searchInsertMaterial" , id: "modal_working_small_item_code" << f.options[:child_index].to_s ,  style: 'width:150px;ime-mode:inactive' } %>
   
   <%= f.label :working_small_item_name, "品名手入力:"%>
@@ -70,8 +70,9 @@
       :onkeyup => "focusNextModal(this, event, 'modal_rate', 'modal_material_price')", id:'modal_rate' << f.options[:child_index].to_s  %>
   
   <%= f.label :material_price, "資材費:" %>
+  <!--upd180315 onkeyupに変更-->
   <%= f.text_field :material_price , :style => 'width:70px; text-align:right;ime-mode:disabled;' , :tabindex => (22 + (f.options[:child_index] * 7)).to_s, 
-       :onkeydown => "focusNextModal(this, event, 'modal_material_price', 'modal_labor_productivity_unit')", 
+       :onkeyup => "focusNextModal(this, event, 'modal_material_price', 'modal_labor_productivity_unit')", 
         id:'modal_material_price' << f.options[:child_index].to_s , name: "material_price[]" %>
   
   <%= f.label :labor_productivity_unit, "歩掛:" %>

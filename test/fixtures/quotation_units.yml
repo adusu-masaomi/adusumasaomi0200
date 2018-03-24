@@ -1,7 +1,0 @@
-# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
-
-one:
-  quotation_unit_name: MyString
-
-two:
-  quotation_unit_name: MyString

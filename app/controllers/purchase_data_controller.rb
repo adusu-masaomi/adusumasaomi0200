@@ -78,7 +78,7 @@ class PurchaseDataController < ApplicationController
           end
 		end
 		
-		#@q = PurchaseDatum.ransack(params[:q]) 
+        #@q = PurchaseDatum.ransack(params[:q]) 
         #ransack保持用--上記はこれに置き換える
 		@q = PurchaseDatum.ransack(query)
 		
@@ -93,6 +93,15 @@ class PurchaseDataController < ApplicationController
 
 	@purchase_data = @q.result(distinct: true)
 	
+    #add180324
+    ###
+    #仕入区分のみで検索をした場合は、"入庫"は除外する(在庫区分がヌルの場合のみ検索)。納品書チェックしたい場合等。
+    if params[:q].present? && 
+       params[:q][:division_id_eq] == $INDEX_DIVISION_PURCHASE.to_s && params[:q][:inventory_division_id_eq] == ""
+      @purchase_data = @purchase_data.where(:inventory_division_id => nil)
+    end
+    ###
+    
 	#kaminari用設定。
 	@purchase_data = @purchase_data.page(params[:page])
 	
@@ -463,14 +472,24 @@ class PurchaseDataController < ApplicationController
   def update_material_master
       
 	  if @material_masters.present? && (@material_masters.material_name != params[:purchase_datum][:material_name] ||
-	                                   @material_masters.material_code != params[:purchase_datum][:material_code])
-	    if @material_masters.id != 1  #手入力以外
+	                                   @material_masters.material_code != params[:purchase_datum][:material_code] ||
+                                       @material_masters.unit_id != params[:purchase_datum][:unit_id])
+	    
+        if @material_masters.id != 1  #手入力以外
           #更新
 		  @materials = MaterialMaster.find(params[:purchase_datum][:material_id])
 		
 	      #品番は、異なった場合はそのまま上書きする（別の品番としては原則、登録できない(ハイフン付与などの微調整と区別できないため。)）
-		  material_update_params = { material_code: params[:purchase_datum][:material_code],
+		  if params[:purchase_datum][:supplier_id].to_i != $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO
+               material_update_params = { material_code: params[:purchase_datum][:material_code],
 		                           material_name: params[:purchase_datum][:material_name] }
+          else
+               #add180316
+               #岡田電気の場合は、単位を資材マスターへ反映（見積の作業明細マスターに反映させるため）
+               material_update_params = { material_code: params[:purchase_datum][:material_code],
+		                           material_name: params[:purchase_datum][:material_name],
+                                   unit_id: params[:purchase_datum][:unit_id] }
+          end
 	      @materials.update(material_update_params)
 	    end
 	  end
@@ -482,8 +501,13 @@ class PurchaseDataController < ApplicationController
     params[:purchase_datum][:supplier_id], params[:purchase_datum][:material_id] ]).first
 
     if @purchase_unit_prices.present?
+      #purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+      #                  unit_price: params[:purchase_datum][:purchase_unit_price]}
+      #upd180316
+      #単位も更新
       purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
-                        unit_price: params[:purchase_datum][:purchase_unit_price]}
+                        unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
+      
       @purchase_unit_prices.update(purchase_unit_prices_params)
     else
     #該当なしの場合は新規追加  add180120

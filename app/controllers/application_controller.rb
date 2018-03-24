@@ -54,9 +54,8 @@ class ApplicationController < ActionController::Base
   $HEADER_CODE_MAX = "9999999999"
   
   #仕入区分
-  #$INDEX_DIVISION_STOCK = 5       #入庫
-  #$INDEX_DIVISION_SHIPPING = 6    #出庫
-  $INDEX_DIVISION_SHIPPING = 5    #出庫  upd170413
+  $INDEX_DIVISION_PURCHASE = 1    #仕入 add180324
+  $INDEX_DIVISION_SHIPPING = 5    #出庫 
   
   #在庫の区分
   $INDEX_INVENTORY_STOCK = 0       #入庫
@@ -83,4 +82,7 @@ class ApplicationController < ActionController::Base
   
   #労務単価定数
   $LABOR_COST = 11000
+  
+  $INDEX_SUPPLIER_OKADA = 2     #仕入先ID(岡田電気)
+  
 end

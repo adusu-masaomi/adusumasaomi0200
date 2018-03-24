@@ -173,12 +173,16 @@ class WorkingMiddleItemsController < ApplicationController
 	end
     
 	###
-    #検索パラメータの引継ぎ
-    if @@working_category_id.present?
-      @working_middle_item.working_middle_item_category_id = @@working_category_id
-    end
-    if @@working_subcategory_id.present?
-      @working_middle_item.working_subcategory_id = @@working_subcategory_id
+    if params[:move_flag].blank?   #add condition 180317
+      
+      #検索パラメータの引継ぎ(モーダル時のみ)
+      if @@working_category_id.present?
+        @working_middle_item.working_middle_item_category_id = @@working_category_id
+      end
+      if @@working_subcategory_id.present?
+        @working_middle_item.working_subcategory_id = @@working_subcategory_id
+      end
+    
     end
     ###
     
@@ -202,6 +206,10 @@ class WorkingMiddleItemsController < ApplicationController
     
     #明細マスターのパラメータ補正 
     set_params_replenishment
+    
+    #カテゴリーがなければ新たに作る
+    #add180318
+    create_category
   
     if params[:move_flag].blank?
 	#upd171128
@@ -294,6 +302,10 @@ class WorkingMiddleItemsController < ApplicationController
     
     #明細マスターのパラメータ補正 
     set_params_replenishment
+    
+    #カテゴリーがなければ新たに作る
+    #add180318
+    create_category
     
 	if params[:move_flag].blank?
 	#upd171128
@@ -472,12 +484,16 @@ class WorkingMiddleItemsController < ApplicationController
             if item[:working_small_item_id] == "1"
 		    #手入力の場合→新規登録
 			  
-              
+              #upd180316
+              #品番品名・定価・メーカーのみ登録。
               material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
-			     maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
-				 standard_labor_productivity_unit: item[:labor_productivity_unit],
-                 maker_id: item[:maker_master_id], 
-                 unit_id: item[:unit_master_id] }
+			     list_price: item[:unit_price], maker_id: item[:maker_master_id] }
+                 
+              #material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
+			  #   maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
+			#	 standard_labor_productivity_unit: item[:labor_productivity_unit],
+             #    maker_id: item[:maker_master_id], 
+             #    unit_id: item[:unit_master_id] }
 			     
                  if item[:working_small_item_code].present?  #add180131 品番がなければマスター反映させない。
                    @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
@@ -504,14 +520,17 @@ class WorkingMiddleItemsController < ApplicationController
 		      @material_master = MaterialMaster.find(item[:working_small_item_id])
 			  
 			  if @material_master.present?
-                #定価は更新しない
-                
-			    material_master_params = {standard_quantity: item[:quantity], 
-			     standard_labor_productivity_unit: item[:labor_productivity_unit], 
-				 material_name: item[:working_small_item_name], 
-				 standard_quantity: item[:quantity], list_price: item[:unit_price],
-                 maker_id: item[:maker_master_id], 
-                 unit_id: item[:unit_master_id] }
+                #upd180316
+                #品名・メーカーのみ登録とする
+                material_master_params = {material_name: item[:working_small_item_name], 
+				 maker_id: item[:maker_master_id] }
+			   
+			    #material_master_params = {standard_quantity: item[:quantity], 
+			    # standard_labor_productivity_unit: item[:labor_productivity_unit], 
+				# material_name: item[:working_small_item_name], 
+				# standard_quantity: item[:quantity], list_price: item[:unit_price],
+                # maker_id: item[:maker_master_id], 
+                # unit_id: item[:unit_master_id] }
 			  
 			      @material_master.update(material_master_params)
 			  end
@@ -524,6 +543,50 @@ class WorkingMiddleItemsController < ApplicationController
 	end
   
   end
+  
+  #カテゴリーがなければ新たに作る
+  #add180318
+  def create_category
+    @working_category = WorkingCategory.where(:id => params[:working_middle_item][:working_middle_item_category_id]).first
+    
+    if @working_category.nil?
+       #名称にID(カテゴリー名が入ってくる--やや強引？)をセット、seqは最大値+1をセットする。
+       working_category_params = {category_name: params[:working_middle_item][:working_middle_item_category_id], 
+				 seq: WorkingCategory.maximum(:seq) + 1 }
+       @working_category = WorkingCategory.new(working_category_params)
+                     @working_category.save!(:validate => false)
+                     
+       if @working_category.present?
+         #明細マスターのカテゴリーIDを更新（パラメータ）
+         params[:working_middle_item][:working_middle_item_category_id] = @working_category.id
+       end
+    end
+    
+    #サブカテゴリーもなければ新たに作る
+    create_subcategory
+  end
+  #サブカテゴリーがなければ新たに作る
+  #add180318
+  def create_subcategory
+    @working_subcategory = WorkingSubcategory.where(:id => params[:working_middle_item][:working_subcategory_id], 
+                                                    :working_category_id => params[:working_middle_item][:working_middle_item_category_id]).first
+    
+    if @working_subcategory.nil?
+       #名称にID(カテゴリー名が入ってくる--やや強引？)をセット、seqは最大値+1をセットする。
+       working_subcategory_params = {working_category_id: params[:working_middle_item][:working_middle_item_category_id],
+                 name: params[:working_middle_item][:working_subcategory_id], 
+				 seq: WorkingSubcategory.maximum(:seq) + 1 }
+       @working_subcategory = WorkingSubcategory.new(working_subcategory_params)
+                     @working_subcategory.save!(:validate => false)
+                     
+       if @working_subcategory.present?
+         #明細マスターのカテゴリーIDを更新（パラメータ）
+         params[:working_middle_item][:working_subcategory_id] = @working_subcategory.id
+       end
+    end
+    
+  end
+  
   
   #手入力用IDの場合は、単位マスタへも登録する。
   #add171108
