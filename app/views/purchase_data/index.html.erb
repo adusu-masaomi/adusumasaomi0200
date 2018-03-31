@@ -22,7 +22,7 @@
   <%= f.label :maker_code, 'メーカー：：' %>
   <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %>
   <%= f.label :slip_code, '伝票No' %>
-  <%= f.text_field :slip_code_cont, include_blank: true, id: 'slip_code'  %>
+  <%= f.text_field :slip_code_eq, include_blank: true, id: 'slip_code'  %>
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSlipCode()" %>
   
   <%= f.label :supplier_id, '仕入先：：' %>

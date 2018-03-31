@@ -572,17 +572,19 @@ class WorkingMiddleItemsController < ApplicationController
                                                     :working_category_id => params[:working_middle_item][:working_middle_item_category_id]).first
     
     if @working_subcategory.nil?
-       #名称にID(カテゴリー名が入ってくる--やや強引？)をセット、seqは最大値+1をセットする。
-       working_subcategory_params = {working_category_id: params[:working_middle_item][:working_middle_item_category_id],
+      if WorkingSubcategory.maximum(:seq).present?   #add180331
+         #名称にID(カテゴリー名が入ってくる--やや強引？)をセット、seqは最大値+1をセットする。
+         working_subcategory_params = {working_category_id: params[:working_middle_item][:working_middle_item_category_id],
                  name: params[:working_middle_item][:working_subcategory_id], 
 				 seq: WorkingSubcategory.maximum(:seq) + 1 }
-       @working_subcategory = WorkingSubcategory.new(working_subcategory_params)
+         @working_subcategory = WorkingSubcategory.new(working_subcategory_params)
                      @working_subcategory.save!(:validate => false)
                      
-       if @working_subcategory.present?
-         #明細マスターのカテゴリーIDを更新（パラメータ）
-         params[:working_middle_item][:working_subcategory_id] = @working_subcategory.id
-       end
+         if @working_subcategory.present?
+           #明細マスターのカテゴリーIDを更新（パラメータ）
+           params[:working_middle_item][:working_subcategory_id] = @working_subcategory.id
+         end
+      end
     end
     
   end

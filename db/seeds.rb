@@ -8,10 +8,31 @@
 
 require "csv"
 
-CSV.foreach('db/contact.csv') do |row|
- Contact.create(:name => row[0], :company_name => row[1], :affiliation => row[2], :department => row[3], :post => row[4], :address => row[5], 
- :tel => row[6], :fax => row[7], :email => row[8], :url => row[9], :partner_division_id => row[10].to_i )
+#資材マスターの定価を更新する
+
+require 'date'
+update_date = '2017-10-01'.to_date  #カタログの更新日とする
+
+#日時型の場合
+#require 'time'
+#update_time = "2017-10-01 00:00:00 +0900"  #カタログの更新日とする
+#update_time_to_time = Time.parse(update_time)
+
+CSV.foreach('db/material_list_price_update_since_201710.csv') do |row|
+ 
+ @material_master = MaterialMaster.where(material_code:  row[0]).first
+ 
+ if @material_master.present?
+   material_params = {list_price: row[1].to_i, list_price_update_at: update_date }
+   @material_master.update(material_params)
+ end 
 end
+
+#del180329
+#CSV.foreach('db/contact.csv') do |row|
+# Contact.create(:name => row[0], :company_name => row[1], :affiliation => row[2], :department => row[3], :post => row[4], :address => row[5], 
+# :tel => row[6], :fax => row[7], :email => row[8], :url => row[9], :partner_division_id => row[10].to_i )
+#end
 
 #CSV.foreach('db/purchase.csv') do |row|
 # PurchaseDatum.create(:purchase_date => row[0], :slip_code => row[1], :purchase_order_datum_id => row[2], :construction_datum_id => row[3], :material_id => row[4], :material_name => row[5], :maker_id => row[6], :maker_name => row[7], :quantity => row[8], :unit_id => row[9], :purchase_unit_price => row[10], :purchase_amount => row[11], :list_price => row[12], :purchase_id => row[13], :division_id => row[14], :supplier_id => row[15]  )

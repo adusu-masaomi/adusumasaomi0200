@@ -486,6 +486,23 @@
         },
         "items": [
           {
+            "id": "fmeSituation",
+            "type": "rect",
+            "display": true,
+            "description": "",
+            "x": 720.9,
+            "y": 174.3,
+            "width": 92.5,
+            "height": 15,
+            "style": {
+              "border-color": "none",
+              "border-width": 1,
+              "border-style": "solid",
+              "fill-color": "#f79646"
+            },
+            "border-radius": 0
+          },
+          {
             "id": "invoice_date",
             "type": "text-block",
             "display": true,

@@ -18,10 +18,12 @@ class WorkingMiddleItem < ActiveRecord::Base
    attr_accessor :quantity_hide
    attr_accessor :unit_price_hide
    attr_accessor :labor_productivity_unit_hide
-   attr_accessor :material_price_hide  #add180201
-   attr_accessor :maker_id_hide        #add180201
-   attr_accessor :unit_master_id_hide  #add180201
-   attr_accessor :working_subcategory_select_hide #add180202
+   attr_accessor :material_price_hide  
+   attr_accessor :maker_id_hide        
+   attr_accessor :unit_master_id_hide  
+   attr_accessor :working_subcategory_select_hide 
+   
+   attr_accessor :list_price_color_hide  #add180331
    
    #明細合計用
    attr_accessor :material_cost_total

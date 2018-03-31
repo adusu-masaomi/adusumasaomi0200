@@ -131,14 +131,14 @@
         <%= f.input :quantity_hide, input_html:{id:'quantity_hide'}, as: :hidden  %>
 		<%= f.input :unit_price_hide, input_html:{id:'unit_price_hide'}, as: :hidden  %>
 		<%= f.input :labor_productivity_unit_hide, input_html:{id:'labor_productivity_unit_hide'}, as: :hidden  %>
-		<!--add180307-->
-        <%= f.input :material_price_hide, input_html:{id:'material_price_hide'}, as: :hidden  %>
+		<%= f.input :material_price_hide, input_html:{id:'material_price_hide'}, as: :hidden  %>
         <%= f.input :maker_id_hide, input_html:{id:'maker_id_hide'}, as: :hidden  %>
         <%= f.input :unit_master_id_hide, input_html:{id:'unit_master_id_hide'}, as: :hidden  %>
         <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
             {id:"working_subcategory_select_hide",  hidden: true  } %>
-        <!--add end-->
-		
+        <!--add180331-->
+        <%= f.input :list_price_color_hide, input_html:{id:'list_price_color_hide'}, as: :hidden  %>
+        
 		<!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。--> 
        <%= f.hidden_field_tag(:move_flag, params[:move_flag], {id: "move_flag"}) %>
        <!--見積関連パラメータ-->

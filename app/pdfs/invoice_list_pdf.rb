@@ -52,7 +52,13 @@ class InvoiceListPDF
           #binding.pry
 		    
 		    report.list(:default).add_row do |row|
-			      
+			  
+              #binding.pry
+              
+              #add180331
+              row.item(:fmeSituation).visible(false)
+              
+              
 			  #請求金額をフォーマット
 			  #@num = invoice_header.billing_amount
 			  #formatNum()
@@ -100,12 +106,19 @@ class InvoiceListPDF
 				
 			    set_subtotal
 				
-				
-			    report.list(:default).add_row  note: @note,
-						     billing_amount: @biling_amount_subtotal_formatted,
-							 commission: @commission_subtotal_formatted
-				
-							 
+				#report.list(:default).add_row  note: @note,
+				#		     billing_amount: @biling_amount_subtotal_formatted,
+				#			 commission: @commission_subtotal_formatted
+                
+                #upd180331
+                report.list(:default).add_row do |row2|
+                       row2.values  note: @note,
+						            billing_amount: @biling_amount_subtotal_formatted,
+							        commission: @commission_subtotal_formatted
+				       #add180331
+                       row2.item(:fmeSituation).visible(false)
+				end
+             
 			    @biling_amount_subtotal = 0
 				@commission_subtotal = 0
 			    
@@ -129,12 +142,24 @@ class InvoiceListPDF
 			  #
 		      if @year != "" && invoice_date.year != @year 
 			  #年ごとの小計(年またがりを考慮)
-			    set_total
+              
+                set_total
 				
-				report.list(:default).add_row  note: @note,
+				#report.list(:default).add_row  
+                #             row.values note: @note,
+			    #             billing_amount: @biling_amount_total_formatted,
+                #             commission: @commission_total_formatted
+                
+                #upd180331
+                report.list(:default).add_row do |row2| 
+                       row2.values note: @note,
 			                 billing_amount: @biling_amount_total_formatted,
                              commission: @commission_total_formatted
-				@biling_amount_subtotal = 0
+                        #add180331
+                       row2.item(:fmeSituation).visible(false)
+				end
+                
+                @biling_amount_subtotal = 0
 				@biling_amount_total = 0
 				@commission_subtotal = 0
 				@commission_total = 0
@@ -173,6 +198,12 @@ class InvoiceListPDF
 			  row.item(:line_upper).visible(false)
 			  row.item(:line_lower).visible(false)
 			  
+              
+              #add180331
+              if invoice_header.invoice_code.present? && invoice_header.payment_date.blank?
+                row.item(:fmeSituation).visible(true)
+              end
+              
 			  #明細行出力
 			  row.values invoice_code: invoice_header.invoice_code,
 			             invoice_date: invoice_date,
@@ -205,17 +236,30 @@ class InvoiceListPDF
 		  
 		  set_subtotal
 		  
-	      report.list(:default).add_row  note: @note,
+	      #report.list(:default).add_row  note: @note,
+		  #       billing_amount: @biling_amount_subtotal_formatted,
+		  #                 commission: @commission_subtotal_formatted
+          
+          report.list(:default).add_row  do |row2|
+                   row2.values note: @note,
 						   billing_amount: @biling_amount_subtotal_formatted,
 			               commission: @commission_subtotal_formatted
+                   row2.item(:fmeSituation).visible(false)
+          end
         end
 		#合計
 		set_total
 		
-        report.list(:default).add_row  note: @note,
-						   billing_amount: @biling_amount_total_formatted,
-						   commission: @commission_total_formatted
-					   
+        #report.list(:default).add_row  note: @note,
+		#				   billing_amount: @biling_amount_total_formatted,
+		#				   commission: @commission_total_formatted
+        #upd180331
+        report.list(:default).add_row do |row2|
+                row2.values note: @note,
+						    billing_amount: @biling_amount_total_formatted,
+						    commission: @commission_total_formatted
+                row2.item(:fmeSituation).visible(false)
+	    end
 	
 		
         # ThinReports::Reportを返す

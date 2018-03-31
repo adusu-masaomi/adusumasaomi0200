@@ -129,13 +129,14 @@
         <%= f.input :quantity_hide, input_html:{id:'quantity_hide'}, as: :hidden  %>
 		<%= f.input :unit_price_hide, input_html:{id:'unit_price_hide'}, as: :hidden  %>
 		<%= f.input :labor_productivity_unit_hide, input_html:{id:'labor_productivity_unit_hide'}, as: :hidden  %>
-        <!--add180201-->
         <%= f.input :material_price_hide, input_html:{id:'material_price_hide'}, as: :hidden  %>
         <%= f.input :maker_id_hide, input_html:{id:'maker_id_hide'}, as: :hidden  %>
         <%= f.input :unit_master_id_hide, input_html:{id:'unit_master_id_hide'}, as: :hidden  %>
         <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
             {id:"working_subcategory_select_hide",  hidden: true  } %>
-        <!--add end-->
+        <!--add180331-->
+        <%= f.input :list_price_color_hide, input_html:{id:'list_price_color_hide'}, as: :hidden  %>
+        
         <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。--> 
        <%= f.hidden_field_tag(:move_flag, params[:move_flag], {id: "move_flag"}) %>
        <%= f.hidden_field_tag(:quotation_header_id, params[:quotation_header_id]) %>
@@ -542,8 +543,11 @@
 	  if (obj != null){
 	    var index = parseInt(obj);
 	    nm = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_id]"
-	    document.getElementsByName(nm)[0].value = index; 
-        
+	    
+        //add180331
+        if (document.getElementsByName(nm)[0] != null) {
+          document.getElementsByName(nm)[0].value = index; 
+        }
         //ここでsetMaterialDetailがコールされる。
         //$(".searchableMaterial").trigger("change"); 
         
@@ -555,7 +559,10 @@
                { material_id: material_id },
 			   function(data){ 
                   //各種アイテム情報のセット
-			     setMaterialDetail(child_index);
+			     //setMaterialDetail(child_index);
+                 
+                 //upd180331
+                 setWorkingSmallItemDetail(child_index, 1);
              });
         }   
         //upd end

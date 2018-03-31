@@ -55,12 +55,30 @@
   <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 1} , 
       {class: "searchableUnit" , id: "unit_master_id" , style: 'width:60px;'} %>
   
-  
   <!--<%= f.label :unit_price, "単価:" %>-->
   <!--upd180131-->
   <%= f.label :unit_price, "定価:" %>
+  
+  <!--add180331 パナソニックの値上がり分は色をセット(201710分)-->
+  <!--変更時はコントローラ側も要変更-->
+  <% if f.object.maker_master_id.present? %>
+    <% @material_master = MaterialMaster.find(f.object.working_small_item_id) %>
+  <% else %>
+    <% @material_master = nil %>
+  <% end %>
+  <% @color = "black" %>
+  <% if @material_master.present? %>
+    <%require "date"%>
+    <% if @material_master.list_price_update_at == Date.new(2017,10,01) %>
+      <% @color = "blue" %>
+    <% end %>
+  <% end %>
+  <!--add end-->
+  <font color = <%= @color %>  >
   <%= f.text_field :unit_price , :style => 'width:60px; text-align:right;ime-mode:disabled;font-size:12px;' , :tabindex => (20 + (f.options[:child_index] * 7)).to_s , 
-      :onkeyup => "focusNextModal(this, event, 'modal_unit_price', 'modal_rate')", id:'modal_unit_price' << f.options[:child_index].to_s  %>
+       :onkeyup => "focusNextModal(this, event, 'modal_unit_price', 'modal_rate')", id:'modal_unit_price' << f.options[:child_index].to_s  %>
+  </font>
+  <!---->
   
   <%= f.label :rate, "掛率:" %>
   <!--<%= f.text_field :rate , :style => 'width:60px; text-align:right;ime-mode:disabled;' , :tabindex => (21 + (f.options[:child_index] * 7)).to_s , 
