@@ -489,6 +489,12 @@ class InventoriesController < ApplicationController
     #新規
       @inventory = Inventory.new(inventory_params)
       @inventory.save!(:validate => false)
+      
+      return "new_inventory"
+      #以下はなぜかNG
+      #flash.now[:notice] = "在庫マスターへ新規登録しました。資材マスターの在庫区分・在庫マスターの画像を登録してください。"
+      #session[:inventory_new_flag] = "true"
+      
     else
     #更新
       @inventory.update(inventory_params)
@@ -641,7 +647,7 @@ class InventoriesController < ApplicationController
   end 
   
   #ajax
-  #最終単価を返す
+  #最終単価＆仕入業者を返す
   def get_unit_price
     record = Inventory.where(material_master_id: params[:material_id]).first
   	
@@ -650,6 +656,13 @@ class InventoriesController < ApplicationController
 	  #@inventory_id = record.id   #idをセット add171128
 	  
 	  @current_unit_price = record.last_unit_price
+      #add180302
+      @supplier  = SupplierMaster.where(:id => record.supplier_master_id).where("id is NOT NULL").pluck("supplier_name, id")
+      @supplier += SupplierMaster.all.pluck("supplier_name, id")
+      #add end
+    else
+      #add180302
+      @supplier = SupplierMaster.all.pluck("supplier_name, id")
 	end
 	  
   end

@@ -7,7 +7,7 @@
                                                          working_large_item_name: quotation_detail_large_classification.working_large_item_name,
                                                          working_large_specification: quotation_detail_large_classification.working_large_specification,
                                                          quotation_detail_large_classification_id: quotation_detail_large_classification.id,  new_flag: "1"),
-            :class => 'btn btn-warning'%>
+            :class => 'btn btn-warning keep-disp'%>
         </td>
 		
         <!--add170223-->
@@ -94,13 +94,13 @@
 		
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
-					  quotation_header_name: params[:quotation_header_name]), :class => 'btn btn-white_rsd btn-xs' , remote: true%>
+					  quotation_header_name: params[:quotation_header_name]), :class => 'btn btn-white_rsd btn-xs keep-disp' , remote: true%>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
                       quotation_header_name: params[:quotation_header_name] ),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
 		
       </tr>

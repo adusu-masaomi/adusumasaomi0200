@@ -168,21 +168,21 @@
    <!-- -->
    
    <!--フラグ１-->
-   <%= f.check_box :all_bid_flag_1,  :id => "all_bid_flag_1" , :class => "all_bid_flag_1" %>
+   <%= f.check_box :all_bid_flag_1,  :id => "all_bid_flag_1" , :class => "all_bid_flag_1", :onchange => "setSupplierAll(this)" %>
    <%= f.label :all_bid_flag_1, '全て落札　　　', { style: 'color:red'}  %>
    
    <!--スペース用-->
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
    &nbsp;&nbsp;
    <!--フラグ２-->
-   <%= f.check_box :all_bid_flag_2,  :id => "all_bid_flag_2", :class => "all_bid_flag_2" %>
+   <%= f.check_box :all_bid_flag_2,  :id => "all_bid_flag_2", :class => "all_bid_flag_2", :onchange => "setSupplierAll(this)" %>
    <%= f.label :all_bid_flag_2, '全て落札　　　', { style: 'color:red'}  %>
    
    <!--スペース用-->
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
    &nbsp;&nbsp;
    <!--フラグ３-->
-   <%= f.check_box :all_bid_flag_3,  :id => "all_bid_flag_3", :class => "all_bid_flag_3" %>
+   <%= f.check_box :all_bid_flag_3,  :id => "all_bid_flag_3", :class => "all_bid_flag_3", :onchange => "setSupplierAll(this)" %>
    <%= f.label :all_bid_flag_3, '全て落札　　　', { style: 'color:red'}  %>
    
    </br>
@@ -353,7 +353,10 @@
 		 setNextControlOnSelect(e,control_name, 2);
 	   });
 	   //明細-メーカー
-	   $( ".searchableSelect1_3" ).on("select2:close", function (e) {
+       //add180411
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+	   //add end
+       $( ".searchableSelect1_3" ).on("select2:close", function (e) {
 		 //次のコントロールへフォーカスを移す
 	     var control_name = $(this)[0].name;
 		 setNextControlOnSelect(e,control_name, 3);
@@ -495,7 +498,10 @@
 	   });
 	    
 	   //メーカー
-       $(".searchableSelect1_3").select2({ theme: "classic" });
+       //$(".searchableSelect1_3").select2({ theme: "classic" });
+       //upd180411
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+       
        $( ".searchableSelect1_3" ).on("select2:close", function (e) {
 		 //次のコントロールへフォーカスを移す
 	     var control_name = $(this)[0].name;
@@ -517,7 +523,33 @@
     //});
 	  
   }
+ 
+ 
+ //add180412
+ //全落札チェックした場合に、送信用の仕入先をセットする
+ function setSupplierAll(t){
+    //name属性に埋め込まれているIDを抜き出す
+	var controlId = t.id
+    
+    //var child_index = controlName.slice(65);
+    //var child_index = child_index.slice(0,-25);
+    
+    //仕入先1~3のどれかを判定
+    var supplier_number = controlId.substr(-1,1);
+    
+    var nm_id = "all_bid_flag_" + supplier_number;
+    if (document.getElementById(nm_id).checked == true){
+       //仕入先をセットする
+       nm_id = "supplier_id_" + supplier_number;
+       var supplier_master_index = parseInt(document.getElementById(nm_id).value);
+            
+       $(".searchableSupplier").val(supplier_master_index).trigger("change");
+     }
+	
+ 
   
+  }
+ 
  //次のコントロールへフォーカスする（明細フォーム用）
  //プルダウンは明細側のイベントを呼ばない為、フォームに記述
  function setNextControlOnSelect(e, control_name, flag){

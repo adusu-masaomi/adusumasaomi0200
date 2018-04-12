@@ -107,7 +107,19 @@ end
       
       #画面のメアドをグローバルへセット
       $email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-   
+      
+      #add180405
+      #CC用に担当者２のアドレスもグローバルへセット
+      $email_responsible2 = nil
+      if params[:purchase_order_datum][:supplier_master_id].present?
+        supplier = SupplierMaster.where(id: params[:purchase_order_datum][:supplier_master_id]).first
+         
+        if supplier.present? && supplier.email2.present?
+          $email_responsible2 = supplier.email2
+        end
+      end
+      #add end
+      
       #メール送信フラグをセット
       params[:purchase_order_datum][:mail_sent_flag] = 1
 	  @purchase_order_datum = PurchaseOrderDatum.new(purchase_order_datum_params)  #add170922
@@ -141,7 +153,19 @@ end
       
       #画面のメアドをグローバルへセット
       $email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-
+      
+      #add180405
+      #CC用に担当者２のアドレスもグローバルへセット
+      $email_responsible2 = nil
+      if params[:purchase_order_datum][:supplier_master_id].present?
+        supplier = SupplierMaster.where(id: params[:purchase_order_datum][:supplier_master_id]).first
+         
+        if supplier.present? && supplier.email2.present?
+          $email_responsible2 = supplier.email2
+        end
+      end
+      #add end
+              
       #インスタンスへパラメータを再セット
       reset_parameters
 	  

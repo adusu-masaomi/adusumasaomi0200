@@ -134,7 +134,10 @@
   $(document).ready(function(){
     
     $(".searchableMaterial").select2({ theme: "classic" });
-    $(".searchableMaker").select2({ theme: "classic" });
+    //$(".searchableMaker").select2({ theme: "classic" });
+    //upd180412
+      $(".searchableMaker").select2({ theme: "classic", tags: true });
+    
     //$(".searchableUnit").select2({ theme: "classic" });
 	$(".searchableUnit").select2({ theme: "classic"}).on("load", function(e) { 
         $(this).prop('tabindex',19)}).trigger('load');

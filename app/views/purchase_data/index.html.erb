@@ -35,8 +35,8 @@
   <!--<%= f.text_field :purchase_date_gteq, as: :datepicker, required: false, include_blank: true  %>-->
   
   <%= f.label :purchase_order_datum_id, '注文No：：' %>
-  <%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
-  
+  <!--<%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>-->
+  <%= f.select :purchase_order_datum_id_eq, @purchase_order_data_extract.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
   <%= f.label :division_id, '仕入区分' %>
   <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true},
        { id: 'division_id', style: 'width:120px' , class: "searchablePurchaseDivision"}  %>
@@ -82,6 +82,7 @@
   
       <div>
        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+       
        <%= f.button_tag "条件全クリア", :type => 'link', name: "clear",  
                :onclick => "clearAllConditions()" %>
        <%= link_to "仕入表(様式１)",
@@ -106,6 +107,8 @@
  
      </div>
    <% end %>
+   
+   
     <!-- kaminari用追加箇所開始 -->
    <%= paginate @purchase_data %>
    <!-- kaminari用追加箇所終了 --> 

@@ -442,10 +442,13 @@
       //単位のselect2
       $(".searchableUnit").select2({ theme: "classic"}).on("load", function(e) { 
         $(this).prop('tabindex',19)}).trigger('load');
+      
       //メーカーのselect2
-      $(".searchableMaker").select2({ theme: "classic" });
-       //
-	   //return event.preventDefault();
+      //$(".searchableMaker").select2({ theme: "classic" });
+      //upd180412
+      $(".searchableMaker").select2({ theme: "classic", tags: true });
+
+       //return event.preventDefault();
 	   return false;
 	})
       

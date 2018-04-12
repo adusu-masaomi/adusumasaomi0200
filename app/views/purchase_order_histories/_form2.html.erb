@@ -239,6 +239,11 @@
 	   });
 	  
 	  
+       //メーカー
+       //add180411
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+	   //add end
+       
 	   //メーカー操作後処理(既に登録済み)
 	   $( ".searchableSelect1_3" ).on("select2:open", function (e) {
 	       //Y座標を取得
@@ -392,8 +397,10 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
        
 	   
 	   //メーカー(新規追加時)
-       $(".searchableSelect1_3").select2({ theme: "classic" });
-     
+       //$(".searchableSelect1_3").select2({ theme: "classic" });
+       //upd180411
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+	   
 	 //メーカー操作後の処理(新規追加時)
 	   $( ".searchableSelect1_3" ).on("select2:open", function (e) {
 	       //Y座標を取得
@@ -543,18 +550,23 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    if (gTrigger == false){
    	 //var maker_id = $(this)[0].value;
      var maker_id = obj[0].value;
-	 //メーカーIDから該当する品番リストを取得する
-     $.get("<%= purchase_order_historiez_material_extract_path %>",
+     
+     if (isNaN(maker_id) == false){
+     //add180411 idが名称の場合（メーカー新規）を除外
+     
+	   //メーカーIDから該当する品番リストを取得する
+       $.get("<%= purchase_order_historiez_material_extract_path %>",
         {maker_id: maker_id},
-       function(data){
+         function(data){
 	   
-	     if (document.getElementById("material_id_select_hide").innerHTML != "") {
-           var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
-	       document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
-	     }
-	   });
-	 }	 
-     //
+	       if (document.getElementById("material_id_select_hide").innerHTML != "") {
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+	         document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	       }
+	     });
+     }
+   }	 
+   //
  }
  
  //入力チェック(eメール用）

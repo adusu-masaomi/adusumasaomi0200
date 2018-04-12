@@ -36,6 +36,7 @@ class PurchaseDatum < ActiveRecord::Base
 	
 	attr_accessor :construction_datum_id_hide
 	
+    #attr_accessor :parameters  #add180403
     #validation
     validates :material_id, presence: true
     validates :material_code, presence: true

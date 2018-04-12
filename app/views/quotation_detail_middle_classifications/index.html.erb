@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = QuotationDetailMiddleClassification -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px" >
@@ -34,18 +35,18 @@
 <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
                                        quotation_header_name: params[:quotation_header_name]),
-            :class => 'btn btn-warning' %>
+            :class => 'btn btn-warning keep-disp' %>
 <!--マスター画面へ遷移-->
 <%= link_to t('.new', :default => t("共通マスター")),
             new_working_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
 			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
 			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
-            :class => 'btn btn-teal500_rsd' %>
+            :class => 'btn btn-teal500_rsd keep-disp' %>
 <%= link_to t('.new', :default => t("固有マスター")),
             new_working_specific_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
 			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
 			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
-            :class => 'btn btn-purple300_rsd' %>
+            :class => 'btn btn-purple300_rsd keep-disp' %>
 
 </br>
 <!--upd170626 global valiable erased-->
@@ -151,8 +152,30 @@
 	      
        });
        $( ".sortable" ).disableSelection();
-	 
+	   
+       //画面位置保存→実行
+       $('form').keepPosition();
+       
+       
+       
   });
+  
+  //画面位置保存するプラグイン
+  $.fn.keepPosition = function(){
+  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+    var key = 'keep-position-'+location.pathname;
+    var win = $(window);
+    this.each(function(){
+    //$(this).on('submit',function(){
+    $(".keep-disp").click(function(){
+      div_top = bodyDiv.scrollTop();
+	    $.cookie(key, div_top);
+	  });
+    });
+    setTimeout(function(){
+      bodyDiv.scrollTop($.cookie(key));
+    },0);
+  }
   
   function addParam(link){
     var default_page_number = $('default_page_number');

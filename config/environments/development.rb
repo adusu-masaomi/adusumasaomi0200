@@ -27,8 +27,13 @@ Rails.application.configure do
   config.action_controller.perform_caching = true
 
   # Don't care if the mailer can't send.
-  config.action_mailer.raise_delivery_errors = false
-
+  #config.action_mailer.raise_delivery_errors = false
+  #developモードはここを活かしたほうが良い。
+  config.action_mailer.raise_delivery_errors = true
+  
+  #add180405
+  #config.action_mailer.perform_deliveries = true
+  
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 

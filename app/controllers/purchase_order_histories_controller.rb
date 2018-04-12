@@ -469,21 +469,29 @@ class PurchaseOrderHistoriesController < ApplicationController
 		  ###
 		  
 		  
-		  #del171030
-		  #varidate用のために、本来の箇所から離れたパラメータを再セットする
-		  #item[:material_id] = params[:material_id][i]
-		  #item[:material_code] = params[:material_code][i]
-		  #item[:material_name] = params[:material_name][i]
-		  #item[:list_price] = params[:list_price][i]
-		  #item[:unit_master_id] = params[:unit_master_id][i]
-		  #item[:maker_id] = params[:maker_id][i]
+		  #@maker_master = MakerMaster.find(item[:maker_id])
+          #upd180411
+          @maker_master = MakerMaster.where(:id => item[:maker_id]).first
           
-		  #@maker_master = MakerMaster.find(params[:maker_id][i])
-		  #upd171028
-		  @maker_master = MakerMaster.find(item[:maker_id])
+          #add180411
+          #メーカーを手入力した場合の新規登録
+          if @maker_master.nil?
+            #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+            maker_params = {maker_name: item[:maker_id] }
+            @maker_master = MakerMaster.new(maker_params)
+                     @maker_master.save!(:validate => false)
+                     
+            if @maker_master.present?
+              #メーカーIDを更新（パラメータ）
+              item[:maker_id] = @maker_master.id
+            end
+          end
+          ####
+          
+          
+          
 		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
-		  
-          if @maker_master.present?
+		  if @maker_master.present?
             item[:maker_name] = @maker_master.maker_name
           end
 		  ######
@@ -502,21 +510,26 @@ class PurchaseOrderHistoriesController < ApplicationController
                 item[:list_price] = @material_master.list_price
 			  end
 			  
-			  #if params[:material_name][i] != @material_master.material_name
-			  if item[:material_name] != @material_master.material_name
-			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
-			    materials = MaterialMaster.where(:id => @material_master.id).first
-			    if materials.present?
-                  #materials.update_attributes!(:material_name => params[:material_name][i] )
-				  materials.update_attributes!(:material_name => item[:material_name] )
-                end 
-			  end
+              #del180411
+			  #if item[:material_name] != @material_master.material_name
+			  ##マスターの品名を変更した場合は、商品マスターへ反映させる。
+			  #  materials = MaterialMaster.where(:id => @material_master.id).first
+			  #  if materials.present?
+              #    materials.update_attributes!(:material_name => item[:material_name] )
+              #  end 
+			  #end
 			  
-			  if item[:maker_id] != @material_master.maker_id
-			  #メーカー名を登録or変更した場合は、商品マスターへ反映させる。
+             
+			  #if item[:maker_id] != @material_master.maker_id
+              if (item[:material_name] != @material_master.material_name) || 
+                 (item[:maker_id] != @material_master.maker_id)
+			  #品名・メーカーを登録or変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  materials.update_attributes!(:maker_id => item[:maker_id] )
+                  #materials.update_attributes!(:maker_id => item[:maker_id] )
+                  #upd180411 
+                  #品名・メーカーIDをそれぞれ更新
+                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id])
                 end 
 			  end
 			  
@@ -629,6 +642,19 @@ class PurchaseOrderHistoriesController < ApplicationController
       
        #画面のメアドをグローバルへセット
        $email_responsible = params[:purchase_order_history][:email_responsible]
+       
+       #add180405
+       #CC用に担当者２のアドレスもグローバルへセット
+       $email_responsible2 = nil
+       if params[:purchase_order_history][:supplier_master_id].present?
+         supplier = SupplierMaster.where(id: params[:purchase_order_history][:supplier_master_id]).first
+         
+         if supplier.present? && supplier.email2.present?
+           $email_responsible2 = supplier.email2
+         end
+       end
+       #add end
+       
 	   $responsible = params[:purchase_order_history][:responsible]
        PostMailer.send_purchase_order(@purchase_order_history).deliver
        
@@ -694,14 +720,18 @@ class PurchaseOrderHistoriesController < ApplicationController
   
   #メーカーから該当する商品を取得
   def material_extract
-    #まず手入力用IDをセット。
-    @material_extract = MaterialMaster.where(:id => 1).where("id is NOT NULL").
-     pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+  
+     #exist = MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").first
+     
+     #if exist.present?
+       #まず手入力用IDをセット。
+       @material_extract = MaterialMaster.where(:id => 1).where("id is NOT NULL").
+        pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
 	
-	#次に抽出されたアイテムをセット
-	@material_extract += MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").
-     pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
-	
+	   #次に抽出されたアイテムをセット
+	   @material_extract += MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").
+        pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+     #end
 	
   end
   

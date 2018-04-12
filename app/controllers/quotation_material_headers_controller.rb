@@ -509,32 +509,31 @@ class QuotationMaterialHeadersController < ApplicationController
 		    item[:quantity] = item[:quantity].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
 		  end
 		  
-		  #if  params[:quantity][i].to_i == 0
-		  #  params[:quantity][i] = params[:quantity][i].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
-		  #end
-		  #item[:quantity] = params[:quantity][i].to_i
-		  #
-		  
-		  
-		  #del170929
-		  #item[:material_id] = params[:material_id][i]
-		  #item[:material_code] = params[:material_code][i]
-		  #item[:material_name] = params[:material_name][i]
-		  #item[:list_price] = params[:list_price][i]
-		  #item[:unit_master_id] = params[:unit_master_id][i]
-		  
-		  #メーカーの処理(upd170616)
-		  #item[:maker_id] = params[:maker_id][i]
-          #@maker_master = MakerMaster.find(params[:maker_id][i])
-		  @maker_master = MakerMaster.find(item[:maker_id])
+		  #@maker_master = MakerMaster.find(item[:maker_id])
+          @maker_master = MakerMaster.where(:id => item[:maker_id]).first
+          
+          #add180411
+          #メーカーを手入力した場合の新規登録
+          if @maker_master.nil?
+            #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+            maker_params = {maker_name: item[:maker_id] }
+            @maker_master = MakerMaster.new(maker_params)
+                     @maker_master.save!(:validate => false)
+                     
+            if @maker_master.present?
+              #メーカーIDを更新（パラメータ）
+              item[:maker_id] = @maker_master.id
+            end
+          end
+          ####
+          
+          
 		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
-		  
-		  
-          if @maker_master.present?
+		  if @maker_master.present?
             item[:maker_name] = @maker_master.maker_name
           end
-		  ######
-		 
+		  
+          
 		  
 		  id = item[:material_id].to_i
            
@@ -559,12 +558,16 @@ class QuotationMaterialHeadersController < ApplicationController
               #  item[:maker_name] = @maker_master.maker_name
 			  #end
 			  
-			  #if params[:material_name][i] != @material_master.material_name
-			  if item[:material_name] != @material_master.material_name
-			  #マスターの品名を変更した場合は、商品マスターへ反映させる。
+			  #if item[:material_name] != @material_master.material_name
+              if (item[:material_name] != @material_master.material_name) || 
+                 (item[:maker_id] != @material_master.maker_id)
+			  #マスターの品名orメーカーを変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  materials.update_attributes!(:material_name => item[:material_name] )
+                  #materials.update_attributes!(:material_name => item[:material_name] )
+                  #upd180411 
+                  #品名・メーカーIDをそれぞれ更新
+                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id])
                 end 
 			  end
 			  
@@ -603,8 +606,12 @@ class QuotationMaterialHeadersController < ApplicationController
 				@material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:material_id], list_price: item[:list_price] }
+				  #material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                  #                      maker_id: item[:material_id], list_price: item[:list_price] }
+                  #upd180411
+                  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                                        maker_id: item[:maker_id], list_price: item[:list_price] }
+                                        
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
 			  
@@ -672,6 +679,19 @@ class QuotationMaterialHeadersController < ApplicationController
 	   
      #画面のメアドをグローバルへセット
      $email_responsible = params[:quotation_material_header][:email]
+     
+     #add180405
+     #CC用に担当者２のアドレスもグローバルへセット
+     $email_responsible2 = nil
+     if params[:quotation_material_header][:supplier_master_id].present?
+       supplier = SupplierMaster.where(id: params[:quotation_material_header][:supplier_master_id]).first
+         
+       if supplier.present? && supplier.email2.present?
+         $email_responsible2 = supplier.email2
+       end
+     end
+     #add end
+     
      #仕入先（１〜３）の判定
      setSupplier
 
@@ -897,9 +917,18 @@ class QuotationMaterialHeadersController < ApplicationController
 	    tmp_code = params[:quotation_material_header][:purchase_order_code] 
 	    
 		if tmp_code.present?
-		  header = tmp_code[0, 1]
-	      constant_params = { purchase_order_last_header_code: tmp_code}
-		  @constant.update(constant_params)
+		  #header = tmp_code[0, 1]
+          
+          #upd180411
+          #新コードの年(Axx)が最終コード以上の場合のみ更新。(古い年でテストするケースもあるため）
+          new_year = tmp_code[1,2].to_i
+          current_year = @constant.purchase_order_last_header_code[1,2].to_i
+          
+          if new_year >= current_year
+          
+            constant_params = { purchase_order_last_header_code: tmp_code}
+            @constant.update(constant_params)
+          end
 		end
 	  end
 	  #
@@ -990,12 +1019,23 @@ class QuotationMaterialHeadersController < ApplicationController
            where("id is NOT NULL").pluck(:purchase_order_code).flatten.join(" ")
 	 
 	   ###
-	   if @purchase_order_code.blank?
+       
+       if @purchase_order_code.blank?
 	   #既存のものがなければ新規にコード生成する。
-	 
-         crescent = "%" + params[:last_header_number] + "%"
+         if @last_header_number.blank?
+	       @last_header_number = Constant.where(:id => 1).
+             where("id is NOT NULL").pluck(:purchase_order_last_header_code).flatten.join(" ")
+         end
+     
+         @last_header_number = @last_header_number[0,1]   #下記の判定用に1文字だけ抜き取る
+     
+         #crescent = "%" + params[:last_header_number] + "%"
+         crescent = "%" + @last_header_number + "%"
        
          @purchase_order_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
+         
+         #binding.pry
+          
          #最終番号に１を足す。
          newStr = @purchase_order_code[1, 4]
          header = @purchase_order_code[0, 1]

@@ -26,16 +26,18 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;
   
+  
+  <!--upd180411 onkeydownからonkeyupに変更-->
   <%= f.input :quotation_unit_price_1,  label: "見積単価１", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_1",  style: 'width:100px;color:purple;' , 
-       class: "quotation_unit_price_1", :type=>"text", :tabindex=>"10", :onkeydown => "checkQuotationUnitPriceAll(1,event)" } %>
+       class: "quotation_unit_price_1", :type=>"text", :tabindex=>"10", :onkeyup => "checkQuotationUnitPriceAll(this,1,event)" } %>
 
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.input :quotation_unit_price_2,  label: "見積単価２", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_2",  style: 'width:100px;color:purple' , 
-       class: "quotation_unit_price_2", :type=>"text", :tabindex=>"12",:onkeydown => "checkQuotationUnitPriceAll(2,event)"  } %>
+       class: "quotation_unit_price_2", :type=>"text", :tabindex=>"12",:onkeyup => "checkQuotationUnitPriceAll(this,2,event)"  } %>
 	   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.input :quotation_unit_price_3,  label: "見積単価３", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_3",  style: 'width:100px;color:purple' , 
-       class: "quotation_unit_price_3", :type=>"text", :tabindex=>"14", :onkeydown => "checkQuotationUnitPriceAll(3,event)"  } %>
+       class: "quotation_unit_price_3", :type=>"text", :tabindex=>"14", :onkeyup => "checkQuotationUnitPriceAll(this,3,event)"  } %>
   
   
   </br>
@@ -75,13 +77,13 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   
   <!-- -->
-  <%= f.input :quotation_price_1,  label: "見積金額１", input_html:{ id: "quotation_price_1", :tabindex=>"11", style: 'width:100px' , class: "quotation_price_1" , :onchange => "checkQuotationPriceAll(1)" } %>
+  <%= f.input :quotation_price_1,  label: "見積金額１", input_html:{ id: "quotation_price_1", :tabindex=>"11", style: 'width:100px' , class: "quotation_price_1" , :onchange => "checkQuotationPriceAll(this,1)" } %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.input :quotation_price_2,  label: "見積金額２", input_html:{ id: "quotation_price_2", :tabindex=>"13", style: 'width:100px' , class: "quotation_price_2" , :onchange => "checkQuotationPriceAll(2)" } %>
+  <%= f.input :quotation_price_2,  label: "見積金額２", input_html:{ id: "quotation_price_2", :tabindex=>"13", style: 'width:100px' , class: "quotation_price_2" , :onchange => "checkQuotationPriceAll(this,2)" } %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.input :quotation_price_3,  label: "見積金額３", input_html:{ id: "quotation_price_3", :tabindex=>"15", style: 'width:100px' , class: "quotation_price_3" , :onchange => "checkQuotationPriceAll(3)" } %>
+  <%= f.input :quotation_price_3,  label: "見積金額３", input_html:{ id: "quotation_price_3", :tabindex=>"15", style: 'width:100px' , class: "quotation_price_3" , :onchange => "checkQuotationPriceAll(this,3)" } %>
   <!-- -->
   
   </br>
@@ -136,7 +138,7 @@
   <%= f.check_box :quotation_email_flag_1,  :id => "quotation_email_flag_1" %>
   <%= f.label :quotation_email_flag_1, '見積', { style: 'font-size:8px;color:green'}  %>
   <%= f.check_box :order_email_flag_1,  :id => "order_email_flag_1" %>
-  <%= f.label :order_email_flag_1, '注文', { style: 'font-size:8px;color:brown'}  %>
+  <%= f.label :order_email_flag_1, '注文', { id: "order_email_flag_1", style: 'font-size:8px;color:brown'}  %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -144,7 +146,7 @@
   <%= f.check_box :quotation_email_flag_2,  :id => "quotation_email_flag_2" %>
   <%= f.label :quotation_email_flag_2, '見積', { style: 'font-size:8px;color:green'}  %>
   <%= f.check_box :order_email_flag_2,  :id => "order_email_flag_2" %>
-  <%= f.label :order_email_flag_2, '注文', { style: 'font-size:8px;color:brown'}  %>
+  <%= f.label :order_email_flag_2, '注文', { id: "order_email_flag_2", style: 'font-size:8px;color:brown'}  %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -152,7 +154,7 @@
   <%= f.check_box :quotation_email_flag_3,  :id => "quotation_email_flag_3" %>
   <%= f.label :quotation_email_flag_3, '見積', { style: 'font-size:8px;color:green'}  %>
   <%= f.check_box :order_email_flag_3,  :id => "order_email_flag_3" %>
-  <%= f.label :order_email_flag_3, '注文', { style: 'font-size:8px;color:brown'}  %>
+  <%= f.label :order_email_flag_3, '注文', { id: "order_email_flag_3", style: 'font-size:8px;color:brown'}  %>
   
   </br>
   <!-- -->
@@ -256,14 +258,13 @@
   }
   
   //見積単価から金額を算出
-  function checkQuotationUnitPriceAll(Flag,e){
+  function checkQuotationUnitPriceAll(t, Flag,e){
      
-	 
-	 if (e.keyCode == 13 || e.keyCode == 9) {
-	 //  return false;
-	 } else {
-       return false;
-	 }
+	 //del180411
+	 //if (e.keyCode == 13 || e.keyCode == 9) {
+	 //} else {
+     //  return false;
+	 //}
 	 
 	 var unit_price;
 	 var num = 0;
@@ -307,7 +308,7 @@
 		price[index].value = parseInt(unit_price[index].value * quantity[index].value);
 		
 		//落札のチェックも行う
-		checkQuotationPriceAll(num);
+		checkQuotationPriceAll(t,num);
 	  }
 	}
      
@@ -322,8 +323,11 @@
 	 checkItem_2 = document.querySelectorAll("#bid_flag_2");
 	 checkPrice_3 = document.querySelectorAll("#quotation_price_3");
 	 checkItem_3 = document.querySelectorAll("#bid_flag_3");
-	
-	
+	 //add180411
+     //orderMailFlag_1 = document.querySelectorAll("#order_email_flag_1");
+     //orderMailFlag_2 = document.querySelectorAll("#order_email_flag_2");
+     //orderMailFlag_3 = document.querySelectorAll("#order_email_flag_3");
+     //
 	
 	for (var index = 0; index < checkPrice_1.length  ; index ++) {
 	  var price_1_win = false;
@@ -428,7 +432,7 @@
   
   
   //見積もり価格をチェック＆落札チェック
-  function checkQuotationPriceAll(Flag){
+  function checkQuotationPriceAll(t,Flag){
      
 	 
 	 //合計をセット
@@ -439,8 +443,44 @@
      
 	 //合計をセット
 	 setTotalQuotation(Flag);
+     
+     //add180412
+     //注文前に仕入先を判定しセットする
+     setSupplier(t);
 	 
   }
+  
+  //add180412
+  //注文前に仕入先を判定しセットする
+  function setSupplier(t){
+    //name属性に埋め込まれているIDを抜き出す
+	var controlName = t.name
+    var child_index = controlName.slice(65);
+    var child_index = child_index.slice(0,-25);
+   
+    
+    //落札フラグの判定
+    //仕入先1~3でループし、落札フラグがあれば仕入先を注文先として自動セットする。
+    for (var i=1; i<3; i++){
+      strNum = String(i);
+      var nm = "quotation_material_header[quotation_material_details_attributes][" + child_index + "][bid_flag_" + strNum + "]"
+    
+      if (nm != undefined){
+         if (document.getElementsByName(nm)[1] != undefined){
+           if (document.getElementsByName(nm)[1].checked == true){
+             //仕入先をセットする
+             var nm_id = "supplier_id_" + strNum;
+             var supplier_master_index = parseInt(document.getElementById(nm_id).value);
+             $(".searchableSupplier").val(supplier_master_index).trigger("change");
+           }
+         }
+	   }
+    
+    }
+  
+  
+  }
+  
   
   //選択した行のインデックスを取得(手入力を考慮し、品番で判別)
   function getSelectedChildIndexCode(){

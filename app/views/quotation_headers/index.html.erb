@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = QuotationHeader -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px">
@@ -74,7 +75,7 @@
                                                         delivery_slip_code: quotation_header.delivery_slip_code,
                                                         invoice_code: quotation_header.invoice_code,
                                                         new_flag: "1"),
-            :class => 'btn btn-info' %>
+            :class => 'btn btn-info keep-disp' %>
         </td>
         <td><%= link_to quotation_header.id, quotation_header_path(quotation_header) %></td>
         <td><%= quotation_header.quotation_code %></td>
@@ -100,7 +101,7 @@
         <td><%=l quotation_header.created_at.in_time_zone('Tokyo') %></td>
         <td>
 		  <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_quotation_header_path(quotation_header), :class => 'btn btn-white_rsd btn-xs' %>
+                      edit_quotation_header_path(quotation_header), :class => 'btn btn-white_rsd btn-xs keep-disp' %>
 		  
           <!--<%= link_to "履歴",
             quotation_header_histories_list_path(quotation_header_id: quotation_header.id),
@@ -110,7 +111,7 @@
                       quotation_header_path(quotation_header),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
       </tr>
     <% end %>
@@ -146,6 +147,27 @@
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
+     
+     //画面位置保存→実行
+     $('form').keepPosition();
   });
+  
+  //画面位置保存するプラグイン
+  $.fn.keepPosition = function(){
+  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+    var key = 'keep-position-'+location.pathname;
+    var win = $(window);
+    this.each(function(){
+    //$(this).on('submit',function(){
+    $(".keep-disp").click(function(){
+      
+      div_top = bodyDiv.scrollTop();
+	    $.cookie(key, div_top);
+	  });
+    });
+    setTimeout(function(){
+      bodyDiv.scrollTop($.cookie(key));
+    },0);
+  }
 </script>
 

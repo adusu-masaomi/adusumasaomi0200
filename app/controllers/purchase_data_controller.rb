@@ -34,8 +34,17 @@ class PurchaseDataController < ApplicationController
         #ransack保持用コード
         query = params[:q]
 
-        query ||= eval(cookies[:recent_search_history].to_s)  	
+        query ||= eval(cookies[:recent_search_history_purchase].to_s)  	
 
+        @purchase_order_data_extract = PurchaseOrderDatum.all  #add180403
+
+        
+        #注文番号の絞り込み（登録済みのものだけにする） upd180403
+        if query.present? && query[:with_construction].present?
+          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: query[:with_construction])
+        end
+        ##upd end
+        
         case params[:move_flag]
 		when "1"
           #工事一覧画面から遷移した場合
@@ -55,7 +64,9 @@ class PurchaseDataController < ApplicationController
                      "supplier_id_eq"=> supplier_master_id}
           end
 		  
-		when "2"
+          #注文番号の絞り込み（登録済みのものだけにする） upd180403
+          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
+        when "2"
           
 		  #注文一覧画面から遷移した場合
 		  if params[:construction_id].present?
@@ -76,6 +87,8 @@ class PurchaseDataController < ApplicationController
             query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
                      "supplier_id_eq"=> supplier_master_id}
           end
+          #注文番号の絞り込み（登録済みのものだけにする） upd180403
+          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
 		end
 		
         #@q = PurchaseDatum.ransack(params[:q]) 
@@ -87,7 +100,9 @@ class PurchaseDataController < ApplicationController
         value: params[:q],
         expires: 24.hours.from_now
         }
-        cookies[:recent_search_history] = search_history if params[:q].present?
+        #upd180403
+        #クッキーは仕入専用とする（工事画面に影響してしまうので）
+        cookies[:recent_search_history_purchase] = search_history if params[:q].present?
         #
        
 
@@ -317,6 +332,13 @@ class PurchaseDataController < ApplicationController
         #伝票が重複しないように登録フラグをセット
         set_registerd_flag_to_headers
   
+        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
+        #moved180407
+        trans = InventoriesController.set_inventory_history(params, @purchase_datum)
+		if trans == "new_inventory"
+           flash[:notice] = "在庫マスターへ新規登録しました。資材マスターの在庫区分・在庫マスターの画像を登録してください。"
+        end
+  
         #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully created.' }
         #format.json { render :show, status: :created, location: @purchase_datum }
         
@@ -327,8 +349,7 @@ class PurchaseDataController < ApplicationController
 		
        
        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
-       #takano
-	   InventoriesController.set_inventory_history(params, @purchase_datum)
+       #InventoriesController.set_inventory_history(params, @purchase_datum)
 
       else
         format.html { render :new }
@@ -395,6 +416,14 @@ class PurchaseDataController < ApplicationController
         #伝票が重複しないように登録フラグをセット
         set_registerd_flag_to_headers
         
+        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
+        #moved180407
+        trans = InventoriesController.set_inventory_history(params, @purchase_datum)
+		#if session[:inventory_new_flag] == "true"
+        if trans == "new_inventory"
+           flash[:notice] = "在庫マスターへ新規登録しました。資材マスターの在庫区分・在庫マスターの画像を登録してください。"
+        end
+        
         
         #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
         #format.json { render :show, status: :ok, location: @purchase_datum }
@@ -403,11 +432,7 @@ class PurchaseDataController < ApplicationController
          :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
          :move_flag => params[:move_flag])}
        
-   
-        #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
-        #takano
-		InventoriesController.set_inventory_history(params, @purchase_datum)
-		
+        
       else
         format.html { render :edit }
         format.json { render json: @purchase_datum.errors, status: :unprocessable_entity }
@@ -478,18 +503,23 @@ class PurchaseDataController < ApplicationController
         if @material_masters.id != 1  #手入力以外
           #更新
 		  @materials = MaterialMaster.find(params[:purchase_datum][:material_id])
-		
-	      #品番は、異なった場合はそのまま上書きする（別の品番としては原則、登録できない(ハイフン付与などの微調整と区別できないため。)）
-		  if params[:purchase_datum][:supplier_id].to_i != $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO
-               material_update_params = { material_code: params[:purchase_datum][:material_code],
-		                           material_name: params[:purchase_datum][:material_name] }
-          else
-               #add180316
-               #岡田電気の場合は、単位を資材マスターへ反映（見積の作業明細マスターに反映させるため）
-               material_update_params = { material_code: params[:purchase_datum][:material_code],
+          #upd180402
+          #資材コード、品名、単位を更新
+          material_update_params = { material_code: params[:purchase_datum][:material_code],
 		                           material_name: params[:purchase_datum][:material_name],
                                    unit_id: params[:purchase_datum][:unit_id] }
-          end
+        
+	      ##品番は、異なった場合はそのまま上書きする（別の品番としては原則、登録できない(ハイフン付与などの微調整と区別できないため。)）
+		  #if params[:purchase_datum][:supplier_id].to_i != $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO
+          #     material_update_params = { material_code: params[:purchase_datum][:material_code],
+		  #                         material_name: params[:purchase_datum][:material_name] }
+          #else
+          #     #岡田電気の場合は、単位を資材マスターへ反映（見積の作業明細マスターに反映させるため）
+          #     material_update_params = { material_code: params[:purchase_datum][:material_code],
+		  #                         material_name: params[:purchase_datum][:material_name],
+          #                         unit_id: params[:purchase_datum][:unit_id] }
+          #end
+          
 	      @materials.update(material_update_params)
 	    end
 	  end
@@ -619,15 +649,17 @@ class PurchaseDataController < ApplicationController
             @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
 	        #商品マスターへセット(商品コード存在しない場合)
 	         if @material_master.nil?
+               #upd180403 単位もセットする
 		       material_master_params = {material_code: params[:purchase_datum][:material_code], 
 		                             material_name: params[:purchase_datum][:material_name], 
                                      maker_id: params[:purchase_datum][:maker_id],
-									 list_price: params[:purchase_datum][:list_price] }
+                                     list_price: params[:purchase_datum][:list_price],
+                                     unit_id: params[:purchase_datum][:unit_id] }
 		       @material_master = MaterialMaster.create(material_master_params)
 		   
 		       #仕入データのマスターIDも更新する  add170405
 		       @purchase_datum.material_id = @material_master.id
-	         
+	           params[:purchase_datum][:material_id] = @material_master.id
 			 end
              
 			 if @material_master.id.present?
@@ -646,6 +678,11 @@ class PurchaseDataController < ApplicationController
                   unit_price: 0 ,
                   unit_id: params[:purchase_datum][:unit_id]}
 	           @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
+               
+               
+               #仕入データのマスターIDも更新する  add180407
+		       @purchase_datum.material_id = @material_master.id
+               params[:purchase_datum][:material_id] = @material_master.id
              end 
 	      end
 		end
@@ -667,11 +704,13 @@ class PurchaseDataController < ApplicationController
 		   material_master_params = {material_code: params[:purchase_datum][:material_code], 
 		                             material_name: params[:purchase_datum][:material_name], 
                                      maker_id: params[:purchase_datum][:maker_id],
-									 list_price: params[:purchase_datum][:list_price] }
+									 list_price: params[:purchase_datum][:list_price],
+                                     unit_id: params[:purchase_datum][:unit_id] }
 		   @material_master = MaterialMaster.create(material_master_params)
 		   
 		   #仕入データのマスターIDも更新する  add170405
 		   @purchase_datum.material_id = @material_master.id
+           params[:purchase_datum][:material_id] = @material_master.id
 		   #params[:purchase_datum][:material_id] = @material_master.id
 	   end
 	  
@@ -695,7 +734,12 @@ class PurchaseDataController < ApplicationController
                   unit_price: params[:purchase_datum][:purchase_unit_price] ,
                   unit_id: params[:purchase_datum][:unit_id]}
 	     @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
-                
+         
+         #binding.pry
+         
+           #仕入データのマスターIDも更新する  add180407
+		   @purchase_datum.material_id = @material_master.id
+           params[:purchase_datum][:material_id] = @material_master.id    
 	     end
 	   end
   

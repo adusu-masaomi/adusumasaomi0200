@@ -481,6 +481,25 @@ class WorkingMiddleItemsController < ApplicationController
 		  
 		  if item[:_destroy] != "1"
 		  
+            
+            #add180411
+            @maker_master = MakerMaster.where(:id => item[:maker_master_id]).first
+          
+            #メーカーを手入力した場合の新規登録
+            if @maker_master.nil?
+              #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+              maker_params = {maker_name: item[:maker_master_id] }
+              @maker_master = MakerMaster.new(maker_params)
+                     @maker_master.save!(:validate => false)
+                     
+              if @maker_master.present?
+                #メーカーIDを更新（パラメータ）
+                item[:maker_master_id] = @maker_master.id
+              end
+            end
+            ####
+          
+          
             if item[:working_small_item_id] == "1"
 		    #手入力の場合→新規登録
 			  
@@ -496,7 +515,8 @@ class WorkingMiddleItemsController < ApplicationController
              #    unit_id: item[:unit_master_id] }
 			     
                  if item[:working_small_item_code].present?  #add180131 品番がなければマスター反映させない。
-                   @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], material_name: item[:working_small_item_name])
+                   @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], 
+                        material_name: item[:working_small_item_name])
                    
                    if @material_master.blank?  #更新はないものとする
 				     
@@ -512,8 +532,6 @@ class WorkingMiddleItemsController < ApplicationController
                      
 				   end
                  end
-                 
-                 #binding.pry
                  
 		    else
 		    #手入力以外--特定のデータを更新

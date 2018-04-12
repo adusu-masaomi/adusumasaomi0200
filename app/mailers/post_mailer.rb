@@ -1,5 +1,6 @@
 class PostMailer < ApplicationMailer
    
+   
    def send_when_update(user)
     #layout "mailer"
     
@@ -19,16 +20,24 @@ class PostMailer < ApplicationMailer
     @supplier_name = user.supplier_master.supplier_name
     @responsible_name = user.supplier_master.responsible1 + "様"
     
+        #件名に日時を入れる（メール重なるのを防ぐため）
+        require 'date'
+        subject_time = "<" + Time.now.to_s + ">"
+
+
         #本番用
         #mail to: $email_responsible ,
-        #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
-        
+        #upd180405 担当者２のメアドがあれば、CCに加える。
+        #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+
         #test用
         mail to: "kamille1973@live.jp" ,
         cc: "ilovekyosukehimuro@yahoo.co.jp", 
         
         #以下は消さない事!
-        subject: '注文番号登録依頼'
+        #add180403
+        #件名に日時を入れる（メール重なるのを防ぐため）
+        subject: '注文番号登録依頼' + subject_time
   end
   
   #注文依頼
@@ -53,19 +62,25 @@ class PostMailer < ApplicationMailer
     else
 	  @responsible_name = "ご担当者様"
 	end
+
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    require 'date'
+    subject_time = "<" + Time.now.to_s + ">"
 	
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
-    
+    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-	cc: ["ilovekyosukehimuro@yahoo.co.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
-    #cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
-    subject: '注文依頼'
+    #add180403
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    subject: '注文依頼' + subject_time 
   
   end
   
@@ -88,24 +103,33 @@ class PostMailer < ApplicationMailer
     else
 	  @responsible_name = "ご担当者様"
 	end
+   
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    require 'date'
+    subject_time = "<" + Time.now.to_s + ">"
+
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
-    
+    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
     cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
-    subject: '見積依頼'
-  
+    #add180403
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    subject: '見積依頼' + subject_time
+
   end
   #注文依頼メール(見積後)
   def send_order_after_quotation(user)
    
+    #@quotation_code = "見積No:" + user.quotation_code
+
     @purchase_order_code = "注文No:" + $purchase_order_code
-	#@quotation_code = "見積No:" + user.quotation_code
     if user.construction_datum.alias_name.present?
     #通称名をセット
       @construction_name = "工事名:" + user.construction_datum.alias_name
@@ -140,18 +164,24 @@ class PostMailer < ApplicationMailer
 	end
 	
 	
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    require 'date'
+    subject_time = "<" + Time.now.to_s + ">"
 	
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-	#cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" ] ,
-    
+    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-	cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
-    subject: '注文依頼'
+    #add180403
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    subject: '注文依頼' + subject_time 
     
   end
   

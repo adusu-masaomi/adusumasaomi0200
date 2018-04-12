@@ -189,6 +189,9 @@
 	   //単価をセット
 	    setUnitPrice();
 		
+        //出庫の場合は別途単価・業者を取得
+        setInventoriesInfo();
+        
 		//入庫の場合に工事IDをセット(マイナス登録も有るので保留・・)
 		//setConstructionOnStocked();
 		
@@ -408,7 +411,7 @@
 	   document.getElementById("inventory_division_id").value = INDEX_INVENTORY_SHIPPING;
 	   
 	   //かつ、在庫マスターの単価を持ってくる！！
-	   getInventoryUnitPrices();
+	   getInventoryUnitPricesAndSupplier();
 	   
 	 }else{
 	   
@@ -429,7 +432,7 @@
 	   document.getElementById("division_id").value = INDEX_DIVISION_SHIPPING;
 	   
 	   //かつ、在庫マスターの単価を持ってくる！！
-	   getInventoryUnitPrices();
+	   getInventoryUnitPricesAndSupplier();
 	   
 	 }
 	 //入庫の場合、仕入区分は”仕入”にする
@@ -452,8 +455,8 @@
 	 //setConstructionOnStocked();
    }
    
-   //在庫Mより現在単価を取得する（出庫の場合に取得する）--ajax利用
-   function getInventoryUnitPrices() {
+   //在庫Mより現在単価・業者を取得する（出庫の場合に取得する）--ajax利用
+   function getInventoryUnitPricesAndSupplier() {
      material_id = document.getElementById("material_id").value;
 	 $.get("<%= inventoriez_get_unit_price_path %>",
           {material_id: material_id },
@@ -591,6 +594,15 @@
           obj3 = document.getElementById("material_name");
           obj3.value = obj2.options[index].innerText;
         }
+   }
+   
+   //add180402
+   //出庫の場合のみ、在庫の単価・業者を取得
+   function setInventoriesInfo(){
+     division_id = document.getElementById("division_id").value;
+     if (division_id == INDEX_DIVISION_SHIPPING) {
+       getInventoryUnitPricesAndSupplier();
+     }
    }
 
   //仕入先単価のセット

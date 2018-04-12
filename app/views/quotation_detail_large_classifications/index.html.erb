@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = QuotationDetailLargeClassification -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header">
@@ -28,29 +29,29 @@
             :class => 'btn btn-info' %>
 <%= link_to t('.new', :default => t("共通マスター")),
             new_working_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
-            :class => 'btn btn-teal500_rsd' %>
+            :class => 'btn btn-teal500_rsd keep-disp' %>
 <%= link_to t('.new', :default => t("固有マスター")),
             new_working_specific_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
-            :class => 'btn btn-purple300_rsd' %>
+            :class => 'btn btn-purple300_rsd keep-disp' %>
 <%= link_to "見積書(提出用)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
-            :class => 'btn btn-green500_ftg' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>
+            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>
 <%= link_to "見積書(提出／印付)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
-            :class => 'btn btn btn-red500_ftg' , :target=>["_blank"], id: 'quotation_print_2', :onclick => "submitAfterValidation()" %>
+            :class => 'btn btn btn-red500_ftg keep-disp' , :target=>["_blank"], id: 'quotation_print_2', :onclick => "submitAfterValidation()" %>
 <%= link_to "見積書(控え)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "2",  format: "pdf" ),
-            :class => 'btn btn-lime700_ftg' , :target=>["_blank"] %>
+            :class => 'btn btn-lime700_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "請求書データ作成",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
             quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
             data_type: "1" ),
-            :class => 'btn btn-grey300_rsd' , :data => {:confirm => '請求書データを作成しますか？'}  %>
+            :class => 'btn btn-grey300_rsd keep-disp' , :data => {:confirm => '請求書データを作成しますか？'}  %>
 <%= link_to "納品書データ作成",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id],
             quotation_code: params[:quotation_code], invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], 
             data_type: "2" ),
-            :class => 'btn btn-warning' , :data => {:confirm => '納品書データを作成しますか？'} %>
+            :class => 'btn btn-warning keep-disp' , :data => {:confirm => '納品書データを作成しますか？'} %>
 
 </br>
 <font size="3";><b>
@@ -162,7 +163,8 @@
     });
     $( ".sortable" ).disableSelection();
 	 
-	 
+	//画面位置保存→実行
+    $('form').keepPosition();
   });
   
   
@@ -180,6 +182,24 @@
     //  );
     //}
  }
+ 
+ //画面位置保存するプラグイン
+  $.fn.keepPosition = function(){
+  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+    var key = 'keep-position-'+location.pathname;
+    var win = $(window);
+    this.each(function(){
+    //$(this).on('submit',function(){
+    $(".keep-disp").click(function(){
+      
+      div_top = bodyDiv.scrollTop();
+	    $.cookie(key, div_top);
+	  });
+    });
+    setTimeout(function(){
+      bodyDiv.scrollTop($.cookie(key));
+    },0);
+  }
  
   //履歴へ保存させる処理(ajax)
   //$('#quotation_print_1').on('confirm:complete', function(e, answer) {
