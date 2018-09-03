@@ -75,28 +75,34 @@
   <div class="col-md-4" ,  style="margin-left : -0px;margin-top : -10px">
   <!--<%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。",  input_html:{ style: 'width:200px;' }  %>-->
   </div>
+  
+  <div class="col-md-5" ,  style="margin-left : 50px;margin-top : 20px">
+  <%= f.check_box :labor_insurance_not_flag %> 
+  <%= f.label :labor_insurance_not_flag, "労働保険適用外(中越用)", {style: 'color: black', :tabindex=>"19"} %>
+  </div>
+  
   </br></br></br></br></br></br>
   
   <div class="col-md-4" ,  style="margin-left : -15px;margin-top : -10px">
-  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"19", style: 'width:200px;', :onchange => "setCommission()" } %>
+  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"20", style: 'width:200px;', :onchange => "setCommission()" } %>
   </div>
   
   <div class="col-md-4" ,  style="margin-left : 0px;margin-top : -5px">
   <%= f.label :"支払方法", {:class => "my-custom-class-l"}  %></br>
   <%= f.select :payment_method_id, InvoiceHeader.payment_method, {:selected => @invoice_header.payment_method_id || 0}, 
   {id:'payment_method_id', :class => "my-custom-class", style: 'width:140px;height:30px;margin-left:-10px;margin-top:5px;font-size:16px;background-color:#ffffff;', 
-  :tabindex=>"20", :onchange => "setCommission()" } %>
+  :tabindex=>"21", :onchange => "setCommission()" } %>
   </div>
   
   <div class="col-md-3" ,  style="margin-left : 0px;margin-top : -10px">
-  <%= f.input :commission, input_html:{id:"commission", :tabindex=>"21", style: 'width:200px;'} %>
+  <%= f.input :commission, input_html:{id:"commission", :tabindex=>"22", style: 'width:200px;'} %>
   </div>
   </br></br></br></br>
   <div class="col-md-6" ,  style="margin-left : -15px;margin-top : -0px">
   <%= f.input :payment_date, :include_blank => true, label_html:{style: 'margin-top: -15px;'},
-                 input_html:{id:"payment", :tabindex=>"22",style: 'width:100px;margin-top:-0px;'} %>
+                 input_html:{id:"payment", :tabindex=>"23",style: 'width:100px;margin-top:-0px;'} %>
   </div>
-  <%= f.input :remarks, label_html:{style: 'margin-top:-15px;'}, input_html:{id:"remarks", :tabindex=>"23", style: 'width:355px;margin-top:-0px;'} %>
+  <%= f.input :remarks, label_html:{style: 'margin-top:-15px;'}, input_html:{id:"remarks", :tabindex=>"24", style: 'width:355px;margin-top:-0px;'} %>
   </br>
   
   <!--得意先M-->
@@ -113,7 +119,7 @@
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
   
   
-  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" tabindex="24"/>
+  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" tabindex="25"/>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 invoice_headers_path, :class => 'btn btn-default' %>
 <% end %>

@@ -25,8 +25,8 @@
   <div class="col-md-3", style="margin-left : -0px;margin-top:10px;">
   
   <%= f.label :"見積コード（参照）" , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :quotation_header_origin_id, QuotationHeader.all, :id, :quotation_code, {:include_blank => true} , 
-  {id:"quotation_header_origin_id", :onchange => "CopyQuotationHeader()", class: "searchableSelect2_1" , style: 'width:150px' } %>
+  <%= f.collection_select :quotation_header_origin_id, QuotationHeader.order('quotation_code desc').all, :id, :quotation_code, {:include_blank => true} , 
+  {id:"quotation_header_origin_id", :onchange => "CopyQuotationHeader()", class: "searchableQuotationOrigin" , style: 'width:150px' } %>
 
   </div>
   </br></br></br></br></br>
@@ -98,6 +98,10 @@
   <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", :tabindex=>"25"} %>
   <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"26"}  %>
   
+  <%= f.check_box :fixed_flag %> 
+  <%= f.label :fixed_flag, "確定済み(確定後に自動チェックされます。解除のみ操作可能です。)", {style: 'color: blue', :tabindex=>"27"} %>
+  </br>
+  
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
   <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_start_date_hide'}, as: :hidden  %>
   <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_end_date_hide'}, as: :hidden  %>
@@ -128,7 +132,16 @@
 
    $(document).on('ready page:load', function(){
    
-   　   //検索可能なリストボックス(注文Noの場合)
+     //見積コード（参照）
+     //select2のタブインデックスはここで指定する
+	 $(".searchableQuotationOrigin").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+     //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableQuotationOrigin" ).on("select2:close", function (e) {
+	 //  $('[tabindex=1]').focus(); 
+	 });
+     
+     //検索可能なリストボックス(注文Noの場合)
      $(".searchableConstructionCode").select2({ theme: "bootstrap" });
 
      $( ".searchableConstructionCode" ).change(function(e) {
@@ -239,7 +252,9 @@
   function CopyQuotationHeader(){
    
    var index = document.getElementById("quotation_header_origin_id").selectedIndex;
-   var quotation_origin_code = 
+   if (index > 0){
+     
+     var quotation_origin_code = 
 	  document.getElementById("quotation_header_origin_id").options[index].innerText;
    
    
@@ -345,7 +360,7 @@
 		  
 		 }
 	  );
-   
+    }
   }
    
    //顧客情報のセット

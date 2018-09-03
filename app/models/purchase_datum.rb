@@ -15,7 +15,9 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :SupplierMaster,  :foreign_key => "supplier_id"
 	belongs_to :CustomerMaster,  :foreign_key => "customer_id"
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
-    belongs_to :purchase_header  #add180223
+    belongs_to :purchase_header  
+    
+    #belongs_to :material_category #add180626
     
     #単価M更新切り分け用
     #attr_accessor :check_unit
@@ -35,7 +37,8 @@ class PurchaseDatum < ActiveRecord::Base
     attr_accessor :outsourcing
 	
 	attr_accessor :construction_datum_id_hide
-	
+	attr_accessor :material_category_id_hide
+        
     #attr_accessor :parameters  #add180403
     #validation
     validates :material_id, presence: true
@@ -92,8 +95,17 @@ class PurchaseDatum < ActiveRecord::Base
 	  end
     }
 	
+    #add180626
+    scope :with_material_category, -> (material_category_id=1) { 
+	  if material_category_id.present?
+	    joins(:MaterialMaster).where("material_category_id = ?", material_category_id )
+	  end
+    }
+    
+    #upd180626
 	def self.ransackable_scopes(auth_object=nil)
-  		[:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, :with_material_code_include, :with_material_name_include]
+        [:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, :with_material_code_include, 
+         :with_material_category, :with_material_name_include]
 	end
 	
 	def self.to_csv(options = {})

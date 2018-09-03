@@ -46,6 +46,14 @@
 		<td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_working_middle_item_path(working_middle_item, move_flag: ""), remote: true, :class => 'btn btn-default btn-xs' %>
+          
+          
+          <%= link_to "コピー", 
+                      copy_working_middle_item_path(working_middle_item),
+                      :data => { :confirm => 'データをコピーしますか?'  },
+                      :class => 'btn btn-cyan100_rsd btn-xs' %>
+          
+          
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       working_middle_item_path(working_middle_item),
                       :method => :delete,

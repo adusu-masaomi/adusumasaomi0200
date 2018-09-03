@@ -14,8 +14,12 @@
   
   <%= search_form_for @q, :html => {:style=> 'width:1280px' } do |f| %>
     <%= f.label :construction_name, '工事名　' %>
-    <!--<%= f.select :id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") , {include_blank: true}, {style: 'width:400px' , class: "searchableConstructionName" } %>-->
-    <%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id:'id', style: 'width:400px' , class: "searchableConstructionName" } %>
+    <!--<%= f.select :id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id:'id', style: 'width:400px' , class: "searchableConstructionName" } %>-->
+    <%= f.select :id_eq, @construction_code_extract.order("construction_code desc").all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id:'id', style: 'width:400px' , class: "searchableConstructionName" } %>
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+    <% end %>
     
     <%= f.label :construction_code, '工事コード(範囲)' %>
     <%= f.text_field :construction_code_cont, include_blank: true , id: 'construction_code_range' %>
@@ -25,7 +29,11 @@
     <!--<%= f.select :customer_id_eq, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:330px' , class: "searchableCustomerName" } %>-->
     <%= f.select :customer_id_eq, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {id: 'customer_id', style: 'width:330px' , 
 	     class: "searchableCustomerName", :onchange => "setConstructionExtractByCutomer()" } %>
-
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
+    <% end %>
+    
     </br><%= f.label :billed_flag, '請求済' %>
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
@@ -78,7 +86,7 @@
       <th></th>
 	  <th></th>
 	  <th></th>
-      <!--<th></th>-->
+      <th></th>
       <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:reception_date) %></th>
@@ -124,7 +132,6 @@
         <% @search = ConstructionCost.find_by(:construction_datum_id => construction_datum.id) %>
 			
 		<% if @search.present? %>
-		
 		  <% if construction_datum.calculated_flag == 1 %>
 	      <!--完了フラグ１の場合は色を変える-->
 		    <td><%= link_to t('.edit', :default => t("集計")),
@@ -140,13 +147,13 @@
 		    <!--<td><%= link_to t('.back', :default => t("集計")), construction_costs_path(construction_id: construction_datum.id, move_flag: "1"), 
                                    :class => 'btn btn-lime500_rsd btn-xs keep-disp'  %></td>-->
 		  <% end %>
-	
-		
-          
 		<% else %>
 		  <td></td>
 		<% end %>
 		
+        <td><%= link_to t('.edit', :default => t("資料")),
+                      edit3_construction_datum_path(construction_datum),  :class => 'btn btn-yellow500_rsd btn-xs keep-disp' %></td>
+        
         <td><%= construction_datum.construction_code %></td>
         <td><%= construction_datum.construction_name %></td>
         <td><%= construction_datum.reception_date %></td>
@@ -221,10 +228,13 @@
 	  var fc = 1;    //デフォルトの固定列数(社長PC基準)
 	  var ht = 628;  //デフォルトの高さ(社長PC基準)old-586
 		
-	  if (sz != 1920) {
+	  if (sz < 1920) {
 	  //画面サイズ1920px(社長PC基準)以外は、列固定させる。
-        fc = 3;  //固定列数
+        //fc = 3;  //固定列数
+        fc = 2;  //固定列数
 	    ht -= 50;
+        
+        sz = 1920; //for ipad pro!!
       }
 	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	   //
@@ -283,6 +293,15 @@
 	});
   }
   
+  //モバイル用対応 add180830
+  //select2をクリアする
+  function clearConstruction(){
+    $(".searchableConstructionName").val(null).trigger("change"); 
+  }
+  function clearCustomer(){
+    $(".searchableCustomerName").val(null).trigger("change"); 
+  }
+  //
 
 </script>
 

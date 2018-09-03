@@ -1,8 +1,7 @@
 class ConstructionDataController < ApplicationController
   
-  #binding.pry
-  
-  before_action :set_construction_datum, only: [:show, :edit, :edit2, :update, :destroy]
+  #before_action :set_construction_datum, only: [:show, :edit, :edit2, :update, :destroy]
+  before_action :set_construction_datum, only: [:show, :edit, :edit2, :edit3, :update, :destroy]
 
   # GET /construction_data
   # GET /construction_data.json
@@ -11,7 +10,15 @@ class ConstructionDataController < ApplicationController
     #ransack保持用コード
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  	
-		
+	
+   
+    @construction_code_extract = ConstructionDatum.all     #add180830
+    #件名の絞り込み addd180830
+    if query.present? && query[:customer_id_eq].present?
+       @construction_code_extract = ConstructionDatum.where(customer_id: query[:customer_id_eq]).order("construction_code desc")
+    end
+    ##upd end
+ 
    
 	#@q = ConstructionDatum.ransack(params[:q])
     #ransack保持用--上記はこれに置き換える
@@ -62,6 +69,11 @@ class ConstructionDataController < ApplicationController
   # GET /construction_data/new
   def new
     @construction_datum = ConstructionDatum.new
+    
+    #画像ファイル用
+    #3.times { @construction_datum.construction_attachments.build }
+    
+    
     Time.zone = "Tokyo"
 
     #工事コードの最終番号を取得
@@ -79,6 +91,23 @@ class ConstructionDataController < ApplicationController
   def edit2
      Time.zone = "Tokyo"
 	 @construction_datum.issue_date = Date.today
+  end
+  
+  
+  #資料添付用
+  # GET /construction_data/1/edit3
+  def edit3
+     #test
+     #3.times { @construction_datum.construction_attachments.build }
+    
+  end
+  def download
+    
+    @construction_attachment = ConstructionAttachment.find(params[:id])
+    # ref: https://github.com/carrierwaveuploader/carrierwave#activerecord
+    filepath = @construction_attachment.attachment.current_path
+    stat = File::stat(filepath)
+    send_file(filepath, :filename => @construction_attachment.title, :length => stat.size)
   end
 
   # POST /construction_data
@@ -122,7 +151,9 @@ class ConstructionDataController < ApplicationController
    
     
     #住所のパラメータ変換
-    params[:construction_datum][:address] = params[:addressX]
+    if params[:addressX].present?
+      params[:construction_datum][:address] = params[:addressX]
+    end
     
     if params[:directions].present?
 	  
@@ -148,8 +179,22 @@ class ConstructionDataController < ApplicationController
    
     respond_to do |format|
 	
-	  
-	  if @construction_datum.update(construction_datum_params)
+      document_flag = false
+    
+	  @update = nil
+      if params[:documents].nil?
+        #通常のアップデート
+        @update = @construction_datum.update(construction_datum_params)
+      else
+        #資料のみ更新した場合
+        @update = @construction_datum.update_attributes(construction_datum_attachments_params)
+      
+        document_flag = true
+      end
+      
+      
+      if @update
+	  #if @construction_datum.update(construction_datum_params)
         
         #工事費集計表データも空で作成(データ存在しない場合のみ)
         #add170330
@@ -161,11 +206,13 @@ class ConstructionDataController < ApplicationController
             @construction_cost = ConstructionCost.create(construction_cost_params)
         end
         #
-		
-		
-		format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully updated.' }
-		
-	  	  
+		if document_flag = false
+          format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully updated.' }
+		else
+        #資料更新の場合、indexへそのまま戻る
+          format.html { redirect_to action: "index", notice: 'Documents was successfully created.' }
+        end
+        
 		if params[:directions].present?
 		  #指示書の発行
 		  
@@ -202,7 +249,9 @@ class ConstructionDataController < ApplicationController
           end
 		 end
 		
-        format.json { render :show, status: :ok, location: @construction_datum }
+         if document_flag == false
+           format.json { render :show, status: :ok, location: @construction_datum }
+         end
       else
         format.html { render :edit }
         format.json { render json: @construction_datum.errors, status: :unprocessable_entity }
@@ -280,7 +329,7 @@ class ConstructionDataController < ApplicationController
 
 	  
 	  #カテゴリー別のアイテムをセット
-	  @customer_extract  += ConstructionDatum.where(:customer_id => params[:customer_id]).where("id is NOT NULL").
+	  @customer_extract  += ConstructionDatum.where(:customer_id => params[:customer_id]).where("id is NOT NULL").order("construction_data.construction_code desc").
            pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
     else
 	#未選択状態の場合は、全リストを出す
@@ -294,7 +343,7 @@ class ConstructionDataController < ApplicationController
       past_date = now_date << 12
 	  #
 	  
-	  @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).
+	  @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).order("construction_data.construction_code desc").
 	      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
 	  
 	  #@customer_extract  = ConstructionDatum.all.
@@ -390,5 +439,8 @@ class ConstructionDataController < ApplicationController
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag)
+    end
+    def construction_datum_attachments_params
+      params.require(:construction_datum).permit(construction_attachments_attributes: [:id, :attachment, :title, :_destroy])
     end
 end

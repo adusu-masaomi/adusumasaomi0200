@@ -15,6 +15,9 @@ class QuotationMaterialDetail < ActiveRecord::Base
   attr_accessor :sequential_id_hide
   #ソート順判別用（新規＝降順、編集＝昇順）
   attr_accessor :sort_order
+  #add180508
+  #備考
+  attr_accessor :notes
   
   # sequential(gem)用 '1707xx
   acts_as_sequenced scope: :quotation_material_header_id

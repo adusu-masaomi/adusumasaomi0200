@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180226013239) do
+ActiveRecord::Schema.define(version: 20180827020137) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -69,6 +69,35 @@ ActiveRecord::Schema.define(version: 20180226013239) do
 
   add_index "account_bank_branch", ["bank_id"], name: "account_bank_branch_bank_id_5343d462_fk_account_bank_id", using: :btree
 
+  create_table "account_cash_book", force: :cascade do |t|
+    t.date     "settlement_date"
+    t.date     "receipt_date"
+    t.string   "description_partner",    limit: 255,               null: false
+    t.string   "description_content",    limit: 255,               null: false
+    t.integer  "incomes",                limit: 4
+    t.integer  "expences",               limit: 4
+    t.integer  "balance",                limit: 4
+    t.datetime "created_at",                         precision: 6
+    t.datetime "update_at",                          precision: 6
+    t.integer  "account_title_id",       limit: 4
+    t.integer  "purchase_order_code_id", limit: 4
+    t.integer  "staff_id",               limit: 4
+    t.integer  "order",                  limit: 4,                 null: false
+  end
+
+  add_index "account_cash_book", ["account_title_id"], name: "account_cash_book_account_title_id_65deee9c_fk_account_a", using: :btree
+  add_index "account_cash_book", ["purchase_order_code_id"], name: "account_cash_book_purchase_order_code_id_25c63053", using: :btree
+  add_index "account_cash_book", ["staff_id"], name: "account_cash_book_staff_id_ae5af84d", using: :btree
+
+  create_table "account_cash_book_weekly", force: :cascade do |t|
+    t.date     "computation_date",                          null: false
+    t.integer  "balance",           limit: 4
+    t.integer  "balance_president", limit: 4
+    t.integer  "balance_staff",     limit: 4
+    t.datetime "created_at",                  precision: 6
+    t.datetime "update_at",                   precision: 6
+  end
+
   create_table "account_partner", force: :cascade do |t|
     t.integer  "order",               limit: 4,                 null: false
     t.string   "administrative_name", limit: 255,               null: false
@@ -101,11 +130,13 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.integer  "account_title_id",    limit: 4
     t.integer  "bank_id",             limit: 4
     t.integer  "bank_branch_id",      limit: 4
+    t.integer  "source_bank_id",      limit: 4
   end
 
-  add_index "account_partner", ["account_title_id"], name: "account_pa_account_title_id_83c0e560_fk_account_account_title_id", using: :btree
-  add_index "account_partner", ["bank_branch_id"], name: "account_partne_bank_branch_id_89ec6121_fk_account_bank_branch_id", using: :btree
+  add_index "account_partner", ["account_title_id"], name: "account_partner_account_title_id_83c0e560_fk_account_a", using: :btree
+  add_index "account_partner", ["bank_branch_id"], name: "account_partner_bank_branch_id_89ec6121_fk_account_b", using: :btree
   add_index "account_partner", ["bank_id"], name: "account_partner_bank_id_4b4698ec_fk_account_bank_id", using: :btree
+  add_index "account_partner", ["source_bank_id"], name: "account_partner_source_bank_id_d58cbbcf_fk_account_bank_id", using: :btree
 
   create_table "account_payment", force: :cascade do |t|
     t.integer  "order",              limit: 4,                 null: false
@@ -121,10 +152,14 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.datetime "update_at",                      precision: 6
     t.integer  "account_title_id",   limit: 4
     t.integer  "partner_id",         limit: 4
+    t.integer  "commission",         limit: 4
+    t.integer  "payment_amount",     limit: 4
+    t.integer  "source_bank_id",     limit: 4
   end
 
-  add_index "account_payment", ["account_title_id"], name: "account_pa_account_title_id_de8d3cfe_fk_account_account_title_id", using: :btree
+  add_index "account_payment", ["account_title_id"], name: "account_payment_account_title_id_de8d3cfe_fk_account_a", using: :btree
   add_index "account_payment", ["partner_id"], name: "account_payment_partner_id_efa46d84_fk_account_partner_id", using: :btree
+  add_index "account_payment", ["source_bank_id"], name: "account_payment_source_bank_id_88df979f_fk_account_bank_id", using: :btree
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -202,6 +237,16 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.string   "purchase_order_last_header_code", limit: 255
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
+  end
+
+  create_table "construction_attachments", force: :cascade do |t|
+    t.integer  "construction_datum_id", limit: 4
+    t.string   "title",                 limit: 255
+    t.string   "attachment",            limit: 255
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.string   "construction_datum",    limit: 255
+    t.string   "references",            limit: 255
   end
 
   create_table "construction_costs", force: :cascade do |t|
@@ -298,6 +343,8 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.string   "responsible1",          limit: 255
     t.string   "responsible2",          limit: 255
     t.integer  "contact_id",            limit: 4
+    t.integer  "card_not_flag",         limit: 4
+    t.integer  "contractor_flag",       limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "update_at",                         null: false
   end
@@ -378,36 +425,38 @@ ActiveRecord::Schema.define(version: 20180226013239) do
   end
 
   create_table "delivery_slip_headers", force: :cascade do |t|
-    t.string   "delivery_slip_code",        limit: 255
-    t.string   "quotation_code",            limit: 255
-    t.string   "invoice_code",              limit: 255
+    t.string   "delivery_slip_code",             limit: 255
+    t.string   "quotation_code",                 limit: 255
+    t.string   "invoice_code",                   limit: 255
+    t.integer  "delivery_slip_header_origin_id", limit: 4
     t.date     "delivery_slip_date"
-    t.integer  "construction_datum_id",     limit: 4
-    t.string   "construction_name",         limit: 255
-    t.integer  "customer_id",               limit: 4
-    t.string   "customer_name",             limit: 255
-    t.integer  "honorific_id",              limit: 4
-    t.string   "responsible1",              limit: 255
-    t.string   "responsible2",              limit: 255
-    t.string   "post",                      limit: 255
-    t.string   "address",                   limit: 255
-    t.string   "house_number",              limit: 255
-    t.string   "address2",                  limit: 255
-    t.string   "tel",                       limit: 255
-    t.string   "fax",                       limit: 255
-    t.string   "construction_period",       limit: 255
-    t.string   "construction_post",         limit: 255
-    t.string   "construction_place",        limit: 255
-    t.string   "construction_house_number", limit: 255
-    t.string   "construction_place2",       limit: 255
-    t.integer  "delivery_amount",           limit: 4
-    t.integer  "execution_amount",          limit: 4
-    t.integer  "last_line_number",          limit: 4
-    t.integer  "category_saved_flag",       limit: 4
-    t.integer  "category_saved_id",         limit: 4
-    t.integer  "subcategory_saved_id",      limit: 4
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.integer  "construction_datum_id",          limit: 4
+    t.string   "construction_name",              limit: 255
+    t.integer  "customer_id",                    limit: 4
+    t.string   "customer_name",                  limit: 255
+    t.integer  "honorific_id",                   limit: 4
+    t.string   "responsible1",                   limit: 255
+    t.string   "responsible2",                   limit: 255
+    t.string   "post",                           limit: 255
+    t.string   "address",                        limit: 255
+    t.string   "house_number",                   limit: 255
+    t.string   "address2",                       limit: 255
+    t.string   "tel",                            limit: 255
+    t.string   "fax",                            limit: 255
+    t.string   "construction_period",            limit: 255
+    t.string   "construction_post",              limit: 255
+    t.string   "construction_place",             limit: 255
+    t.string   "construction_house_number",      limit: 255
+    t.string   "construction_place2",            limit: 255
+    t.integer  "delivery_amount",                limit: 4
+    t.integer  "execution_amount",               limit: 4
+    t.integer  "last_line_number",               limit: 4
+    t.integer  "category_saved_flag",            limit: 4
+    t.integer  "category_saved_id",              limit: 4
+    t.integer  "subcategory_saved_id",           limit: 4
+    t.integer  "fixed_flag",                     limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
   end
 
   create_table "django_admin_log", force: :cascade do |t|
@@ -457,23 +506,23 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.integer  "warehouse_id",             limit: 4
     t.integer  "location_id",              limit: 4
     t.integer  "material_master_id",       limit: 4
-    t.integer  "inventory_quantity",       limit: 4
+    t.float    "inventory_quantity",       limit: 24
     t.integer  "unit_master_id",           limit: 4
     t.integer  "inventory_amount",         limit: 4
     t.integer  "supplier_master_id",       limit: 4
     t.integer  "current_history_id",       limit: 4
     t.date     "current_warehousing_date"
-    t.integer  "current_quantity",         limit: 4
+    t.float    "current_quantity",         limit: 24
     t.float    "current_unit_price",       limit: 24
     t.date     "last_warehousing_date"
     t.float    "last_unit_price",          limit: 24
     t.integer  "next_history_id_1",        limit: 4
     t.date     "next_warehousing_date_1"
-    t.integer  "next_quantity_1",          limit: 4
+    t.float    "next_quantity_1",          limit: 24
     t.float    "next_unit_price_1",        limit: 24
     t.integer  "next_history_id_2",        limit: 4
     t.date     "next_warehousing_date_2"
-    t.integer  "next_quantity_2",          limit: 4
+    t.float    "next_quantity_2",          limit: 24
     t.float    "next_unit_price_2",        limit: 24
     t.string   "image",                    limit: 255
     t.datetime "created_at",                           null: false
@@ -485,7 +534,7 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.integer  "inventory_division_id", limit: 4
     t.integer  "construction_datum_id", limit: 4
     t.integer  "material_master_id",    limit: 4
-    t.integer  "quantity",              limit: 4
+    t.float    "quantity",              limit: 24
     t.integer  "inventory_quantity",    limit: 4
     t.integer  "unit_master_id",        limit: 4
     t.float    "unit_price",            limit: 24
@@ -596,6 +645,7 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.integer  "payment_method_id",         limit: 4
     t.integer  "commission",                limit: 4
     t.date     "payment_date"
+    t.integer  "labor_insurance_not_flag",  limit: 4
     t.integer  "last_line_number",          limit: 4
     t.string   "remarks",                   limit: 255
     t.datetime "created_at",                            null: false
@@ -617,17 +667,29 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.datetime "update_at",              null: false
   end
 
+  create_table "material_categories", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "seq",        limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "material_masters", force: :cascade do |t|
     t.string   "material_code",                    limit: 255
     t.string   "material_name",                    limit: 255
     t.integer  "maker_id",                         limit: 4
     t.integer  "unit_id",                          limit: 4
     t.integer  "list_price",                       limit: 4
+    t.integer  "list_price_quotation",             limit: 4
     t.integer  "standard_quantity",                limit: 4
     t.float    "standard_labor_productivity_unit", limit: 24
+    t.float    "standard_rate",                    limit: 24
     t.float    "last_unit_price",                  limit: 24
     t.date     "last_unit_price_update_at"
     t.integer  "inventory_category_id",            limit: 4
+    t.integer  "material_category_id",             limit: 4
+    t.date     "list_price_update_at"
+    t.string   "notes",                            limit: 255
     t.datetime "created_at",                                   null: false
     t.datetime "update_at",                                    null: false
   end
@@ -916,6 +978,7 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.integer  "subcategory_saved_id",       limit: 4
     t.date     "invoice_period_start_date"
     t.date     "invoice_period_end_date"
+    t.integer  "fixed_flag",                 limit: 4
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
   end
@@ -1054,10 +1117,10 @@ ActiveRecord::Schema.define(version: 20180226013239) do
     t.date     "stocktake_date"
     t.integer  "material_master_id",    limit: 4
     t.integer  "inventory_id",          limit: 4
-    t.integer  "physical_quantity",     limit: 4
+    t.float    "physical_quantity",     limit: 24
     t.float    "unit_price",            limit: 24
     t.integer  "physical_amount",       limit: 4
-    t.integer  "book_quantity",         limit: 4
+    t.float    "book_quantity",         limit: 24
     t.integer  "book_amount",           limit: 4
     t.integer  "inventory_update_flag", limit: 4
     t.datetime "created_at",                       null: false
@@ -1313,10 +1376,13 @@ ActiveRecord::Schema.define(version: 20180226013239) do
   add_foreign_key "account_authuser_user_permissions", "account_authuser", column: "authuser_id", name: "account_authuser_use_authuser_id_6e7eeb5d_fk_account_authuser_id"
   add_foreign_key "account_authuser_user_permissions", "auth_permission", column: "permission_id", name: "account_authuser_us_permission_id_6812ac4a_fk_auth_permission_id"
   add_foreign_key "account_bank_branch", "account_bank", column: "bank_id", name: "account_bank_branch_bank_id_5343d462_fk_account_bank_id"
-  add_foreign_key "account_partner", "account_account_title", column: "account_title_id", name: "account_pa_account_title_id_83c0e560_fk_account_account_title_id"
+  add_foreign_key "account_cash_book", "account_account_title", column: "account_title_id", name: "account_cash_book_account_title_id_65deee9c_fk_account_a"
+  add_foreign_key "account_partner", "account_account_title", column: "account_title_id", name: "account_partner_account_title_id_83c0e560_fk_account_a"
   add_foreign_key "account_partner", "account_bank", column: "bank_id", name: "account_partner_bank_id_4b4698ec_fk_account_bank_id"
-  add_foreign_key "account_partner", "account_bank_branch", column: "bank_branch_id", name: "account_partne_bank_branch_id_89ec6121_fk_account_bank_branch_id"
-  add_foreign_key "account_payment", "account_account_title", column: "account_title_id", name: "account_pa_account_title_id_de8d3cfe_fk_account_account_title_id"
+  add_foreign_key "account_partner", "account_bank", column: "source_bank_id", name: "account_partner_source_bank_id_d58cbbcf_fk_account_bank_id"
+  add_foreign_key "account_partner", "account_bank_branch", column: "bank_branch_id", name: "account_partner_bank_branch_id_89ec6121_fk_account_b"
+  add_foreign_key "account_payment", "account_account_title", column: "account_title_id", name: "account_payment_account_title_id_de8d3cfe_fk_account_a"
+  add_foreign_key "account_payment", "account_bank", column: "source_bank_id", name: "account_payment_source_bank_id_88df979f_fk_account_bank_id"
   add_foreign_key "account_payment", "account_partner", column: "partner_id", name: "account_payment_partner_id_efa46d84_fk_account_partner_id"
   add_foreign_key "auth_group_permissions", "auth_group", column: "group_id", name: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id"
   add_foreign_key "auth_group_permissions", "auth_permission", column: "permission_id", name: "auth_group_permissi_permission_id_84c5c92e_fk_auth_permission_id"

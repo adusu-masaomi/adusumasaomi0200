@@ -66,8 +66,12 @@ class EstimationSheetLandscapePDF
 		     @quotation_headers = QuotationHeaderHistory.find(quotation_detail_large_classification.quotation_header_history_id)
 		   end
 		   
-		   @construction_data = ConstructionDatum.find(@quotation_headers.construction_datum_id)
-		   @customer_masters = CustomerMaster.find(@quotation_headers.customer_id)
+           @construction_data = nil
+           if ConstructionDatum.where(:id => @quotation_headers.construction_datum_id).exists?
+		     @construction_data = ConstructionDatum.find(@quotation_headers.construction_datum_id)
+		   end
+           
+           @customer_masters = CustomerMaster.find(@quotation_headers.customer_id)
 		   
 		   #郵便番号
            #@report.page.item(:post).value(@quotation_headers.post) 
@@ -102,8 +106,13 @@ class EstimationSheetLandscapePDF
 		   #見積No
 		   @report.page.item(:quotation_code2).value(@quotation_headers.quotation_code) 
 		   #工事CD
-		   @report.page.item(:construction_code).value(@construction_data.construction_code) 
-		   
+           if !(@construction_data.blank?)
+		     @report.page.item(:construction_code).value(@construction_data.construction_code) 
+		   else
+             #データ存在しない場合
+             @report.page.item(:construction_code).value("-")
+           end
+           
 		   #顧客CD
 		   @report.page.item(:customer_code).value(@customer_masters.id)
 		   

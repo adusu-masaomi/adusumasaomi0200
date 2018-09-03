@@ -1,2 +1,7 @@
-$("#delivery_slip_detail_middle_classification-modal").html("<%= escape_javascript(render 'edit') %>")
-$("#delivery_slip_detail_middle_classification-modal").modal("show")
+<% if @status != 'fixed' %>
+    $("#delivery_slip_detail_middle_classification-modal").html("<%= escape_javascript(render 'edit') %>")
+    $("#delivery_slip_detail_middle_classification-modal").modal("show")
+<% else %>
+    alert('確定済みのデータです。このデータは変更できません！\n（解除したい場合は、一覧データの”確定済み”の\nチェックを外してください）');
+<% end %>
+

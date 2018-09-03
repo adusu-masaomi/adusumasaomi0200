@@ -53,11 +53,14 @@ class InvoiceListPDF
 		    
 		    report.list(:default).add_row do |row|
 			  
-              #binding.pry
               
-              #add180331
+              #備考欄の背景色(非表示)
               row.item(:fmeSituation).visible(false)
               
+              #add180719
+              #得意先の背景色(非表示)
+              row.item(:fmeCustomer).visible(false)
+              row.item(:lineDelete).visible(false)
               
 			  #請求金額をフォーマット
 			  #@num = invoice_header.billing_amount
@@ -101,8 +104,13 @@ class InvoiceListPDF
 			    invoice_date = Date.new(0001, 01, 01)
 			  end
 			  
-			  if @month != "" && (invoice_date.year == @year && invoice_date.mon != @month) 
-				#月ごとの小計
+              #月ごとの小計
+              
+              #12月の計が出ないバグ修正(upd180417)
+              #if @month != "" && (invoice_date.year == @year && invoice_date.mon != @month)
+              if (@month != "" && (invoice_date.year == @year && invoice_date.mon != @month)) ||
+                 (@month == 12 && (invoice_date.year > @year && invoice_date.mon != @month))
+				
 				
 			    set_subtotal
 				
@@ -117,6 +125,8 @@ class InvoiceListPDF
 							        commission: @commission_subtotal_formatted
 				       #add180331
                        row2.item(:fmeSituation).visible(false)
+                       row2.item(:fmeCustomer).visible(false)
+                       row2.item(:lineDelete).visible(false)
 				end
              
 			    @biling_amount_subtotal = 0
@@ -126,6 +136,7 @@ class InvoiceListPDF
               else
 			    row.item(:line_upper).visible(false)
 				row.item(:line_lower).visible(false)
+                row.item(:lineDelete).visible(false)
 			    #row.item(:rect).style(:border_width, 1)
 			  
 		        #同一月でも、最終ページ判定用に変数保存
@@ -157,6 +168,8 @@ class InvoiceListPDF
                              commission: @commission_total_formatted
                         #add180331
                        row2.item(:fmeSituation).visible(false)
+                       row2.item(:fmeCustomer).visible(false)
+                       row2.item(:lineDelete).visible(false)
 				end
                 
                 @biling_amount_subtotal = 0
@@ -197,11 +210,27 @@ class InvoiceListPDF
 			  #row.item(:rect).style(:border_width, 1)
 			  row.item(:line_upper).visible(false)
 			  row.item(:line_lower).visible(false)
+              row.item(:lineDelete).visible(false)
 			  
               
-              #add180331
+              #未入金のものに背景色をつける
               if invoice_header.invoice_code.present? && invoice_header.payment_date.blank?
                 row.item(:fmeSituation).visible(true)
+              end
+              
+              #add180719
+              #元請業者の色つけ（印刷フラグがある場合のみ）
+              if $print_flag_invoice == "1"
+                  #元請業者には赤系の色をつける
+                  if invoice_header.customer_master.present?
+                    if invoice_header.customer_master.contractor_flag == 1
+                        row.item(:fmeCustomer).visible(true)
+                    end
+                  end
+                  #労働保険対象外は取り消し線入れる
+                  if invoice_header.labor_insurance_not_flag == 1
+                    row.item(:lineDelete).visible(true)
+                  end
               end
               
 			  #明細行出力
@@ -245,6 +274,8 @@ class InvoiceListPDF
 						   billing_amount: @biling_amount_subtotal_formatted,
 			               commission: @commission_subtotal_formatted
                    row2.item(:fmeSituation).visible(false)
+                   row2.item(:fmeCustomer).visible(false)
+                   row2.item(:lineDelete).visible(false)
           end
         end
 		#合計
@@ -259,6 +290,8 @@ class InvoiceListPDF
 						    billing_amount: @biling_amount_total_formatted,
 						    commission: @commission_total_formatted
                 row2.item(:fmeSituation).visible(false)
+                row2.item(:fmeCustomer).visible(false)
+                row2.item(:lineDelete).visible(false)
 	    end
 	
 		

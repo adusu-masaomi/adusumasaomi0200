@@ -1,5 +1,5 @@
 class WorkingMiddleItemsController < ApplicationController
-  before_action :set_working_middle_item, only: [:show, :edit, :update, :destroy]
+  before_action :set_working_middle_item, only: [:show, :edit, :update, :destroy, :copy]
   before_action :set_move_flag, only: [:new, :edit]
   
   #新規画面への引継ぎ用クラス変数
@@ -9,6 +9,17 @@ class WorkingMiddleItemsController < ApplicationController
   # GET /working_middle_items
   # GET /working_middle_items.json
   def index
+  
+    #add180829
+    #ページングはコントローラ側で行う（モバイルとの切り分けがあるため）
+    page_disp_max_num = 0
+    if browser.platform.ios? || browser.platform.android?
+      page_disp_max_num = 50
+    else
+      page_disp_max_num = 200
+    end
+    #
+    
     #ransack保持用コード
     query = params[:q]
     #query ||= eval(cookies[:recent_search_history].to_s)
@@ -68,7 +79,10 @@ class WorkingMiddleItemsController < ApplicationController
     #
 	
 	@working_middle_items  = @q.result(distinct: true)
-    @working_middle_items  = @working_middle_items.page(params[:page])
+    
+    #@working_middle_items  = @working_middle_items.page(params[:page])
+    #upd180829
+    @working_middle_items  = @working_middle_items.page(params[:page]).per(page_disp_max_num)
 	
 	$sort = nil
 	
@@ -505,8 +519,13 @@ class WorkingMiddleItemsController < ApplicationController
 			  
               #upd180316
               #品番品名・定価・メーカーのみ登録。
+              #material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
+			  #   list_price: item[:unit_price], maker_id: item[:maker_master_id] }
+              
+              #upd180720
+              #品番品名・メーカーのみ登録。
               material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
-			     list_price: item[:unit_price], maker_id: item[:maker_master_id] }
+			     maker_id: item[:maker_master_id] }
                  
               #material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
 			  #   maker_id: 1, unit_id: 1, standard_quantity: item[:quantity], list_price: item[:unit_price], 
@@ -660,6 +679,38 @@ class WorkingMiddleItemsController < ApplicationController
     @working_middle_item.destroy
     respond_to do |format|
       format.html { redirect_to working_middle_items_url, notice: 'Working middle item was successfully destroyed.' }
+      format.json { head :no_content }
+    end
+  end
+
+  
+  #add 180719
+  #レコードをコピーする
+  def copy
+    #test deo
+    new_record = @working_middle_item.dup
+    ##new_record.seq = nil  #seqは空にする
+    
+    #new_record = WorkingMiddleItem.new(@working_middle_item.attributes.select{ |key, _| WorkingMiddleItem.attribute_names.include? key })
+    
+    #not work well
+    new_record = @working_middle_item.deep_clone include: :working_small_items
+    
+    #binding.pry
+    
+    
+    #test
+    status = new_record.save
+    
+   
+    
+    respond_to do |format|
+      if status == true
+        notice = 'Working middle item was successfully copied.'
+      else
+        notice = 'Working middle item was unfortunately failed...'
+      end
+        format.html { redirect_to working_middle_items_url, notice: notice }
       format.json { head :no_content }
     end
   end

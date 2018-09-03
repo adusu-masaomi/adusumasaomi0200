@@ -47,8 +47,11 @@
    <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name,
    {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>
    
-   
-   <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Date.today , style: 'width:220px'},as: :date_picker %>
+  
+   <!--<%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Date.today , style: 'width:220px'},as: :date_picker %>-->
+   <!--upd180821 海外時間になってい他ので修正-->
+   <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, 
+        input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Time.now.in_time_zone('Tokyo').to_date , style: 'width:220px'},as: :date_picker %>
   
    <!--<%= f.hidden_field :mail_sent_flag, input_html:{id: "mail_sent_flag"} %>-->
    <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
@@ -475,13 +478,16 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	 
 	 if (visibled == "true") {
 	     
-		 
-		 
        	 $('#filter').removeClass('hide');
 		 // マウスカーソルの形を変える
 		 $("body").css("cursor", "default");
 	 }else{
-	     $('#filter').addClass('hide');
+	     //$('#filter').addClass('hide');
+         //モバイル対応 add180829
+         //iodだと、removeclassが何故か機能しないので・・・
+         if(!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ) {
+           $('#filter').addClass('hide');
+         }
 	 }
   }
 
@@ -638,24 +644,22 @@ function dispDiv() {
 	   // Loadingイメージ表示
        $('#loading-indicator').show();
 	   
-	   
-	   //5秒待つ（描写されないことがあるため）
+       //5秒待つ（描写されないことがあるため）
 	   //centOS上では必須なようである！
 	   setTimeout("reloadDiv()", 5000);
         
 	
-		//setTimeout(reloadDiv(), 30000);  
-           
-           //reloadDiv();   	   
+	   //setTimeout(reloadDiv(), 30000);  
+       //reloadDiv();   	   
 
 	   //隠れていたボタンをここで表示させる
        //$('#filter').removeClass('hide');
+       
        //セッション用のパラメータへセットする
        sessionStorage.setItem('onvisible', 'true');
-  
-	    
+       
        // Loadingイメージを消す
-      // $('#loading-indicator').hide();
+       // $('#loading-indicator').hide();
 
      }
    );

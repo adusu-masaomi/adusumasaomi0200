@@ -292,8 +292,8 @@ class ConstructionDailyReportsController < ApplicationController
         format.json { render json: @construction_daily_report.errors, status: :unprocessable_entity }
       end
       
-      @construction_daily_report.update(construction_data_params)  
-	 
+      @construction_daily_report.update(construction_data_params) 
+       
     end
   end
   

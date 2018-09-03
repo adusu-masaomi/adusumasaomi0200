@@ -1,5 +1,8 @@
 class WorkingMiddleItem < ActiveRecord::Base
-   paginates_per 200  # 1ページあたり項目表示
+
+   #require "browser"
+   #browser = Browser.new("Some User Agent", accept_language: "en-us")
+   #paginates_per 200  # 1ページあたり項目表示
 
    belongs_to :WorkingUnit, :foreign_key => "working_unit_id"
    belongs_to :MaterialMaster, :foreign_key => "material_id"
@@ -12,7 +15,7 @@ class WorkingMiddleItem < ActiveRecord::Base
    belongs_to :working_subcategory
   
    #明細（小）フォームajax用
-   attr_accessor :material_id_hide     #add180214
+   attr_accessor :material_id_hide     
    attr_accessor :material_code_hide
    attr_accessor :material_name_hide
    attr_accessor :quantity_hide
@@ -22,8 +25,8 @@ class WorkingMiddleItem < ActiveRecord::Base
    attr_accessor :maker_id_hide        
    attr_accessor :unit_master_id_hide  
    attr_accessor :working_subcategory_select_hide 
-   
-   attr_accessor :list_price_color_hide  #add180331
+   attr_accessor :list_price_color_hide 
+   attr_accessor :rate_hide   #add180726
    
    #明細合計用
    attr_accessor :material_cost_total

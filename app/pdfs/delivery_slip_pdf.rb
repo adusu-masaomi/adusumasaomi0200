@@ -97,11 +97,16 @@ class DeliverySlipPDF
 		     @report.page.item(:delivery_amount_tax_only).value(@delivery_amount_tax_only) 
 		   end
 		   
+           #納品日
 		   if @delivery_slip_headers.delivery_slip_date.present?
 		     @gengou = @delivery_slip_headers.delivery_slip_date
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		     @report.page.item(:delivery_slip_date).value(@gengou) 
-		   end
+		   else
+            #空でも文字を出す add180515
+             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             @report.page.item(:delivery_slip_date).value(empty_string) 
+           end
 		   
 		   #NET金額
 		   #if @delivery_slip_headers.net_amount.present?
@@ -252,7 +257,11 @@ class DeliverySlipPDF
              @gengou = @delivery_slip_headers.delivery_slip_date
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		     @report.page.item(:delivery_slip_date).value(@gengou) 
-		   end
+		   else
+            #空でも文字を出す add180515
+             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             @report.page.item(:delivery_slip_date).value(empty_string) 
+           end
 		   
 		   #品目名
 		   @report.page.item(:working_large_item_name).value(delivery_slip_detail_middle_classification.DeliverySlipDetailLargeClassification.working_large_item_name)

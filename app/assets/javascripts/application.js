@@ -14,6 +14,7 @@
 //= require jquery
 //= require jquery_ujs
 //= require jquery-ui
+// require jquery.ui.touch-punch.min
 // require jquery.ui.sortable
 // require jquery-ui/sortable
 // require cocoon

@@ -104,8 +104,18 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	      @quotation_detail_middle_classifications = @quotation_detail_middle_classifications.order(column_name + " desc")
 		end
 	end
-	#add end 
-
+	
+    #add180423
+    #内訳へのデータ移行を行う。
+    if params[:data_type] == "1"
+      #内訳へデータ移行
+      move_middle_to_large
+      if @success_flag == true
+	    flash[:notice] = "データ作成が完了しました。"
+      end
+	end
+    #add end 
+      
   end
     
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
@@ -147,6 +157,17 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
     if params[:quotation_header_id].present?
       @quotation_header_id = params[:quotation_header_id]
+      #add180803
+      #確定済みのものは、変更できないようにする
+      quotation_header = QuotationHeader.find(params[:quotation_header_id])
+      if quotation_header.present?
+        if quotation_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
     end
 	
     if @@new_flag == "1"
@@ -173,6 +194,21 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #カテゴリー保持フラグを取得
     #add180210
     get_category_save_flag
+    
+    #add180803
+    #確定済みのものは、変更できないようにする
+    if params[:quotation_header_id].present?
+      quotation_header = QuotationHeader.find(params[:quotation_header_id])
+      if quotation_header.present?
+        if quotation_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+    end
+    #
+    
   end
 
   # POST /quotation_detail_middle_classifications
@@ -385,23 +421,36 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
       @quotation_header_id = params[:quotation_header_id]
       if params[:quotation_detail_large_classification_id].present?
           @quotation_detail_large_classification_id = params[:quotation_detail_large_classification_id]
+      
+          #add180803
+          #確定済みのものは、変更できないようにする
+          quotation_header = QuotationHeader.find(params[:quotation_header_id])
+          if quotation_header.present?
+            if quotation_header.fixed_flag == 1
+              @status = "fixed"
+            else
+              @status = "not_fixed"
+            end
+          end
+          #
       end
 	end
   
-    @quotation_detail_middle_classification.destroy
-    respond_to do |format|
-      #format.html { redirect_to quotation_detail_middle_classifications_url, notice: 'Quotation detail middle classification was successfully destroyed.' }
-      #format.json { head :no_content }
-	  
-	  format.html {redirect_to quotation_detail_middle_classifications_path( :quotation_header_id => params[:quotation_header_id],
-                    :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id], 
-	                :quotation_header_name => params[:quotation_header_name],
-                    :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
-                   )}
+    if @status != "fixed"
+      @quotation_detail_middle_classification.destroy
+    #respond_to do |format|
+      #del180803
+      #確定済みデータに警告を出すため、ここでリダイレクトさせない
+	  #format.html {redirect_to quotation_detail_middle_classifications_path( :quotation_header_id => params[:quotation_header_id],
+      #              :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id], 
+	  #              :quotation_header_name => params[:quotation_header_name],
+      #              :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
+      #             )}
 	  
 	  #品目データの金額を更新
       save_price_to_large_classifications
 	  
+    #end
     end
   end
   
@@ -916,6 +965,106 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   
   end
   
+  #add180426
+  #明細→内訳へのデータ移行
+  def move_middle_to_large
+  
+    q_d_m_cs = 
+        QuotationDetailMiddleClassification.where(:quotation_header_id => params[:quotation_header_id]).
+             where(:quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id])
+    if q_d_m_cs.present?
+      success_flag = true
+      
+      #内訳、行数の最大値を取得する
+      line_number = QuotationDetailLargeClassification.
+        where(:quotation_header_id => params[:quotation_header_id]).maximum(:line_number)
+      
+      #内訳が１件しかない場合は、行数１からカウントアップさせるようにする
+      if line_number == 1
+        line_number = 0
+      end
+      
+      q_d_m_cs.each do |q_d_m_c|
+        
+        line_number += 1
+        
+        quotation_detail_large_classification_params = 
+          {quotation_header_id: params[:quotation_header_id], quotation_items_division_id: q_d_m_c.quotation_items_division_id,
+           working_large_item_id: q_d_m_c.working_middle_item_id, working_specific_middle_item_id: q_d_m_c.working_specific_middle_item_id,
+           working_large_item_name: q_d_m_c.working_middle_item_name, working_large_item_short_name: q_d_m_c.working_middle_item_short_name,
+           working_middle_item_category_id: q_d_m_c.working_middle_item_category_id, working_middle_item_category_id_call: q_d_m_c.working_middle_item_category_id_call,
+           working_middle_item_subcategory_id: q_d_m_c.working_middle_item_subcategory_id, working_middle_item_subcategory_id_call: q_d_m_c.working_middle_item_subcategory_id_call,
+           working_large_specification: q_d_m_c.working_middle_specification, line_number: line_number, quantity: q_d_m_c.quantity, execution_quantity: q_d_m_c.execution_quantity,
+           working_unit_id: q_d_m_c.working_unit_id, working_unit_name: q_d_m_c.working_unit_name, working_unit_price: q_d_m_c.working_unit_price, 
+           quote_price: q_d_m_c.quote_price, execution_unit_price: q_d_m_c.execution_unit_price, execution_price: q_d_m_c.execution_price, labor_productivity_unit: q_d_m_c.labor_productivity_unit, 
+           labor_productivity_unit_total: q_d_m_c.labor_productivity_unit_total, remarks: q_d_m_c.remarks, construction_type: q_d_m_c.construction_type, 
+           piping_wiring_flag: q_d_m_c.piping_wiring_flag, equipment_mounting_flag: q_d_m_c.equipment_mounting_flag, labor_cost_flag: q_d_m_c.labor_cost_flag
+          }
+                                                         
+        quotation_detail_large_classification = QuotationDetailLargeClassification.new(quotation_detail_large_classification_params)
+        unless quotation_detail_large_classification.save!(:validate => false)
+          success_flag = false
+        end 
+      end
+      if success_flag == true
+        #既存のデータを削除
+        #明細データ削除
+        q_d_m_cs.destroy_all
+        #内訳データ削除
+        QuotationDetailLargeClassification.find(params[:quotation_detail_large_classification_id]).destroy
+        
+        if save_price_to_headers_move(line_number) == true
+        #合計値を一覧データへ書き込み
+        
+          #リダイレクト
+          #(これをしないとパラメータが残る)
+          respond_to do |format|
+            format.html {redirect_to quotation_detail_large_classifications_path(:quotation_header_id => params[:quotation_header_id], 
+                    :quotation_header_name => params[:quotation_header_name], :working_large_item_name => params[:working_large_item_name], 
+                    :working_large_specification => params[:working_large_specification] )}
+          end
+        end
+      end
+    end
+     
+    
+  end
+  
+  #del180822
+  #見積金額トータル
+  #def quote_total_price_large
+  #   @quote_total_price_large = QuotationDetailLargeClassification.where(["quotation_header_id = ?", params[:quotation_header_id]]).sumpriceQuote
+  #end 
+  ##実行金額トータル
+  #def execution_total_price_Large
+  #   @execution_total_price_Large = QuotationDetailLargeClassification.where(["quotation_header_id = ?", 
+  #      params[:quotation_header_id]]).sumpriceExecution
+  #end
+  
+  #見出データへ合計保存用
+  def save_price_to_headers_move(line_number)
+     quotation_header = QuotationHeader.find(params[:quotation_header_id])
+     
+     status = false
+     if quotation_header.present? 
+         #請求金額
+          quotation_header.quote_price = quote_total_price_large
+		  
+          #実行金額
+          quotation_header.execution_amount = execution_total_price_Large
+          
+          
+          #最終行
+          quotation_header.last_line_number = line_number
+          
+          status = quotation_header.save
+          
+     end 
+     return status
+     
+  end
+  #(ここまで)内訳→明細へのデータ移行
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_quotation_detail_middle_classification
@@ -953,8 +1102,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
         #見積金額
         @quotation_detail_large_classification.quote_price = quote_total_price
+        
         #実行金額
         @quotation_detail_large_classification.execution_price = execution_total_price
+        
         #歩掛り
         @quotation_detail_large_classification.labor_productivity_unit = labor_total
 		#歩掛計
@@ -978,6 +1129,7 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		  
           #実行金額
           @quotation_header.execution_amount = execution_total_price_Large
+          
           @quotation_header.save
        end 
    end

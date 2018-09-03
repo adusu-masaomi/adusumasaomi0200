@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :construction_attachments
+  resources :material_categories
   resources :purchase_headers
   resources :working_subcategories
   resources :working_subcatefories
@@ -118,6 +120,8 @@ Rails.application.routes.draw do
     member do
       get :edit2
       patch :update_and_pdf
+      get :edit3
+      get :download
 	end
   end
   
@@ -172,12 +176,9 @@ Rails.application.routes.draw do
   post '/working_middle_itemz/reorder' => 'working_middle_items#reorder'
   post '/working_large_itemz/reorder' => 'working_large_items#reorder'
   
-  #add180206
   post '/working_categoriez/reorder' => 'working_categories#reorder'
-  #add180207
   post '/working_subcategoriez/reorder' => 'working_subcategories#reorder'
   
-  #add170421
   post '/working_unitz/reorder' => 'working_units#reorder'
   post '/quotation_detail_large_classificationz/reorder' => 'quotation_detail_large_classifications#reorder'
   post '/quotation_breakdown_historiez/reorder' => 'quotation_breakdown_histories#reorder'
@@ -189,37 +190,28 @@ Rails.application.routes.draw do
   post '/invoice_detail_middle_classificationz/reorder' => 'invoice_detail_middle_classifications#reorder'
   #
   
-  #add170927
+  post '/material_categoriez/reorder' => 'material_categories#reorder'
+  
   get '/material_masterz/get_material_id' => 'material_masters#get_material_id'
   
   get '/purchase_datum/unit_price_select' => 'purchase_data#unit_price_select'
   get '/purchase_datum/list_price_select' => 'purchase_data#list_price_select'
   get '/purchase_datum/maker_select' => 'purchase_data#maker_select'
   get '/purchase_datum/unit_select' => 'purchase_data#unit_select'
-  
   get '/purchase_datum/supplier_item_select' => 'purchase_data#supplier_item_select'
   
-  #add170226
+  #add180627
+  get '/purchase_datum/material_category_select' => 'purchase_data#material_category_select'
+  
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
-  #add170428
   get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
-  
-  #add180221
   get '/purchase_datum/get_header_id' => 'purchase_data#get_header_id'
-  
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   
-  #add170904
   get "/quotation_material_headerz/get_data" => 'quotation_material_headers#get_data'
   get "/quotation_material_headerz/email_select" => 'quotation_material_headers#email_select'
-  #add170906
   get "/quotation_material_headerz/set_sequence" => 'quotation_material_headers#set_sequence'
-  
-  #add171023
   get "/quotation_material_headerz/get_purchase_order_code" => 'quotation_material_headers#get_purchase_order_code'
-  
-  #161212
-  #get "/purchase_order_historiez/check_quantity" => 'purchase_order_histories#check_quantity'
   
   get '/purchase_order_histories_list' => "purchase_order_histories#index2"
   
@@ -269,19 +261,18 @@ Rails.application.routes.draw do
   get '/construction_costz/purchase_amount_etc_select' => 'construction_costs#purchase_amount_etc_select'
   get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
 
-  #add170912
   get '/construction_costz/set_caluculated_flag' => 'construction_costs#set_caluculated_flag'
 
-  #add170621
   #見積書履歴保存処理
   get "/quotation_header_historiez/set_history" => 'quotation_header_histories#set_history'
 
-  #get '/quotation_headerz/customer_name_select' => 'quotation_headers#customer_name_select'
-  #upd161028
+  #add180803
+  #見積書確定処理用
+  get "/quotation_headerz/set_fixed" => 'quotation_headers#set_fixed'
+  
   #見積書一覧D顧客情報
   get '/quotation_headerz/customer_info_select' => 'quotation_headers#customer_info_select'
   
-  #add170831
   get '/quotation_headerz/duplicate_quotation_header' => 'quotation_headers#duplicate_quotation_header'
 
   #  add161003
@@ -378,6 +369,12 @@ Rails.application.routes.draw do
   ###
   #納品書見出D関連
   get '/delivery_slip_headerz/customer_info_select' => 'delivery_slip_headers#customer_info_select'
+  get '/delivery_slip_headerz/duplicate_delivery_slip_header' => 'delivery_slip_headers#duplicate_delivery_slip_header'
+  
+  #add180817
+  #納品書確定処理用
+  get "/delivery_slip_headerz/set_fixed" => 'delivery_slip_headers#set_fixed'
+  
   #納品書内訳D関連
   get '/delivery_slip_detail_large_classificationz/working_large_item_select' => 'delivery_slip_detail_large_classifications#working_large_item_select'
   get '/delivery_slip_detail_large_classificationz/working_large_specification_select' => 'delivery_slip_detail_large_classifications#working_large_specification_select'
@@ -562,6 +559,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :construction_attachments
+  resources :material_categories
   resources :purchase_headers
   resources :working_subcategories
   resources :working_subcatefories
@@ -587,6 +586,10 @@ Rails.application.routes.draw do
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :working_middle_items
+  
+  #add180719
+  get 'working_middle_items/:id/copy', to: 'working_middle_items#copy', as: :copy_working_middle_item
+  
   resources :working_large_items
   resources :working_large_items
   resources :working_large_items

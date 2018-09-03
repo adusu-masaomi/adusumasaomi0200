@@ -11,13 +11,27 @@
   
   <%= search_form_for @q do |f| %>
   <%= f.label :delivery_slip_code, '納品Ｎｏ：' %>
-  <!--<%= f.select :id_eq, options_from_collection_for_select(DeliverySlipHeader.all, "id", "delivery_slip_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %></br>-->
-  <%= f.select :id_eq, DeliverySlipHeader.all.map{|st| [st.quotation_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
+  <%= f.select :id_eq, DeliverySlipHeader.all.map{|st| [st.quotation_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableDeliverySlipCode" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearDeliverySlipCode()" %>
+  <% end %>
+  
   <%= f.label :construction_code, '件名：' %>
-  <!--<%= f.select :with_id, options_from_collection_for_select(DeliverySlipHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>-->
-  <%= f.select :with_id, DeliverySlipHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %></br>
+  <%= f.select :with_id, DeliverySlipHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+  <% end %>
+  </br>
+  
   <%= f.label :customer_name, '得意先：' %>
-  <%= f.select :customer_id_eq, DeliverySlipHeader.all.select(:customer_name, :customer_id).uniq.map{|st| [st.customer_name, st.customer_id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableCustomerName" } %></br>
+  <%= f.select :customer_id_eq, DeliverySlipHeader.all.select(:customer_name, :customer_id).uniq.map{|st| [st.customer_name, st.customer_id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableCustomerName" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
+  <% end %>
+  </br>
   
   	<div>
     	<%= f.submit '検索する' %>
@@ -103,7 +117,7 @@
   
   //検索可能なリストボックス
   $(document).ready(function(){
-	$(".searchableQuotationCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+	$(".searchableDeliverySlipCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
     $(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
     $(".searchableCustomerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
     
@@ -117,6 +131,8 @@
         fc = 1;  //固定列数
 		//ht -= 70;
 		ht -= 108;
+        
+        sz = 1920; //for ipad pro (add180829)
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
@@ -141,5 +157,19 @@
       bodyDiv.scrollTop($.cookie(key));
     },0);
   }
+  //モバイル用対応 add180830
+  //select2をクリアする
+  function clearDeliverySlipCode(){
+    $(".searchableDeliverySlipCode").val(null).trigger("change"); 
+  }
+  function clearConstruction(){
+    $(".searchableConstructionName").val(null).trigger("change"); 
+  }
+  function clearCustomer(){
+    $(".searchableCustomerName").val(null).trigger("change"); 
+  }
+  //
+  
+  
 </script>
 

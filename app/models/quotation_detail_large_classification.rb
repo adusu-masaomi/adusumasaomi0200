@@ -41,6 +41,18 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   attr_accessor :category_save_flag_child
   #
   
+  
+  #add180803
+  #確定済みのバリデーション
+  #とりあえずここで必要ないので保留中・・
+  #validate :check_fixed
+  #def check_fixed
+  #  if  self.QuotationHeader.fixed_flag ==  1
+  #      errors.add(:quotation_code, ": 確定済みです。変更したい場合は、" << 
+  #        "　　　　　　　　" << "「確定済み」のチェックを外してください。")
+  #  end
+  #end
+  
   #金額合計(見積)
   def self.sumpriceQuote  
     #工事種別が通常かまたは値引の場合のみ合算。

@@ -424,7 +424,7 @@
               "type": "number",
               "number": {
                 "delimiter": ",",
-                "precision": 0
+                "precision": 1
               }
             }
           },

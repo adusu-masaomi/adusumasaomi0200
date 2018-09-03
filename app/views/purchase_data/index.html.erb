@@ -29,14 +29,23 @@
   <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
   <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
   
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSupplier()" %>
+  <% end %>
   </br>
   
   <!--<%= f.text_field :purchase_date_gteq, class:"my-custom-class-d datepicker", include_blank: true  %>-->
   <!--<%= f.text_field :purchase_date_gteq, as: :datepicker, required: false, include_blank: true  %>-->
   
   <%= f.label :purchase_order_datum_id, '注文No：：' %>
-  <!--<%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>-->
   <%= f.select :purchase_order_datum_id_eq, @purchase_order_data_extract.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
+  
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrder()" %>
+  <% end %>
+  
   <%= f.label :division_id, '仕入区分' %>
   <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true},
        { id: 'division_id', style: 'width:120px' , class: "searchablePurchaseDivision"}  %>
@@ -48,18 +57,41 @@
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearInventoryDivision()" %>
        
   <%= f.label :construction_code, '件名：：' %>
-  <!--<%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
-  <%= f.select :with_construction, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>
+  <!--<%= f.select :with_construction, ConstructionDatum.all.order("construction_code desc").map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id: 'id', style: 'width:440px' , class: "searchableConstructionCode" } %>-->
+  <%= f.select :with_construction,  @construction_code_extract.order("construction_code desc").map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id: 'id', style: 'width:440px' , class: "searchableConstructionCode" } %>
+  
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+  <% end %>
+  </br>
   
   <%= f.label :customer_id, '得意先：：' %>
   <!--<%= f.select :with_customer, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" }  %>-->
-  <%= f.select :with_customer, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" } %>
-  
+  <%= f.select :with_customer, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {id: 'customer_id', style: 'width:220px' , 
+      class: "searchableCustomerName", :onchange => "setConstructionExtractByCutomer()" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
+  <% end %>
+    
   <%= f.label :material_code, '品番：：' %>
   <!--<%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
   <!--<%= f.select :with_material, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
   <%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterial()" %>
+  <% end %>
   
+  <%= f.label :material_category_id, '分類：：' %>
+  <%= f.select :with_material_category, MaterialCategory.order("seq asc").all.map{|st| [st.name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCategory" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterialCategory()" %>
+  <% end %>
+    
+    
   <%= f.label :material_code, '　品番(キーワード)：' %>
   <!--<%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>-->
   <%= f.text_field :with_material_code_include, include_blank: true , id: 'material_code' %>
@@ -147,6 +179,7 @@
       <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
       <th style="width:90px;"><%=t '.actions', :default => t("helpers.actions") %></th>
 	  <th style="width:160px;"><%= model_class.human_attribute_name(:created_at) %></th>
+      <th style="width:80px;">分類</th>
       <th style="width:25px;">完</th>
     </tr>
   </thead>
@@ -258,12 +291,21 @@
                       :class => 'btn btn-xs btn-danger' %>
         </td>
         <td><%=l purchase_datum.created_at.in_time_zone('Tokyo') %></td>
+        
+        <!--分類-->
+        <% if purchase_datum.MaterialMaster.present? && purchase_datum.MaterialMaster.material_category.present? %>
+          <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_category.name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <!-- -->
         <% if purchase_datum.purchase_header.present? %>
           <td><%= check_box("complete_flag", "active", {checked: check_if_true(purchase_datum.purchase_header.complete_flag) , :multiple => true,
                 :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
         <% else %>
           <td>-</td>
         <% end %>
+        
       </tr>
     <% end %>
    
@@ -287,6 +329,8 @@
 
         $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 
+        $(".searchableMaterialCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+
         $(".searchableMakerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST});
    
          $(".searchablePurchaseDivison").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST});
@@ -299,10 +343,13 @@
 	 //var ht = 618;  //デフォルトの高さ(社長PC基準)580
         var ht = 690;  //デフォルトの高さ(社長PC基準)580
 	 
-	 if (sz != 1920) {
+	 //if (sz != 1920) {
+     if (sz < 1920) {
 	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
-        fc = 4;  //固定列数
+        //fc = 4;  //固定列数
+        fc = 1;  //固定列数
 		ht -= 70;
+        sz = 1920; //for ipad pro (add180829)
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
@@ -330,7 +377,45 @@
 	
 	
  }
-
+ 
+ //得意先別に件名を抽出する処理
+ function setConstructionExtractByCutomer(){
+    var customer_id = document.getElementById("customer_id").value;
+	$.get("<%= construction_dataz_customer_extract_path %>",
+      {customer_id: customer_id},
+       function(data){
+		 
+		 document.getElementById("id").value = "";
+		 
+		 //リストを未選択状態にする
+		 //document.getElementById("working_middle_item_id_select_hide").value = "";
+		 //短縮名も同様
+		 //document.getElementById("working_middle_item_short_name_select_hide").value = "";
+	});
+ }
+ 
+ //モバイル用対応 add180830
+ //仕入先をクリアする
+ function clearSupplier(){
+   $(".searchableSupplierName").val(null).trigger("change"); 
+ }
+ function clearPurchaseOrder(){
+   $(".searchablePurchaseCode").val(null).trigger("change"); 
+ }
+ function clearConstruction(){
+   $(".searchableConstructionCode").val(null).trigger("change"); 
+ }
+ function clearCustomer(){
+   $(".searchableCustomerName").val(null).trigger("change"); 
+ }
+ function clearMaterial(){
+   $(".searchableMaterialCode").val(null).trigger("change"); 
+ }
+ function clearMaterialCategory(){
+   $(".searchableMaterialCategory").val(null).trigger("change"); 
+ }
+ //
+ 
  //開始日を空にする
  function clearStartDate(){
    document.getElementById("purchase_date_start").value = "";

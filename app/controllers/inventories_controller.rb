@@ -272,8 +272,12 @@ class InventoriesController < ApplicationController
 	
     if @inventory.blank?
     #新規
-      inventory_quantity = @inventory_history.quantity
-      inventory_amount = @inventory_history.price
+      #upd180626
+      inventory_quantity = @inventory_history.quantity.to_i.abs
+      inventory_amount = @inventory_history.price.to_i.abs
+      
+      #inventory_quantity = @inventory_history.quantity
+      #inventory_amount = @inventory_history.price
 	  
 	  current_unit_price = @inventory_history.unit_price 
 	  #add170508
@@ -315,6 +319,8 @@ class InventoriesController < ApplicationController
 	  last_unit_price = @inventory.last_unit_price
 	  last_warehousing_date = @inventory.last_warehousing_date
 	  
+      unit_price_no_move = false
+      
 	  if @inventory.current_history_id == @inventory_history.id
 	    #同一仕入IDの場合のみ、単価を更新。
 		if @inventory_division_id == $INDEX_INVENTORY_STOCK
@@ -347,6 +353,9 @@ class InventoriesController < ApplicationController
 		     @inventory_division_id == $INDEX_INVENTORY_SHIPPING
 			 
 		  #現在ストックのある入庫日より後に入庫された場合or出庫
+          
+            #binding.pry
+          
 		    if next_unit_price_1.blank? || next_unit_price_1 == @inventory_history.unit_price 
 			#単価１が存在しない,または単価１と現在の単価が同じ場合
               #次の履歴IDへ現在の履歴IDをセット
@@ -361,9 +370,29 @@ class InventoriesController < ApplicationController
 		      else
 		        next_quantity_1 -= @inventory_history.quantity
 		      end
-		    end
+		    
+            else
+                #単価が異なる、かつ出庫の場合(入庫より先に出庫を登録した場合等)
+                #add180607
+                if @inventory_division_id == $INDEX_INVENTORY_SHIPPING
+		            current_quantity -= @inventory_history.quantity.abs     #数は減産する(絶対値)
+		            
+                    #単価・入出庫日を更新する
+                    #最善ではないが、、ひとまず。
+                    current_history_id = @inventory_history.id 
+		            current_warehousing_date = @inventory_history.inventory_date
+			        current_unit_price = @inventory_history.unit_price
+                    
+                    last_unit_price = @inventory_history.unit_price
+                    last_warehousing_date = @inventory_history.inventory_date
+          
+                    unit_price_no_move = true
+                end 
+            
+            end
 		  else
 		  #現在ストックのある入庫日より前or同一日に入庫された場合
+            
 		    if @inventory.current_warehousing_date.present?
 		      next_warehousing_date_1 = @inventory.current_warehousing_date
 			next_unit_price_1 = @inventory.current_unit_price
@@ -391,24 +420,31 @@ class InventoriesController < ApplicationController
 		  if next_unit_price_1.present?
 		    
 		    if next_unit_price_1 != @inventory_history.unit_price
-	          if next_warehousing_date_1 < @inventory_history.inventory_date
-              #単価１の入庫日が現在単価の入庫日より前？＝＞現在のものを単価２へセット
-			    next_history_id_2 = @inventory_history.id
-				next_warehousing_date_2 = @inventory_history.inventory_date
-			    next_unit_price_2 = @inventory_history.unit_price
-				if @inventory_division_id == $INDEX_INVENTORY_STOCK
-			      next_quantity_2 += @inventory_history.quantity
-				else
-				  next_quantity_2 -= @inventory_history.quantity
-                end
-			  else
-			  #単価１の入庫日が現在単価の入庫日より後 => 単価２へセット
-			    next_history_id_2 = @inventory.next_history_id_1
-				next_warehousing_date_2 = @inventory.next_warehousing_date_1
-			    next_unit_price_2 = @inventory.next_unit_price_1
-			    next_quantity_2 = @inventory.next_quantity_1  
-			  end
-			end
+              if unit_price_no_move == false
+            
+	            #if next_warehousing_date_1 < @inventory_history.inventory_date
+                #upd180713
+                if next_warehousing_date_1.nil? || next_warehousing_date_1 < @inventory_history.inventory_date
+                #単価１の入庫日が現在単価の入庫日より前？＝＞現在のものを単価２へセット
+			        
+                    next_history_id_2 = @inventory_history.id
+				    next_warehousing_date_2 = @inventory_history.inventory_date
+			        next_unit_price_2 = @inventory_history.unit_price
+				    if @inventory_division_id == $INDEX_INVENTORY_STOCK
+			            next_quantity_2 += @inventory_history.quantity
+				    else
+				        next_quantity_2 -= @inventory_history.quantity
+                    end
+			    else
+			    #単価１の入庫日が現在単価の入庫日より後 => 単価２へセット
+			        next_history_id_2 = @inventory.next_history_id_1
+				    next_warehousing_date_2 = @inventory.next_warehousing_date_1
+			        next_unit_price_2 = @inventory.next_unit_price_1
+			        next_quantity_2 = @inventory.next_quantity_1  
+			    end
+			
+              end
+            end
 		  end
 		  
 		  if next_unit_price_2 == @inventory_history.unit_price &&

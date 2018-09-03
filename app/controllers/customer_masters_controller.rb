@@ -26,7 +26,38 @@ class CustomerMastersController < ApplicationController
 	
     @customer_masters  = @q.result(distinct: true)
     @customer_masters  = @customer_masters.page(params[:page])
-
+    
+    
+    $customers = @customer_masters
+    
+    $print_flag_customer = params[:print_flag]
+    
+    #csv_data = CSV.generate(encoding: Encoding::SJIS, row_sep: "\r\n", force_quotes: true) do |csv|
+    #    csv << []
+    #end
+    
+    
+	respond_to do |format|
+	  format.html
+      
+      #format.csv { send_data @customer_masters.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }
+      
+      #csv
+      format.csv { send_data @customer_masters.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis', disposition: 'attachment' }
+      
+      
+	  format.pdf do
+        report = CustomerListCardPDF.create @customer_list_card 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "customer_list_card.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+	end
+    
   end
 
   # GET /customer_masters/1
@@ -135,6 +166,6 @@ class CustomerMastersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def customer_master_params
       params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :house_number, :address2, :tel_main, :fax_main, :email_main, :closing_date, 
-	                 :closing_date_division, :due_date, :due_date_division, :responsible1, :responsible2, :contact_id)
+	                 :closing_date_division, :due_date, :due_date_division, :responsible1, :responsible2, :contact_id, :card_not_flag, :contractor_flag)
     end
 end

@@ -144,6 +144,7 @@ ja:
   activerecord:
     models:
        material_master: 資材マスター
+       material_category: 資材分類
        purchase_datum: 仕入データ
        purchase_header: 仕入見出データ
        purchase_order_datum: 注文Ｎｏデータ
@@ -215,6 +216,8 @@ ja:
        material_master:
          standard_quantity: 標準数量
          standard_labor_productivity_unit: 標準歩掛
+       material_category:
+         name: 分類名
        working_large_item:
          working_unit_price: 単価
        construction_cost:
@@ -225,6 +228,7 @@ ja:
          working_details: 作業内容
        customer_master:
          search_character: 検索文字
+         card_not_flag: 年賀不要
        purchase_datum:
          purchase_amount: 金額
        purchase_header:

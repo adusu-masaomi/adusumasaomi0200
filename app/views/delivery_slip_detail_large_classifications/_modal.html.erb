@@ -1,7 +1,9 @@
+<% params[:data_type] = nil %>
 
 <div class="modal-dialog modal-lg" >
   <div class="modal-content" >
   <div style="padding-left : 15px;">
+
 <%= simple_form_for @delivery_slip_detail_large_classification, remote: true, :html => { id: "mymodal", :class => 'form-horizontal' } do |f| %>
   
   <!--非表示のフィールド-->

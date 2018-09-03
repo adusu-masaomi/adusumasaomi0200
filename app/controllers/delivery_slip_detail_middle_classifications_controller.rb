@@ -66,6 +66,8 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     #ransack保持用--上記はこれに置き換える
     @q = DeliverySlipDetailMiddleClassification.ransack(query)   
     
+    
+    
     #ransack保持用コード
     if @null_flag == "" 
 	  search_history = {
@@ -110,40 +112,19 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
 		elsif $sort_dm == "desc"
 	      @delivery_slip_detail_middle_classifications = @delivery_slip_detail_middle_classifications.order(column_name + " desc")
 		end
+    end
+
+    #add180423
+    #内訳へのデータ移行を行う。
+    if params[:data_type] == "1"
+      #内訳へデータ移行
+      move_middle_to_large
+      if @success_flag == true
+	    flash[:notice] = "データ作成が完了しました。"
+      end
 	end
-	#add end 
-	
-	#global set
-	#del170626
-	#$delivery_slip_detail_middle_classifications = @delivery_slip_detail_middle_classifications
-	
-	#del below 170626
-	#明細画面からの印刷機能は抹消する
-    #@print_type = params[:print_type]
+    #add end 
     
-    #デフォルトの頁番号→グローバルに格納
-    #$default_page_number = params[:default_page_number].to_i
-	
-    #内訳書PDF発行
-    #respond_to do |format|
-    #  format.html # index.html.erb
-    #  format.pdf do
-         
-    #     if @print_type == "1"
-    #      report = DetailedStatementPDF.create @detailed_statement
-    #     else
-    #      report = DetailedStatementLandscapePDF.create @detailed_statement_landscape
-    #     end 
-    #    # ブラウザでPDFを表示する
-    #    # disposition: "inline" によりダウンロードではなく表示させている
-    #    send_data(
-    #      report.generate,
-    #      filename:  "detailed_statatement.pdf",
-    #      type:        "application/pdf",
-    #      disposition: "inline")
-    #    end
-    #end
-    ######
   end
 
   #add170412
@@ -185,6 +166,19 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
 	#add170626
 	if params[:delivery_slip_header_id].present?
       @delivery_slip_header_id = params[:delivery_slip_header_id]
+      
+      #add180817
+      #確定済みのものは、変更できないようにする
+      delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+      if delivery_slip_header.present?
+        if delivery_slip_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
+      
     end
 	
     if @@new_flag == "1"
@@ -215,6 +209,22 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
     #カテゴリー保持フラグを取得
     #add180210
     get_category_save_flag
+    
+    #add180803
+    #確定済みのものは、変更できないようにする
+    if params[:delivery_slip_header_id].present?
+      delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+      if delivery_slip_header.present?
+        if delivery_slip_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+    end
+    #
+    
+    
   end
 
   # POST /delivery_slip_detail_middle_classifications
@@ -226,6 +236,7 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
 	
     ###モーダル化対応
     @delivery_slip_detail_middle_classification = DeliverySlipDetailMiddleClassification.create(delivery_slip_detail_middle_classification_params)
+    
     
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
@@ -534,27 +545,37 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
       #upd170626
       @delivery_slip_header_id = params[:delivery_slip_header_id]
       if params[:delivery_slip_detail_large_classification_id].present?
-          #$delivery_slip_detail_large_classification_id = params[:delivery_slip_detail_large_classification_id]
-          #upd170626
           @delivery_slip_detail_large_classification_id = params[:delivery_slip_detail_large_classification_id]
-	  end
+	    
+          #add180817
+          #確定済みのものは、変更できないようにする
+          delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+          if delivery_slip_header.present?
+            if delivery_slip_header.fixed_flag == 1
+              @status = "fixed"
+            else
+              @status = "not_fixed"
+            end
+          end
+          #
+      
+      end
 	end
   
-    @delivery_slip_detail_middle_classification.destroy
-    respond_to do |format|
-      #format.html { redirect_to delivery_slip_detail_middle_classifications_url, notice: 'DeliverySlip detail middle classification was successfully destroyed.' }
-      #format.json { head :no_content }
-	  
-	  #upd170626
-	   format.html {redirect_to delivery_slip_detail_middle_classifications_path( :delivery_slip_header_id => params[:delivery_slip_header_id],
-                    :delivery_slip_detail_large_classification_id => params[:delivery_slip_detail_large_classification_id], 
-	                :delivery_slip_header_name => params[:delivery_slip_header_name],
-                    :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
-                   )}
-	  
+    if @status != "fixed"
+        @delivery_slip_detail_middle_classification.destroy
+        #respond_to do |format|
+        #del180817
+        #確定済みデータに警告を出すため、ここでリダイレクトさせない
+	    #  format.html {redirect_to delivery_slip_detail_middle_classifications_path( :delivery_slip_header_id => params[:delivery_slip_header_id],
+        #                :delivery_slip_detail_large_classification_id => params[:delivery_slip_detail_large_classification_id], 
+	    #                :delivery_slip_header_name => params[:delivery_slip_header_name],
+        #                :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
+        #               )}
 	  #品目データの金額を更新
       save_price_to_large_classifications
-	  
+    
+    #end
     end
   end
  
@@ -1013,6 +1034,105 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
       end
     end
   end
+  
+  #add180426
+  #明細→内訳へのデータ移行
+  def move_middle_to_large
+    d_s_d_m_cs = 
+        DeliverySlipDetailMiddleClassification.where(:delivery_slip_header_id => params[:delivery_slip_header_id]).
+             where(:delivery_slip_detail_large_classification_id => params[:delivery_slip_detail_large_classification_id])
+    if d_s_d_m_cs.present?
+      success_flag = true
+      
+      #内訳、行数の最大値を取得する
+      line_number = DeliverySlipDetailLargeClassification.
+        where(:delivery_slip_header_id => params[:delivery_slip_header_id]).maximum(:line_number)
+      
+      #内訳が１件しかない場合は、行数１からカウントアップさせるようにする
+      if line_number == 1
+        line_number = 0
+      end
+      
+      d_s_d_m_cs.each do |d_s_d_m_c|
+        
+        line_number += 1
+        
+        delivery_slip_detail_large_classification_params = 
+          {delivery_slip_header_id: params[:delivery_slip_header_id], delivery_slip_items_division_id: d_s_d_m_c.delivery_slip_item_division_id,
+           working_large_item_id: d_s_d_m_c.working_middle_item_id, working_specific_middle_item_id: d_s_d_m_c.working_specific_middle_item_id,
+           working_large_item_name: d_s_d_m_c.working_middle_item_name, working_large_item_short_name: d_s_d_m_c.working_middle_item_short_name,
+           working_middle_item_category_id: d_s_d_m_c.working_middle_item_category_id, working_middle_item_category_id_call: d_s_d_m_c.working_middle_item_category_id_call,
+           working_middle_item_subcategory_id: d_s_d_m_c.working_middle_item_subcategory_id, working_middle_item_subcategory_id_call: d_s_d_m_c.working_middle_item_subcategory_id_call,
+           working_large_specification: d_s_d_m_c.working_middle_specification, line_number: line_number, quantity: d_s_d_m_c.quantity, execution_quantity: d_s_d_m_c.execution_quantity,
+           working_unit_id: d_s_d_m_c.working_unit_id, working_unit_name: d_s_d_m_c.working_unit_name, working_unit_price: d_s_d_m_c.working_unit_price, 
+           delivery_slip_price: d_s_d_m_c.delivery_slip_price, execution_unit_price: d_s_d_m_c.execution_unit_price, execution_price: d_s_d_m_c.execution_price, labor_productivity_unit: d_s_d_m_c.labor_productivity_unit, 
+           labor_productivity_unit_total: d_s_d_m_c.labor_productivity_unit_total, remarks: d_s_d_m_c.remarks, construction_type: d_s_d_m_c.construction_type, 
+           piping_wiring_flag: d_s_d_m_c.piping_wiring_flag, equipment_mounting_flag: d_s_d_m_c.equipment_mounting_flag, labor_cost_flag: d_s_d_m_c.labor_cost_flag
+          }
+                                                         
+        delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.new(delivery_slip_detail_large_classification_params)
+        unless delivery_slip_detail_large_classification.save!(:validate => false)
+          success_flag = false
+        end 
+      end
+      if success_flag == true
+        #既存のデータを削除
+        #明細データ削除
+        d_s_d_m_cs.destroy_all
+        #内訳データ削除
+        DeliverySlipDetailLargeClassification.find(params[:delivery_slip_detail_large_classification_id]).destroy
+        
+        if save_price_to_headers_move(line_number) == true
+        #合計値を一覧データへ書き込み
+        
+          #リダイレクト
+          #(これをしないとパラメータが残る)
+          respond_to do |format|
+            format.html {redirect_to delivery_slip_detail_large_classifications_path(:delivery_slip_header_id => params[:delivery_slip_header_id], 
+                    :delivery_slip_header_name => params[:delivery_slip_header_name], :working_large_item_name => params[:working_large_item_name], 
+                    :working_large_specification => params[:working_large_specification] )}
+          end
+        end
+      end
+    end
+  end
+  
+  
+  #del180822
+  #納品金額トータル
+  #def delivery_slip_total_price_large
+  #   @delivery_slip_total_price_large = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", 
+  #        params[:delivery_slip_header_id]]).sumpriceDeliverySlip
+  #end 
+  #実行金額トータル
+  #def execution_total_price_Large
+  #   @execution_total_price_Large = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", 
+  #      params[:delivery_slip_header_id]]).sumpriceExecution
+  #end
+  
+  #見出データへ合計保存用
+  def save_price_to_headers_move(line_number)
+     delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+     
+     status = false
+     if delivery_slip_header.present? 
+         #請求金額
+          delivery_slip_header.delivery_amount = delivery_slip_total_price_large
+		  
+          #実行金額
+          delivery_slip_header.execution_amount = execution_total_price_Large
+          
+          #最終行
+          delivery_slip_header.last_line_number = line_number
+          
+          status = delivery_slip_header.save
+          
+     end 
+     return status
+     
+  end
+  #(ここまで)内訳→明細へのデータ移行
+  
   
   private
     # Use callbacks to share common setup or constraints between actions.

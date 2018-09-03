@@ -32,7 +32,6 @@ class StocktakesController < ApplicationController
 	  update_inventory
 	elsif params[:update_flag] == "2"
 	#在庫マスターからのコピー
-	#add171221
 	  
 	  calcFlag = true
 	  
@@ -68,7 +67,6 @@ class StocktakesController < ApplicationController
         $stocktake_date = query["stocktake_date_gteq"]
 	  end
 	  
-      #add180210
       #エアコン、配線器具などのサブタイトルをセットする
       if query["with_material_category_include"].present?
         $stocktake_list_header_subtitle = Inventory.category[(query["with_material_category_include"].to_i)-1][0]
@@ -129,15 +127,12 @@ class StocktakesController < ApplicationController
 		  @success_flag = false
 		end
 		
-		#binding.pry
-		
 	  end
 	end
   end
   
   #在庫マスターへの反映
   def update_inventory
-    #binding.pry
 	
 	@stocktakes.where(inventory_update_flag: nil).each do |stocktake| 
 	  if stocktake.physical_quantity.present? && stocktake.book_quantity.present?
@@ -167,6 +162,7 @@ class StocktakesController < ApplicationController
 		  supplier_master_id = inventory.supplier_master_id
 		end
 		
+        
 		inventory_hisotory_params = {inventory_date: stocktake.stocktake_date, inventory_division_id: $INDEX_INVENTORY_STOCKTAKE, 
                                      construction_datum_id: @construction_datum_id, material_master_id: stocktake.material_master_id, 
 									 quantity: differ_quantity, unit_master_id: unit_master_id, unit_price: unit_price, 
@@ -201,7 +197,7 @@ class StocktakesController < ApplicationController
 		  #本来なら現在数量、現在単価にも影響する！！（今のところはそのままとする！！）
 	      inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
                                      current_quantity: current_quantity }
-	  
+      
           inventory.update(inventory_update_params)
 	    end
 	    

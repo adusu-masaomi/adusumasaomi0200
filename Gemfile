@@ -1,10 +1,20 @@
 source 'https://rubygems.org'
+
+gem 'browser'
+#iosのタッチ判定用
+gem 'touchpunch-rails'  
+
+#add180719
+#モデルのattributesも複製できる
+gem 'deep_cloneable', '~> 2.3.2'
+
 #画像表示用
 gem 'carrierwave'
 #画像圧縮用
 #gem 'rmagick', require: 'RMagick'
 #上記だとcentosでエラー
 gem 'rmagick', require: false
+gem 'mini_magick'  #add180830
 
 #グラフ用
 gem "chartkick"

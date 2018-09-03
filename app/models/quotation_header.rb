@@ -28,11 +28,22 @@ class QuotationHeader < ActiveRecord::Base
    #validates :address, format: {without: /−/ , :message => ADDRESS_ERROR_MESSAGE_3 }
    validates :address, format: {without: /-/ , :message => ADDRESS_ERROR_MESSAGE_3 }
    
+   #add180803
+   validate :check_fixed
+   
    #住所に数値が混じっていた場合も禁止する
    validate  :address_regex
    def address_regex
      if address.match(/[0-9０-９]+$/)
        errors.add :address, ADDRESS_ERROR_MESSAGE_4
+     end
+   end
+   
+   #add180803
+   def check_fixed
+     if fixed_flag == 1
+        errors.add(:quotation_code, ": 確定済みです。変更したい場合は、" << 
+        "　　　　　　　　" << "「確定済み」のチェックを外してください。")
      end
    end
    

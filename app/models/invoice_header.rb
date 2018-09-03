@@ -37,8 +37,18 @@ class InvoiceHeader < ActiveRecord::Base
 
    scope :with_id, -> (invoice_headers_id=1) { where("invoice_headers.id = ?", invoice_headers_id )}
    
+   #add180718
+   #元請業者または保険適用外を除く
+   scope :with_constractor, -> (extract_flag=true) { 
+     if extract_flag.present?
+       joins(:customer_master).where("invoice_headers.labor_insurance_not_flag is NULL or invoice_headers.labor_insurance_not_flag <> 1 ").
+                    where("customer_masters.contractor_flag = ?" , 1 )
+     end
+   }
+   
+   
    def self.ransackable_scopes(auth_object=nil)
-       [:with_id]
+       [:with_id, :with_constractor]
    end
  	
   

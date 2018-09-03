@@ -120,16 +120,24 @@
   <%= f.check_box :bid_flag_3,  :id => "bid_flag_3" %>
   <%= f.label :bid_flag_3, '落札　　　', { style: 'color:red'}  %></br>
   
+  <!--備考-->
+  <!--タブ移動はjs側の”setNextControl”で制御-->
+  <% @notes = MaterialMaster.where(:id => f.object.material_id).where("id is NOT NULL").pluck(:notes).flatten.join(" ") %>
+  
+  <%= f.input :notes,  input_html:{ id: "notes",  style: 'width:581px' , :tabindex=>"5", :value => @notes} %>
+  
   <!--メール送信フラグ-->
   
+  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   
   <%= f.label :mail_sent_flag, 'メール送信フラグ：', { style: 'font-size:8px'} %>
   
@@ -657,6 +665,12 @@
 				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][list_price]";
 				document.getElementsByName(nm)[0].value = obj;
 				
+                //add180509
+                //備考をセット
+				obj = document.getElementById("notes").textContent;
+				var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][notes]";
+				document.getElementsByName(nm)[0].value = obj;
+                
 			  }
             );
 		  }
@@ -800,6 +814,7 @@
 	  //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
 	  selectedIndex = controlName.slice(65);
 	  
+      
 	  if (controlName.substr(-10,10) == "[quantity]") {
 	  //数量→単位へ
 		moveFlag = true;
@@ -826,11 +841,21 @@
 	    selectedIndex = selectedIndex.slice(0,-17);
 		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][maker_id]"
 	  }else if (controlName.substr(-12,12) == "[list_price]") {
-	  //定価→見積単価１へ
+	  //定価→備考へ
+      //upd180509
 	    moveFlag = true;
 		selectedIndex = selectedIndex.slice(0,-13);
-		nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
-	  }else if (controlName.substr(-24,24) == "[quotation_unit_price_1]") {
+		//nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
+        nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][notes]"
+	  }else if (controlName.substr(-7,7) == "[notes]") {
+      //備考→見積単価１へ
+      //add180509
+        
+        moveFlag = true;
+        selectedIndex = selectedIndex.slice(0,-8);
+        nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
+      
+      }else if (controlName.substr(-24,24) == "[quotation_unit_price_1]") {
 	  //見積単価１→金額１へ
 	    moveFlag = true;
 		selectedIndex = selectedIndex.slice(0,-25);

@@ -144,12 +144,18 @@ class EstimationSheetPDF
 		   #有効期間
 		   @report.page.item(:effective_period).value(@quotation_headers.effective_period) 
 		   
+           #binding.pry
+           
 		   if @quotation_headers.quotation_date.present?
 		     @gengou = @quotation_headers.quotation_date
 		     #元号変わったらここも要変更
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		     @report.page.item(:quotation_date).value(@gengou) 
-		   end
+		   else
+           #空でも文字を出す add180515
+             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             @report.page.item(:quotation_date).value(empty_string) 
+           end
 		   
 		   #NET金額
 		   if @quotation_headers.net_amount.present?
@@ -315,11 +321,16 @@ class EstimationSheetPDF
 		   #見積No
 		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
 		   
+           #見積日
 		   if @quotation_headers.quotation_date.present?
              @gengou = @quotation_headers.quotation_date
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
 		     @report.page.item(:quotation_date).value(@gengou) 
-		   end
+		   else
+           #空でも文字を出す add180515
+             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             @report.page.item(:quotation_date).value(empty_string) 
+           end
 		   
 		   if @history == false
 		     #品目名

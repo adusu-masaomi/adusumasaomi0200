@@ -10,14 +10,28 @@
   
   <%= search_form_for @q do |f| %>
   <%= f.label :invoice_code, '請求Ｎｏ：' %>
-  <!--<%= f.select :id_eq, options_from_collection_for_select(InvoiceHeader.all, "id", "invoice_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>-->
-  <%= f.select :id_eq, InvoiceHeader.all.map{|st| [st.invoice_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
+  <%= f.select :id_eq, InvoiceHeader.all.map{|st| [st.invoice_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableInvoiceCode" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearInvoiceCode()" %>
+  <% end %>
+  
   <%= f.label :construction_code, '件名：' %>
   <!--<%= f.select :with_id, options_from_collection_for_select(InvoiceHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %></br>-->
-  <%= f.select :with_id, InvoiceHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %></br>
+  <%= f.select :with_id, InvoiceHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+  <% end %>
+  </br>
+  
   <%= f.label :customer_name, '得意先：' %>
-  <!--<%= f.select :customer_id_eq, options_from_collection_for_select(InvoiceHeader.all, "customer_id", "customer_name") , {include_blank: true}, {style: 'width:440px' , class: "searchableCustomerName" } %></br>-->
-  <%= f.select :customer_id_eq, InvoiceHeader.all.select(:customer_name, :customer_id).uniq.map{|st| [st.customer_name, st.customer_id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableCustomerName" } %></br>
+  <%= f.select :customer_id_eq, InvoiceHeader.all.select(:customer_name, :customer_id).uniq.map{|st| [st.customer_name, st.customer_id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableCustomerName" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
+  <% end %>
+  </br>
   
   <%= f.label :invoice_date, '請求日' %>
   <%= f.date_select :invoice_date_gteq, {include_blank: true} ,  {id: "invoice_date_start"}   %>
@@ -27,6 +41,12 @@
   <!--スペース空ける-->
   &nbsp;&nbsp;
   <%= button_tag "クリア", type: 'button', :class => 'btn btn-indigo100_rsd btn-xs', onclick: "clearDate()" %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <!--元請業者のみ抽出-->
+  
+  <%= f.check_box :with_constractor %> 
+  <%= f.label :invoice_date, '元請業者のみ(中越用)' %>
   
 	<div>
     	<%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
@@ -42,8 +62,18 @@
             invoice_headers_path(@invoice_headers, format: "pdf"  ),
             :class => 'btn  btn-success', :target=>["_blank"], :onclick => "submitAfterValidation()" %>-->
 <%= link_to "請求書一覧表",
-            invoice_headers_path(@invoice_headers, format: "pdf"  ),
+            invoice_headers_path(@invoice_headers, format: "pdf" , print_flag: 0 ),
             :class => 'btn  btn-lightblue600_ftg', :target=>["_blank"] %>
+            
+
+ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<%= link_to "請求一覧(元請-確認用)",
+            invoice_headers_path(@invoice_headers, format: "pdf" , print_flag: 1 ),
+            :class => 'btn  btn-lime500_ftg btn-xs', :target=>["_blank"] %>
+<!--<%= link_to "請求一覧(元請-中越用)",
+            invoice_headers_path(@invoice_headers, format: "pdf"  ),
+            :class => 'btn  btn-amber500_ftg btn-xs', :target=>["_blank"] %>-->
 
 			   
 <!--見出し固定用設定追加-->
@@ -143,7 +173,7 @@
   
   //検索可能なリストボックス
   $(document).ready(function(){
-	$(".searchableQuotationCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST});
+	$(".searchableInvoiceCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST});
     $(".searchableConstructionName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 	$(".searchableCustomerName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
     //見出し固定用設定追加
@@ -156,6 +186,8 @@
         fc = 1;  //固定列数
 		//ht -= 70;
 		ht -= 108;
+        
+        sz = 1920; //for ipad pro (add180829)
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
@@ -213,16 +245,27 @@
   
   }
   
- //入力チェック後の、更新処理
- //うまく動作しないので保留中・・・
- function submitAfterValidation() {
+  //入力チェック後の、更新処理
+  //うまく動作しないので保留中・・・
+  function submitAfterValidation() {
  	var obj_start = document.getElementById("invoice_date_start");
 	var obj_end = document.getElementById("invoice_date_end");
     if (obj_start == null){
 	  window.confirm("まだ集計されていないようです！！開始日・終了日を入力後、\n一旦「検索（集計）」ボタンを押してから印刷してください。")
-	}
- }
+    }
+  }
   
+  //モバイル用対応 add180830
+  //select2をクリアする
+  function clearInvoiceCode(){
+    $(".searchableInvoiceCode").val(null).trigger("change"); 
+  }
+  function clearConstruction(){
+    $(".searchableConstructionName").val(null).trigger("change"); 
+  }
+  function clearCustomer(){
+    $(".searchableCustomerName").val(null).trigger("change"); 
+  }
   
 </script>
 

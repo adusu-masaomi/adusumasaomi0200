@@ -50,6 +50,12 @@
       <%= item[:material_code] %></p>
       &nbsp;&nbsp;&nbsp;品名：
       <%= item[:material_name] %></p>
+      
+      <% if item[:notes].present? %>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <%= item[:notes] %></p>
+      <% end %>
+      
       &nbsp;&nbsp;&nbsp;メーカー：
       <%= item[:maker_name] %></p>
       &nbsp;&nbsp;&nbsp;数量：

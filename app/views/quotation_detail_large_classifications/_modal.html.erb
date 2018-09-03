@@ -1,4 +1,23 @@
 <div class="modal-dialog modal-lg" id="myModal" >
+
+  
+  <% if session[:modal] == true %>
+<% end %>
+
+  <% if @quotation_detail_large_classification.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @quotation_detail_large_classification.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @quotation_detail_large_classification.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+ 
+     
+  
   <div class="modal-content" >
   <div style="padding-left : 15px;">
 <%= simple_form_for @quotation_detail_large_classification, remote: true, :html => { id: "mymodal", :class => 'form-horizontal' } do |f| %>

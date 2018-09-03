@@ -304,6 +304,9 @@ class QuotationMaterialHeadersController < ApplicationController
 	 if @unit_id.blank?
 	   @unit_id = "3"
 	 end
+     
+     #add180509
+     @notes = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:notes).flatten.join(" ")
   end
   
   #見積コードの最終番号(+1)を取得する
@@ -498,21 +501,14 @@ class QuotationMaterialHeadersController < ApplicationController
     if params[:quotation_material_header][:quotation_material_details_attributes].present?
 	           
 	    params[:quotation_material_header][:quotation_material_details_attributes].values.each do |item|
-		
-		 
-		  ######
-          #varidate用のために、本来の箇所から離れたパラメータを再セットする
-		  #item[:quantity] = params[:quantity][i]
 		  
 		  # 数値は全角入力の場合、半角に変換する
 		  if  item[:quantity].to_i == 0
 		    item[:quantity] = item[:quantity].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
 		  end
 		  
-		  #@maker_master = MakerMaster.find(item[:maker_id])
-          @maker_master = MakerMaster.where(:id => item[:maker_id]).first
+		  @maker_master = MakerMaster.where(:id => item[:maker_id]).first
           
-          #add180411
           #メーカーを手入力した場合の新規登録
           if @maker_master.nil?
             #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
@@ -542,60 +538,48 @@ class QuotationMaterialHeadersController < ApplicationController
               @material_master = MaterialMaster.find(id)
               item[:material_code] = @material_master.material_code
               
-			  if item[:list_price].nil?  #add170905
-                if @material_master.list_price != 0  #upd170310
+			  if item[:list_price].nil?  
+                if @material_master.list_price != 0  
 			    #資材マスターの定価をセット
 			    #(マスター側未登録を考慮。但しアプデは考慮していない）
                   item[:list_price] = @material_master.list_price
 			    end
 			  end
 			  
-			  #del170616
-			  #@maker_master = MakerMaster.find(@material_master.maker_id)
-			  #if @maker_master.maker_name != "-"  #upd170310
-			  ##資材マスターのメーカー名をセット
-			  ##(マスター側未登録を考慮。但しアプデは考慮していない）
-              #  item[:maker_name] = @maker_master.maker_name
-			  #end
-			  
-			  #if item[:material_name] != @material_master.material_name
               if (item[:material_name] != @material_master.material_name) || 
-                 (item[:maker_id] != @material_master.maker_id)
-			  #マスターの品名orメーカーを変更した場合は、商品マスターへ反映させる。
+                 (item[:maker_id] != @material_master.maker_id)  || 
+                 (item[:list_price] != @material_master.list_price)  ||
+                 (item[:notes] != @material_master.notes)
+			  #↑フィールド追加時注意！
+              #マスター情報変更した場合は、商品マスターへ反映させる。
+                
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  #materials.update_attributes!(:material_name => item[:material_name] )
-                  #upd180411 
-                  #品名・メーカーIDをそれぞれ更新
-                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id])
+                  #品名・メーカーID・定価・備考を更新
+                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
+                                               :list_price => item[:list_price], :notes => item[:notes])
                 end 
 			  end
 			  
 			  
-			  #del170911 複数業者の判定が難しいため抹消
-			  #restore170914 フィールド定義変更したため、できるようになった！！
 			  #仕入単価マスターの単位も更新する
 			  if params[:quotation_material_header][:supplier_master_id] != "1"   #手入力仕入先以外
 			    purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                    params[:quotation_material_header][:supplier_master_id], item[:material_id] ]).first
 			  
-			  #if purchase_unit_price.present?
 			     if item[:unit_master_id].present?
 			       purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:quotation_material_header][:supplier_master_id], 
 			                                     unit_id: item[:unit_master_id]}
 				   if purchase_unit_price.present?
 			         purchase_unit_price.update(purchase_unit_price_params)
 				   else
-				     #add170914
-					 #新規登録も考慮する。
+				     #新規登録も考慮する。
 			         purchase_unit_price = PurchaseUnitPrice.create(purchase_unit_price_params)
 				   end
 			  	 end
 			  end
-			  #else
-			      
-			  #end
-		  else
+		
+          else
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
 			
@@ -606,11 +590,8 @@ class QuotationMaterialHeadersController < ApplicationController
 				@material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-				  #material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                  #                      maker_id: item[:material_id], list_price: item[:list_price] }
-                  #upd180411
-                  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:maker_id], list_price: item[:list_price] }
+				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                                        maker_id: item[:maker_id], list_price: item[:list_price], :notes => item[:notes] }
                                         
 			      @material_master = MaterialMaster.create(material_master_params)
 			    end
@@ -619,6 +600,9 @@ class QuotationMaterialHeadersController < ApplicationController
                 @material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    if @material_master.present?
 			      material_id = @material_master.id
+                  
+                  item[:material_id] = material_id  #資材マスターのIDも更新 add180508
+                  
 				  supplier_id = params[:quotation_material_header][:supplier_master_id]
 				  
 				  supplier_material_code = item[:material_code]

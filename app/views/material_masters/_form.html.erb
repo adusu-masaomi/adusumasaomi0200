@@ -40,19 +40,31 @@
   
   <%= f.input :list_price, input_html:{ :tabindex=>"4" } %>
   
+  <div class="col-xs-5 " , style="margin-left : -15px;">
+  <%= f.label :カテゴリー, {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :material_category_id,  MaterialCategory.all, :id, :name, {:include_blank => true} ,
+      {:id => 'material_category_id', class: "searchableSelect2_3",  style: 'width:220px'} %>
+  </div>
+  
   <%= f.label_tag :inventory_category_id, '在庫品目(*在庫管理する場合のみ登録して下さい。)' , { style: 'margin-left:-15px' }%></br>
   <%= f.select :inventory_category_id, Inventory.category, {:include_blank => true}, 
-      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"5", 
+      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"6", 
        style: 'width:140px;margin-left:-15px;font-size:16px;background-color:#ffffff;' } %>
-	   
-   <%= f.input :standard_quantity, input_html:{ :tabindex=>"6" } %>
-   <%= f.input :standard_labor_productivity_unit, input_html:{ :tabindex=>"7" } %>
+  
+  </br></br>
+  
+   <!--add180509-->
+   <%= f.input :notes, input_html:{ :tabindex=>"7" } %>
+
+   
+   <%= f.input :standard_quantity, input_html:{ :tabindex=>"8" } %>
+   <%= f.input :standard_labor_productivity_unit, input_html:{ :tabindex=>"9" } %>
 	
-  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので（原則的に）入力不要です。", input_html:{ :tabindex=>"8"} %>
+  <%= f.input :last_unit_price, hint: "*仕入データ登録後に自動反映されるので（原則的に）入力不要です。", input_html:{ :tabindex=>"10"} %>
   <%= f.input :last_unit_price_update_at, default: Date.strptime("2000/01/01", "%Y/%m/%d"), 
      hint: "*仕入データ登録後に自動反映されるので入力不要です。", input_html:{ :readonly => true } %>
 
-  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"9" %>
+  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"11" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 material_masters_path, :class => 'btn btn-white_rsd' %>
     
@@ -70,6 +82,10 @@
        //単位
        $(".searchableSelect2_2").select2({ theme: "bootstrap" }).on("load", function(e) { 
         $(this).prop('tabindex',3)}).trigger('load');
+       
+       //カテゴリー
+       $(".searchableSelect2_3").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',5)}).trigger('load');
 
   });
 

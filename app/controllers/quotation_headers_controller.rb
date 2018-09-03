@@ -66,6 +66,9 @@ class QuotationHeadersController < ApplicationController
 	
     @quotation_header = QuotationHeader.new(quotation_header_params)
 
+    #見出しデータ（コピー元）の補完
+    complementCopyHeader
+
     respond_to do |format|
       if @quotation_header.save
 	    
@@ -97,10 +100,13 @@ class QuotationHeadersController < ApplicationController
     #手入力時の顧客マスターの新規登録
   	create_manual_input_customer
 	
+    #見出しデータ（コピー元）の補完
+    complementCopyHeader
+    
     respond_to do |format|
       if @quotation_header.update(quotation_header_params)
 	  
-	    #参照コードがあれば内訳マスターをコピー
+        #参照コードがあれば内訳マスターをコピー
 	    copyBreakDown
 	  
 	    #顧客Mも更新
@@ -237,6 +243,19 @@ class QuotationHeadersController < ApplicationController
   end
   
   # ajax
+  
+  #add180803
+  #確定フラグのセット
+  def set_fixed
+    if params[:quotation_header_id].present?
+        quotation_header = QuotationHeader.find_by(id: params[:quotation_header_id])
+	    if quotation_header.present?
+    	    quotation_header.assign_attributes(:fixed_flag => 1)
+			quotation_header.save(validate: false)
+		end
+    end
+  end
+  
   def construction_name_select
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
   end
@@ -376,6 +395,21 @@ class QuotationHeadersController < ApplicationController
     
   end
   
+  #見出しデータ（コピー元）の補完する
+  def complementCopyHeader
+  
+    if params[:quotation_header][:quotation_header_origin_id].present?
+        quotation_header_origin = QuotationHeader.find(params[:quotation_header][:quotation_header_origin_id])
+        #if quotation_header_origin.present?
+        
+        @quotation_header.last_line_number = quotation_header_origin.last_line_number
+        @quotation_header.category_saved_flag = quotation_header_origin.category_saved_flag
+        @quotation_header.category_saved_id = quotation_header_origin.category_saved_id
+        @quotation_header.subcategory_saved_id = quotation_header_origin.subcategory_saved_id
+        
+    end
+  end
+  
   #内訳データを参照元からコピー
   def copyBreakDown
     	
@@ -432,7 +466,6 @@ class QuotationHeadersController < ApplicationController
 	
 	@qdmc = QuotationDetailMiddleClassification.where(quotation_header_id: params[:quotation_header][:quotation_header_origin_id],
 	                               quotation_detail_large_classification_id: old_large_classification_id)
-	#binding.pry
 	
 	if @qdmc.present?
       @qdmc.each do |qdmc|
@@ -466,7 +499,7 @@ class QuotationHeadersController < ApplicationController
                                                :honorific_id, :responsible1, :responsible2, :customer_id, :customer_name, :post, :address, :house_number, :address2, :tel, :fax, 
                                                :construction_period, :construction_post, :construction_place, :construction_house_number, :construction_place2, 
                                                :trading_method, :effective_period, :net_amount, :quote_price, :execution_amount, 
-                                               :invoice_period_start_date, :invoice_period_end_date )
+                                               :invoice_period_start_date, :invoice_period_end_date, :fixed_flag )
 	  #upd171014 "quotation_header_origin_id"は誤って上書きの危険性があるので抹消。
     end
     

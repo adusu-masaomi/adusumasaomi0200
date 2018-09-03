@@ -1,6 +1,8 @@
 class PurchaseDataController < ApplicationController
   before_action :set_purchase_datum, only: [:show, :edit, :update, :destroy]
   
+  before_action :set_material, only: [:new, :edit]
+  
   #ransack保持用 
   #before_action only: [:index] do
   #  get_query('query_purchase_data')
@@ -11,6 +13,8 @@ class PurchaseDataController < ApplicationController
   #    cookies[cookie_key] = params[:q].to_json if params[:q]
   #    @query = params[:q].presence || JSON.load(cookies[cookie_key])
   #end
+
+  #@@material_masters = ""
 
   #新規登録の画面引継用
   @@purchase_datum_purchase_date = ""
@@ -26,6 +30,9 @@ class PurchaseDataController < ApplicationController
   
   @@new_flag = []
   
+  #見積用の定価
+  @@list_price_quotation = 0
+  
   # GET /purchase_data
   # GET /purchase_data.json
   
@@ -37,11 +44,16 @@ class PurchaseDataController < ApplicationController
         query ||= eval(cookies[:recent_search_history_purchase].to_s)  	
 
         @purchase_order_data_extract = PurchaseOrderDatum.all  #add180403
-
+        @construction_code_extract = ConstructionDatum.all     #add180830
         
-        #注文番号の絞り込み（登録済みのものだけにする） upd180403
+        #注文番号の絞り込み（登録済みのものだけにする） 
         if query.present? && query[:with_construction].present?
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: query[:with_construction])
+        end
+        
+        #件名の絞り込み addd180830
+        if query.present? && query[:with_customer].present?
+          @construction_code_extract = ConstructionDatum.where(customer_id: query[:with_customer]).order("construction_code desc")
         end
         ##upd end
         
@@ -229,6 +241,10 @@ class PurchaseDataController < ApplicationController
   def new
     @purchase_datum = PurchaseDatum.new
 	
+    #ここで資材マスターもセットしておく(動作軽減のため)
+    #@@material_masters = MaterialMaster.all
+      
+    
     Time.zone = "Tokyo"
 	
       @purchase_unit_prices = PurchaseUnitPrice.none
@@ -276,10 +292,14 @@ class PurchaseDataController < ApplicationController
 
   # GET /purchase_data/1/edit
   def edit
-  	@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
+    	@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
     @material_masters = MaterialMaster.where(["id = ?", @purchase_datum.material_id]).pluck(:list_price)
 	@maker_masters = MakerMaster.where(["id = ?", @purchase_datum.material_id])
 	
+    #ここで資材マスターもセットしておく(動作軽減のため)
+    #@@material_masters = MaterialMaster.all
+    
+    
 	@outsourcing_flag = "0"
     
     #add180223
@@ -321,6 +341,11 @@ class PurchaseDataController < ApplicationController
 	#資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
 	update_material_master
 	
+    
+    #upd180627
+    #資材マスターの分類を更新
+    update_material_category
+    
     
     respond_to do |format|
       
@@ -409,6 +434,11 @@ class PurchaseDataController < ApplicationController
    #資材マスターへ品名などを反映させる処理(手入力&入出庫以外)
    update_material_master
 
+
+   #upd180627
+   #資材マスターの分類を更新
+   update_material_category
+    
    respond_to do |format|
       
       if @purchase_datum.update(purchase_datum_params)
@@ -492,6 +522,23 @@ class PurchaseDataController < ApplicationController
     end
   end 
   
+  #資材マスターの分類を更新
+  def update_material_category
+    
+    if params[:purchase_datum][:MaterialMaster_attributes][:material_category_id].to_i > 0
+        if params[:purchase_datum][:material_id].to_i > 1
+            #手入力の場合の資材IDは、別ファンクション(add_manual_input_except_unit_price)で更新されている。
+            @material = MaterialMaster.find(params[:purchase_datum][:material_id])
+        
+            #分類を更新
+            material_update_params = { material_category_id: params[:purchase_datum][:MaterialMaster_attributes][:material_category_id] }
+         
+	        @material.update(material_update_params)
+        end
+    end
+    
+  end
+  
   
   #資材マスターへ品名などを反映させる処理(手入力以外)
   def update_material_master
@@ -503,23 +550,12 @@ class PurchaseDataController < ApplicationController
         if @material_masters.id != 1  #手入力以外
           #更新
 		  @materials = MaterialMaster.find(params[:purchase_datum][:material_id])
-          #upd180402
+          
           #資材コード、品名、単位を更新
           material_update_params = { material_code: params[:purchase_datum][:material_code],
 		                           material_name: params[:purchase_datum][:material_name],
                                    unit_id: params[:purchase_datum][:unit_id] }
-        
-	      ##品番は、異なった場合はそのまま上書きする（別の品番としては原則、登録できない(ハイフン付与などの微調整と区別できないため。)）
-		  #if params[:purchase_datum][:supplier_id].to_i != $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO
-          #     material_update_params = { material_code: params[:purchase_datum][:material_code],
-		  #                         material_name: params[:purchase_datum][:material_name] }
-          #else
-          #     #岡田電気の場合は、単位を資材マスターへ反映（見積の作業明細マスターに反映させるため）
-          #     material_update_params = { material_code: params[:purchase_datum][:material_code],
-		  #                         material_name: params[:purchase_datum][:material_name],
-          #                         unit_id: params[:purchase_datum][:unit_id] }
-          #end
-          
+         
 	      @materials.update(material_update_params)
 	    end
 	  end
@@ -610,6 +646,18 @@ class PurchaseDataController < ApplicationController
             #if @material_masters.list_price.nil? || @material_masters.list_price == 0 then
               params[:purchase_datum][:MaterialMaster_attributes][:list_price] = params[:purchase_datum][:list_price]
             #end
+            
+            #add180726
+            if (params[:purchase_datum][:unit_price_not_update_flag] == '0')
+              #見積用の定価をセット
+              set_material_list_price_quotation
+              params[:purchase_datum][:MaterialMaster_attributes][:list_price_quotation] = @@list_price_quotation
+            
+              #見積用の掛け率をセット
+              params[:purchase_datum][:MaterialMaster_attributes][:standard_rate] = set_material_standard_rate
+            end
+            #
+            
             #メーカー
             if @material_masters.maker_id.nil? || @material_masters.maker_id== 1 then
                params[:purchase_datum][:MaterialMaster_attributes][:maker_id] = params[:purchase_datum][:maker_id]
@@ -625,6 +673,38 @@ class PurchaseDataController < ApplicationController
 	  end
 	end
   end
+  
+  #add180725
+  #見積用の定価を登録する
+  def set_material_list_price_quotation
+    
+    @@list_price_quotation = 0
+    
+    if params[:purchase_datum][:list_price].to_i > 0
+        @@list_price_quotation = params[:purchase_datum][:list_price]
+    else
+    #定価が0の場合は、単価を登録する
+        @@list_price_quotation = params[:purchase_datum][:purchase_unit_price]
+    end
+    
+    
+  end
+  
+  #見積用の掛け率を登録する
+  def set_material_standard_rate
+    standard_rate = 0
+    
+    if @@list_price_quotation.to_f > 0
+        if params[:purchase_datum][:purchase_unit_price].to_f > 0
+            #if params[:purchase_datum][:purchase_unit_price] != @@list_price_quotation  #
+           standard_rate = params[:purchase_datum][:purchase_unit_price].to_f / @@list_price_quotation.to_f
+            #end
+        end
+    end
+    
+    return standard_rate
+  end
+  
   
   #viewで分解されたパラメータを、正常更新できるように復元させる。
   def adjust_purchase_date_params
@@ -649,11 +729,23 @@ class PurchaseDataController < ApplicationController
             @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
 	        #商品マスターへセット(商品コード存在しない場合)
 	         if @material_master.nil?
+               
+               #add180726
+               #見積単価
+               set_material_list_price_quotation
+               material_list_price_quotation = @@list_price_quotation
+               
+               #見積用の掛け率をセット
+               standard_rate = set_material_standard_rate
+               #
+               
                #upd180403 単位もセットする
 		       material_master_params = {material_code: params[:purchase_datum][:material_code], 
 		                             material_name: params[:purchase_datum][:material_name], 
                                      maker_id: params[:purchase_datum][:maker_id],
                                      list_price: params[:purchase_datum][:list_price],
+                                     list_price_quotation: material_list_price_quotation,
+                                     standard_rate: standard_rate,
                                      unit_id: params[:purchase_datum][:unit_id] }
 		       @material_master = MaterialMaster.create(material_master_params)
 		   
@@ -701,10 +793,22 @@ class PurchaseDataController < ApplicationController
        @material_master = MaterialMaster.find_by(material_code: params[:purchase_datum][:material_code])
 	   #商品マスターへセット(商品コード存在しない場合)
 	   if @material_master.nil?
+       
+           #add180726
+           #見積単価
+           set_material_list_price_quotation
+           material_list_price_quotation = @@list_price_quotation
+           
+           #見積用の掛け率をセット
+           standard_rate = set_material_standard_rate
+           #
+       
 		   material_master_params = {material_code: params[:purchase_datum][:material_code], 
 		                             material_name: params[:purchase_datum][:material_name], 
                                      maker_id: params[:purchase_datum][:maker_id],
 									 list_price: params[:purchase_datum][:list_price],
+                                     list_price_quotation: material_list_price_quotation,
+                                     standard_rate: standard_rate,
                                      unit_id: params[:purchase_datum][:unit_id] }
 		   @material_master = MaterialMaster.create(material_master_params)
 		   
@@ -806,6 +910,16 @@ class PurchaseDataController < ApplicationController
 
   def supplier_item_select
     @supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
+    
+    #add180514
+    #資材マスターからも取得する
+    if @supplier_material.present?
+      #@supplier_material += MaterialMaster.all.pluck("material_code", "id")
+      
+      #upd180627
+      @supplier_material += @@material_masters.pluck("material_code", "id")
+    end
+    
   end
   
   #add170226
@@ -837,13 +951,28 @@ class PurchaseDataController < ApplicationController
 	end
   end
   
+  #add180627
+  #資材分類をセット
+  def material_category_select
+     
+     @material_categories = MaterialMaster.with_category.where(:id => params[:material_id]).
+           where("material_masters.id is NOT NULL").pluck("material_categories.id").flatten.join(",")
+  end
+  
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_purchase_datum
       @purchase_datum = PurchaseDatum.find(params[:id])
-
+      
     end
 	
+    #add180627
+    def set_material
+      #ここで資材マスターもセットしておく(動作軽減のため)
+      @@material_masters = MaterialMaster.all
+    end
+    
 	# Never trust parameters from the scary internet, only allow the white list through.
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
@@ -856,7 +985,8 @@ class PurchaseDataController < ApplicationController
     end
 
     def material_masters_params
-         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at, :list_price, :maker_id])
+         params.require(:purchase_datum).permit(MaterialMaster_attributes: [:id,  :last_unit_price, :last_unit_price_update_at, 
+                :list_price, :list_price_quotation, :standard_rate, :maker_id])
     end
     
 	#資材Mへ最終単価・日付を更新用

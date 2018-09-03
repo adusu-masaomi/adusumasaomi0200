@@ -8,6 +8,19 @@
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_working_unit_path,
             :class => 'btn btn-primary' %>
+
+<!--モバイル対応 add180829-->
+<% if browser.platform.ios? || browser.platform.android? %>
+  <!--スペース-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <font color="#8F00FE">
+  <label><%= radio_button(:drag, :on, "1", onClick: "dragg_on()") %>(モバイル用)ソートOn</label>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <label><%= radio_button(:drag, :off, "1", onClick: "dragg_off()") %>Off</label>
+  </font>
+<% end %>
+<!-- -->
+
 <div class="span11 table-scrollable">
   <style>
    table { }
@@ -67,6 +80,20 @@
 		
 	//
   
+    //モバイル対応 add180829
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      // モバイルはソートさせない。
+    } else {
+      //モバイル以外ならデフォルトでソート有効にする
+      sortableEnable();
+    }
+  
+  });
+  
+  //モバイル対応 add180829
+  //////
+  //ドラッグソートOn
+  function sortableEnable() {
     $( "#tablefix tbody" ).sortable({
 	//$( ".sortable" ).sortable({
         cursor: 'move',
@@ -83,10 +110,28 @@
 	   },
 	       
     });
+    $( "#tablefix tbody" ).sortable( "option", "disabled", false );
     $( ".sortable" ).disableSelection();
   
-  });
-
-
+  }
+  
+  //ドラッグソートOff
+  function sortableDisable() {
+    $( "#tablefix tbody" ).sortable("disable");
+    return false;
+  }
+  
+  //ラジオボタンによるソート(On)
+  function dragg_on(){
+    document.getElementById("drag_off_1").checked = false;
+    sortableEnable();
+  }
+  //ラジオボタンによるソート(Off)
+  function dragg_off(){
+    document.getElementById("drag_on_1").checked = false;
+    sortableDisable();
+  }
+  //////
+  
 </script>
 

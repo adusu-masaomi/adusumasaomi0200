@@ -134,8 +134,8 @@
         <%= f.input :unit_master_id_hide, input_html:{id:'unit_master_id_hide'}, as: :hidden  %>
         <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
             {id:"working_subcategory_select_hide",  hidden: true  } %>
-        <!--add180331-->
         <%= f.input :list_price_color_hide, input_html:{id:'list_price_color_hide'}, as: :hidden  %>
+        <%= f.input :rate_hide, input_html:{id:'rate_hide'}, as: :hidden  %>
         
         <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。--> 
        <%= f.hidden_field_tag(:move_flag, params[:move_flag], {id: "move_flag"}) %>
@@ -435,6 +435,7 @@
   
   
   //アイテム選択後の、各種アイテム情報のセット
+  //通常はjsの"setWorkingSmallItemDetail"を使用！！
   function setMaterialDetail(child_index){
       
       //品番をセット
@@ -484,14 +485,22 @@
 	    obj = document.getElementById("quantity_hide");
 	    var quantity = "modal_quantity" + child_index;
 	    document.getElementById(quantity).value = obj.innerText;
-				 
+	    
+        
 	    //定価をセット
 	    obj = document.getElementById("unit_price_hide");
 	    //var unit_price = "unit_price" + child_index;
 	    //upd171205
 	    var unit_price = "modal_unit_price" + child_index;
 	    document.getElementById(unit_price).value = obj.innerText;
-				 
+	    
+        //add180726
+        //掛け率をセット
+	    obj = document.getElementById("rate_hide");
+	    var rate = "modal_rate" + child_index;
+	    document.getElementById(rate).value = obj.innerText;
+        
+        
 	    //資材費を算出
 	    //add180201フィールド化
         obj = document.getElementById("material_price_hide");

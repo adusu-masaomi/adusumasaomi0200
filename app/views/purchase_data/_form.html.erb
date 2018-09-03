@@ -116,18 +116,29 @@
   <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック' %> 
   <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"15"} %>
   <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
+  
+  <!--資材分類-->
+  <%= f.simple_fields_for :MaterialMaster, :remote => true do |m| %>
+    <%= m.label :"資材分類" , {:class => "my-custom-class-l"} %></br>
+    <%= m.collection_select :material_category_id, MaterialCategory.all, :id, :name, {:include_blank => true} , {id:"material_category_id", class: "searchableCategory" , 
+               style: 'width:220px;', :selected => 0 } %>
+  <% end %>
+  </br></br>
+  
   <%= f.label :仕入区分 , {:class => "my-custom-class-l", style: 'width:190px;'} %><%= f.label :入出庫区分 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , 
      {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , 
-       {id: "division_id", :tabindex=>"17", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
+       {id: "division_id", :tabindex=>"18", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
   <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {:include_blank => true}, 
        {id:'inventory_division_id', :onchange => "uncheckUnitPriceInventory()", :class => "my-custom-class",
-          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"18" } %>
-  <%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"19", :readonly=> true} %> 
+          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"19" } %>
+  <%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %> 
   <%= f.label :complete_flag, "入力完了", {} %> 
   </br>
 	   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
+  <%= f.input :material_category_id_hide, input_html:{id:'material_category_id_hide'}, as: :hidden  %>
+    
   <!--外注工事判定用-->
   <%= f.input :outsourcing, :value => "1", input_html:{id:'outsourcing', :value => @outsourcing_flag} , as: :hidden %>
   <!--工事ID自動切り替え用-->
@@ -173,7 +184,17 @@
 	 $( ".searchableUnit" ).on("select2:close", function (e) {
 	   $('[tabindex=14]').focus(); 
 	 });
-	  
+	 
+     //資材分類
+     //select2のタブインデックスはここで指定する
+	 $(".searchableCategory").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',17)}).trigger('load');
+     //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableCategory" ).on("select2:close", function (e) {
+	   $('[tabindex=18]').focus(); 
+	 });
+     
+     
      //検索可能なリストボックス(品名の場合)
 	 //色がピンクにしたいが、Macだと変わらない？？
      $(".searchableItem").select2({ theme: "bootstrap", allowClear: true , placeholder: "どれか一つを選択して下さい。", style: 'font-color:red;'
@@ -188,6 +209,9 @@
 	   setItem(index);
 	   //単価をセット
 	    setUnitPrice();
+        
+        //資材分類をセット
+        setMaterialCategory();
 		
         //出庫の場合は別途単価・業者を取得
         setInventoriesInfo();
@@ -604,7 +628,26 @@
        getInventoryUnitPricesAndSupplier();
      }
    }
-
+   
+   //資材分類のセット
+   function setMaterialCategory()
+   {    
+      var material_id = document.getElementById("material_id").value;
+      if (material_id > 1) {
+        $.get("<%= purchase_datum_material_category_select_path %>",
+            { material_id: material_id },
+            function(data){
+              obj = document.getElementById("material_category_id_hide").textContent;
+              if (obj != null){
+		        index = parseInt(obj);
+                $(".searchableCategory").val(index).trigger("change"); 
+		      }
+            }
+        );
+      }
+   
+   }
+   
   //仕入先単価のセット
    function setUnitPrice()
    {

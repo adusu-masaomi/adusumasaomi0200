@@ -19,6 +19,15 @@ class ConstructionDatum < ActiveRecord::Base
 	has_many :construction_costs, :foreign_key => "construction_datum_id"
 	#belongs_to :construction_costs
 	
+    #add180827
+    #has_many :construction_attachments
+    #accepts_nested_attributes_for :construction_attachments
+    
+    #upd180828
+    has_many :construction_attachments, dependent: :destroy
+    accepts_nested_attributes_for :construction_attachments, allow_destroy: true
+    #
+    
 	#発行日用
     attr_accessor :issue_date
 	

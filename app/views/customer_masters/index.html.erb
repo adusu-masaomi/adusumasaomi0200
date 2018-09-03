@@ -25,6 +25,20 @@
 		<%= link_to t('.new', :default => t("helpers.links.new")),
             new_customer_master_path,
             :class => 'btn btn-primary' %>
+        
+        <%= link_to "一覧表",
+            customer_masters_path(@customer_masters, action:"index", print_flag: "1", format: "pdf"),
+            :class => 'btn  btn-deeporange500_ftg', :target=>["_blank"] %>
+         
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         
+        <%= link_to "一覧(年賀状確認用)",
+            customer_masters_path(@customer_masters, action:"index", print_flag: "2", format: "pdf"),
+            :class => 'btn  btn-orange500_ftg', :target=>["_blank"] %>
+        
+        <%= link_to "CSV", customer_masters_path(params.merge(format: 'csv')),:class => 'btn btn-grey300_rsd btn-xs'%>
+        
   	</div>
    <% end %>
 </div>
@@ -61,6 +75,7 @@
       <th></th>
 	  <th><%= model_class.human_attribute_name(:responsible1) %></th>
       <th><%= model_class.human_attribute_name(:responsible2) %></th>
+      <th><%= model_class.human_attribute_name(:card_not_flag) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -117,6 +132,9 @@
 		<% end %>
 		<td><%= customer_master.responsible1 %></td>
         <td><%= customer_master.responsible2 %></td>
+        
+        <td><%= check_box("", "", {checked: check_if_true(customer_master.card_not_flag) , :multiple => true, :style => "margin-left: 16px;",  :disabled => true}, "true", "false") %></td>
+        
         <td><%=l customer_master.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
@@ -158,7 +176,8 @@
 	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
         fc = 1;  //固定列数
 		ht -= 70;
-		sz -= 0;
+        //sz -= 0;
+        sz = 1920; //for ipad pro (add180829)
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
      //$('#tablefix').tablefix({width: 1920, height: 610, fixRows: 1, fixCols: 1});

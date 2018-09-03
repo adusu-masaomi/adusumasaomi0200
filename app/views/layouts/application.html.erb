@@ -93,6 +93,7 @@ body > .container {
                <li><a href="/supplier_masters">仕入先マスター管理</a></li>
                <li><a href="/customer_masters">得意先マスター管理</a></li>
                <li><a href="/material_masters">資材マスター管理</a></li>
+               <li><a href="/material_categories">資材分類管理</a></li>
                <li><a href="/task_contents">工程表項目マスター</a></li>
                <li><a href="/purchase_unit_prices">資材単価マスター管理</a></li>
                <li><a href="/maker_masters">メーカーマスター管理</a></li>
@@ -118,9 +119,9 @@ body > .container {
            <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">在庫管理<b class="caret"></b></a>
                  <ul class="dropdown-menu">
+                   <li><a href="/inventories">在庫管理</a></li>
                    <li><a href="/inventory_histories">入出庫管理</a></li>
-				   <li><a href="/inventories">在庫管理</a></li>
-                   <li><a href="/stocktakes">棚卸管理</a></li>
+				   <li><a href="/stocktakes">棚卸管理</a></li>
 				 </ul>
            </li>
 	       <li class="dropdown">
@@ -247,6 +248,7 @@ body > .container {
   var AFFILIATION_OUTSOURCING = 4;      //外注
   
   //グローバル変数
+  //var radio_sort_flag = 0;   //0:ソートしない 1:する
   //
   
   $(document).ready(function() {
@@ -338,20 +340,29 @@ body > .container {
 	  //countはデフォの50から1に変更
 	  
 	  if (thisAddress != undefined){
-	     $.ajax({
-           url: "http://zip.ricollab.jp/search"
-           , data: { q: address, type: "json", count: 1 }
+	     
+         //upd180724 既存サイト(old)閉鎖のため切替
+         $.ajax({
+           url: "http://zipcoda.net/api"
+           , data: { address: address }
            , dataType: "jsonp"
          }).done(function (data) {
+         
+           document.getElementById(postId).value = data.items[0].zipcode;
+           formatPost2(postId);
+         
+         //old
+         //$.ajax({
+         //  url: "http://zip.ricollab.jp/search"
+         //  , data: { q: address, type: "json", count: 1 }
+         //  , dataType: "jsonp"
+         //}).done(function (data) {
            
-		   var result = $.map(data.result, function (item) {
-             
-			 //var zip = "〒"  item.zipcode.substring(0, 3) + "-" + item.zipcode.substring(3);
-             document.getElementById(postId).value = item.zipcode;
-			 
-			 formatPost2(postId);
-			 
-		   });
+		   //var result = $.map(data.result, function (item) {
+           //  //var zip = "〒"  item.zipcode.substring(0, 3) + "-" + item.zipcode.substring(3);
+           //  document.getElementById(postId).value = item.zipcode;
+		   //  formatPost2(postId);
+		   //});
 		   
 		 }).fail(function (jqXHR, textStatus, errorThrown) {
            //alert(textStatus);

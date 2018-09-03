@@ -27,7 +27,9 @@ class InvoiceHeadersController < ApplicationController
     
     #global set
     $invoice_headers = @invoice_headers
-	
+	$print_flag_invoice = params[:print_flag]
+    
+    
 	#開始・終了日をセット
     if query.present? && query["invoice_date_gteq(1i)"].present? && query["invoice_date_lteq(1i)"].present?
       $invoice_date_start = query["invoice_date_gteq(1i)"] + "/" + query["invoice_date_gteq(2i)"]  + "/" + query["invoice_date_gteq(3i)"]
@@ -302,7 +304,7 @@ class InvoiceHeadersController < ApplicationController
             :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, :post, :address, :house_number, :address2,  
             :tel, :fax, :construction_period, :construction_place,
             :payment_period, :invoice_period_start_date, :invoice_period_end_date, :billing_amount, :execution_amount, 
-            :deposit_amount, :payment_method_id, :commission, :payment_date, :last_line_number, :remarks)
+            :deposit_amount, :payment_method_id, :commission, :payment_date, :labor_insurance_not_flag, :last_line_number, :remarks)
     end
     
     # 

@@ -11,25 +11,34 @@
   <!-- 追加箇所終了 -->
     <%= search_form_for @q do |f| %>
       <%= f.label :purchase_order_code, '注文No：' %>
-	  
-	  <!--<%= f.select :id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
-	     { style: 'width:220px' , class: "searchablePurchaseOrderCode"}  %>-->
-	
-	  <%= f.select :id_eq, PurchaseOrderDatum.order('purchase_order_code').all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
+	    <%= f.select :id_eq, PurchaseOrderDatum.order('purchase_order_code').all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
 	     { style: 'width:220px' , class: "searchablePurchaseOrderCode"}  %>
+      <!--モバイル用対応  add180830-->
+      <% if browser.platform.ios? || browser.platform.android? %>
+        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCode()" %>
+      <% end %>
       
-	  
 	  <%= f.label :purchase_order_code_header, '注文No頭文字::' %>
-	  
-      <%= f.select :purchase_order_code_cont, PurchaseOrderDatum.header_numbers.map{|st| [st,st]}, {include_blank: true}, { style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader"}  %>
-	  
-	  <!--<%= f.select :purchase_order_code_cont,options_for_select(PurchaseOrderDatum.header_numbers), {include_blank: true }, {style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader" } %>-->
-      </br>
+	  <%= f.select :purchase_order_code_cont, PurchaseOrderDatum.header_numbers.map{|st| [st,st]}, {include_blank: true}, { style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader"}  %>
+	  <!--モバイル用対応  add180830-->
+      <% if browser.platform.ios? || browser.platform.android? %>
+        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCodeHeader()" %>
+      <% end %>
+      
+	  </br>
 	  <%= f.label :construction_datum_id, '工事名：：' %>
 	  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, { style: 'width:440px' , class: "searchableConstructionCode"}  %>
-	  
+	  <!--モバイル用対応  add180830-->
+      <% if browser.platform.ios? || browser.platform.android? %>
+        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+      <% end %>
+      
       <%= f.label :supplier_master_id, '仕入先：：' %>
       <%= f.select :supplier_master_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+      <!--モバイル用対応  add180830-->
+      <% if browser.platform.ios? || browser.platform.android? %>
+        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSupplier()" %>
+      <% end %>
       </br>
   
       <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
@@ -155,7 +164,9 @@
 		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
           fc = 2;  //固定列数
 		  ht -= 80;
-		}
+          
+          sz = 1920; //for ipad pro (add180829)
+        }
 		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 		
 	    //実行
@@ -178,5 +189,19 @@
 		bodyDiv.scrollTop($.cookie(key));
     },0);
   }
-
+  //モバイル用対応 add180830
+  //select2をクリアする
+  function clearPurchaseOrderCode(){
+    $(".searchablePurchaseOrderCode").val(null).trigger("change"); 
+  }
+  function clearPurchaseOrderCodeHeader(){
+    $(".searchablePurchaseOrderCodeHeader").val(null).trigger("change"); 
+  }
+  function clearConstruction(){
+    $(".searchableConstructionCode").val(null).trigger("change"); 
+  }
+  function clearSupplier(){
+    $(".searchableSupplierName").val(null).trigger("change"); 
+  }
+  
 </script>

@@ -80,8 +80,16 @@ class WorkingSmallItemsController < ApplicationController
      end
 	 
 	 #単価（定価）
-	 @unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
+	 #@unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
+     #upd180726
+     #見積で使用するための定価(ケーブル等、定価ゼロなら直近単価が入っている）
+     @unit_price = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price_quotation).flatten.join(",")
 	 
+     #掛率
+     #@rate = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
+     #update180726
+     @rate = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:standard_rate).flatten.join(",")
+     
      #add180331
      #定価一斉更新時の場合などで色をつける
      @update_date = MaterialMaster.where(:id => params[:material_id]).where("id is NOT NULL").pluck(:list_price_update_at).flatten.join(",")
@@ -128,8 +136,15 @@ class WorkingSmallItemsController < ApplicationController
        end
 	 
 	   #単価(定価)
-	   @unit_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
-	 
+	   #@unit_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:list_price).flatten.join(",")
+	   #見積で使用するための定価(ケーブル等、定価ゼロなら直近単価が入っている）
+       @unit_price = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:list_price_quotation).flatten.join(",")
+     
+       #掛率
+       @rate = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:standard_rate).flatten.join(",")
+     
+       #binding.pry
+     
        #add180331
        #定価一斉更新時の場合などで色をつける
        @update_date = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:list_price_update_at).flatten.join(",")

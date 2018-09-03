@@ -4,7 +4,9 @@ class MaterialMaster < ActiveRecord::Base
 	#has_many :PurchaseDatum
 	belongs_to :PurchaseDatum
 	belongs_to :MakerMaster, :foreign_key => "maker_id"
-	has_many :UnitMaster
+    belongs_to :material_category
+    
+    has_many :UnitMaster
 	
 	has_many :inventories
 	
@@ -44,8 +46,12 @@ class MaterialMaster < ActiveRecord::Base
    #scope :with_inventory_item, -> { where.not(:inventory_category_id => nil).where("inventory_category_id > ?", 0) }
    scope :with_inventory_item, -> { where.not(:inventory_category_id => nil) }
    
+   #add180627
+   #scope :with_category, -> (id=1){joins(:material_category).where("material_categories.id = material_masters.material_category_id" )}
+   scope :with_category, -> (id=1){joins(:material_category)}
+   
    def self.ransackable_scopes(auth_object=nil)
-       [:with_maker]
+       [:with_maker, :with_category]
    end
    
    private

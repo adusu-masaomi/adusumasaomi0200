@@ -122,9 +122,17 @@
 		
 		<td style = <%= bold %> ><font color = <%= color %>  ><%= link_to inventory_history.id, inventory_history_path(inventory_history) %></font></td>
         <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.inventory_date %></font></td>
-        <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.construction_code %></font></td>
-        <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.construction_name %></font></td>
-        <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.CustomerMaster.customer_name %></font></td>
+        
+        <% if inventory_history.construction_datum.present? %>
+            <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.construction_code %></font></td>
+            <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.construction_name %></font></td>
+            <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.construction_datum.CustomerMaster.customer_name %></font></td>
+        <% else %>
+            <td style = <%= bold %> ><font color = <%= color %>  > - </font></td>
+            <td style = <%= bold %> ><font color = <%= color %>  > - </font></td>
+            <td style = <%= bold %> ><font color = <%= color %>  > - </font></td>
+        <% end %>
+        
         <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.material_master.material_code %></font></td>
 		<td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.material_master.material_name %></font></td>
         <td style = <%= bold %> ><font color = <%= color %>  ><%= inventory_history.material_master.MakerMaster.maker_name %></font></td>

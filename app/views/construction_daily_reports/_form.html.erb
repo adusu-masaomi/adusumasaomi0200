@@ -98,17 +98,24 @@
       
 	  
 	  $(".datepicker").on("dp.change", function(e) {
-	    //debugger;
 	    getDailyPay.call({}, this.form);
+        //add180501
+        //工事画面から遷移した場合、日付のみ入力もあり得る為
+        setConstructionDateDefault();
 	  });
 	  
-	    
-	  
-   //工事日のセット(デフォルト)
+	
+	
+  });
+  
+  //工事日のセット(デフォルト)
    function setConstructionDateDefault()
    {  
-      obj = document.getElementById("construction_datum_id");
-       construction_id = parseInt(obj.value);
+     obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     
+     if (!(isNaN(construction_id))){  
+       
        $.get("<%= construction_daily_reportz_start_day_select_path %>",
          {id: construction_id },
           function(data){
@@ -127,13 +134,8 @@
                //debugger;
           }
         );
+      }
     };
-    
-	 
-
-	
-  });
-  
   
      // 登録前処理(工事日のセット)
      $('#report-form').submit(function(){
@@ -149,17 +151,20 @@
      end_date = new Date(end_date);　          
 
      // 工事開始日の判定
-     if (working_date <= start_date) {
+     //if (working_date <= start_date) {
+     //upd180501 タイミングの問題で日付がNULLになっているケース有るため条件追加
+     if (working_date <= start_date || start_date.toString() === "Invalid Date") {
        document.getElementById("construction_start_date").value = working_date;
      }
      
      // 工事終了日の判定
-     if (working_date >= end_date) {
+     //if (working_date >= end_date) {
+     //upd180501 タイミングの問題で日付がNULLになっているケース有るため条件追加
+     if (working_date >= end_date || end_date.toString() === "Invalid Date") {
        document.getElementById("construction_end_date").value = working_date;
      }
      
-	 //obj = document.getElementById("construction_start_date").value;
-     //debugger;
+     //obj = document.getElementById("construction_start_date").value;
     
    });
 

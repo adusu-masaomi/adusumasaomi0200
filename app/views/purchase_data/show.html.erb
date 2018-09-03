@@ -28,6 +28,13 @@
   <dd><%= @purchase_datum.material_code %></dd>
   <dt><strong>品名</strong></dt>
   <dd><%= @purchase_datum.material_name %></dd>
+  <dt><strong>分類</strong></dt>
+  <% if @purchase_datum.MaterialMaster.material_category.present? %>
+    <dd><%= @purchase_datum.MaterialMaster.material_category.name %></dd>
+  <% else %>
+    <dd>-</dd>
+  <% end %>
+  
   <dt><strong>メーカー名</strong></dt>
   <dd><%= @purchase_datum.maker_name %></dd>
   <dt><strong>数量</strong></dt>
