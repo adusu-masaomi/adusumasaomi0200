@@ -1,5 +1,5 @@
 class QuotationDetailMiddleClassificationsController < ApplicationController
-  before_action :set_quotation_detail_middle_classification, only: [:show, :edit, :update, :destroy]
+  before_action :set_quotation_detail_middle_classification, only: [:show, :edit, :update, :destroy, :copy]
   
   #add171016
   before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
@@ -435,22 +435,24 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
           #
       end
 	end
-  
+    
+    
     if @status != "fixed"
       @quotation_detail_middle_classification.destroy
-    #respond_to do |format|
-      #del180803
-      #確定済みデータに警告を出すため、ここでリダイレクトさせない
-	  #format.html {redirect_to quotation_detail_middle_classifications_path( :quotation_header_id => params[:quotation_header_id],
-      #              :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id], 
-	  #              :quotation_header_name => params[:quotation_header_name],
-      #              :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
-      #             )}
+    
+        #respond_to do |format|
+            #del180803
+            #確定済みデータに警告を出すため、ここでリダイレクトさせない→させる
+	    #    format.html {redirect_to quotation_detail_middle_classifications_path( :quotation_header_id => params[:quotation_header_id],
+        #            :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id], 
+	    #            :quotation_header_name => params[:quotation_header_name],
+        #            :working_large_item_name => params[:working_large_item_name], :working_large_specification => params[:working_large_specification]
+        #           )}
 	  
-	  #品目データの金額を更新
-      save_price_to_large_classifications
+	        #品目データの金額を更新
+            save_price_to_large_classifications
 	  
-    #end
+        #end
     end
   end
   
@@ -495,6 +497,48 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	
 	return status
 	
+  end
+  
+  #add 180911
+  #レコードをコピーする
+  def copy
+    
+    if params[:quotation_header_id].present?
+      #確定済みのものは、変更できないようにする
+      quotation_header = QuotationHeader.find(params[:quotation_header_id])
+      if quotation_header.present?
+        if quotation_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
+    end
+    
+    if @status != "fixed"
+      @quotation_detail_middle_classification.working_middle_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
+    
+      new_record = @quotation_detail_middle_classification.dup
+      status = new_record.save
+    
+      if status == true
+        notice = 'Quotation detail middle classification was successfully copied.'
+        
+        #内訳データの金額を更新
+        @quotation_detail_middle_classification = new_record
+        save_price_to_large_classifications
+        
+      else
+        notice = 'Quotation detail middle classification was unfortunately failed...'
+      end
+        
+        #redirect_to :action => "index", :notice => notice,  :quotation_header_id => params[:quotation_header_id], 
+        #    :quotation_header_name => params[:quotation_header_name],  
+        #    :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id],
+        #    :working_large_item_name => params[:working_large_item_name], 
+        #    :working_large_specification => params[:working_large_specification]
+    end
   end
   
   

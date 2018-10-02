@@ -8,6 +8,9 @@
   <p><%= @responsible_name %></p>
   <p>いつもお世話になっております。</p>
   <p>下記の商品につきまして、ご注文の程よろしくお願い申し上げます。</p>
+  <% if @notes.present? %>
+    <p><%= @notes %></p>
+  <% end %>
   <p><%= @purchase_order_code %></p>
   <p><%= @construction_name %></p>
   </p>
@@ -22,6 +25,13 @@
       <%= item[:material_code] %></p>
       &nbsp;&nbsp;&nbsp;品名：
       <%= item[:material_name] %></p>
+      
+      <% if item[:notes].present? %>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <%= "※" + item[:notes] %></p>
+      <% end %>
+      
+      
       &nbsp;&nbsp;&nbsp;メーカー：
       <%= item[:maker_name] %></p>
       &nbsp;&nbsp;&nbsp;数量：

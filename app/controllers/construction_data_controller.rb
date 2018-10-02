@@ -39,26 +39,33 @@ class ConstructionDataController < ApplicationController
 
     @customer_masters = CustomerMaster.all
     
-	
 	$construction_data = @construction_data
 	
-	respond_to do |format|
-	  format.html
+    #add180903
+    #資料フォルダを開く
+	if params[:document_flag] == "1"
+      openFileDialog
+    end
+    
+    if params[:document_flag] != "1"
+      respond_to do |format|
+	    format.html
 		
-	  format.pdf do
-       
-	    
-        report = ConstructionListPDF.create @construction_list 
+	    format.pdf do
         
-        # ブラウザでPDFを表示する
-        # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "construction_list.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
-      end
-	end
+          report = ConstructionListPDF.create @construction_list 
+        
+          # ブラウザでPDFを表示する
+          # disposition: "inline" によりダウンロードではなく表示させている
+          send_data(
+            report.generate,
+            filename:  "construction_list.pdf",
+            type:        "application/pdf",
+            disposition: "inline")
+        end
+	  end
+    
+    end
   end
 
   # GET /construction_data/1
@@ -80,7 +87,6 @@ class ConstructionDataController < ApplicationController
     get_last_construction_code_select
     @construction_datum.construction_code = @@construction_new_code
 	
-	
   end
 
   # GET /construction_data/1/edit
@@ -101,6 +107,26 @@ class ConstructionDataController < ApplicationController
      #3.times { @construction_datum.construction_attachments.build }
     
   end
+  def openFileDialog
+     
+     if params[:format].present?
+       @construction_datum = ConstructionDatum.find(params[:format])
+     end
+     
+     if @construction_datum.present?
+       dir_detail_path = @construction_datum.construction_code + "-" + @construction_datum.construction_name + "/"
+     
+       if browser.platform.windows?
+         #windowsの場合
+         system("explorer #{"/Users/%username%/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
+         #system("start /Users/$USER/OneDrive/ADUSU/工事資料/")
+       elsif browser.platform.mac?
+         #macの場合
+         system("open #{"/Users/$USER/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
+       end
+     end
+  end
+  
   def download
     
     @construction_attachment = ConstructionAttachment.find(params[:id])
@@ -127,6 +153,10 @@ class ConstructionDataController < ApplicationController
 
 	
       if @construction_datum.save
+        
+        #add180903
+        #OneDrive用のディレクトリを作る
+        #makeDocumentsFolder
         
         #工事費集計表データも空で作成
         #add170330
@@ -196,6 +226,11 @@ class ConstructionDataController < ApplicationController
       if @update
 	  #if @construction_datum.update(construction_datum_params)
         
+        #add180903
+        #OneDrive用のディレクトリを作る
+        #makeDocumentsFolder
+        
+        
         #工事費集計表データも空で作成(データ存在しない場合のみ)
         #add170330
         construction_cost = ConstructionCost.where(:construction_datum_id => @construction_datum.id).first
@@ -262,6 +297,32 @@ class ConstructionDataController < ApplicationController
     
     
   end
+  
+  #資料保管用のフォルダーをOneDriveへ作成する
+  #winアプリ側で行うことにしたので、一旦保留(180910)
+  def makeDocumentsFolder
+    ###
+    #dir_detail_path = @construction_datum.construction_code + "-" + @construction_datum.construction_name
+    #require "fileutils"
+    
+    username = ENV['USER']
+    
+    #mac or windows の場合
+    #if browser.platform.windows? || browser.platform.mac?
+    
+      dir_path += @construction_datum.construction_code + "-" + @construction_datum.construction_name
+      
+      #this can't sync folders...
+      #dir_path = "/rootOneDrive/共有/工事資料/"
+      dir_path = "/rootOneDrive/attachment/"       
+
+      #FileUtils.mkdir_p(dir_path) unless FileTest.exist?(dir_path)
+      FileUtils.mkdir_p(dir_path, :mode => 0777) unless FileTest.exist?(dir_path)
+    #end
+    #
+  end
+  
+  
   
   #作業指示書PDF発行
   def set_pdf
@@ -356,6 +417,27 @@ class ConstructionDataController < ApplicationController
   
   
   # ajax
+  
+  #add180926
+  #請求フラグのON/OFF
+  def set_billed_flag
+    construction_data = ConstructionDatum.find(params[:id])
+    if construction_data.present?
+        #更新する
+        construction_data_params = { billed_flag: params[:billed_flag] }
+        construction_data.update(construction_data_params)
+    end
+  end
+  #受注フラグのON/OFF
+  def set_order_flag
+    construction_data = ConstructionDatum.find(params[:id])
+    if construction_data.present?
+        #更新する
+        construction_data_params = { order_flag: params[:order_flag] }
+        construction_data.update(construction_data_params)
+    end
+  end
+  
   #add170218 見積書などで使用
   #upd171013
   def construction_and_customer_select
@@ -438,7 +520,7 @@ class ConstructionDataController < ApplicationController
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
-      :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag)
+      :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
     end
     def construction_datum_attachments_params
       params.require(:construction_datum).permit(construction_attachments_attributes: [:id, :attachment, :title, :_destroy])

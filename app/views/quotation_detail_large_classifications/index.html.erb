@@ -120,7 +120,7 @@
       <th style="width:20px;">労</th>
 	  <th style="width:220px;"><%= model_class.human_attribute_name(:remarks) %></th>
       <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
-      <th style="width:100px;"><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th style="width:140px;"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody class="quotation_detail_large_classification-index">
@@ -203,23 +203,23 @@
     //}
  }
  
- //画面位置保存するプラグイン
-  $.fn.keepPosition = function(){
-  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-    var key = 'keep-position-'+location.pathname;
-    var win = $(window);
-    this.each(function(){
-    //$(this).on('submit',function(){
-    $(".keep-disp").click(function(){
-      
-      div_top = bodyDiv.scrollTop();
-	    $.cookie(key, div_top);
-	  });
-    });
-    setTimeout(function(){
-      bodyDiv.scrollTop($.cookie(key));
-    },0);
-  }
+//180914共通化
+// //画面位置保存するプラグイン
+//  $.fn.keepPosition = function(){
+//  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+//    var key = 'keep-position-'+location.pathname;
+//    var win = $(window);
+//    this.each(function(){
+//    //$(this).on('submit',function(){
+//    $(".keep-disp").click(function(){
+//      div_top = bodyDiv.scrollTop();
+//	    $.cookie(key, div_top);
+//	  });
+//    });
+//    setTimeout(function(){
+//        bodyDiv.scrollTop($.cookie(key));
+//    },0);
+//  }
  
   //履歴へ保存させる処理(ajax)
   //$('#quotation_print_1').on('confirm:complete', function(e, answer) {

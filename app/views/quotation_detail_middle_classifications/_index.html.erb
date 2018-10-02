@@ -92,13 +92,22 @@
                       edit_quotation_detail_middle_classification_path(quotation_detail_middle_classification, quotation_header_id: params[:quotation_header_id], 
 					       quotation_header_name: params[:quotation_header_name], quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], 
 					       working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ), :class => 'btn btn-white_rsd btn-xs keep-disp', remote: true %>
+          
+          <%= link_to "コピー", 
+                      copy_quotation_detail_middle_classification_path(quotation_detail_middle_classification, quotation_header_id: params[:quotation_header_id],  
+                      quotation_header_name: params[:quotation_header_name], quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], 
+					       working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ),
+                      :data => { :confirm => 'データをコピーしますか?'  },
+                      :class => 'btn btn-cyan100_rsd btn-xs', remote: true %>
+          
+          
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      quotation_detail_middle_classification_path(quotation_detail_middle_classification, quotation_header_id: quotation_detail_middle_classification.quotation_header_id, 
-                      quotation_detail_large_classification_id: quotation_detail_middle_classification.quotation_detail_large_classification_id,
+                      quotation_detail_middle_classification_path(quotation_detail_middle_classification, quotation_header_id: params[:quotation_header_id], 
                       quotation_header_name: params[:quotation_header_name], 
+                      quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
                       working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ),
                       :method => :delete,
-                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :data => { :confirm => t('.confirm', :default => t('helpers.links.confirm', :default => 'Are you sure?')) },
                       :class => 'btn btn-xs btn-danger keep-disp', remote: true %>
         </td>
       </tr>

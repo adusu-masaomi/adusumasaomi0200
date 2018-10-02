@@ -4,6 +4,7 @@ class DeliverySlipHeadersController < ApplicationController
   # GET /delivery_slip_headers
   # GET /delivery_slip_headers.json
   def index
+    
     #@delivery_slip_headers = DeliverySlipHeader.all
     
     #ransack保持用コード
@@ -132,18 +133,30 @@ class DeliverySlipHeadersController < ApplicationController
   def destroy
     #ヘッダIDをここで保持(内訳・明細も消すため)
     delivery_slip_header_id = @delivery_slip_header.id
-  
-    @delivery_slip_header.destroy
-    respond_to do |format|
-      format.html { redirect_to delivery_slip_headers_url, notice: 'Delivery slip header was successfully destroyed.' }
-      format.json { head :no_content }
+    
+    #確定フラグを取得
+    if @delivery_slip_header.fixed_flag == 1
+      @status = "fixed"
+    else
+      @status = "not_fixed"
     end
+    
+    if @status != "fixed"
+    
+      @delivery_slip_header.destroy
+      
+      #respond_to do |format|
+      #  format.html { redirect_to delivery_slip_headers_url, notice: 'Delivery slip header was successfully destroyed.' }
+      #  format.json { head :no_content }
+      #end
 	
-	#内訳も消す
-	DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: delivery_slip_header_id).destroy_all
+	    #内訳も消す
+	    DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: delivery_slip_header_id).destroy_all
 		
-	#明細も消す
-	DeliverySlipDetailMiddleClassification.where(delivery_slip_header_id: delivery_slip_header_id).destroy_all
+	    #明細も消す
+	    DeliverySlipDetailMiddleClassification.where(delivery_slip_header_id: delivery_slip_header_id).destroy_all
+    end
+    
   end
   
    #viewで拡散されたパラメータを、正常更新できるように復元させる。

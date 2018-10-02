@@ -422,9 +422,9 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 400.7,
+            "x": 401,
             "y": 135.9,
-            "width": 173.8,
+            "width": 184.2,
             "height": 11,
             "style": {
               "font-family": [
@@ -443,7 +443,7 @@
             },
             "reference-id": "",
             "value": "",
-            "multiple-line": false,
+            "multiple-line": true,
             "format": {
               "base": "",
               "type": ""

@@ -44,7 +44,7 @@
 </div>
 <%= link_to t('.new',:default => t("新規作成")),
             new_quotation_header_path,
-            :class => 'btn btn-primary' %>
+            :class => 'btn btn-primary keep-disp' %>
 <!--見出し固定用設定追加-->
 <div style="margin-top : -0px;", class="span11 table-scrollable" >
 
@@ -125,7 +125,7 @@
                       quotation_header_path(quotation_header),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger keep-disp' %>
+                      :class => 'btn btn-xs btn-danger keep-disp', remote: true %>
         </td>
       </tr>
     <% end %>
@@ -167,24 +167,24 @@
      //画面位置保存→実行
      $('form').keepPosition();
   });
-  
-  //画面位置保存するプラグイン
-  $.fn.keepPosition = function(){
-  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-    var key = 'keep-position-'+location.pathname;
-    var win = $(window);
-    this.each(function(){
-    //$(this).on('submit',function(){
-    $(".keep-disp").click(function(){
-      
-      div_top = bodyDiv.scrollTop();
-	    $.cookie(key, div_top);
-	  });
-    });
-    setTimeout(function(){
-      bodyDiv.scrollTop($.cookie(key));
-    },0);
-  }
+
+//180914共通化
+//  //画面位置保存するプラグイン
+//  $.fn.keepPosition = function(){
+//  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+//    var key = 'keep-position-'+location.pathname;
+//    var win = $(window);
+//    this.each(function(){
+//    //$(this).on('submit',function(){
+//    $(".keep-disp").click(function(){
+//      div_top = bodyDiv.scrollTop();
+//	    $.cookie(key, div_top);
+//	  });
+//    });
+//    setTimeout(function(){
+//      bodyDiv.scrollTop($.cookie(key));
+//    },0);
+//  }
   
   //モバイル用対応 add180830
   //select2をクリアする

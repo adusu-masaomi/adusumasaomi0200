@@ -1,5 +1,5 @@
 class DeliverySlipDetailLargeClassificationsController < ApplicationController
-  before_action :set_delivery_slip_detail_large_classification, only: [:show, :edit, :update, :destroy]
+  before_action :set_delivery_slip_detail_large_classification, only: [:show, :edit, :update, :destroy, :copy]
 
   before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
   
@@ -344,7 +344,46 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
                    where(:delivery_slip_header_id => @delivery_slip_detail_large_classification.delivery_slip_header_id)
       
   end
-
+  
+  #add 180911
+  #レコードをコピーする
+  def copy
+    
+    if params[:delivery_slip_header_id].present?
+      #確定済みのものは、変更できないようにする為のフラグを設定
+      delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+      if delivery_slip_header.present?
+        if delivery_slip_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
+    end
+    
+    if @status != "fixed"
+      @delivery_slip_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
+      new_record = @delivery_slip_detail_large_classification.deep_clone include: :delivery_slip_detail_middle_classifications
+      status = new_record.save
+     
+      #respond_to do |format|
+      if status == true
+        notice = 'Delivery slip detail large classification was successfully copied.'
+        
+        #見出データの金額を保存 
+        @delivery_slip_detail_large_classification = new_record
+        save_price_to_headers
+      else
+        notice = 'Delivery slip detail large classification was unfortunately failed...'
+      end
+        
+      #redirect_to :action => "index", :notice => notice,  :delivery_slip_header_id => params[:delivery_slip_header_id], 
+      #      :delivery_slip_header_name => params[:delivery_slip_header_name]
+    end
+    #end
+  end
+    
   #作業明細マスターの更新
   def update_working_middle_item
   

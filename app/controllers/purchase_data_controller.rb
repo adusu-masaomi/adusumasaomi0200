@@ -36,13 +36,37 @@ class PurchaseDataController < ApplicationController
   # GET /purchase_data
   # GET /purchase_data.json
   
+  include ApplicationHelper
+  @@clear = false
+  @@count = 0
+  
   def index
         
         #ransack保持用コード
         query = params[:q]
 
-        query ||= eval(cookies[:recent_search_history_purchase].to_s)  	
-
+        
+        #query ||= eval(cookies[:reset_purchase].to_s)  	#add180929
+        
+        #upd181001 
+        #クッキーへのget/putはヘルパーに設定
+        cky = get_cookies("recent_search_history_purchase")
+        query ||= eval(cky.to_s)   
+        
+        #
+        #クッキーをクリアさせる場合の処理
+        if @@clear == true
+          query = eval(cky.to_s) 
+          @@count += 1
+          #２回目の遷移時に(なぜか)、正常なパラメータが送られてくるので
+          #ここで一旦リセットする
+          if @@count == 2
+            @@clear = false
+            @@count = 0
+          end
+        end
+        #
+        
         @purchase_order_data_extract = PurchaseOrderDatum.all  #add180403
         @construction_code_extract = ConstructionDatum.all     #add180830
         
@@ -56,6 +80,8 @@ class PurchaseDataController < ApplicationController
           @construction_code_extract = ConstructionDatum.where(customer_id: query[:with_customer]).order("construction_code desc")
         end
         ##upd end
+        
+        #binding.pry
         
         case params[:move_flag]
 		when "1"
@@ -76,6 +102,10 @@ class PurchaseDataController < ApplicationController
                      "supplier_id_eq"=> supplier_master_id}
           end
 		  
+          #add181001
+          #検索用クッキーへも保存
+          params[:q] = query
+          
           #注文番号の絞り込み（登録済みのものだけにする） upd180403
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
         when "2"
@@ -99,6 +129,11 @@ class PurchaseDataController < ApplicationController
             query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
                      "supplier_id_eq"=> supplier_master_id}
           end
+          
+          #add181001
+          #検索用クッキーへも保存
+          params[:q] = query
+          
           #注文番号の絞り込み（登録済みのものだけにする） upd180403
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
 		end
@@ -110,11 +145,17 @@ class PurchaseDataController < ApplicationController
         #ransack保持用コード
         search_history = {
         value: params[:q],
-        expires: 24.hours.from_now
+        expires: 4.hours.from_now
         }
         #upd180403
         #クッキーは仕入専用とする（工事画面に影響してしまうので）
-        cookies[:recent_search_history_purchase] = search_history if params[:q].present?
+        
+        #cookies[:recent_search_history_purchase] = search_history if params[:q].present?
+        if params[:q].present?
+          set_cookies("recent_search_history_purchase", search_history)
+                   
+          
+        end
         #
        
 
@@ -202,10 +243,11 @@ class PurchaseDataController < ApplicationController
           type:        "application/pdf",
           disposition: "inline")
       end
-      
-      #
+     
 	end
 	
+    
+    
 	#仕入表PDF発行
     #respond_to do |format|
     #  format.html # index.html.erb
@@ -871,6 +913,32 @@ class PurchaseDataController < ApplicationController
   end
   
   # ajax
+  
+  #add180929
+  #検索クッキーをクリアする
+  def clear_cookies
+    
+    #add180929
+    #特定の検索クッキーを消去
+    cookie_clear(cookies, "nothing") #２番目のパラメータは、cookieから削除したくないパラメータ名
+    
+    @@count = 0
+    @@clear = true
+    
+    
+    respond_to do |format|
+      
+      format.js {render inline: "location.reload();" }
+      
+      #redirect_to :back
+      #format.html {redirect_to purchase_data_path( :construction_id => params[:construction_id], 
+      #   :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
+      #   :move_flag => params[:move_flag])}
+    end
+   
+    #
+  end
+  
   def unit_price_select
      @purchase_unit_prices = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id], :material_id => params[:material_id]).where("supplier_id is NOT NULL").where("material_id is NOT NULL").pluck(:unit_price).flatten.join(",")
   end

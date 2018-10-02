@@ -30,6 +30,8 @@ class ApplicationController < ActionController::Base
   end
   ### ここまで追加(ログイン) ###
   
+  
+    
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"
   $GENGO_ALPHABET = "H"
@@ -85,4 +87,5 @@ class ApplicationController < ActionController::Base
   
   $INDEX_SUPPLIER_OKADA = 2     #仕入先ID(岡田電気)
   
+  $STRING_COPY = "(コピー)"      #明細をコピーした場合にアイテム名につける文字  (add180912)
 end

@@ -56,7 +56,7 @@
       "width": 360,
       "height": 37,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid",
         "fill-color": "#FFFFFF"
@@ -69,7 +69,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -84,7 +84,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -124,9 +124,9 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 32,
+      "x": 40,
       "y": 121.7,
-      "width": 59.9,
+      "width": 41.9,
       "height": 16.6,
       "style": {
         "font-family": [
@@ -142,7 +142,7 @@
         "font-style": []
       },
       "texts": [
-        "件名Ｎｏ．"
+        "件名"
       ]
     },
     {
@@ -178,13 +178,13 @@
       }
     },
     {
-      "id": "construction_code",
+      "id": "construction_name",
       "type": "text-block",
       "display": true,
       "description": "",
       "x": 110.6,
       "y": 121.8,
-      "width": 201.8,
+      "width": 263.3,
       "height": 12.1,
       "style": {
         "font-family": [
@@ -198,7 +198,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -679,7 +679,7 @@
       "width": 821.7,
       "height": 416.2,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid",
         "fill-color": "none"
@@ -692,7 +692,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -707,7 +707,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -748,7 +748,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -789,7 +789,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -830,7 +830,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -871,7 +871,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -912,7 +912,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -953,7 +953,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -968,7 +968,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -983,7 +983,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -998,7 +998,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1121,7 +1121,7 @@
       "width": 104.1,
       "height": 18.7,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid",
         "fill-color": "none"
@@ -1230,7 +1230,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1245,7 +1245,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1260,7 +1260,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1275,7 +1275,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1290,7 +1290,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1305,7 +1305,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1320,7 +1320,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1335,7 +1335,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1350,7 +1350,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1365,7 +1365,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1380,7 +1380,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1395,7 +1395,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1410,7 +1410,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1425,7 +1425,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1440,7 +1440,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1455,7 +1455,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1470,7 +1470,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1485,7 +1485,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1500,7 +1500,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1515,7 +1515,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1534,7 +1534,7 @@
       "width": 57.7,
       "height": 18.5,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 2,
         "border-style": "solid",
         "fill-color": "#FFFFFF"
@@ -1551,7 +1551,7 @@
       "width": 54.7,
       "height": 18.5,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 2,
         "border-style": "solid",
         "fill-color": "#FFFFFF"
@@ -1688,7 +1688,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1703,7 +1703,7 @@
       "display": true,
       "description": "",
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 1,
         "border-style": "solid"
       },
@@ -1720,7 +1720,7 @@
       "x": 747,
       "y": 162.5,
       "width": 23.1,
-      "height": 18.9,
+      "height": 19.8,
       "style": {
         "font-family": [
           "IPAPGothic"
@@ -1788,7 +1788,7 @@
         "font-style": []
       },
       "texts": [
-        "＊最安値"
+        "＊差額"
       ]
     },
     {
@@ -1801,7 +1801,7 @@
       "width": 57.4,
       "height": 18.7,
       "style": {
-        "border-color": "#ff0000",
+        "border-color": "#000000",
         "border-width": 2,
         "border-style": "solid",
         "fill-color": "#FFFFFF"
@@ -1856,6 +1856,192 @@
         "letter-spacing": "",
         "font-style": [],
         "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 108,
+      "y": 566,
+      "width": 43.5,
+      "height": 14.2,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "高値計："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 249.1,
+      "y": 566,
+      "width": 44.7,
+      "height": 14.6,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "安値計："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 395.4,
+      "y": 566,
+      "width": 35.9,
+      "height": 16,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "差額："
+      ]
+    },
+    {
+      "id": "total_high_price",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 146,
+      "y": 566,
+      "width": 46.4,
+      "height": 9.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "total_low_price",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 287,
+      "y": 566,
+      "width": 46.4,
+      "height": 9.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "total_balance",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 423,
+      "y": 566,
+      "width": 46.4,
+      "height": 9.9,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",

@@ -65,5 +65,45 @@ module ApplicationHelper
   end
  
  
-
+  #add180929
+  def set_cookies(cookie_name, value)
+    cookies[cookie_name.to_sym] = value
+  end
+  def get_cookies(cookie_name)
+    return cookies[cookie_name.to_sym]
+  end
+  
+  #検索結果保存用のクッキーを初期化する
+  def cookie_clear(cookies, cookie_name)
+    #仕入画面検索結果を削除
+    if cookie_name != "recent_search_history_purchase"
+      
+      #工事・得意先は残したいので、他を消すようにする
+      new_array = eval(cookies[:recent_search_history_purchase])
+      
+      #
+      new_array.each{|item|
+        if item[0] != "with_construction" &&
+           item[0] != "with_customer" 
+          new_array.delete(item[0])
+        end
+      }
+      
+      #new_array.delete("with_material_code")
+      #
+      
+      #１時間後に消すクッキーとして再セット
+      search_history = {
+        value: new_array,
+        expires: 1.hours.from_now
+      }
+      
+      #cookies.delete(:recent_search_history_purchase)
+      set_cookies("recent_search_history_purchase", search_history)
+      
+    end
+    
+    #return cookies
+  end
+  
 end

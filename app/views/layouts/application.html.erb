@@ -90,7 +90,7 @@ body > .container {
 		  <li class="dropdown">
             <a href="#" class="dropdown-toggle" data-toggle="dropdown">マスター管理<b class="caret"></b></a>
             <ul class="dropdown-menu">
-               <li><a href="/supplier_masters">仕入先マスター管理</a></li>
+               <li><a href="/supplier_masters" >仕入先マスター管理</a></li>
                <li><a href="/customer_masters">得意先マスター管理</a></li>
                <li><a href="/material_masters">資材マスター管理</a></li>
                <li><a href="/material_categories">資材分類管理</a></li>
@@ -109,7 +109,7 @@ body > .container {
            <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">仕入管理<b class="caret"></b></a>
                  <ul class="dropdown-menu">
-                   <li><a href="/purchase_data">仕入データ管理</a></li>
+                   <li><a href="/purchase_data" onclick="clearCookies()" >仕入データ管理</a></li>
 				   <li><a href="/purchase_order_data">注文No管理</a></li>
 				   <!--<li><a href="/purchase_order_data?order_flag=true">注文データ管理</a></li>-->
 				   <li><a href="/purchase_order_histories">注文データ管理</a></li>
@@ -279,6 +279,12 @@ body > .container {
         }, 1);        
     });
 	//
+    
+    //フォーム（ブラウザ）を閉じる場合の処理
+    $(window).on('beforeunload', function() {
+      //debugger;
+      //clearCookies();
+    });
 	
 	
   });
@@ -539,5 +545,41 @@ function toHalfWidth(strVal){
   return halfVal;
 }
 
+//検索用cookieを削除する
+function clearCookies(){
+  
+  $.get("<%= purchase_datum_clear_cookies_path %>",
+    { },
+      function(data){
+        
+        //本番・テスト環境でパスが異なるので注意!
+        window.location.href = '/purchase_data'
+
+        //画面再描画のためリロードする
+		//window.location.reload();
+      }
+  );
+}
+
+//画面位置保存するプラグイン
+$.fn.keepPosition = function(){
+  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+  var key = 'keep-position-'+location.pathname;
+  var win = $(window);
+  this.each(function(){
+    //$(this).on('submit',function(){
+    $(".keep-disp").click(function(){
+       if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+         div_top = bodyDiv.scrollTop();
+         $.cookie(key, div_top);
+       }
+    });
+  });
+  setTimeout(function(){
+    if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+      bodyDiv.scrollTop($.cookie(key));
+    }
+  },0);
+}
 
 </script>

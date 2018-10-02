@@ -4,6 +4,13 @@ class QuotationHeadersController < ApplicationController
   # GET /quotation_headers
   # GET /quotation_headers.json
   def index
+    
+    #add180929
+    #特定の検索クッキーを消去
+    #application = ApplicationController.new
+    #application.cookie_clear(cookies, "recent_search_history") #２番目のパラメータは、cookieから削除したくないパラメータ名
+    #
+    
     #@quotation_headers = QuotationHeader.all
     #ransack保持用コード
     query = params[:q]
@@ -127,19 +134,31 @@ class QuotationHeadersController < ApplicationController
   # DELETE /quotation_headers/1.json
   def destroy
     #ヘッダIDをここで保持(内訳・明細も消すため)
-	quotation_header_id = @quotation_header.id
-	
-	@quotation_header.destroy
-    respond_to do |format|
-      format.html { redirect_to quotation_headers_url, notice: 'Quotation header was successfully destroyed.' }
-      format.json { head :no_content }
+	  quotation_header_id = @quotation_header.id
+    
+    #確定フラグを取得
+    if @quotation_header.fixed_flag == 1
+      @status = "fixed"
+    else
+      @status = "not_fixed"
     end
+    
+    if @status != "fixed"
+    
+	    @quotation_header.destroy
+        
+        #respond_to do |format|
+        #  format.html { redirect_to quotation_headers_url, notice: 'Quotation header was successfully destroyed.' }
+        #  format.json { head :no_content }
+        #end
 	
-	#内訳も消す
-	QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id).destroy_all
+	    #内訳も消す
+	    QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id).destroy_all
 		
-	#明細も消す
-	QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
+	    #明細も消す
+	    QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
+    
+    end
   end
   
   #viewで拡散されたパラメータを、正常更新できるように復元させる。

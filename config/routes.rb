@@ -206,6 +206,10 @@ Rails.application.routes.draw do
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
   get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
   get '/purchase_datum/get_header_id' => 'purchase_data#get_header_id'
+  
+  #ad180929
+  get '/purchase_datum/clear_cookies' => 'purchase_data#clear_cookies'
+  
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   
   get "/quotation_material_headerz/get_data" => 'quotation_material_headers#get_data'
@@ -242,6 +246,11 @@ Rails.application.routes.draw do
   
   #add171121
   get '/construction_dataz/customer_extract' => 'construction_data#customer_extract'
+  
+  #add180926
+  get '/construction_dataz/set_order_flag' => 'construction_data#set_order_flag'
+  get '/construction_dataz/set_billed_flag' => 'construction_data#set_billed_flag'
+  #
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -586,8 +595,7 @@ Rails.application.routes.draw do
   resources :delivery_slip_detail_middle_classifications
   resources :invoice_detail_middle_classifications
   resources :working_middle_items
-  
-  #add180719
+  #明細コピー用
   get 'working_middle_items/:id/copy', to: 'working_middle_items#copy', as: :copy_working_middle_item
   
   resources :working_large_items
@@ -611,6 +619,21 @@ Rails.application.routes.draw do
   resources :quotation_detail_middle_classifications
   resources :quotation_units
   resources :quotation_detail_large_classifications
+  
+  #add180912
+  #
+  #納品書-内訳コピー用
+  get 'delivery_slip_detail_large_classifications/:id/copy', to: 'delivery_slip_detail_large_classifications#copy', as: :copy_delivery_slip_detail_large_classification
+  #納品書-明細コピー用
+  get 'delivery_slip_detail_middle_classifications/:id/copy', to: 'delivery_slip_detail_middle_classifications#copy', as: :copy_delivery_slip_detail_middle_classification
+  
+  #
+  #見積書-内訳コピー用
+  get 'quotation_detail_large_classifications/:id/copy', to: 'quotation_detail_large_classifications#copy', as: :copy_quotation_detail_large_classification
+  #見積書-明細コピー用
+  get 'quotation_detail_middle_classifications/:id/copy', to: 'quotation_detail_middle_classifications#copy', as: :copy_quotation_detail_middle_classification
+  #add end 
+  
   resources :quotation_headers
   get 'session/index'
 

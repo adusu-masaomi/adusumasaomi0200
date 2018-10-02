@@ -529,7 +529,8 @@ class PurchaseOrderHistoriesController < ApplicationController
                   #materials.update_attributes!(:maker_id => item[:maker_id] )
                   #upd180411 
                   #品名・メーカーIDをそれぞれ更新
-                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id])
+                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
+                                               :notes => item[:notes] )
                 end 
 			  end
 			  
@@ -568,9 +569,9 @@ class PurchaseOrderHistoriesController < ApplicationController
 			    if @material_master.nil?
 				  #material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
                   #                      maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
-                  #upd171028 パラメータは従来通り
+                  #upd 180922 notes追加
 				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:maker_id], list_price: item[:list_price] }
+                                        maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes] }
                   @material_master = MaterialMaster.create(material_master_params)
                   
                   #add180215
@@ -769,7 +770,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #                orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
       #               :maker_id, :maker_name, :list_price, :mail_sent_flag, :_destroy])
 	  #upd170616 メーカー名は抹消
-	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
+	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, :notes, 
 	                  orders_attributes: [:id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
                      :maker_id, :list_price, :mail_sent_flag, :_destroy])
     end

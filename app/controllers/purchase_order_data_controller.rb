@@ -102,6 +102,10 @@ end
   def create
     @purchase_order_datum = PurchaseOrderDatum.new(purchase_order_datum_params)
     
+    #add180919
+    #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
+    update_constant
+    
 	#メール送信する(メール送信ボタン押した場合)
 	if params[:send].present?
       
@@ -220,6 +224,9 @@ end
   # DELETE /purchase_order_data/1
   # DELETE /purchase_order_data/1.json
   def destroy
+    #add180926
+    reset_last_number
+  
     @purchase_order_datum.destroy
     respond_to do |format|
       #format.html { redirect_to purchase_order_data_url, notice: 'Purchase order datum was successfully destroyed.' }
@@ -229,6 +236,46 @@ end
     end
   end
   
+  
+  #add180919
+  #constantに注文Noを書き込む
+  def update_constant
+    constant = Constant.find(1)   #id=１に定数ファイルが保管されている
+    if constant.purchase_order_last_header_code[0,1] != @purchase_order_datum.purchase_order_code[0,1]
+      #外注用のアルファベットを除く
+      if @purchase_order_datum.purchase_order_code[0,1] != "M" && 
+           @purchase_order_datum.purchase_order_code[0,1] != "O"
+        
+        #アルファベット以下の数値２桁が(AorB..+"xx")constant以上？
+        if @purchase_order_datum.purchase_order_code[1,2].to_i >=
+           constant.purchase_order_last_header_code[1,2].to_i 
+          
+          #更新する
+          constant_params = { purchase_order_last_header_code: @purchase_order_datum.purchase_order_code}
+          constant.update(constant_params)
+        
+        end
+      end
+    end
+  end
+  
+  #add180926
+  def reset_last_number
+    #Constantの最終番号に該当するものを削除した場合は、直近での最大値を再セットする
+    last_number = @purchase_order_datum.purchase_order_code
+    constant = Constant.find(1)   #id=１に定数ファイルが保管されている
+    
+    if constant.present? && constant.purchase_order_last_header_code == last_number
+      #注文コードの直近最大値を取得
+      last_new_number = PurchaseOrderDatum.where('purchase_order_code < ?', last_number).maximum(:purchase_order_code)
+      #更新する
+      constant_params = { purchase_order_last_header_code: last_new_number}
+      constant.update(constant_params)
+    end
+    
+  end
+  
+  
   #ajax
   def get_last_number_select
      crescent = "%" + params[:header] + "%"
@@ -237,8 +284,51 @@ end
 	 #最終番号に１を足す。
 	 newStr = @purchase_order_datum_new_code[1, 4]
 	 header = @purchase_order_datum_new_code[0, 1]
-	 newNum = newStr.to_i + 1
-	 
+   
+   #upd180926 
+   #lastNum = @purchase_order_datum_new_code[-2, 2]  #末尾から２文字
+   #年号の２文字
+   #yearNum = @purchase_order_datum_new_code[-4, 2]
+   
+#   if lastNum.to_i != 99
+#   #通常は１だけプラスする
+#     newNum = newStr.to_i + 1
+#	 else
+#   #99まで行ったら次のアルファベットになる
+#     exist = false
+#     while exist == false
+#       header = header.succ      #アルファベットを繰り上げる
+#       #次のアルファベットでの最大値を取得
+#       crescent = "%" + header + yearNum + "%"
+#       purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
+#       #
+#       if purchase_order_datum_new_code.present?
+#         lastNum = purchase_order_datum_new_code[-2, 2]  #末尾から２文字
+#       else
+#         lastNum = 0  #次のアルファベットで同年の数値がなければ、ゼロに戻す
+#       end
+#       if lastNum.to_i != 99  #最終２桁が９９までなければ、このアルファベットで決定
+#         exist = true
+#       end
+#     end
+     
+#     #次のアルファベットでのナンバー判定
+#     if purchase_order_datum_new_code.present?
+#     #最終番号に１を足す。
+#	     newStr = purchase_order_datum_new_code[1, 4]
+#       newNum = newStr.to_i + 1
+#	     header = purchase_order_datum_new_code[0, 1]
+#     else
+#     #新しいアルファベットにしてゼロから開始
+#       newNum = newStr.to_i + 1  #ゼロにする
+#       newNum -= 100             #年の２桁を繰り上げないようにする
+#       #header = header.succ      #アルファベットを繰り上げる
+#     end
+#   end
+#   #
+   
+   newNum = newStr.to_i + 1
+   
 	 @purchase_order_datum_new_code = header + newNum.to_s
 	 
   end

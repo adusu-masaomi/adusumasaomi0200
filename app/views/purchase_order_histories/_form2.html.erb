@@ -41,7 +41,7 @@
    ※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行うようにお願いします！
    </br></br>
    
-   <%= f.label :注文先：, {style: 'color:blue'} %>
+   <%= f.label :注文先　：, {style: 'color:blue'} %>
    <!--<%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>-->
    
    <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name,
@@ -49,7 +49,7 @@
    
   
    <!--<%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Date.today , style: 'width:220px'},as: :date_picker %>-->
-   <!--upd180821 海外時間になってい他ので修正-->
+   <!--upd180821 海外時間になっていたので修正-->
    <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, 
         input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Time.now.in_time_zone('Tokyo').to_date , style: 'width:220px'},as: :date_picker %>
   
@@ -78,8 +78,11 @@
   
    </br>
    
-   <%= f.input :responsible , label:"担当者", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
+   <%= f.input :responsible , label:"担当者　", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
    <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   
+   </br></br>
+   <%= f.input :notes , label:"備考　　", label_html: { style: 'color:blue;' }, input_html:{ id:"notes", style: 'width:650px'} %>
    
    <%= f.collection_select :material_id_select_hide, @material_masters.all, :id, :p_material_code_name,  {} , 
       {id:"material_id_select_hide", hidden: true } %>

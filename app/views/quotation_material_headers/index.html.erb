@@ -151,10 +151,12 @@
 		var fc = 1;    //デフォルトの固定列数(社長PC基準)
 		var ht = 618;  //デフォルトの高さ(社長PC基準)
 		
-		if (sz != 1920) {
+		//if (sz != 1920) {
+        if (sz < 1920) {
 		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
           fc = 2;  //固定列数
 		  ht -= 80;
+          sz = 1920; //for ipad pro (add180829)
 		}
 		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 		//

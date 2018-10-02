@@ -14,4 +14,3 @@ Time::DATE_FORMATS[:start_time_2] = '%H:%M'
 Time::DATE_FORMATS[:end_time_2] = '%H:%M'
 
 
-

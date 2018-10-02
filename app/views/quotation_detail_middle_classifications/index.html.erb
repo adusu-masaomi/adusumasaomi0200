@@ -17,9 +17,9 @@
   <%= f.label :quotation_middle_item, '内訳名　' %>
   <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
   
-  	<div>
-    	<%= f.submit '検索する' %>
-  	</div>
+    <div>
+        <%= f.submit '検索する' %>
+    </div>
    <% end %>
 
 
@@ -29,8 +29,8 @@
 <%= link_to t('.new', :default => t("新規作成")),
             new_quotation_detail_middle_classification_path(quotation_header_id: params[:quotation_header_id], 
                       quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id], new_flag: "1", 
-					  quotation_header_name: params[:quotation_header_name],
-					  working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]), remote: true,
+                      quotation_header_name: params[:quotation_header_name],
+                      working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]), remote: true,
             :class => 'btn btn-primary keep-disp' %>
 <td><%= link_to "内訳へ",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], 
@@ -39,13 +39,13 @@
 <!--マスター画面へ遷移-->
 <%= link_to t('.new', :default => t("共通マスター")),
             new_working_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
-			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
-			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
+            quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+            working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
             :class => 'btn btn-teal500_rsd keep-disp' %>
 <%= link_to t('.new', :default => t("固有マスター")),
             new_working_specific_middle_item_path(move_flag: "2",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name], 
-			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
-			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
+            quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+            working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification]),
             :class => 'btn btn-purple300_rsd keep-disp' %>
 
 <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -53,8 +53,8 @@
 
 <%= link_to "内訳へデータ移行",
             quotation_detail_middle_classifications_path(quotation_header_id: params[:quotation_header_id],quotation_header_name: params[:quotation_header_name], 
-			quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
-			working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification], data_type: "1" ),
+            quotation_detail_large_classification_id: params[:quotation_detail_large_classification_id],
+            working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification], data_type: "1" ),
             :class => 'btn btn-yellow300 btn-xs keep-disp' , :data => {:confirm => '内訳へデータを移行しますか？'} %>
 
 
@@ -105,12 +105,12 @@
     <tr>
       <th style="width:40px;"><%= model_class.human_attribute_name(:id) %></th>
       <!--<th style="width:35px;"><%= model_class.human_attribute_name(:line_number) %></th>-->
-	  <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number), default_order: :asc ) %></th>
-	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
-	  <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
+      <th style="width:55px;"><%= sort_link(@q, :line_number, model_class.human_attribute_name(:line_number), default_order: :asc ) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_item_name) %></th>
+      <th style="width:300px;"><%= model_class.human_attribute_name(:working_middle_specification) %></th>
       <th style="width:50px;">　数量</th>
       <th style="width:50px;">単位</th>
-	  <th style="width:80px;">　 見積単価</th>
+      <th style="width:80px;">　 見積単価</th>
       <th style="width:110px;">　 見積金額</th>
       <th style="width:50px;">　実数</th>
       <th style="width:50px;">単位</th>
@@ -122,7 +122,7 @@
       <th style="width:20px;">機</th>
       <th style="width:20px;">労</th>
       <th style="width:220px;"><%= model_class.human_attribute_name(:remarks) %></th>
-      <th style="width:100px;"><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th style="width:140px;"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody class="quotation_detail_middle_classification-index">
@@ -135,27 +135,27 @@
   
   //検索可能なリストボックス
   $(document).ready(function(){
-	$(".searchableQuotationCode").select2({ theme: "classic" });
+    $(".searchableQuotationCode").select2({ theme: "classic" });
         $(".searchableConstructionName").select2({ theme: "classic" });
         $(".searchableLargeItem").select2({ theme: "classic" });
         $(".searchableMiddleItem").select2({ theme: "classic" });
-		$(".searchableMiddleSpecification").select2({ theme: "classic" });
-		
-	   //見出し固定用設定追加
-	   var sz = window.parent.screen.width;
-	   var fc = 1;    //デフォルトの固定列数(社長PC基準)
-	   var ht = 618;  //デフォルトの高さ(社長PC基準)580
-	 
-	   if (sz != 1920) {
-	   //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        $(".searchableMiddleSpecification").select2({ theme: "classic" });
+        
+       //見出し固定用設定追加
+       var sz = window.parent.screen.width;
+       var fc = 1;    //デフォルトの固定列数(社長PC基準)
+       var ht = 618;  //デフォルトの高さ(社長PC基準)580
+     
+       if (sz != 1920) {
+       //画面サイズ1920px(社長PC基準)以外は、列固定させる。
           fc = 1;  //固定列数
-		  //ht -= 70;
-		  ht -= 108;
+          //ht -= 70;
+          ht -= 108;
           sz = 1920; //for ipad pro (add180829)
-	   }
-	   $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
-	   
-	  //モバイル対応 add180829
+       }
+       $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+       
+      //モバイル対応 add180829
       if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
         // モバイルの場合（デフォはソートしない、但し保存はできるようにする
         var radio_sort_flag = sessionStorage.getItem('radio_sort_flag');
@@ -168,29 +168,39 @@
         //モバイル以外ならデフォルトでソート有効にする
         sortableEnable();
       }
-	  //
+      //
+ 
+ 
+       //del180913
  
        //画面位置保存→実行
        $('form').keepPosition();
        
   });
   
-  //画面位置保存するプラグイン
-  $.fn.keepPosition = function(){
-  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-    var key = 'keep-position-'+location.pathname;
-    var win = $(window);
-    this.each(function(){
-    //$(this).on('submit',function(){
-    $(".keep-disp").click(function(){
-      div_top = bodyDiv.scrollTop();
-	    $.cookie(key, div_top);
-	  });
-    });
-    setTimeout(function(){
-      bodyDiv.scrollTop($.cookie(key));
-    },0);
-  }
+  
+//180914共通化
+//  //画面位置保存するプラグイン
+//  $.fn.keepPosition = function(){
+//    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+//    var key = 'keep-position-'+location.pathname;
+//    var win = $(window);
+//    this.each(function(){
+//        //$(this).on('submit',function(){
+//        $(".keep-disp").click(function(){
+//            if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+//              div_top = bodyDiv.scrollTop();
+//              $.cookie(key, div_top);
+//            }
+//        });
+//    });
+//    setTimeout(function(){
+//        if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+//          bodyDiv.scrollTop($.cookie(key));
+//        }
+//    },0);
+//  }
+  
   
   function addParam(link){
     var default_page_number = $('default_page_number');
@@ -211,23 +221,23 @@
   function sortableEnable() {
     $( "#tablefix tbody" ).sortable({
         cursor: 'move',
-	   start: function(event, ui) {ui.item.css("background-color", "orange");},
-	   stop: function(event, ui) {
-	     ui.item.css("background-color", "white");
-		 var row = $(this).sortable('toArray').toString();
-		 quotation_header_id = document.getElementById("quotation_header_id").innerText;
-		 quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").innerText;
-		 
-		 $.post("<%= quotation_detail_middle_classificationz_reorder_path %>",
+       start: function(event, ui) {ui.item.css("background-color", "orange");},
+       stop: function(event, ui) {
+         ui.item.css("background-color", "white");
+         var row = $(this).sortable('toArray').toString();
+         quotation_header_id = document.getElementById("quotation_header_id").innerText;
+         quotation_detail_large_classification_id = document.getElementById("quotation_detail_large_classification_id").innerText;
+         
+         $.post("<%= quotation_detail_middle_classificationz_reorder_path %>",
            { row: row, ajax_quotation_header_id: quotation_header_id,
              ajax_quotation_detail_large_classification_id: quotation_detail_large_classification_id },
            function(data){
-		     //画面再描画のためリロードする
-		     window.location.reload();
+             //画面再描画のためリロードする
+             window.location.reload();
            }
          );
-	   },
-	      
+       },
+          
     });
     $( "#tablefix tbody" ).sortable( "option", "disabled", false );
     $( ".sortable" ).disableSelection();
@@ -257,5 +267,6 @@
   
   
 </script>
+
 
 

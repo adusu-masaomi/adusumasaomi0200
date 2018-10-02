@@ -687,23 +687,14 @@ class WorkingMiddleItemsController < ApplicationController
   #add 180719
   #レコードをコピーする
   def copy
-    #test deo
-    new_record = @working_middle_item.dup
-    ##new_record.seq = nil  #seqは空にする
     
-    #new_record = WorkingMiddleItem.new(@working_middle_item.attributes.select{ |key, _| WorkingMiddleItem.attribute_names.include? key })
+    #new_record = @working_middle_item.dup
+    @working_middle_item.working_middle_item_name += $STRING_COPY  #わかりやすいように、名前を変更する
     
-    #not work well
     new_record = @working_middle_item.deep_clone include: :working_small_items
     
-    #binding.pry
-    
-    
-    #test
     status = new_record.save
-    
-   
-    
+     
     respond_to do |format|
       if status == true
         notice = 'Working middle item was successfully copied.'

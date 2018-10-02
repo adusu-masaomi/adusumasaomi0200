@@ -6,11 +6,20 @@ class QuotationMaterialHeader < ActiveRecord::Base
   has_many :quotation_material_details
   accepts_nested_attributes_for :quotation_material_details, :allow_destroy => true
   
+  #備考(1~3を切り分けるため)
+  attr_accessor :notes
+  
   #ボタン切り分け用
   attr_accessor :sent_flag
   
   #見積依頼メール判定フラグ（済or未）
   attr_accessor :quotation_email_flag
+  
+  #add180919
+  #強制注文フラグ
+  attr_accessor :force_order_flag
+  #ダミー用
+  attr_accessor :empty
   
   #全チェック(落札)フラグ
   attr_accessor :all_bid_flag

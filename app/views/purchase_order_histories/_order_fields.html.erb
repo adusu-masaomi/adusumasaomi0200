@@ -51,6 +51,12 @@
   
   <%= f.input :list_price,  input_html:{ id: "list_price", style: 'width:90px;' , :tabindex=>"4" } %>
   
+  </br>
+  <!--備考-->
+  <!--タブ移動はjs側の”setNextControl”で制御-->
+  <% @notes = MaterialMaster.where(:id => f.object.material_id).where("id is NOT NULL").pluck(:notes).flatten.join(" ") %>
+  
+  <%= f.input :notes,  input_html:{ id: "notes",  style: 'width:610px' , :tabindex=>"5", :value => @notes} %>
   
 </div>
 </div>
@@ -407,7 +413,19 @@
 			 
 			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
 			 
-			 
+		   }else if (gControl_id == "list_price") {
+           //定価→備考へフォーカス
+             //name属性に埋め込まれているIDを抜き出す
+	         var controlName = document.activeElement.name;
+	         var selectedIndex = 0;
+             selectedIndex = controlName.slice(42);
+		     selectedIndex = selectedIndex.slice(0,-13);
+             
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][notes]"
+			 document.getElementsByName(nm)[0].focus();
+			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+             
+             
 		   //}else if (gControl_id == "quantity") {
 		   //  debugger;
 		   }

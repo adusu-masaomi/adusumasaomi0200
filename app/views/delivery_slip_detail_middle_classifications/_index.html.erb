@@ -91,6 +91,14 @@
                           delivery_slip_detail_large_classification_id: params[:delivery_slip_detail_large_classification_id], 
                           delivery_slip_header_name: params[:delivery_slip_header_name], working_large_item_name: params[:working_large_item_name], 
                           working_large_specification: params[:working_large_specification]), :class => 'btn btn-white_rsd btn-xs keep-disp', remote: true %>
+          
+          <%= link_to "コピー", 
+                      copy_delivery_slip_detail_middle_classification_path(delivery_slip_detail_middle_classification, delivery_slip_header_id: params[:delivery_slip_header_id],  
+                      delivery_slip_header_name: params[:delivery_slip_header_name], delivery_slip_detail_large_classification_id: params[:delivery_slip_detail_large_classification_id], 
+					       working_large_item_name: params[:working_large_item_name], working_large_specification: params[:working_large_specification] ),
+                      :data => { :confirm => 'データをコピーしますか?'  },
+                      :class => 'btn btn-cyan100_rsd btn-xs', remote: true %>
+          
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       delivery_slip_detail_middle_classification_path(delivery_slip_detail_middle_classification, 
 					  delivery_slip_header_id: delivery_slip_detail_middle_classification.delivery_slip_header_id, 

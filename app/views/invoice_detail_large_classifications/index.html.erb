@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = InvoiceDetailLargeClassification -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header">
@@ -22,29 +23,29 @@
 <%= link_to t('.new', :default => t("新規作成")),
             new_invoice_detail_large_classification_path(invoice_header_id: params[:invoice_header_id], 
                                    invoice_header_name: params[:invoice_header_name], new_flag: "1"), remote: true,
-            :class => 'btn btn-primary' %>
+            :class => 'btn btn-primary keep-disp' %>
 <%= link_to "一覧へ",
             invoice_headers_path(),
-            :class => 'btn btn-info' %>
+            :class => 'btn btn-info keep-disp' %>
 <%= link_to "請求書(提出用)PDF",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id], print_type: "1", format: "pdf"),
-            :class => 'btn btn-indigo500_ftg' , :target=>["_blank"] %>
+            :class => 'btn btn-indigo500_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "請求書(提出／印付)PDF",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id], print_type: "3", format: "pdf"),
             :class => 'btn btn-red500_ftg' , :target=>["_blank"] %>
 <%= link_to "請求書(控え)PDF",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id], print_type: "2",  format: "pdf" ),
-            :class => 'btn btn-lightblue300_ftg' , :target=>["_blank"] %>
+            :class => 'btn btn-lightblue300_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "納品書データ作成",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id], 
             invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], quotation_code: params[:quotation_code],
             data_type: "1" ),
-            :class => 'btn btn-warning' , :data => {:confirm => '納品書データを作成しますか？'}  %>
+            :class => 'btn btn-warning keep-disp' , :data => {:confirm => '納品書データを作成しますか？'}  %>
 <%= link_to "見積書データ作成",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id],
             invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], quotation_code: params[:quotation_code],
             data_type: "2" ),
-            :class => 'btn btn-success' , :data => {:confirm => '見積書データを作成しますか？'} %>
+            :class => 'btn btn-success keep-disp' , :data => {:confirm => '見積書データを作成しますか？'} %>
 </br>
 <font size="3";><b>
 <%= "件名:" %>
@@ -152,7 +153,9 @@
        sortableEnable();
      }
 	 //
-      
+     
+     //画面位置保存→実行
+     $('form').keepPosition();
   });
   
   

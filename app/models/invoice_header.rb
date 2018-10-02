@@ -16,8 +16,8 @@ class InvoiceHeader < ActiveRecord::Base
     #住所に番地等を入れないようにするためのバリデーション(冗長だが他に方法が見当たらない)
     ADDRESS_ERROR_MESSAGE = "番地（番地）は入力できません。"
     ADDRESS_ERROR_MESSAGE_2 = "番地（丁目）は入力できません。"
-	ADDRESS_ERROR_MESSAGE_3 = "番地（ハイフン）は入力できません。"
-	ADDRESS_ERROR_MESSAGE_4 = "番地（数字）は入力できません。"
+    ADDRESS_ERROR_MESSAGE_3 = "番地（ハイフン）は入力できません。"
+    ADDRESS_ERROR_MESSAGE_4 = "番地（数字）は入力できません。"
    
     validates :address, format: {without: /丁目/ , :message => ADDRESS_ERROR_MESSAGE_2 }
     validates :address, format: {without: /番地/ , :message => ADDRESS_ERROR_MESSAGE }
@@ -34,23 +34,52 @@ class InvoiceHeader < ActiveRecord::Base
       end
     end
     ##add end 
+    
+  #add180914
+  #入金日のチェック
+  #＊備考に"繰越"が入っていたら、入金日もセットで入れてもらうようにする
+  validate  :check_payment_date
+  def check_payment_date
+    if remarks.include?("繰越")
+      if payment_date.nil?
+        errors.add :payment_date, "を入力して下さい。"
+      end
+    end
+  end
 
-   scope :with_id, -> (invoice_headers_id=1) { where("invoice_headers.id = ?", invoice_headers_id )}
+  scope :with_id, -> (invoice_headers_id=1) { where("invoice_headers.id = ?", invoice_headers_id )}
    
-   #add180718
-   #元請業者または保険適用外を除く
-   scope :with_constractor, -> (extract_flag=true) { 
-     if extract_flag.present?
-       joins(:customer_master).where("invoice_headers.labor_insurance_not_flag is NULL or invoice_headers.labor_insurance_not_flag <> 1 ").
-                    where("customer_masters.contractor_flag = ?" , 1 )
-     end
-   }
+  #元請業者または保険適用外を除く
+  scope :with_constractor, -> (extract_flag=true) { 
+    if extract_flag.present?
+      joins(:customer_master).where("invoice_headers.labor_insurance_not_flag is NULL or invoice_headers.labor_insurance_not_flag <> 1 ").
+                  where("customer_masters.contractor_flag = ?" , 1 )
+    end
+  }
    
+  #add180914
+  #入金有無のチェック
+  scope :with_deposit, -> deposit_flag { 
+    if deposit_flag.present?
+      if deposit_flag == "unpaid"
+        #where("deposit_amount is NULL or deposit_amount = ?", 0)
+        where("payment_date is NULL")
+      elsif deposit_flag == "paid"
+        #where("deposit_amount > ?", 0)
+        where("payment_date is not NULL")
+      end
+    end
+  }
    
    def self.ransackable_scopes(auth_object=nil)
-       [:with_id, :with_constractor]
+       [:with_id, :with_constractor, :with_deposit]
    end
  	
+  #入金フラグ
+  #ex.値に0~1だとransack側のバグで認識できないため、文字にする
+  def self.deposit_check_list 
+      [["未", "unpaid"], ["済", "paid"]] 
+  end
   
   #支払方法---増えたらここで変更する。
   def self.payment_method 

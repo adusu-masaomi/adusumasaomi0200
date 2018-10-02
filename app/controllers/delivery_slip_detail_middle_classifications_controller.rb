@@ -1,5 +1,5 @@
 class DeliverySlipDetailMiddleClassificationsController < ApplicationController
-  before_action :set_delivery_slip_detail_middle_classification, only: [:show, :edit, :update, :destroy]
+  before_action :set_delivery_slip_detail_middle_classification, only: [:show, :edit, :update, :destroy, :copy]
 
    @@new_flag = []
    
@@ -417,8 +417,54 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
       where(:delivery_slip_header_id => @delivery_slip_header_id).
         where(:delivery_slip_detail_large_classification_id => @delivery_slip_detail_large_classification_id)
   end
-
-
+  
+    
+    
+  #add 180911
+  #レコードをコピーする
+  def copy
+    
+    if params[:delivery_slip_header_id].present?
+      #確定済みのものは、変更できないようにする
+      delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+      if delivery_slip_header.present?
+        if delivery_slip_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
+    end
+    
+    if @status != "fixed"
+    
+        @delivery_slip_detail_middle_classification.working_middle_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
+    
+        new_record = @delivery_slip_detail_middle_classification.dup
+    
+        status = new_record.save
+    
+        if status == true
+            notice = 'Delivery slip detail middle classification was successfully copied.'
+            
+            #品目データの金額を更新
+            @delivery_slip_detail_middle_classification = new_record
+            save_price_to_large_classifications
+      
+        else
+            notice = 'Delivery slip detail middle classification was unfortunately failed...'
+        end
+        
+        #redirect_to :action => "index", :notice => notice,  :delivery_slip_header_id => params[:delivery_slip_header_id], 
+        #    :delivery_slip_header_name => params[:delivery_slip_header_name],  
+        #    :delivery_slip_detail_large_classification_id => params[:delivery_slip_detail_large_classification_id],
+        #    :working_large_item_name => params[:working_large_item_name], 
+        #    :working_large_specification => params[:working_large_specification]
+    end
+  end
+  
+  
   #add170823
   #作業明細マスターの更新
   def update_working_middle_item
@@ -560,7 +606,7 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
           #
       
       end
-	end
+	  end
   
     if @status != "fixed"
         @delivery_slip_detail_middle_classification.destroy

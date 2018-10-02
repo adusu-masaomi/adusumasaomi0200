@@ -9,7 +9,6 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   
   def self.serial_number
     [[("<行選択>").to_s , (1..999).to_a ]]
-	#[[("<行選択>").to_s , (0..999).to_a ]]
   end 
   
   #行挿入用
@@ -18,29 +17,19 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   attr_accessor :check_update_item
   attr_accessor :check_update_all
   
-  #短縮名手入力用(add170822)
+  #短縮名手入力用
   attr_accessor :working_large_item_short_name_manual
   
-  #add 1711004
   attr_accessor :quotation_large_item_id
   attr_accessor :master_insert_flag
   
   #ajax用（リスト）
   
-  #del180213
-  #attr_accessor :working_middle_item_category_id_call
-  #attr_accessor :working_middle_item_subcategory_id_call
-  #
-  
   attr_accessor :working_middle_item_id_select_hide
   attr_accessor :working_middle_item_short_name_select_hide
-  
   attr_accessor :working_subcategory_select_hide
-  
-  #add180210
   attr_accessor :category_save_flag_child
   #
-  
   
   #add180803
   #確定済みのバリデーション
@@ -58,7 +47,6 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
     #工事種別が通常かまたは値引の場合のみ合算。
     #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:quote_price)
     
-    #upd180105
     #工事種別が小計以外は加算する
     where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:quote_price)
   end
@@ -67,8 +55,7 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
     #工事種別が通常かまたは値引の場合のみ合算。
     #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:execution_price)
 	
-	#upd180105
-    #工事種別が小計以外は加算する
+	#工事種別が小計以外は加算する
     where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:execution_price)
   end
   
@@ -80,7 +67,7 @@ class QuotationDetailLargeClassification < ActiveRecord::Base
   def self.sumLaborProductivityUnitTotal  
     #工事種別が通常かまたは値引の場合のみ合算。
     #where("construction_type = ? or construction_type = ? ", "0", $INDEX_DISCOUNT.to_s ).sum(:labor_productivity_unit_total)
-    #upd180105
+    
     #工事種別が小計以外は加算する
     where("construction_type <> ? ", $INDEX_SUBTOTAL.to_s ).sum(:labor_productivity_unit_total)
 	

@@ -355,7 +355,12 @@ class QuotationMaterialHeadersController < ApplicationController
   def create
   
    
-	@quotation_material_header = QuotationMaterialHeader.new(quotation_material_header_params)
+	  @quotation_material_header = QuotationMaterialHeader.new(quotation_material_header_params)
+   
+    #add180928
+    #備考１〜３のいずれかへセット
+    set_notes_before_save
+      
    
     #パラーメータ補完＆メール送信する
     set_params_complement
@@ -367,30 +372,29 @@ class QuotationMaterialHeadersController < ApplicationController
 
     #170911 moved
     #メール送信済みフラグをセット
-	#set_mail_sent_flag 
+	  #set_mail_sent_flag 
 	
     respond_to do |format|
       #if @quotation_material_header.save
-	  if @quotation_material_header.save!(:validate => false)
+	    if @quotation_material_header.save!(:validate => false)
         
-		#upd170911
-		#メール送信する
-		send_email
+		    #upd170911
+		    #メール送信する
+		    send_email
 		
-		if params[:format] == "pdf"  
-		#pdf発行
+		    if params[:format] == "pdf"  
+		    #pdf発行
           set_pdf(format)
-		else
-		#通常の更新の場合
-		  format.html {redirect_to quotation_material_header_path( @quotation_material_header,
+		    else
+	  	  #通常の更新の場合
+		      format.html {redirect_to quotation_material_header_path( @quotation_material_header,
                  :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
-		end
-		
-		
-      else
+		    end
+		  else
         format.html { render :new }
         format.json { render json: @quotation_material_header.errors, status: :unprocessable_entity }
       end
+    
     end
   end
 
@@ -398,35 +402,38 @@ class QuotationMaterialHeadersController < ApplicationController
   # PATCH/PUT /quotation_material_headers/1.json
   def update
      
-	if @quotation_material_header.quotation_code == params[:quotation_material_header][:quotation_code]
+	  if @quotation_material_header.quotation_code == params[:quotation_material_header][:quotation_code]
 	  
+      #add180928
+      #備考１〜３のいずれかへセット
+      set_notes_before_save
 	
       #すでに登録していた注文データは一旦抹消する。
-	  destroy_before_update
+	    destroy_before_update
 	
       #パラーメータ補完＆メール送信する
       set_params_complement
       
-	  #del170911
-	  #メール送信済みフラグをセット
-	  #set_mail_sent_flag
+	    #del170911
+	    #メール送信済みフラグをセット
+	    #set_mail_sent_flag
 	  
       respond_to do |format|
         if @quotation_material_header.update(quotation_material_header_params)
         
-		  #メール送信する
-		  send_email
+		      #メール送信する
+		      send_email
 		  
-		  if params[:format] == "pdf"  
-		  #pdf発行
+		      if params[:format] == "pdf"  
+		      #pdf発行
             set_pdf(format) 
 		
-		  else
-		  #通常の更新の場合
+		      else
+		      #通常の更新の場合
             format.html {redirect_to quotation_material_header_path( 
                    :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
 				   
-		  end
+		      end
 	      
 		  #format.json { render :show, status: :ok, location: @quotation_material_header }
 		  
@@ -438,12 +445,12 @@ class QuotationMaterialHeadersController < ApplicationController
           format.json { render json: @quotation_material_header.errors, status: :unprocessable_entity }
         end
       end
-	else
-	#コードが新規コードの場合は、参照コードからの新規登録とみなす
-    ####
-	  create
+	  else
+	  #コードが新規コードの場合は、参照コードからの新規登録とみなす
+      ####
+	    create
 
-	end
+	  end
   end
   
   def destroy_before_update
@@ -471,32 +478,32 @@ class QuotationMaterialHeadersController < ApplicationController
   
   def set_params_complement
     
-	if params[:quotation_material_header][:construction_datum_id].nil?
-	  if params[:construction_id].present?
-	    params[:quotation_material_header][:construction_datum_id] = params[:construction_id]
+	  if params[:quotation_material_header][:construction_datum_id].nil?
+	    if params[:construction_id].present?
+	      params[:quotation_material_header][:construction_datum_id] = params[:construction_id]
+	    end
 	  end
-	end
 	
-	##変数に最終のパラメータをセットする！！
-	#仕入先をセット
-	if @quotation_material_header.present?
+	  ##変数に最終のパラメータをセットする！！
+	  #仕入先をセット
+	  if @quotation_material_header.present?
 	  
-	  if params[:construction_id].present?
-	    @quotation_material_header.construction_datum_id = params[:construction_id]
-	  end
+	    if params[:construction_id].present?
+	      @quotation_material_header.construction_datum_id = params[:construction_id]
+	    end
 	  
-	  if params[:quotation_material_header][:supplier_master_id].present?
-	    @quotation_material_header.supplier_master_id = params[:quotation_material_header][:supplier_master_id]
+	    if params[:quotation_material_header][:supplier_master_id].present?
+	      @quotation_material_header.supplier_master_id = params[:quotation_material_header][:supplier_master_id]
+	    end
+	    #担当者をセット
+	    if params[:quotation_material_header][:responsible].present?
+	      @quotation_material_header.responsible = params[:quotation_material_header][:responsible]
+	    end
 	  end
-	  #担当者をセット
-	  if params[:quotation_material_header][:responsible].present?
-	    @quotation_material_header.responsible = params[:quotation_material_header][:responsible]
-	  end
-	end
 	
 	#binding.pry
 	
-	i = 0
+	  i = 0
    
     if params[:quotation_material_header][:quotation_material_details_attributes].present?
 	           
@@ -509,48 +516,45 @@ class QuotationMaterialHeadersController < ApplicationController
 		  
 		  @maker_master = MakerMaster.where(:id => item[:maker_id]).first
           
-          #メーカーを手入力した場合の新規登録
-          if @maker_master.nil?
-            #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
-            maker_params = {maker_name: item[:maker_id] }
-            @maker_master = MakerMaster.new(maker_params)
-                     @maker_master.save!(:validate => false)
+      #メーカーを手入力した場合の新規登録
+      if @maker_master.nil?
+        #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+        maker_params = {maker_name: item[:maker_id] }
+        @maker_master = MakerMaster.new(maker_params)
+        @maker_master.save!(:validate => false)
                      
-            if @maker_master.present?
-              #メーカーIDを更新（パラメータ）
-              item[:maker_id] = @maker_master.id
-            end
-          end
-          ####
+        if @maker_master.present?
+          #メーカーIDを更新（パラメータ）
+          item[:maker_id] = @maker_master.id
+        end
+      end
+      ####
           
-          
-		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
+      #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
 		  if @maker_master.present?
-            item[:maker_name] = @maker_master.maker_name
-          end
-		  
-          
+        item[:maker_name] = @maker_master.maker_name
+      end
 		  
 		  id = item[:material_id].to_i
            
 		  #手入力以外なら、商品CD・IDをセットする。
-          if id != 1 then
-              @material_master = MaterialMaster.find(id)
-              item[:material_code] = @material_master.material_code
+      if id != 1 then
+        @material_master = MaterialMaster.find(id)
+        item[:material_code] = @material_master.material_code
               
 			  if item[:list_price].nil?  
-                if @material_master.list_price != 0  
-			    #資材マスターの定価をセット
-			    #(マスター側未登録を考慮。但しアプデは考慮していない）
-                  item[:list_price] = @material_master.list_price
+          if @material_master.list_price != 0  
+			      #資材マスターの定価をセット
+			      #(マスター側未登録を考慮。但しアプデは考慮していない）
+            item[:list_price] = @material_master.list_price
 			    end
 			  end
 			  
-              if (item[:material_name] != @material_master.material_name) || 
+        if (item[:material_name] != @material_master.material_name) || 
                  (item[:maker_id] != @material_master.maker_id)  || 
                  (item[:list_price] != @material_master.list_price)  ||
                  (item[:notes] != @material_master.notes)
-			  #↑フィールド追加時注意！
+			    #↑フィールド追加時注意！
               #マスター情報変更した場合は、商品マスターへ反映させる。
                 
 			    materials = MaterialMaster.where(:id => @material_master.id).first
@@ -558,7 +562,7 @@ class QuotationMaterialHeadersController < ApplicationController
                   #品名・メーカーID・定価・備考を更新
                   materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
                                                :list_price => item[:list_price], :notes => item[:notes])
-                end 
+           end 
 			  end
 			  
 			  
@@ -570,70 +574,67 @@ class QuotationMaterialHeadersController < ApplicationController
 			     if item[:unit_master_id].present?
 			       purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:quotation_material_header][:supplier_master_id], 
 			                                     unit_id: item[:unit_master_id]}
-				   if purchase_unit_price.present?
+				     if purchase_unit_price.present?
 			         purchase_unit_price.update(purchase_unit_price_params)
-				   else
+				     else
 				     #新規登録も考慮する。
 			         purchase_unit_price = PurchaseUnitPrice.create(purchase_unit_price_params)
-				   end
+				     end
 			  	 end
 			  end
 		
-          else
+      else
 		  #手入力した場合も、商品＆単価マスターへ新規登録する
 		    if item[:_destroy] != "1"
 			
 			  
 			  #if params[:material_code][i] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
-			  if item[:material_code] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
+			    if item[:material_code] != ""     #商品CD有りのものだけ登録する(バリデーションで引っかかるため)
 			    
-				@material_master = MaterialMaster.find_by(material_code: item[:material_code])
-			    #商品マスターへセット(商品コード存在しない場合)
-			    if @material_master.nil?
-				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+				    @material_master = MaterialMaster.find_by(material_code: item[:material_code])
+			      #商品マスターへセット(商品コード存在しない場合)
+			      if @material_master.nil?
+				      material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
                                         maker_id: item[:maker_id], list_price: item[:list_price], :notes => item[:notes] }
                                         
-			      @material_master = MaterialMaster.create(material_master_params)
-			    end
+			        @material_master = MaterialMaster.create(material_master_params)
+			      end
 			  
                 #仕入先単価マスターへも登録。
-                @material_master = MaterialMaster.find_by(material_code: item[:material_code])
-			    if @material_master.present?
-			      material_id = @material_master.id
+              @material_master = MaterialMaster.find_by(material_code: item[:material_code])
+			      if @material_master.present?
+			        material_id = @material_master.id
                   
-                  item[:material_id] = material_id  #資材マスターのIDも更新 add180508
+              item[:material_id] = material_id  #資材マスターのIDも更新 add180508
                   
-				  supplier_id = params[:quotation_material_header][:supplier_master_id]
+				      supplier_id = params[:quotation_material_header][:supplier_master_id]
 				  
-				  supplier_material_code = item[:material_code]
+				      supplier_material_code = item[:material_code]
 				  
-				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
-				  #岡田電気の場合のみ、品番のハイフンは抹消する
-				      
-					  no_hyphen_code = supplier_material_code.delete('-')  
-					  
-					  if no_hyphen_code.present?
-				        supplier_material_code = no_hyphen_code
-					  end
-					  
-				  end
+				      if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
+				      #岡田電気の場合のみ、品番のハイフンは抹消する
+				        no_hyphen_code = supplier_material_code.delete('-')  
+					      if no_hyphen_code.present?
+				          supplier_material_code = no_hyphen_code
+					      end
+					    end
 				  
-                  purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
+              purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
                                         supplier_material_code: supplier_material_code, unit_price: 0 ,
                                         unit_id: item[:unit_master_id]}
-			      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
+			        @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
                 
 		  	    end
-			  end
+			    end
 			  
-			end
+			  end
 			
 		    
 		  end 
 		  
-		  i = i + 1
+		    i = i + 1
 		   
-		end 
+		  end # do end
 
         #del170911
 	    ##メール送信する(メール送信ボタン押した場合)
@@ -644,7 +645,7 @@ class QuotationMaterialHeadersController < ApplicationController
 		#  PostMailer.send_quotation_material(@quotation_material_header).deliver
         #end
 
-    end
+    end  
   end
 
   def send_email
@@ -661,6 +662,13 @@ class QuotationMaterialHeadersController < ApplicationController
 	   end
 	 end
 	   
+     #add181002
+     #備考(全体)をセット
+     $notes = nil
+     if params[:quotation_material_header][:notes].present?
+       $notes = "※" + params[:quotation_material_header][:notes]
+     end
+     
      #画面のメアドをグローバルへセット
      $email_responsible = params[:quotation_material_header][:email]
      
@@ -908,7 +916,8 @@ class QuotationMaterialHeadersController < ApplicationController
           new_year = tmp_code[1,2].to_i
           current_year = @constant.purchase_order_last_header_code[1,2].to_i
           
-          if new_year >= current_year
+          #if new_year >= current_year
+          if new_year > current_year   #upd180919
           
             constant_params = { purchase_order_last_header_code: tmp_code}
             @constant.update(constant_params)
@@ -933,35 +942,107 @@ class QuotationMaterialHeadersController < ApplicationController
 	
   end
 
+  #保存前に、備考１〜３のいずれかへセット
+  def set_notes_before_save
+    
+    #
+    exist = false
+    
+    #if params[:quotation_material_header][:notes].present?
+      if params[:quotation_material_header][:supplier_id_1].present?
+	      if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1]
+          #exist = true 
+          params[:quotation_material_header][:notes_1] = params[:quotation_material_header][:notes]
+        end
+      end 
+    
+      if params[:quotation_material_header][:supplier_id_2].present?
+	      if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
+          #exist = true 
+          params[:quotation_material_header][:notes_2] = params[:quotation_material_header][:notes]
+        end
+	    end
+	    if params[:quotation_material_header][:supplier_id_3].present?
+	      if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_3]
+          #exist = true 
+          params[:quotation_material_header][:notes_3] = params[:quotation_material_header][:notes]
+	      end
+      end
+    #end
+   
+    
+  end
+
+
   # ajax
   def email_select
-     @email = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
-	 @responsible = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
+    @email = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
+	  @responsible = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
 	 
-	 exist = false
+    quotation_material_header = QuotationMaterialHeader.find(params[:id]) #add181002
+   
+	  exist = false
 	 
-	 if params[:supplier_id_1].present?
-	   if params[:id] == params[:supplier_id_1]
-	     exist = true 
-	   end
-     end 
-	 if params[:supplier_id_2].present?
-	   if params[:id] == params[:supplier_id_2]
-	     exist = true 
-	   end
-	 end
-	 if params[:supplier_id_3].present?
-	   if params[:id] == params[:supplier_id_3]
-	     exist = true 
-	   end
-	 end
-	 
-	 
-	 if exist == true
-	   @quotation_email_flag = 1
-	 else 
-	   @quotation_email_flag = 0
-	 end 
+    #add180919
+     
+	  if params[:supplier_id_1].present?
+	    if params[:supplier_id] == params[:supplier_id_1]
+        
+        #add181002
+        #備考をセット
+        if quotation_material_header.present?
+          @notes = quotation_material_header.notes_1
+        end
+        
+        
+        if params[:quotation_email_flag_1] == "true" #add180919
+	        exist = true 
+        end
+	    end
+    end 
+	  if params[:supplier_id_2].present?
+	    if params[:supplier_id] == params[:supplier_id_2]
+         
+         #add181002
+         #備考をセット
+         if quotation_material_header.present?
+           @notes = quotation_material_header.notes_2
+         end
+                 
+         
+         if params[:quotation_email_flag_2] == "true" #add180919
+	         exist = true 
+         end
+	    end
+	  end
+	  if params[:supplier_id_3].present?
+	     #add181002
+       #備考をセット
+       if quotation_material_header.present?
+         @notes = quotation_material_header.notes_3
+       end
+       
+       if params[:supplier_id] == params[:supplier_id_3]
+         if params[:quotation_email_flag_3] == "true" #add180919
+	         exist = true 
+	       end
+       end
+    end
+     
+    #not yet
+    #該当なし---業者１として扱う
+    if exist == false
+     
+    end
+     
+    #upd180919
+	  @quotation_email_flag = exist
+     
+	 #if exist == true
+	 #  @quotation_email_flag = 1
+	 #else 
+	 #  @quotation_email_flag = 0
+	 #end 
   end
 
   def set_sequence
@@ -990,7 +1071,7 @@ class QuotationMaterialHeadersController < ApplicationController
 	#$seq_exists += 1
 	
   end
-  
+ 
   
   #ajax
   def get_purchase_order_code
@@ -1018,8 +1099,6 @@ class QuotationMaterialHeadersController < ApplicationController
        
          @purchase_order_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
          
-         #binding.pry
-          
          #最終番号に１を足す。
          newStr = @purchase_order_code[1, 4]
          header = @purchase_order_code[0, 1]
@@ -1053,7 +1132,8 @@ class QuotationMaterialHeadersController < ApplicationController
 					 
 					 
 	  params.require(:quotation_material_header).permit(:quotation_code, :quotation_header_origin_id, :requested_date, :construction_datum_id, 
-	                 :supplier_master_id, :responsible, :email, :total_quotation_price_1, :total_quotation_price_2, :total_quotation_price_3,
+	                 :supplier_master_id, :responsible, :email, :notes_1, :notes_2, :notes_3,
+                     :total_quotation_price_1, :total_quotation_price_2, :total_quotation_price_3,
                      :total_order_price_1, :total_order_price_2, :total_order_price_3,
                      :supplier_id_1, :supplier_id_2, :supplier_id_3, :quotation_email_flag_1, 
                      :quotation_email_flag_2, :quotation_email_flag_3, :order_email_flag_1, :order_email_flag_2, :order_email_flag_3, 

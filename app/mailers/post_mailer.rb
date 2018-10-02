@@ -53,6 +53,15 @@ class PostMailer < ApplicationMailer
     #工事名をセット
       @construction_name = "工事名:" + user.purchase_order_datum.construction_datum.construction_name
     end
+    
+    #add181002
+    #備考
+    @notes = nil
+    if user.notes.present?
+      @notes = "※"+ user.notes
+    end
+    #
+    
     @supplier_name = user.supplier_master.supplier_name + " 御中"
     
     #担当者
@@ -103,6 +112,10 @@ class PostMailer < ApplicationMailer
     else
 	  @responsible_name = "ご担当者様"
 	end
+    
+    #add181002
+    #備考(全体)をセット
+    @notes = $notes
    
     #件名に日時を入れる（メール重なるのを防ぐため）
     require 'date'
@@ -145,6 +158,10 @@ class PostMailer < ApplicationMailer
     else
 	  @responsible_name = "ご担当者様"
 	end
+    
+    #add181002
+    #備考(全体)をセット
+    @notes = $notes
 	
 	#見積金額合計
 	

@@ -192,6 +192,8 @@ ja:
        task: 工程表データ
        task_content: 工程表項目マスター
     attributes:
+       construction_datum:
+         order_flag: 受注済
        delivery_slip_header:
          delivery_slip_date: 納品日
          delivery_amount: 納品金額

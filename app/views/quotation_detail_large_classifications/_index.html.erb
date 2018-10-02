@@ -39,7 +39,7 @@
 		<td id="quotation_header_id", style="display:none;"><%= quotation_detail_large_classification.quotation_header_id %></td>
         <!-- <td><%= link_to quotation_detail_large_classification.id, quotation_detail_large_classification_path(quotation_detail_large_classification) %></td> -->
         <!--IDからshow画面への遷移はしない-->
-        <td><%= quotation_detail_large_classification.id %></td>
+        <td><font size = "1rem"><%= quotation_detail_large_classification.id %></font></td>
 		<td id="line_number", style="display:block;"><%= quotation_detail_large_classification.line_number %></td>
 		<!--upd170223-->
         <td style = <%= bold %> ><font color = <%= color %>  ><%= quotation_detail_large_classification.working_large_item_name %></font></td>
@@ -95,6 +95,13 @@
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
 					  quotation_header_name: params[:quotation_header_name]), :class => 'btn btn-white_rsd btn-xs keep-disp' , remote: true%>
+          
+          <%= link_to "コピー", 
+                      copy_quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
+                      quotation_header_name: params[:quotation_header_name] ),
+                      :data => { :confirm => 'データをコピーしますか?'  },
+                      :class => 'btn btn-cyan100_rsd btn-xs', remote: true %>
+          
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       quotation_detail_large_classification_path(quotation_detail_large_classification, quotation_header_id: quotation_detail_large_classification.quotation_header_id, 
                       quotation_header_name: params[:quotation_header_name] ),

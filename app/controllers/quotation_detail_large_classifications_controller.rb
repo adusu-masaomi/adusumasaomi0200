@@ -1,5 +1,5 @@
 class QuotationDetailLargeClassificationsController < ApplicationController
-  before_action :set_quotation_detail_large_classification, only: [:show, :edit, :update, :destroy]
+  before_action :set_quotation_detail_large_classification, only: [:show, :edit, :update, :destroy, :copy]
   
   before_action :initialize_sort, only: [:show, :new, :edit, :update, :destroy ]
   
@@ -362,6 +362,51 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 			   
   end
   
+  #add 180911
+  #レコードをコピーする
+  def copy
+    
+    if params[:quotation_header_id].present?
+      #確定済みのものは、変更できないようにする為フラグをセット
+      quotation_header = QuotationHeader.find(params[:quotation_header_id])
+      if quotation_header.present?
+        if quotation_header.fixed_flag == 1
+          @status = "fixed"
+        else
+          @status = "not_fixed"
+        end
+      end
+      #
+    end
+    
+    if @status != "fixed"
+    
+      @quotation_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
+      new_record = @quotation_detail_large_classification.deep_clone include: :quotation_detail_middle_classifications
+    
+      status = new_record.save
+     
+    #respond_to do |format|
+    
+      if status == true
+        notice = 'Quotation detail large classification was successfully copied.'
+        
+        @quotation_detail_large_classification = new_record
+        #一覧データの金額を更新する 
+        save_price_to_headers
+      else
+        notice = 'Quotation detail large classification was unfortunately failed...'
+      end
+        
+      #redirect_to :action => "index", :notice => notice,  :quotation_header_id => params[:quotation_header_id], 
+      #      :quotation_header_name => params[:quotation_header_name]
+    end
+    
+    #end
+    
+  end
+  
+  
   #作業明細マスターの更新
   def update_working_middle_item
   
@@ -456,7 +501,6 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 			 
 			 
 		  end
-
   
   end
 

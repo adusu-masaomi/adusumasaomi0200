@@ -120,7 +120,7 @@
       <th style="width:20px;">機</th>
       <th style="width:20px;">労</th>
       <th style="width:220px;"><%= model_class.human_attribute_name(:remarks) %></th>
-      <th style="width:100px;"><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th style="width:140px;"><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
   <tbody class="delivery_slip_detail_middle_classification-index">
@@ -169,23 +169,28 @@
        //画面位置保存→実行
        $('form').keepPosition();
   });
-  
-  //画面位置保存するプラグイン
-  $.fn.keepPosition = function(){
-  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-    var key = 'keep-position-'+location.pathname;
-    var win = $(window);
-    this.each(function(){
-    //$(this).on('submit',function(){
-    $(".keep-disp").click(function(){
-      div_top = bodyDiv.scrollTop();
-	    $.cookie(key, div_top);
-	  });
-    });
-    setTimeout(function(){
-      bodyDiv.scrollTop($.cookie(key));
-    },0);
-  }
+
+//180914共通化
+//  //画面位置保存するプラグイン
+//  $.fn.keepPosition = function(){
+//  //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+//    var key = 'keep-position-'+location.pathname;
+//    var win = $(window);
+//    this.each(function(){
+//    //$(this).on('submit',function(){
+//    $(".keep-disp").click(function(){
+//        if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+//          div_top = bodyDiv.scrollTop();
+//	      $.cookie(key, div_top);
+//        }
+//	  });
+//    });
+//    setTimeout(function(){
+//      if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
+//        bodyDiv.scrollTop($.cookie(key));
+//      }
+//    },0);
+//  }
   
   function addParam(link){
     var default_page_number = $('default_page_number');

@@ -86,7 +86,7 @@
       <th></th>
 	  <th></th>
 	  <th></th>
-      <th></th>
+      <!--<th></th>-->
       <th><%= sort_link(@q, :construction_code, model_class.human_attribute_name(:construction_code), default_order: :desc ) %></th>
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:reception_date) %></th>
@@ -95,8 +95,9 @@
       <!--<th><%= model_class.human_attribute_name(:construction_period_end) %></th>-->
 	  <th><%= model_class.human_attribute_name(:construction_end_date) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      <th><%= model_class.human_attribute_name(:order_flag) %></th>
       <th><%= model_class.human_attribute_name(:billed_flag) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
   </thead>
 <!--</table>-->
@@ -108,7 +109,13 @@
   
     <% @construction_data.order("construction_code desc").each do |construction_datum| %>
       <% if construction_datum.billed_flag != nil && construction_datum.billed_flag > 0 %>
-         <tr bgcolor="#F7BE81">
+      <!--請求済の場合の色付け(最優先)-->
+         <!--<tr bgcolor="#F7BE81">-->
+         <!-- EC7C04 -->
+         <tr bgcolor="#FBA417">
+      <% elsif construction_datum.order_flag != nil && construction_datum.order_flag > 0 %>
+      <!--受注済の場合の色付け-->
+         <tr bgcolor="#F6DCBF">
       <% else %>
          <tr bgcolor="white">
       <% end %>
@@ -151,8 +158,14 @@
 		  <td></td>
 		<% end %>
 		
-        <td><%= link_to t('.edit', :default => t("資料")),
-                      edit3_construction_datum_path(construction_datum),  :class => 'btn btn-yellow500_rsd btn-xs keep-disp' %></td>
+        <!--画像のアップ機能は保留で-->
+        <!--<td><%= link_to t('.edit', :default => t("資料")),
+                      edit3_construction_datum_path(construction_datum),  :class => 'btn btn-yellow500_rsd btn-xs keep-disp' %></td>-->
+        <!--保留中-->
+        <!--<td><%= link_to t('.edit', :default => t("資料")),
+                      construction_data_path(construction_datum, document_flag: "1" ), :class => 'btn btn-yellow500_rsd btn-xs keep-disp' %></td>-->
+        <!--td><a href="file:///Users\takaMasa\Desktop" input id="upload" type="file"/>資料</a></td>-->
+                
         
         <td><%= construction_datum.construction_code %></td>
         <td><%= construction_datum.construction_name %></td>
@@ -182,6 +195,17 @@
 		   <td align="center">-</td>
 		<% end %>
         <td><%=l construction_datum.created_at.in_time_zone('Tokyo') %></td>
+        
+        <!--add180926-->
+        <!--受注フラグ-->
+        <td><%= check_box("order_flag", "active", {checked: check_if_true(construction_datum.order_flag) , 
+                  :multiple => true, :style => "margin-left: 16px;",  :disabled => false , :class => "order_check keep-disp" , :id => construction_datum.id }, "true", "false") %></td>
+        
+        <!--請求済フラグ-->
+        <!--<td><%= check_box("test", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;",  :disabled => true}, "true", "false") %></td>-->
+        <td><%= check_box("billed_flag", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;", 
+                             :disabled => false , :class => "billed_check keep-disp" , :id => construction_datum.id}, "true", "false") %></td>
+        
         <td>
          <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_construction_datum_path(construction_datum),  :class => 'btn btn-white_rsd btn-xs keep-disp' %>
@@ -192,8 +216,7 @@
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
                       :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
-        <!--<td><%= check_box("test", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;", :disabled => true}, "true", "false") %></td>-->
-        <td><%= check_box("test", "active", {checked: check_if_true(construction_datum.billed_flag) , :multiple => true, :style => "margin-left: 16px;",  :disabled => true}, "true", "false") %></td>
+        
       </tr>
      <% end %>
   <!--</table>-->
@@ -244,6 +267,42 @@
        //実行
        $('form').keepPosition();
 	   //$('ul.nav-tabs a').keepPosition();
+       
+       //add180926
+       //請求済チェックでリアルタイム更新する
+       $(".billed_check").on('change', function(e) {
+            var $elem = $(e.target);
+            var id = $elem.context.id
+            var bool = $elem.is(':checked') ? 1 : 0;
+
+            $.get("<%= construction_dataz_set_billed_flag_path %>",
+                {id: id , billed_flag: bool},
+                function(data){
+                    //画面再描画のためリロードする
+		            window.location.reload();
+                }
+	        );
+          
+       });
+       
+       //add180926
+       //受注済チェックでリアルタイム更新する
+       $(".order_check").on('change', function(e) {
+            var $elem = $(e.target);
+            var id = $elem.context.id
+            var bool = $elem.is(':checked') ? 1 : 0;
+
+            $.get("<%= construction_dataz_set_order_flag_path %>",
+                {id: id , order_flag: bool},
+                function(data){
+                    //画面再描画のためリロードする
+		            window.location.reload();
+                }
+	        );
+          
+       });
+       
+       
   });
   
   //工事コードを空にする
@@ -259,23 +318,23 @@
     document.getElementById("calculated_flag").selectedIndex = 0;
   }
   
-  
-  //プラグイン化
-  $.fn.keepPosition = function(){
-    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-    var key = 'keep-position-'+location.pathname;
-    var win = $(window);
-    this.each(function(){
-        //$(this).on('submit',function(){
-        $(".keep-disp").click(function(){
-			div_top = bodyDiv.scrollTop();
-			$.cookie(key, div_top);
-	    });
-    });
-    setTimeout(function(){
-		bodyDiv.scrollTop($.cookie(key));
-    },0);
-  }
+//180914共通化
+//  //プラグイン化
+//  $.fn.keepPosition = function(){
+//    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+//    var key = 'keep-position-'+location.pathname;
+//    var win = $(window);
+//    this.each(function(){
+//        //$(this).on('submit',function(){
+//        $(".keep-disp").click(function(){
+//			div_top = bodyDiv.scrollTop();
+//			$.cookie(key, div_top);
+//	    });
+//    });
+//    setTimeout(function(){
+//		bodyDiv.scrollTop($.cookie(key));
+//    },0);
+//  }
  
   //カテゴリー別にアイテムを抽出する処理
   function setConstructionExtractByCutomer(){
@@ -302,6 +361,9 @@
     $(".searchableCustomerName").val(null).trigger("change"); 
   }
   //
+
+ 
+
 
 </script>
 

@@ -4,6 +4,7 @@ class InvoiceHeadersController < ApplicationController
   # GET /invoice_headers
   # GET /invoice_headers.json
   def index
+  
     #@invoice_headers = InvoiceHeader.all
     
 	#ransack保持用コード

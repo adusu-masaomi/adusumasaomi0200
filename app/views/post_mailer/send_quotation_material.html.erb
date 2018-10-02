@@ -8,6 +8,9 @@
   <p><%= @responsible_name %></p>
   <p>いつもお世話になっております。</p>
   <p>下記の商品につきまして、お見積りの程よろしくお願い申し上げます。</p>
+  <% if @notes.present? %>
+    <p><%= @notes %></p>
+  <% end %>
   <p><%= @quotation_code %></p>
   <p><%= @construction_name %></p>
   </p>
@@ -53,7 +56,7 @@
       
       <% if item[:notes].present? %>
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <%= item[:notes] %></p>
+        <%= "※" + item[:notes] %></p>
       <% end %>
       
       &nbsp;&nbsp;&nbsp;メーカー：
