@@ -1,0 +1,47 @@
+<%= simple_form_for @outsourcing_cost, :html => { :class => 'well orm-horizontal' } do |f| %>
+  <!--<%= f.input :construction_datum_id %>-->
+  <div class="col-lg-3", style="margin-left : 0px;margin-top :10px;">
+  <%= f.label :工事名, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい"} , 
+           {id:"construction_datum_id",  class: "searchableSelect2_1" , style: 'width:480px', :tabindex=>"1" } %>
+  </div>
+  </br></br></br></br>
+  
+  <!--<%= f.input :staff_id %>-->
+  <div class="col-lg-3", style="margin-left : 0px;margin-top :10px;">
+  <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , 
+      {id:"staff_id", style: 'width:180px', class: "searchableSelect2_2" , :tabindex=>"2" }  %>
+  </div>
+  </br></br></br></br>
+  
+  <%= f.input :labor_cost , input_html:{id:"labor_cost", :tabindex=>"3"}%>
+  <!--<%= f.input :execution_amount %>-->
+  <%= f.input :billing_amount, input_html:{id:"billing_amount", :tabindex=>"4"} %>
+  <%= f.input :closing_date, input_html:{id:"closing_date", :tabindex=>"5"} %>
+  <%= f.input :payment_amount, input_html:{id:"payment_amount", :tabindex=>"6"} %>
+  <%= f.input :unpaid_amount, input_html:{id:"unpaid_amount", :tabindex=>"7"} %>
+  <%= f.input :payment_due_date, input_html:{id:"payment_due_date", :tabindex=>"8"} %>
+  <%= f.input :payment_date, :include_blank => true, input_html:{id:"payment_date", :tabindex=>"9"} %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                outsourcing_costs_path, :class => 'btn btn-default' %>
+<% end %>
+
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+       
+       //select2のタブ順はここで設定
+       $(".searchableSelect2_1").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',1)}).trigger('load');
+       //select2のタブ順はここで設定
+       $(".searchableSelect2_2").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',2)}).trigger('load');
+      
+       
+  });
+</script>

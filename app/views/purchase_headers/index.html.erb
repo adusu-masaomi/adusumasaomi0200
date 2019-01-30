@@ -1,0 +1,67 @@
+<%- model_class = PurchaseHeader -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <!-- kaminari用追加箇所 -->
+  <%= page_entries_info @purchase_headers %>
+  
+   <%= search_form_for @q do |f| %>
+   <%= f.label :slip_code, '伝票番号：' %>
+   <%= f.select :id_eq, PurchaseHeader.all.map{|st| [st.slip_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSlipCode" } %>
+   
+     <div>
+        <%= f.submit '検索する', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_contact_path,
+            :class => 'btn btn-primary' %>
+
+     </div>
+   <% end %>
+</div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_purchase_header_path,
+            :class => 'btn btn-primary' %>
+
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:slip_code) %></th>
+      <th><%= model_class.human_attribute_name(:complete_flag) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_headers.order("id desc").each do |purchase_header| %>
+      <tr>
+        <td><%= link_to purchase_header.id, purchase_header_path(purchase_header) %></td>
+        <td><%= purchase_header.slip_code %></td>
+        <td><%= purchase_header.complete_flag %></td>
+        <td><%=l purchase_header.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_purchase_header_path(purchase_header), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      purchase_header_path(purchase_header),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- kaminari用追加箇所開始 -->
+    <%= paginate @purchase_headers %>
+  </tbody>
+</table>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchableSlipCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+    
+  });
+  
+</script>    

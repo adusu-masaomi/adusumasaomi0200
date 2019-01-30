@@ -1,0 +1,11 @@
+データリストアした際、全件あるとパフォーマンスが落ちるので下記のように
+mysqlでデータ削除する。
+
+delete from purchase_data where purchase_date < '2018-01-01'
+delete from construction_data where created_at < '2017-01-01'
+
+*リストアのコマンド
+mysql -u adusu -p adusu_db < adusu_db.sql
+(pw:Adusu2016%)
+
+*会計システムにも影響が出るので、別途、migrateする

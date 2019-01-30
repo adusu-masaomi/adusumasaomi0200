@@ -1,0 +1,8 @@
+<%= simple_form_for @purchase_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :slip_code %>
+  <%= f.input :complete_flag, hint: "＊入力済みの場合のみ”１”をセットしてください。" %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_headers_path, :class => 'btn btn-default' %>
+<% end %>

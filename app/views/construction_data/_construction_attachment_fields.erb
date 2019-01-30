@@ -1,0 +1,28 @@
+<div class="nested-fields form_time_selects imgInput">
+    <div class="col-sm-2">
+    
+          <!--<%= f.input :title,:label => false, as: :text, input_html:{id:"title", :readonly => true } %>-->
+          <%= f.input :title,:label => false, as: :text, input_html:{id:"title", :rows => 2  } %>
+          
+          <!--<div class="imagePreview"></div>-->
+          <div class="imagePreview">
+          <%= image_tag(f.object.attachment_url(:thumb), :class=> "imagePreview", input_html:{id:"image" }) if f.object.attachment? %>
+          </div>
+          
+          <div class="input-group">
+              <label class="input-group-btn">
+                  <span class="btn btn-lime500_rsd">
+                      選択
+                        <%= f.file_field :attachment, :class => "uploadFile", :style => "display:none" %>
+                        <%= link_to_remove_association("削除", f, {}) %>
+                        <% if f.object.attachment? %>
+                          <%= link_to "ダウンロード", download_construction_datum_path(f.object)  %>
+                        <% end %>
+                    </span>
+                    
+                </label>
+                
+                <!--<input type="text" class="form-control" readonly="">-->
+          </div>
+    </div>
+</div>

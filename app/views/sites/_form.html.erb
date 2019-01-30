@@ -1,0 +1,11 @@
+<%= simple_form_for @site, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :name,  input_html:{ :tabindex=>"0" } %>
+  <%= f.input :post,  input_html:{ :tabindex=>"1" } %>
+  <%= f.input :address,  input_html:{ :tabindex=>"2" } %>
+  <%= f.input :house_number,  input_html:{ :tabindex=>"3" } %>
+  <%= f.input :address2,  input_html:{ :tabindex=>"4" } %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                sites_path, :class => 'btn btn-default' %>
+<% end %>

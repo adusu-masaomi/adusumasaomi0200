@@ -1,0 +1,19 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Construction datum:</strong>
+  <%= @construction_attachment.construction_datum_id %>
+</p>
+
+<p>
+  <strong>Title:</strong>
+  <%= @construction_attachment.title %>
+</p>
+
+<p>
+  <strong>Attachment:</strong>
+  <%= @construction_attachment.attachment %>
+</p>
+
+<%= link_to 'Edit', edit_construction_attachment_path(@construction_attachment) %> |
+<%= link_to 'Back', construction_attachments_path %>

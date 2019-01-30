@@ -1,0 +1,155 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<%- model_class = MaterialCategory -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_material_category_path,
+            :class => 'btn btn-primary' %>
+
+<!--モバイル対応 add180829-->
+<% if browser.platform.ios? || browser.platform.android? %>
+  <!--スペース-->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <font color="#8F00FE">
+  <label><%= radio_button(:drag, :on, "1", onClick: "dragg_on()") %>(モバイル用)ソートOn</label>
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <label><%= radio_button(:drag, :off, "1", onClick: "dragg_off()") %>Off</label>
+  </font>
+<% end %>
+<!-- -->
+
+<!--<table class="table table-striped">-->
+<div style="margin-top : -0px;", class="span11 table-scrollable" >
+  <style>
+    table { }
+    table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <!--見出し固定用設定追加-->
+  <!--<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1880px;">-->
+  <table class="table  table-striped", style="font-size : 12px;">
+
+  <thead>
+    <tr>
+      <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
+      <th style="width:55px;"><%= sort_link(@q, :seq, model_class.human_attribute_name(:seq), default_order: :desc ) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody id="sortable">
+    <% @material_categories.order("seq asc").each do |material_category| %>
+      <tr id="<%= material_category.id%>" >
+        <!--<td><%= link_to material_category.id, material_category_path(material_category) %></td>-->
+        <td><%= material_category.seq %></td>
+        <td><%= material_category.name %></td>
+        <td><%=l material_category.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_material_category_path(material_category), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      material_category_path(material_category),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+  
+  
+    //見出し固定用設定追加
+    var sz = window.parent.screen.width;
+    var fc = 1;    //デフォルトの固定列数(社長PC基準)
+    var ht = 618;  //デフォルトの高さ(社長PC基準)580
+	 
+    if (sz != 1920) {
+    //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+      fc = 1;  //固定列数
+      ht -= 108;
+    }
+    
+    //モバイル対応 add180829
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      // モバイルの場合（デフォはソートしない、但し保存はできるようにする
+      var radio_sort_flag = sessionStorage.getItem('radio_sort_flag');
+      if (radio_sort_flag == "true"){
+        sortableEnable();
+        document.getElementById("drag_on_1").checked = true;
+      }
+    } else {
+      //モバイル以外ならデフォルトでソート有効にする
+      sortableEnable();
+    }
+    
+	        
+    
+    
+  
+  });
+  
+  //モバイル対応 add180829
+  //////
+  //ドラッグソートOn
+  function sortableEnable() {
+    $( "#sortable" ).sortable({
+        cursor: 'move',
+	   start: function(event, ui) {ui.item.css("background-color", "orange");},
+	   stop: function(event, ui) {
+	     ui.item.css("background-color", "white");
+		 var row = $(this).sortable('toArray').toString();
+		 
+         
+		 $.post("<%= material_categoriez_reorder_path %>",
+           { row: row },
+           function(data){
+		     
+             sessionStorage.setItem('radio_sort_flag', 'true'); 
+             
+             //画面再描画のためリロードする
+		     window.location.reload();
+           }
+         );
+	 },
+	        
+    });
+    $(".sortable td").each(function () {
+            $(this).css("width", $(this).width());
+    });  
+    $( "#sortable" ).sortable( "option", "disabled", false );
+    $( ".sortable" ).disableSelection();
+    return false;
+  }
+  
+  //ドラッグソートOff
+  function sortableDisable() {
+    $( "#sortable" ).sortable("disable");
+    sessionStorage.setItem('radio_sort_flag', 'false'); 
+    return false;
+  }
+  
+  //ラジオボタンによるソート(On)
+  function dragg_on(){
+    document.getElementById("drag_off_1").checked = false;
+    sortableEnable();
+  }
+  //ラジオボタンによるソート(Off)
+  function dragg_off(){
+    document.getElementById("drag_on_1").checked = false;
+    sortableDisable();
+  }
+  //////
+  
+  
+</script>
+
+

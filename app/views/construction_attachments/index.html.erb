@@ -1,0 +1,31 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Construction Attachments</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Construction datum</th>
+      <th>Title</th>
+      <th>Attachment</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @construction_attachments.each do |construction_attachment| %>
+      <tr>
+        <td><%= construction_attachment.construction_datum_id %></td>
+        <td><%= construction_attachment.title %></td>
+        <td><%= construction_attachment.attachment %></td>
+        <td><%= link_to 'Show', construction_attachment %></td>
+        <td><%= link_to 'Edit', edit_construction_attachment_path(construction_attachment) %></td>
+        <td><%= link_to 'Destroy', construction_attachment, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Construction attachment', new_construction_attachment_path %>

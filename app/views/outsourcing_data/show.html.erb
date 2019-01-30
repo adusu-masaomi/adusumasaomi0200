@@ -1,0 +1,82 @@
+<%- model_class = PurchaseDatum -%>
+<% provide(:title, '外注データ') %>
+
+<div class="page-header">
+  <h1><%=t '.title', :default => '外注データ' %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong>作成日</strong></dt>
+  <dd><%= @purchase_datum.purchase_date %></dd>
+  <dt><font color=red><b>注文Ｎｏ</strong></b></font></dt>
+  <% if @purchase_datum.purchase_order_datum.purchase_order_code.present? %>
+    <dd><font color=red><b><%= @purchase_datum.purchase_order_datum.purchase_order_code %></b></font></dd>
+  <% else %>
+    <dd>-</dd>
+  <% end %>
+  <dt><b>件名Ｎｏ</strong></b></dt>
+  <% if @purchase_datum.construction_datum.present? %>
+    <dd><%= @purchase_datum.construction_datum.construction_code %></dd>
+    <dt><b>件名</strong></b></dt>
+	<dd><%= @purchase_datum.construction_datum.construction_name %></dd>
+  <% else %>
+    <dd>-</dd>
+	<dt><b>件名</strong></b></dt>
+    <dd>-</dd>
+  <% end %>
+  <dt><strong>品番</strong></dt>
+  <dd><%= @purchase_datum.material_code %></dd>
+  <dt><strong>品名</strong></dt>
+  <dd><%= @purchase_datum.material_name %></dd>
+  <dt><strong>分類</strong></dt>
+  <% if @purchase_datum.MaterialMaster.material_category.present? %>
+    <dd><%= @purchase_datum.MaterialMaster.material_category.name %></dd>
+  <% else %>
+    <dd>-</dd>
+  <% end %>
+  
+  <dt><strong>メーカー名</strong></dt>
+  <dd><%= @purchase_datum.maker_name %></dd>
+  <dt><strong>数量</strong></dt>
+  <dd><%= @purchase_datum.quantity %></dd>
+  <dt><strong>単位</strong></dt>
+  <% if @purchase_datum.unit_id.present? %>
+  <dd><%= @purchase_datum.unit_master.unit_name %></dd>
+  <% else %>
+  <dd>-</dd>
+  <% end %>
+  <dt><strong>仕入単価</strong></dt>
+  <dd><%= @purchase_datum.purchase_unit_price %></dd>
+  <dt><strong>仕入金額</strong></dt>
+  <dd><%= @purchase_datum.purchase_amount %></dd>
+  <dt><strong>定価</strong></dt>
+  <dd><%= @purchase_datum.list_price %></dd>
+  <dt><strong>仕入業者</strong></dt>
+  <dd><%= @purchase_datum.SupplierMaster.supplier_name %></dd>
+  <dt><strong>伝票番号</strong></dt>
+  <dd><%= @purchase_datum.slip_code %></dd>
+  <dt><strong>仕入区分</strong></dt>
+  <dd><%= @purchase_divisions[(@purchase_datum.division_id)-1].purchase_division_name %></dd>
+  <dt><strong>入出庫区分</strong></dt>
+  <% if @purchase_datum.inventory_division_id.present? %>
+  <dd><%= InventoryHistory.inventory_division[@purchase_datum.inventory_division_id][0] %></dd>
+  <% else %>
+  <dd>-</dd>
+  <% end %>
+  
+  
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              outsourcing_data_path(construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+              supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_outsourcing_datum_path(@purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+              supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
+<%= link_to t('.new', :default => t("helpers.links.new")), new_outsourcing_datum_path(:new_flag => "1"), :class => 'btn btn-primary' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              outsourcing_datum_path(@purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+              supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

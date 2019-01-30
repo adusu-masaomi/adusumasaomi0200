@@ -1,0 +1,8 @@
+<%- model_class = PurchaseDatum -%>
+<% provide(:title, '外注データ') %>
+<b>
+</br>
+<div class="page-header">
+  <h1><%=t '.title', :default => '外注費データの編集', :model => model_class.model_name.human.titleize %></h1>
+</div>
+<%= render :partial => 'form'%>

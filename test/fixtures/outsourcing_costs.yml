@@ -1,0 +1,33 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  construction_datum_id: 1
+  staff_id: 1
+  purchase_amount: 1
+  supplies_expense: 1
+  labor_cost: 1
+  misellaneous_expense: 1
+  execution_amount: 1
+  billing_amount: 1
+  purchase_order_amount: MyString
+  closing_date: 2019-01-24
+  payment_amount: 1
+  unpaid_amount: 1
+  payment_due_date: 2019-01-24
+  payment_date: 2019-01-24
+
+two:
+  construction_datum_id: 1
+  staff_id: 1
+  purchase_amount: 1
+  supplies_expense: 1
+  labor_cost: 1
+  misellaneous_expense: 1
+  execution_amount: 1
+  billing_amount: 1
+  purchase_order_amount: MyString
+  closing_date: 2019-01-24
+  payment_amount: 1
+  unpaid_amount: 1
+  payment_due_date: 2019-01-24
+  payment_date: 2019-01-24

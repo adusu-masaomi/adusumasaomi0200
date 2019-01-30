@@ -1,0 +1,159 @@
+<style>
+  .imagePreview{
+    width: 180px;
+    height: 180px;
+    background-position: center center;
+    background-size: cover;
+    -webkit-box-shadow: 0 0 1px 1px rgba(0, 0, 0, .3);
+    display: inline-block;
+}
+</style>
+  
+  
+  <%= simple_form_for @construction_datum,  :authenticity_token => true, :html => { multipart: true , :class => 'well form-horizontal', 
+         style: 'width:1280px; height:5000px;' }  do |f| %>
+  
+  <div class="col-md-2", style="margin-left : 10px;margin-top :0px;">
+    <%= f.input :construction_code , input_html:{name: "construction_code", :tabindex=>"0", style: 'width:110px' , :readonly => true} %>
+  </div>
+  
+  <div class="col-md-5", style="margin-left : -20px;margin-top :0px;">
+  <%= f.input :construction_name , input_html:{:tabindex=>"1", style: 'width:430px', :readonly => true} %>
+  </div>
+  
+  <div style="margin-top :5px;">
+    <%= f.label :得意先, {:class => "my-custom-class-l" }  %></br>
+    <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:prompt => "どれか一つを選択して下さい"} , 
+    {id:"customer_id", :tabindex=>"0", class: "searchableCustomerName" , style: 'width:330px' , :disabled => true} %></br>
+  </div>
+  
+  </br>
+  
+  <%= f.button :submit, name: "documents", :class => 'btn-primary' %>
+    
+	 
+  <%= link_to t('.cancel', :default => t("helpers.links.back")),
+                construction_data_path, :class => 'btn btn-white_rsd' %>
+  
+  </br>
+  
+  </br>
+  
+  
+  <div class="nested-field">
+    <%= link_to_add_association "資料を追加", f, :construction_attachments, :class => 'btn btn-teal500_rsd' %>
+    <%= f.simple_fields_for :construction_attachments do |construction_attachment| %>
+        <%= render partial: 'construction_attachment_fields', locals: {f: construction_attachment} %>
+    <% end %>
+    
+  </div>
+  
+  <!-- -->
+  
+  </p>
+  
+  <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
+  
+  
+  <% end %>
+
+  
+
+<script type="text/javascript">
+
+  $(document).ready(function(){
+  //$(document).on('turbolinks:load', function(){
+      //検索可能なリストボックス(品名の場合)
+       $(".searchableCustomerName").select2({ theme: "bootstrap" });
+	   
+       //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	   //$( ".searchableCustomerName" ).on("select2:close", function (e) {
+	   //  $('[tabindex=4]').focus(); 
+	   //});
+	 
+	   //安全項目
+	   $(".searchableSafety").select2({ theme: "bootstrap" });
+	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	   $( ".searchableSafety" ).on("select2:close", function (e) {
+	     $('[tabindex=4]').focus(); 
+	   });
+	   
+       $(".searchableSafety").change(function(e) {
+         setWorkingSafetyMatterName();
+       });  
+
+  });
+  
+  
+  
+  
+  $(document).on('change', ':file', function() {
+    var input = $(this),
+    numFiles = input.get(0).files ? input.get(0).files.length : 1,
+    label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    
+    ///
+    //ラベルにファイル名をセットする
+    var child_index = $(this)[0].name.slice(56);
+    child_index = child_index.slice(0,-13);
+    
+    var nm = "construction_datum[construction_attachments_attributes][" + child_index + "][title]";
+    document.getElementsByName(nm)[0].value = label;
+    
+    //debugger;
+    ///
+    
+    //input.parent().parent().next(':text').val(label);
+    input.parent().parent().next(':text').val(label);
+    var files = !!this.files ? this.files : [];
+    if (!files.length || !window.FileReader) return; // no file selected, or no FileReader support
+    if (/^image/.test( files[0].type)){ // only image file
+        var reader = new FileReader(); // instance of the FileReader
+        reader.readAsDataURL(files[0]); // read the local file
+        
+        reader.onload = function(files) {
+        
+            //debugger;
+        
+            //$('#image').context.images[child_index].src = "url("+this.result+")" ;  //soso
+            
+            //$('#image').context.images[child_index].attr('src', "url("+this.result+")");
+            
+            //一旦イメージをクリアする
+            if ($('#image').context.images[child_index] != undefined){
+              
+              $('#image').context.images[child_index].remove();
+              
+              //$('#image').context.images[child_index].alt = "";
+              //$('#image').context.images[child_index].src = "";
+            }
+        
+            input.parent().parent().parent().prev('.imagePreview').css("background-image", "url("+this.result+")");
+        }
+    }
+  });
+  
+  
+  
+  function link_to(link) {
+    location.href = link;
+  }
+  //$(document).on("click", "#your_link", function(){
+  //   $("#form").submit();
+  //});
+  
+  //項目名のセット
+  function setWorkingSafetyMatterName()
+  {  
+     obj = document.getElementById("working_safety_matter_id");
+     working_safety_matter_id = parseInt(obj.value);
+     $.get("<%= construction_datum_working_safety_matter_name_select_path %>",
+       {id: working_safety_matter_id },
+        function(data){
+          obj = document.getElementById("working_safety_matter_name").textContent;
+          document.getElementById("working_safety_matter_name").value = obj;
+		  }
+      );
+   };  
+  
+</script>
