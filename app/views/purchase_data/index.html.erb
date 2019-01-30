@@ -123,6 +123,11 @@
       <%= link_to "仕入表(様式２)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "2"),
             :class => 'btn  btn-pink300_ftg', :target=>["_blank"] %>
+       <!--保留
+       <%= link_to "請求一覧(外注)",
+            purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "3"),
+            :class => 'btn  btn-purple300_ftg', :target=>["_blank"] %>
+       -->
        <%= link_to '新規作成',
             new_purchase_datum_path(:new_flag => "0", construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
             supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag] ),
@@ -174,6 +179,7 @@
 	  <th style="width:65px;"><%= sort_link(@q, :list_price, "定価" ) %></th>
 	  <th style="width:79px;"><%= sort_link(@q, :SupplierMaster_supplier_name, "仕入業者" ) %></th>
 	  <th style="width:40px;"><%= sort_link(@q, :PurchaseDivision_purchase_division_name, "区分" ) %></th>
+      <!--<th style="width:40px;">請求</th>-->
       <!--<th>伝票No</th>-->
       <th align="left;", style="width:50px;"><%= sort_link(@q, :slip_code, "伝票No" ) %></th>
       <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
@@ -278,11 +284,21 @@
         <% else %>
            <td>-</td>
         <% end %>
+        
+        <!--請求のチェック追加--保留
+        <td><%= check_box("outsourcing_invoice_flag", "active", {checked: check_if_true(purchase_datum.outsourcing_invoice_flag) , 
+                  :multiple => true, :style => "margin-left: 16px;",  :disabled => false , :class => "outsourcing_check",  :id => purchase_datum.id  }, "true", "false") %></td>
+        -->
+        
 		<td style="font-size : 8px;"><%= purchase_datum.slip_code %></td>
         <td>
           <%= link_to '編集',
                       edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
                       supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs' %>
+          <!--集計ボタン(保留)-->
+          <!--<%= link_to '集計',
+                      edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-purple300_rsd btn-xs' %>-->
           <%= link_to '削除',
                       purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
                       supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),
@@ -336,7 +352,10 @@
          $(".searchablePurchaseDivison").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST});
 
         $(".searchableSupplierName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST }); 
-        
+     
+     
+         
+     
      //見出し固定用設定追加
 	 var sz = window.parent.screen.width;
 	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
@@ -353,7 +372,41 @@
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
+     
+      //add190124
+     //請求済（外注用）チェックでリアルタイム更新する
+     $(".outsourcing_check").on('change', function(e) {
+       var $elem = $(e.target);
+       var id = $elem.context.id
+       var bool = $elem.is(':checked') ? 1 : 0;
+            
+       //チェック入った場合のみ、ajaxする
+       if (bool)
+         {
+           //砂時計にする
+           $("body").css("cursor", "progress");
+            
+           $.get("<%= purchase_datum_set_ajax_outsourcing_default_data_path %>",
+                {id: id },
+                function(data){
+                    //画面再描画のためリロードする
+		            window.location.reload();
+                    
+                    //$("body").css("cursor", "default");
+           }
+	     );
+       }
+          
+     });
+
+     
+     
   });
+  
+  //フォームロード時のイベント(再読込時も)
+  window.onload = function(){
+    $("body").css("cursor", "default");
+  }
   
   //条件を全てクリアする
   function clearAllConditions() {

@@ -142,7 +142,12 @@ class ConstructionDataController < ApplicationController
   
     #住所のパラメータ変換
     params[:construction_datum][:address] = params[:addressX]
-	
+
+    #現場名を登録 
+    #未検証
+    #add190124
+    create_or_update_site
+    
     @construction_datum = ConstructionDatum.new(construction_datum_params)
     
         #工事開始日・終了日（実績）の初期値をセットする
@@ -184,6 +189,10 @@ class ConstructionDataController < ApplicationController
     if params[:addressX].present?
       params[:construction_datum][:address] = params[:addressX]
     end
+    
+    #現場名を登録 
+    #add190124
+    create_or_update_site
     
     if params[:directions].present?
 	  
@@ -297,6 +306,79 @@ class ConstructionDataController < ApplicationController
     
     
   end
+  
+  #文字列が数字かチェックする
+  def isNumeric(strData)
+    if strData.to_i.to_s == strData.to_s  
+      return true
+    end
+    
+    return false
+  end
+ 
+  
+  #190124
+  #現場マスターへの新規追加又は更新
+  def create_or_update_site
+  
+    numeric = false
+    @site = nil
+  
+    if isNumeric(params[:construction_datum][:site_id])
+      numeric = true
+      @site = Site.find(params[:construction_datum][:site_id])
+    else
+    #名称手入力されている場合は、名称で検索
+      @site = Site.where(["name = ?", 
+             params[:construction_datum][:site_id]]).first
+    end
+   
+    
+    if @site.nil?
+      #if numeric == false
+      if numeric == false && params[:construction_datum][:site_id] != ""
+      #文字の場合(コード入力はないものとする)
+        site_params = {name: params[:construction_datum][:site_id], post: params[:construction_datum][:post], 
+                       address: params[:construction_datum][:address], house_number: params[:construction_datum][:house_number],
+                       address2: params[:construction_datum][:address2] }
+      
+        @site = Site.create(site_params)
+        #生成された現場IDをパラメータに戻す
+        params[:construction_datum][:site_id] = @site.id
+      end
+    else
+    #更新
+      #（IDor手入力一致→住所のみ更新)
+      site_params = {post: params[:construction_datum][:post], 
+                     address: params[:construction_datum][:address], house_number: params[:construction_datum][:house_number],
+                     address2: params[:construction_datum][:address2] }
+      
+      @site.update(site_params)
+    end
+    
+    
+    #if @site.present?
+    #  purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+    #                    unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
+      
+    #  @purchase_unit_prices.update(purchase_unit_prices_params)
+    #else
+    ##該当なしの場合は新規追加  add180120
+	#   #仕入先用CDをセット
+	#   if params[:purchase_datum][:supplier_material_code].present?
+	#	  supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+	#   else
+#		  #仕入先品番が未入力の場合は、品番をそのままセットする
+	#	  supplier_masterial_code = params[:purchase_datum][:material_code]
+	#   end
+	
+    #  purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+    #                    supplier_material_code: supplier_masterial_code, 
+    #                    unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
+    #  @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_prices_params)
+    #end
+  end
+  ##
   
   #資料保管用のフォルダーをOneDriveへ作成する
   #winアプリ側で行うことにしたので、一旦保留(180910)
@@ -438,8 +520,32 @@ class ConstructionDataController < ApplicationController
     end
   end
   
-  #add170218 見積書などで使用
-  #upd171013
+  #現場名から住所をセットする
+  def get_site_address
+     
+	 #郵便番号・住所
+	 @post = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
+	 add1 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+	 #番地  
+	 num = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+	 add2 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+	 
+	 @address = ""
+	 if add1.present?
+	   @address = add1 
+	 end
+	 
+	 #番地
+	 if num.present?
+	   @house_number = num 
+	 end
+	 
+	 if add2.present?
+	   @address2 = add2 
+	 end
+  end
+  
+  #見積書などで使用
   def construction_and_customer_select
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
@@ -518,7 +624,7 @@ class ConstructionDataController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_datum_params
-      params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :construction_start_date, 
+      params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :site_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
     end

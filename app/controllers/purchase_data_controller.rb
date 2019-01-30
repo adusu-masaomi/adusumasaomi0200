@@ -234,6 +234,9 @@ class PurchaseDataController < ApplicationController
           report = PurchaseListPDF.create @purchase_list 
         when "2"
           report = PurchaseListBySupplierPDF.create @purchase_list_by_supplier
+        when "3"
+          #外注用請求
+          report = PurchaseListForOutsourcingPDF.create @purchase_list_for_outsourcing
 		end
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
@@ -388,13 +391,31 @@ class PurchaseDataController < ApplicationController
     #資材マスターの分類を更新
     update_material_category
     
-    
+    #add190124
+    #外注の場合に請求用の外注費をセット
+    outsourcing_invoice_flag = false
+    if params[:purchase_datum][:outsourcing_invoice_flag] == "1"
+      outsourcing_invoice_flag = true
+      @ajax_flag = false
+      set_default_outsourcing_data  #外注費データの初期値をセット
+    end
+        
     respond_to do |format|
       
-      #binding.pry
-    
-	  if @purchase_datum.save
-      #if @purchase_datum.create(purchase_datum_params)
+      #外注請求のチェック有りの場合は、ヴァリデーションを無効にする
+      save_check = false
+      if outsourcing_invoice_flag == false
+        save_check = @purchase_datum.save
+      else
+        save_check = @purchase_datum.save!(:validate => false)
+      end
+      #
+      
+	  #if @purchase_datum.save
+      if save_check
+        #add190125
+        #外注用の請求書発行
+        print_outsourcing_invoice(format)
   
         #伝票が重複しないように登録フラグをセット
         set_registerd_flag_to_headers
@@ -439,6 +460,7 @@ class PurchaseDataController < ApplicationController
   # PATCH/PUT /purchase_data/1.json
   def update
   
+   
    #viewで分解されたパラメータを、正常更新できるように復元させる。
    adjust_purchase_date_params
    
@@ -477,13 +499,35 @@ class PurchaseDataController < ApplicationController
    update_material_master
 
 
-   #upd180627
    #資材マスターの分類を更新
    update_material_category
-    
+   
+   #add190124
+   #外注の場合に請求用の外注費をセット
+   outsourcing_invoice_flag = false
+   if params[:purchase_datum][:outsourcing_invoice_flag] == "1"
+     outsourcing_invoice_flag = true
+     @ajax_flag = false
+     set_default_outsourcing_data  #外注費データの初期値をセット
+   end
+   
    respond_to do |format|
+      update_check = false
+      if outsourcing_invoice_flag == false
+        
+        update_check = @purchase_datum.update(purchase_datum_params)
+      else
+      #外注請求のチェック有りの場合は、ヴァリデーションを無効にする
+        @purchase_datum.assign_attributes(purchase_datum_params)
+        update_check = @purchase_datum.save!(:validate => false)
+      end
       
-      if @purchase_datum.update(purchase_datum_params)
+      #if @purchase_datum.update(purchase_datum_params)
+      if update_check   
+        
+        #add190125
+        #外注用の請求書発行
+        print_outsourcing_invoice(format)
         
         #伝票が重複しないように登録フラグをセット
         set_registerd_flag_to_headers
@@ -495,7 +539,6 @@ class PurchaseDataController < ApplicationController
         if trans == "new_inventory"
            flash[:notice] = "在庫マスターへ新規登録しました。資材マスターの在庫区分・在庫マスターの画像を登録してください。"
         end
-        
         
         #format.html { redirect_to @purchase_datum, notice: 'Purchase datum was successfully updated.' }
         #format.json { render :show, status: :ok, location: @purchase_datum }
@@ -512,6 +555,25 @@ class PurchaseDataController < ApplicationController
   
     end
   end
+  
+  #外注用の請求書発行
+  def print_outsourcing_invoice(format)
+      
+      #グローバルにカレントの仕入データをセット
+      $purchase_data_current = @purchase_datum
+  
+      format.pdf do
+        report = OutsourcingInvoicePDF.create @outsourcing_invoice 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "outsourcing_invoice_list.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+  end
+  
   
   #add180223
   #伝票が重複しないための登録フラグを見出しから取得
@@ -912,9 +974,211 @@ class PurchaseDataController < ApplicationController
     end
   end
   
+  #外注費データの初期値をセットする
+  def set_default_outsourcing_data
+    
+    @purchase_data = nil
+    if @ajax_flag == true
+      @purchase_data = PurchaseDatum.find(params[:id])
+    end
+    
+    #労務費をセット
+    #仕入先のパラメータがある場合のみ
+    construction_labor_cost = 0
+    
+    #あとで社員マスターとリンクさせる。ひとまず固定で。
+    staff_id = 0
+    @construction_datum_id = 0
+    purchase_amount = 0
+    @purchase_date = Date.today
+    
+    if @ajax_flag == false   #フォーム側から呼んだ場合
+        supplier_id = params[:purchase_datum][:supplier_id].to_i
+        @construction_datum_id = params[:purchase_datum][:construction_datum_id]
+        purchase_amount = params[:purchase_datum][:purchase_amount].to_i
+        @purchase_date = params[:purchase_datum][:purchase_date].to_date
+    else  #リストビュー側から呼んだ場合
+        supplier_id = @purchase_data.supplier_id
+        @construction_datum_id = @purchase_data.construction_datum_id
+        purchase_amount = @purchase_data.purchase_amount
+        @purchase_date = @purchase_data.purchase_date
+    end
+    
+    case supplier_id
+    when 37  #村山電気
+      staff_id = 3
+    when 31  #須戸
+      staff_id = 6
+    when 39  #小柳
+      staff_id = 5
+    else
+    end
+    #
+    
+    #請求書コードを取得
+    invoice_code = set_invoice_code
+    
+    #労務費を取得
+    construction_labor_cost = ConstructionDailyReport.where(:construction_datum_id => 
+         @construction_datum_id).where(:staff_id => staff_id).sum(:labor_cost)
+    
+    #作業開始日を取得
+    working_start_date = ConstructionDailyReport.where(:construction_datum_id => 
+         @construction_datum_id).where(:staff_id => staff_id).minimum(:working_date)
+    #作業終了日を取得
+    working_end_date = ConstructionDailyReport.where(:construction_datum_id => 
+         @construction_datum_id).where(:staff_id => staff_id).maximum(:working_date)
+    
+    #binding.pry
+    
+    #仕入金額をセット(外注労務費の、調整額とみなす)
+    billing_amount = 0
+    if purchase_amount > 0
+      billing_amount = purchase_amount
+    else
+    #未入力なら、労務費をセットする
+      billing_amount = construction_labor_cost
+    end
+    #purchase_amount = PurchaseDatum.where(:construction_datum_id => params[:purchase_datum][:construction_datum_id]).sum(:purchase_amount)
+    #実行金額をセット(不要なので保留・・・)
+	#execution_amount = construction_labor_cost + purchase_amount
+    
+        
+    #得意先から締め日・支払日を算出
+    get_customer_date_info
+    
+    outsourcing_cost = OutsourcingCost.where(:construction_datum_id => @construction_datum_id).
+                           where(:staff_id => staff_id).first
+    
+    #@purchase_date.strftime("%Y%m%d")
+    
+    if outsourcing_cost.nil?
+    #新規登録
+      outsourcing_params = {invoice_code: invoice_code, construction_datum_id: @construction_datum_id, staff_id: staff_id, 
+                            labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
+                            payment_due_date: @payment_due_date, working_start_date: working_start_date, 
+                            working_end_date: working_end_date}
+      outsourcing_cost = OutsourcingCost.create(outsourcing_params)
+    else
+    #更新
+      outsourcing_params = {labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
+                            payment_due_date: @payment_due_date, working_start_date: working_start_date, 
+                            working_end_date: working_end_date}
+                            
+      outsourcing_cost.update(outsourcing_params)
+    end
+    #@construction_costs[0].execution_amount = execution_amount
+    #end
+	
+  end
+  
+  #外注費データの初期値をセットする(ajax)
+  def set_ajax_outsourcing_default_data
+    
+    @ajax_flag = true
+     
+    #binding.pry
+     
+    set_default_outsourcing_data
+   
+  end
+  
+  #外注用の請求ナンバーを作成
+  def set_invoice_code
+    
+    purchaseDate = @purchase_date.strftime("%Y%m%d")
+    search_date = nil
+    
+    for i in 1..99 do
+      num = "%02d" % i
+      search_date = purchaseDate + num
+      outsourcing_cost = OutsourcingCost.where(:invoice_code => search_date).first
+      if outsourcing_cost.nil?
+        break
+      end
+    end
+    
+    return search_date
+    
+  end
+  
+  
+  #得意先から締め日・支払日を算出
+  def get_customer_date_info
+    
+    require "date"
+    
+    #construction = ConstructionDatum.find(params[:purchase_datum][:construction_datum_id])
+    construction = ConstructionDatum.find(@construction_datum_id)
+    
+    customer = nil
+    if construction.present?
+      customer = CustomerMaster.find(construction.customer_id)
+    end
+    
+    if customer.present?
+        @closing_date = nil
+        @payment_due_date = nil
+    
+        #締め日算出
+        if customer.closing_date_division == 1
+        #月末の場合
+          #d = params[:purchase_datum][:purchase_date]
+          d = @purchase_date
+          @closing_date = Date.new(d.year, d.month, -1)
+        else
+        #日付指定の場合
+          #d = params[:purchase_datum][:purchase_date].to_date
+          d = @purchase_date
+          if Date.valid_date?(d.year, d.month, customer.closing_date)
+            @closing_date = Date.new(d.year, d.month, customer.closing_date)
+          end
+        end
+        
+        #支払日算出
+        #d = params[:purchase_datum][:purchase_date].to_date
+        d = @purchase_date
+        if customer.due_date.present?
+          if Date.valid_date?(d.year, d.month, customer.due_date)
+            d2 = Date.new(d.year, d.month, customer.due_date)
+            addMonth = customer.due_date_division
+            @payment_due_date = d2 >> addMonth
+          end
+        end
+        
+    end
+    
+  end
+  
+  #####
+  
   # ajax
   
-  #add180929
+  #add190124
+  #外注の場合に、労務費をセットする
+  def get_labor_cost
+    
+    #あとで社員マスターとリンクさせる。ひとまず固定で。
+    staff_id = 0
+    supplier_id = params[:supplier_id].to_i
+    case supplier_id
+    when 37  #村山電気
+      staff_id = 3
+    when 31  #須戸
+      staff_id = 6
+    when 39  #小柳
+    else
+      staff_id = 5
+    end
+    #
+  
+  
+    #労務費をそのままセット
+      @purchase_unit_price = ConstructionDailyReport.where(:construction_datum_id => 
+         params[:construction_datum_id]).where(:staff_id => staff_id).sum(:labor_cost)
+  end
+  #
+  
   #検索クッキーをクリアする
   def clear_cookies
     
@@ -1045,7 +1309,8 @@ class PurchaseDataController < ApplicationController
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
                      :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
-                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :notes, :purchase_header_id )
+                     :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :outsourcing_invoice_flag, 
+                     :notes, :purchase_header_id )
     end
     
     def purchase_unit_prices_params

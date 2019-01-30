@@ -1,4 +1,8 @@
 Rails.application.routes.draw do
+  resources :outsourcing_costs
+  resources :sites
+  resources :site_names
+  resources :site_names
   resources :construction_attachments
   resources :material_categories
   resources :purchase_headers
@@ -170,6 +174,14 @@ Rails.application.routes.draw do
   # root :to => 'main_menu'
   
   get '/purchase_datum' => "purchase_data#index"
+  
+  #外注管理用設定
+  #add190129
+  resources :outsourcing_data
+  get '/outsourcing_data' => "outsourcing_data#index"
+  
+  #
+  
   # ajax
   
   #インデックスのdrag&dropによるソート用
@@ -200,16 +212,21 @@ Rails.application.routes.draw do
   get '/purchase_datum/unit_select' => 'purchase_data#unit_select'
   get '/purchase_datum/supplier_item_select' => 'purchase_data#supplier_item_select'
   
-  #add180627
   get '/purchase_datum/material_category_select' => 'purchase_data#material_category_select'
   
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
   get '/purchase_datum/construction_select_on_stocked' => 'purchase_data#construction_select_on_stocked'
   get '/purchase_datum/get_header_id' => 'purchase_data#get_header_id'
   
-  #ad180929
   get '/purchase_datum/clear_cookies' => 'purchase_data#clear_cookies'
+  #add190124
+  get '/purchase_datum/get_labor_cost' => 'purchase_data#get_labor_cost'
+  get '/purchase_datum/set_ajax_outsourcing_default_data' => 'purchase_data#set_ajax_outsourcing_default_data'
   
+  #add190129
+  get '/outsourcing_datum/set_ajax_outsourcing_default_data' => 'outsourcing_data#set_ajax_outsourcing_default_data'
+  get '/outsourcing_datum/set_payment_flag' => 'outsourcing_data#set_payment_flag'
+  #
   get "/purchase_order_historiez/get_data" => 'purchase_order_histories#get_data'
   
   get "/quotation_material_headerz/get_data" => 'quotation_material_headers#get_data'
@@ -243,14 +260,12 @@ Rails.application.routes.draw do
   #add170830
   get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
   get '/construction_dataz/delivery_slip_header_select' => 'construction_data#delivery_slip_header_select'
-  
-  #add171121
   get '/construction_dataz/customer_extract' => 'construction_data#customer_extract'
-  
-  #add180926
   get '/construction_dataz/set_order_flag' => 'construction_data#set_order_flag'
   get '/construction_dataz/set_billed_flag' => 'construction_data#set_billed_flag'
-  #
+  
+  #add190130
+  get '/construction_dataz/get_site_address' => 'construction_data#get_site_address'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -568,6 +583,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :outsourcing_costs
+  resources :sites
   resources :construction_attachments
   resources :material_categories
   resources :purchase_headers

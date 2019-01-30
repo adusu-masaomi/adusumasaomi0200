@@ -52,7 +52,7 @@
   <dt><strong>定価</strong></dt>
   <dd><%= @purchase_datum.list_price %></dd>
   <dt><strong>仕入業者</strong></dt>
-  <dd><%= @supplier_masters[(@purchase_datum.supplier_id)-1].supplier_name %></dd>
+  <dd><%= @purchase_datum.SupplierMaster.supplier_name %></dd>
   <dt><strong>伝票番号</strong></dt>
   <dd><%= @purchase_datum.slip_code %></dd>
   <dt><strong>仕入区分</strong></dt>

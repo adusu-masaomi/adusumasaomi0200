@@ -34,7 +34,15 @@
       <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
     <% end %>
     
-    </br><%= f.label :billed_flag, '請求済' %>
+    </br>
+    
+    <!--受注・請求・集計済の検索-->
+    <!-- add181004 -->
+    <%= f.label :order_flag, '受注済' %>
+    <%= f.select :order_flag_eq, ConstructionDatum.order_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'order_flag', style: 'width:80px'} %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearOrderFlag()" %>
+    <!-- add end -->
+    <%= f.label :billed_flag, '請求済' %>
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
     <!--<%= f.select :billed_flag_eq,options_for_select(ConstructionDatum.bills_check_list), {include_blank: true }, :style => "width:150px" %>-->
     <%= f.select :billed_flag_eq, ConstructionDatum.bills_check_list.map{ |value, key| [value, key] }, {include_blank: true}, {id: 'billed_flag', style: 'width:80px'} %>
@@ -308,6 +316,10 @@
   //工事コードを空にする
   function clearConstructionCode(){
     document.getElementById("construction_code_range").value = "";
+  }
+  //受注済を空にする
+  function clearOrderFlag(){
+    document.getElementById("order_flag").selectedIndex = 0;
   }
   //請求済を空にする
   function clearBilledFlag(){

@@ -158,6 +158,7 @@ ja:
        construction_datum: 工事データ
        staff: 社員マスター
        construction_daily_report: 労務データ
+       outsourcing_cost: 外注費データ
        affiliation: 所属マスター
        construction_cost: 工事費集計
        working_safety_matter: 作業安全事項マスター
@@ -187,6 +188,7 @@ ja:
        business_holiday: 会社休日マスター
        stocktake: 棚卸データ
        contact: 連絡先マスター
+       site: 現場マスター
        working_category: カテゴリーマスター
        working_subcategory: カテゴリーサブマスター
        task: 工程表データ
@@ -237,6 +239,8 @@ ja:
          complete_flag: 完了フラグ
        purchase_unit_price:
          unit_price: 仕入単価
+       site:
+         name: 現場名
        inventory_history:
          inventory_date: 入出庫日
          unit_price: 単価
@@ -286,6 +290,11 @@ ja:
          affiliation: 所属
          department: 役職
          partner_division_id: 取引区分
+       outsourcing_cost:
+         payment_amount: 支払金額
+         unpaid_amount: 未払金額
+         payment_due_date: 支払予定日
+         payment_date: 支払日
        working_category:
          category_name: カテゴリー名
        working_subcategory:

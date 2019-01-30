@@ -205,7 +205,9 @@
 		  if (obj == "0") {
 		  //歩掛りをマスターからセット(配管配線・機器取付の集計は除く)
 		    setLaborProductivityUnit();
-		    setLaborProductivityUnitTotal();
+		    
+            //del181010
+            //setLaborProductivityUnitTotal();
 		  }
 		}
      });
@@ -378,12 +380,17 @@
       $.get("<%= invoice_detail_large_classificationz_labor_productivity_unit_select_path %>",
        {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("labor_productivity_unit").textContent;
-          document.getElementById("labor_productivity_unit").value = obj;
+            obj = document.getElementById("labor_productivity_unit").textContent;
+            document.getElementById("labor_productivity_unit").value = obj;
+            
+            //upd181011
+            //ここで歩掛計をセットする
+            calcLaborTotal();
 		  }
       );      
   }
   //歩掛り計のセット
+  //181010 マスター上で登録されないため、現在は機能していない・・・
   function setLaborProductivityUnitTotal(){
 	  $.get("<%= invoice_detail_large_classificationz_labor_productivity_unit_total_select_path %>",
        {id: working_large_item_id },

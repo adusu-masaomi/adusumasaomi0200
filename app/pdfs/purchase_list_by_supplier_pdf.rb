@@ -65,6 +65,19 @@ class PurchaseListBySupplierPDF
 		  @purchase_amount_subtotal = @purchase_amount_subtotal + purchase_datum.purchase_amount
 		  @purchase_amount_total = @purchase_amount_total + purchase_datum.purchase_amount
 		end
+        
+        #add190124
+        construction_code = ""
+        construction_name = ""
+        customer_name = ""
+        if purchase_datum.construction_datum.present?
+          construction_code = purchase_datum.construction_datum.construction_code
+          construction_name = purchase_datum.construction_datum.construction_name
+          customer_name = purchase_datum.construction_datum.CustomerMaster.customer_name
+        end
+        #
+        
+        #
 		 #for i in 0..29   #29行分(for test)
 		    report.list(:default).add_row do |row|
 			           #品名のセット
@@ -116,10 +129,11 @@ class PurchaseListBySupplierPDF
 					   end
 					   #
 					   
+                       
 			           row.values purchase_date: purchase_datum.purchase_date,
-                                  construction_code: purchase_datum.construction_datum.construction_code,
-								  construction_name: purchase_datum.construction_datum.construction_name,
-								  customer_name: purchase_datum.construction_datum.CustomerMaster.customer_name,
+                                  construction_code: construction_code,
+								  construction_name: construction_name,
+								  customer_name: customer_name,
 					              purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              material_code: material_code,
                                   material_name: material_name,

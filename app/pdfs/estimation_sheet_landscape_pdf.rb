@@ -152,14 +152,29 @@ class EstimationSheetLandscapePDF
 		   @report.page.item(:construction_period2).value(@quotation_headers.construction_period) 
 		 
 		   #住所（工事場所）
-		   #upd171012 分割された住所を一つにまとめる。
-		   all_address = @quotation_headers.construction_place
-		   if @quotation_headers.construction_house_number.present?
+		   #分割された住所を一つにまとめる。
+		   
+           #all_address = @quotation_headers.construction_place
+           #upd181011 郵便番号追加
+           all_address = ""
+           if @quotation_headers.construction_post.present?
+             all_address = @quotation_headers.construction_post + "　"
+           end
+           all_address += @quotation_headers.construction_place
+		   #
+           
+           if @quotation_headers.construction_house_number.present?
 		     all_address += @quotation_headers.construction_house_number
 		   end
 		   if @quotation_headers.construction_place2.present?
-		     all_address += "　" + @quotation_headers.construction_place2
+             #upd181011
+             if !(all_address.blank?)  #住所・番地が入力されていたら、スペースを入れる（ない場合もある）
+               all_address += "　"
+             end
+		     #all_address += "　" + @quotation_headers.construction_place2
+             all_address += @quotation_headers.construction_place2
 		   end
+                      
 		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
 		   @report.page.item(:construction_place).value(all_address) 
 		   #

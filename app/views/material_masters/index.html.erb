@@ -8,20 +8,26 @@
    <!-- kaminari用追加箇所終了 -->
    
     <%= search_form_for @q do |f| %>
+   
    <%= f.label :material_code, '品番：：' %>
-   <%= f.select :id_eq, MaterialMaster.all.map{|st| [st.material_code, st.id]},
-           {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode"}  %>
+   <%= f.select :id_in, MaterialMaster.all.map{|st| [st.material_code, st.id]},
+           {include_blank: true},  {style: 'width:900px' , class: "searchableMaterialCode" , multiple: true}  %>
+   </br>
+   
+   
+   
    <%= f.label :material_code, '　品番(キーワード)：' %>
    <%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>
    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemKeyWords()" %>
    
    <%= f.label :material_code, '品名：' %>
    <%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %>
-   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %></br>
+   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %>
   
    <%= f.label :maker_code, 'メーカー：：' %>
    <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, 
          {style: 'width:220px' , class: "searchableMaker" } %>
+   
   
   	<div>
     	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
@@ -51,6 +57,7 @@
       <th><%= model_class.human_attribute_name(:material_name) %></th>
 	  <th>メーカー名</th>
       <th><%= model_class.human_attribute_name(:list_price) %></th>
+      <th>カテゴリ</th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -67,6 +74,13 @@
           <td>-</td>
         <% end %>
 	<td><%= number_to_currency(material_master.list_price, precision: 0) %></td>
+        
+        <% if material_master.material_category.present? %>
+          <td><%= material_master.material_category.name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        
         <td><%=l material_master.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

@@ -49,7 +49,10 @@ class DeliverySlipLandscapePDF
 		   @flag = "1"
 		   
 		   @delivery_slip_headers = DeliverySlipHeader.find(delivery_slip_detail_large_classification.delivery_slip_header_id)
-		   @construction_data = ConstructionDatum.find(@delivery_slip_headers.construction_datum_id)
+           @construction_data = nil
+           if ConstructionDatum.exists?(id: @delivery_slip_headers.construction_datum_id) 
+             @construction_data = ConstructionDatum.find(@delivery_slip_headers.construction_datum_id)
+           end
 		   @customer_masters = CustomerMaster.find(@delivery_slip_headers.customer_id)
 		   
 		   #消費税
@@ -89,8 +92,10 @@ class DeliverySlipLandscapePDF
 		   
 		   
 		   #工事CD
-		   @report.page.item(:construction_code).value(@construction_data.construction_code) 
-		   
+           if @construction_data.present?
+		     @report.page.item(:construction_code).value(@construction_data.construction_code) 
+		   end
+           
 		   #顧客CD
 		   @report.page.item(:customer_code).value(@customer_masters.id)
 		   
@@ -130,9 +135,17 @@ class DeliverySlipLandscapePDF
 		   @report.page.item(:construction_period2).value(@delivery_slip_headers.construction_period) 
 		 
 		   #住所（工事場所）
-		   #upd171012 分割された住所を一つにまとめる。
-		   all_address = @delivery_slip_headers.construction_place
-		   if @delivery_slip_headers.construction_house_number.present?
+		   #分割された住所を一つにまとめる。
+		   #all_address = @delivery_slip_headers.construction_place
+		   #upd181011 郵便番号追加
+           all_address = ""
+           if @delivery_slip_headers.construction_post.present?
+             all_address = @delivery_slip_headers.construction_post + "　"
+           end
+           all_address += @delivery_slip_headers.construction_place
+		   #
+                      
+           if @delivery_slip_headers.construction_house_number.present?
 		     all_address += @delivery_slip_headers.construction_house_number
 		   end
 		   if @delivery_slip_headers.construction_place2.present?

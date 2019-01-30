@@ -266,7 +266,9 @@
 		 obj = document.getElementById("construction_type").value;
 	     if (obj == "0") {
 	       setLaborProductivityUnit();
-		   setLaborProductivityUnitTotal();
+		   
+           //del181010
+           //setLaborProductivityUnitTotal();
 		 }
      });
 	 //単位--select2のタブインデックスはここで指定。
@@ -665,12 +667,16 @@
       $.get("<%= delivery_slip_detail_large_classificationz_labor_productivity_unit_select_path %>",
        {id: working_large_item_id },
         function(data){
-          obj = document.getElementById("labor_productivity_unit").textContent;
-          document.getElementById("labor_productivity_unit").value = obj;
+            obj = document.getElementById("labor_productivity_unit").textContent;
+            document.getElementById("labor_productivity_unit").value = obj;
+            //upd181011
+            //ここで歩掛計をセットする
+            calcLaborTotal();
 		  }
       );      
   }
   //歩掛り計のセット
+  //181010 マスター上で登録されないため、現在は機能していない・・・
   function setLaborProductivityUnitTotal(){
 	  $.get("<%= delivery_slip_detail_large_classificationz_labor_productivity_unit_total_select_path %>",
        {id: working_large_item_id },

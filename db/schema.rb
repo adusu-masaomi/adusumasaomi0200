@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180827020137) do
+ActiveRecord::Schema.define(version: 20190124020209) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -245,8 +245,6 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.string   "attachment",            limit: 255
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
-    t.string   "construction_datum",    limit: 255
-    t.string   "references",            limit: 255
   end
 
   create_table "construction_costs", force: :cascade do |t|
@@ -286,6 +284,7 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.string   "alias_name",                 limit: 255
     t.date     "reception_date"
     t.integer  "customer_id",                limit: 4
+    t.integer  "site_id",                    limit: 4
     t.date     "construction_start_date"
     t.date     "construction_end_date"
     t.date     "construction_period_start"
@@ -304,6 +303,7 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.integer  "delivery_slip_header_id",    limit: 4
     t.integer  "billed_flag",                limit: 4
     t.integer  "calculated_flag",            limit: 4
+    t.integer  "order_flag",                 limit: 4
     t.datetime "created_at",                                                     null: false
     t.datetime "update_at",                                                      null: false
   end
@@ -712,6 +712,25 @@ ActiveRecord::Schema.define(version: 20180827020137) do
 
   add_index "orders", ["purchase_order_history_id", "sequential_id"], name: "uq_seq", unique: true, using: :btree
 
+  create_table "outsourcing_costs", force: :cascade do |t|
+    t.integer  "construction_datum_id", limit: 4
+    t.integer  "staff_id",              limit: 4
+    t.integer  "purchase_amount",       limit: 4
+    t.integer  "supplies_expense",      limit: 4
+    t.integer  "labor_cost",            limit: 4
+    t.integer  "misellaneous_expense",  limit: 4
+    t.integer  "execution_amount",      limit: 4
+    t.integer  "billing_amount",        limit: 4
+    t.string   "purchase_order_amount", limit: 255
+    t.date     "closing_date"
+    t.integer  "payment_amount",        limit: 4
+    t.integer  "unpaid_amount",         limit: 4
+    t.date     "payment_due_date"
+    t.date     "payment_date"
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
   create_table "purchase_data", force: :cascade do |t|
     t.date     "purchase_date"
     t.string   "slip_code",                  limit: 255
@@ -767,9 +786,10 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.date     "purchase_order_date"
     t.integer  "supplier_master_id",      limit: 4
     t.integer  "purchase_order_datum_id", limit: 4
-    t.integer  "mail_sent_flag",          limit: 4, default: 0
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.integer  "mail_sent_flag",          limit: 4,   default: 0
+    t.string   "notes",                   limit: 255
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
   end
 
   create_table "purchase_unit_prices", force: :cascade do |t|
@@ -1041,6 +1061,9 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.integer  "supplier_master_id",         limit: 4
     t.string   "responsible",                limit: 255
     t.string   "email",                      limit: 255
+    t.string   "notes_1",                    limit: 255
+    t.string   "notes_2",                    limit: 255
+    t.string   "notes_3",                    limit: 255
     t.integer  "quotation_header_origin_id", limit: 4
     t.integer  "total_quotation_price_1",    limit: 4
     t.integer  "total_quotation_price_2",    limit: 4
@@ -1101,6 +1124,16 @@ ActiveRecord::Schema.define(version: 20180827020137) do
     t.date     "work_end_date"
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+  end
+
+  create_table "sites", force: :cascade do |t|
+    t.string   "name",         limit: 255
+    t.string   "post",         limit: 255
+    t.string   "address",      limit: 255
+    t.string   "house_number", limit: 255
+    t.string   "address2",     limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "staffs", force: :cascade do |t|

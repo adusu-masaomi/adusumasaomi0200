@@ -54,6 +54,8 @@ class MaterialMaster < ActiveRecord::Base
        [:with_maker, :with_category]
    end
    
+   
+   
    private
    def maker_existing
      errors.add(MakerMaster, :missing) if MakerMaster.blank?

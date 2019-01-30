@@ -132,8 +132,15 @@
   <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {:include_blank => true}, 
        {id:'inventory_division_id', :onchange => "uncheckUnitPriceInventory()", :class => "my-custom-class",
           style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"19" } %>
-  <%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %> 
-  <%= f.label :complete_flag, "入力完了", {} %> 
+  <!--190124とりあえずいらないので保留-->
+  <!--<%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>-->
+  <!--<%= f.label :complete_flag, "入力完了", {} %>-->
+  
+  <!--一旦保留
+  <%= f.check_box :outsourcing_invoice_flag , {id:'outsourcing_invoice_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>
+  <%= f.label :complete_flag, "労務費をセット(外注)", {} %>
+  -->
+  
   </br>
 	   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
@@ -161,6 +168,10 @@
                 purchase_order_id: params[:purchase_order_id], 
                 supplier_master_id: params[:supplier_master_id],
                 move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
+   
+  <!--一旦保留
+  <%= button_tag( '請求書(外注)', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank", :onclick => "setOutSourcingFlag()" ) %>-->
 <% end %>
 
 <script type="text/javascript">
@@ -359,8 +370,47 @@
         );
       });
 	  
+      
+      //外注請求書用のチェック
+      //一旦保留・・・
+      var checkbox = document.getElementById('outsourcing_invoice_flag');
+      //var details_div = document.getElementById('card_details');
+      checkbox.onchange = function() {
+        if(this.checked) {
+          var construction_datum_id = $("#construction_datum_id").val();
+          var supplier_id = $("#supplier_id").val();
+		  
+          if (document.getElementById('purchase_unit_price').value == "" || 
+               parseInt(document.getElementById('purchase_unit_price').value) == 0)
+          {
+	        $.get("<%= purchase_datum_get_labor_cost_path %>",
+              { construction_datum_id: construction_datum_id, supplier_id: supplier_id },
+                function(data){ 
+                     if (document.getElementById('unit_price_hide').innerText != undefined)
+                     {
+                       //労務費を単価にセット
+                       document.getElementById('purchase_unit_price').value = document.getElementById('unit_price_hide').innerText;
+                       //金額へもそのままセット
+                       document.getElementById('purchase_amount').value = document.getElementById('purchase_unit_price').value;
+                     }
+                }
+            );
+          }
+        
+        //    details_div.style['display'] = 'block';
+        } else {
+          //debugger;
+        }
+      };
 	
    });
+   
+   //外注フラグをチェックする
+   function setOutSourcingFlag(){
+     //一旦チェックを外してから、イベント発現させる
+     document.getElementById("outsourcing_invoice_flag").checked = false;
+     $('#outsourcing_invoice_flag').trigger('click');
+   }
    
    function initialMurayama(){
      //upd180220

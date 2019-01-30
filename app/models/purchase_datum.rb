@@ -16,6 +16,7 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :CustomerMaster,  :foreign_key => "customer_id"
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
     belongs_to :purchase_header  
+    #belongs_to :outsourcing_cost    #add190128
     
     #belongs_to :material_category #add180626
     
@@ -30,6 +31,8 @@ class PurchaseDatum < ActiveRecord::Base
     #add180223登録フラグ
     attr_accessor :complete_flag
     attr_accessor :complete_flag_hide
+    
+    attr_accessor :labor_cost_set  #add190129
     
     #attr_accessor :purchase_header_id_hide
     
@@ -142,6 +145,15 @@ class PurchaseDatum < ActiveRecord::Base
       where(:division_id => $INDEX_DIVISION_SHIPPING).sum(:quantity) * -1
     end
 	
+    #add190130
+    #請求・支払いチェック用(外注)
+    def self.invoice_check_list 
+      [["未", 0], ["済", 1]] 
+    end
+    
+    def self.payment_check_list 
+      [["未", 0], ["済", 1]] 
+    end
 	
 	#以下、全てcsv用
 	def csv_column_headers

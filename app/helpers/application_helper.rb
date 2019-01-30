@@ -106,4 +106,39 @@ module ApplicationHelper
     #return cookies
   end
   
+  #外注のIDから社員ID取得
+  #後でマスターから拾えるようにする
+  def getSupplierToStaff(supplier_id)
+    
+    case supplier_id
+    when 37  #村山電気
+      staff_id = 3
+    when 31  #須戸
+      staff_id = 6
+    when 39  #小柳
+      staff_id = 5
+    else
+      staff_id = 0
+    end
+    
+    return staff_id
+  end
+  #社員IDから仕入先ID取得
+  #後でマスターから拾えるようにする
+  def getStaffToSupplier(staff_id)
+    
+    case staff_id
+    when 3  #村山電気
+      supplier_id = 37
+    when 6  #須戸
+      supplier_id = 31
+    when 5  #小柳
+      supplier_id = 39
+    else
+      supplier_id = nil
+    end
+    
+    return supplier_id
+  end
+  
 end

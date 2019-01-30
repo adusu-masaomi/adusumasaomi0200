@@ -2,35 +2,19 @@ class ConstructionDatum < ActiveRecord::Base
 	#kaminari用設定
 	paginates_per 200  # 1ページあたり項目表示
 
-        #belongs_to :CustomerMaster
-        belongs_to :CustomerMaster, :foreign_key => "customer_id"
-        accepts_nested_attributes_for :CustomerMaster 
-        #belongs_to :purchase_order_datum
-	belongs_to :PurchaseDivisionMaster
-    
-	#add170307
-    #belongs_to :construction_costs, :foreign_key => "construction_datum_id"
-   
-    #belongs_to :purchase_order_datum, :foreign_key => "construction_id"
-	has_many :purchase_order_datum
+    belongs_to :CustomerMaster, :foreign_key => "customer_id"
+    accepts_nested_attributes_for :CustomerMaster 
+    belongs_to :PurchaseDivisionMaster
+    belongs_to :site    #add190124
+    has_many :purchase_order_datum
 	has_many :construction_daily_reports
-	
-	#add170912
 	has_many :construction_costs, :foreign_key => "construction_datum_id"
-	#belongs_to :construction_costs
-	
-    #add180827
-    #has_many :construction_attachments
-    #accepts_nested_attributes_for :construction_attachments
-    
-    #upd180828
-    has_many :construction_attachments, dependent: :destroy
+	has_many :construction_attachments, dependent: :destroy
     accepts_nested_attributes_for :construction_attachments, allow_destroy: true
     #
     
 	#発行日用
     attr_accessor :issue_date
-	
 	#作業日・作業者（指示書発行一時用）
 	attr_accessor :working_date
 	attr_accessor :staff_id
@@ -40,8 +24,7 @@ class ConstructionDatum < ActiveRecord::Base
     validates :construction_code, presence: true, uniqueness: true
 	validates :alias_name, presence: true
     
-	##add180123
-    #住所に番地等を入れないようにするためのバリデーション(冗長だが他に方法が見当たらない)
+	#住所に番地等を入れないようにするためのバリデーション(冗長だが他に方法が見当たらない)
     ADDRESS_ERROR_MESSAGE = "番地（番地）は入力できません。"
     ADDRESS_ERROR_MESSAGE_2 = "番地（丁目）は入力できません。"
 	ADDRESS_ERROR_MESSAGE_3 = "番地（ハイフン）は入力できません。"
@@ -61,17 +44,11 @@ class ConstructionDatum < ActiveRecord::Base
         errors.add :address, ADDRESS_ERROR_MESSAGE_4
       end
     end
-    ##add end 
-
+    
     #緯度経度の自動登録
-    #add170620
     geocoded_by :address_with_house_number
     after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
-	#geocoded_by :address
-    #after_validation :geocode, if: lambda {|obj| obj.address_changed?}
-	
-	#scope :with_id, -> { where(id: "purchase_order_data.construction_id")} 
 	scope :with_id,  -> { joins(:purchase_order_datum) }
 	
 	def self.ransackable_scopes(auth_object=nil)
@@ -85,9 +62,7 @@ class ConstructionDatum < ActiveRecord::Base
 	  else
         address_with_house_number = self.address + self.house_number
       end
-	  
 	end
-	
 	
 	#リスト表示用(CD/名称)
 	def p_cd_name
@@ -102,7 +77,6 @@ class ConstructionDatum < ActiveRecord::Base
            construction_name = self.construction_name
         end        
 
-        #self.construction_code + ':' + self.construction_name
         construction_code + ':' + construction_name 
     end
 	
@@ -119,15 +93,17 @@ class ConstructionDatum < ActiveRecord::Base
            alias_name = self.alias_name
         end        
 
-        #self.construction_code + ':' + self.construction_name
         construction_code + ':' + alias_name 
     end
 	
-	def self.bills_check_list 
+    def self.order_check_list 
       [["未", 0], ["済", 1]] 
     end
     
-    #add180305
+    def self.bills_check_list 
+      [["未", 0], ["済", 1]] 
+    end
+    
     def self.calculated_check_list 
       [["未", 0], ["済", 1]] 
     end

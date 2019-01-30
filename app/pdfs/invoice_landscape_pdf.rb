@@ -51,8 +51,11 @@ class InvoiceLandscapePDF
 		   @flag = "1"
 		   
 		   @invoice_headers = InvoiceHeader.find(invoice_detail_large_classification.invoice_header_id)
-		   @construction_data = ConstructionDatum.find(@invoice_headers.construction_datum_id)
-		   @customer_masters = CustomerMaster.find(@invoice_headers.customer_id)
+           @construction_data = nil
+           if ConstructionDatum.exists?(id: @invoice_headers.construction_datum_id)  
+             @construction_data = ConstructionDatum.find(@invoice_headers.construction_datum_id)
+           end
+           @customer_masters = CustomerMaster.find(@invoice_headers.customer_id)
 		   #add170119
 		   @construction_costs = ConstructionCost.find_by(construction_datum_id: @invoice_headers.construction_datum_id)
 		       
@@ -91,8 +94,10 @@ class InvoiceLandscapePDF
 		   end
 		   
 		   #工事CD
-		   @report.page.item(:construction_code).value(@construction_data.construction_code) 
-		   
+           if @construction_data.present?
+		     @report.page.item(:construction_code).value(@construction_data.construction_code) 
+		   end
+           
 		   #顧客CD
 		   @report.page.item(:customer_code).value(@customer_masters.id)
 		   

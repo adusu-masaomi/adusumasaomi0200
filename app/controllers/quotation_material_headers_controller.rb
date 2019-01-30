@@ -976,10 +976,13 @@ class QuotationMaterialHeadersController < ApplicationController
 
   # ajax
   def email_select
+    
     @email = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
 	  @responsible = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
 	 
-    quotation_material_header = QuotationMaterialHeader.find(params[:id]) #add181002
+    #quotation_material_header = QuotationMaterialHeader.find(params[:id]) #add181002
+    #upd181126
+    quotation_material_header = QuotationMaterialHeader.where(params[:id]).first
    
 	  exist = false
 	 

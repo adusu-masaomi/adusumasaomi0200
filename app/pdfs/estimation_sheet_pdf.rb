@@ -127,7 +127,16 @@ class EstimationSheetPDF
 		 
 		   #住所（工事場所）
 		   #upd171012 分割された住所を一つにまとめる。
-		   all_address = @quotation_headers.construction_place
+           
+           #upd181015 郵便番号追加
+           all_address = ""
+           if @quotation_headers.construction_post.present?
+             all_address = @quotation_headers.construction_post + "　"
+           end
+           #
+           
+           all_address += @quotation_headers.construction_place
+		   #all_address = @quotation_headers.construction_place
 		   if @quotation_headers.construction_house_number.present?
 		     all_address += @quotation_headers.construction_house_number
 		   end

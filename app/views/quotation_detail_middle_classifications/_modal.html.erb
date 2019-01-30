@@ -568,26 +568,32 @@
       //    document.getElementById("labor_unit_price").value = obj;
 	  //  }
       //);      
+      
       //歩掛り
       $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_select_path %>",
        {id: working_middle_item_id },
         function(data){
-          obj = document.getElementById("labor_productivity_unit").textContent;
-          document.getElementById("labor_productivity_unit").value = obj;
-		  }
+            obj = document.getElementById("labor_productivity_unit").textContent;
+            document.getElementById("labor_productivity_unit").value = obj;
+            
+            //add181011
+            //ここで歩掛計をセットする
+            calcLaborTotal();
+          }
       );      
 	  
-	  //歩掛り計
-	  //add170626
-	  if (construction_type == 0) {
-        $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_total_select_path %>",
-         {id: working_middle_item_id },
-          function(data){
-            obj = document.getElementById("labor_productivity_unit_total").textContent;
-            document.getElementById("labor_productivity_unit_total").value = obj;
-		  }
-        );      
-	  }
+      //歩掛り計
+	  //del181011
+      //マスター上で登録しないため、現在は機能していない・・・
+      //if (construction_type == 0) {
+      //  $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_total_select_path %>",
+      //   {id: working_middle_item_id },
+      //    function(data){
+      //      obj = document.getElementById("labor_productivity_unit_total").textContent;
+      //      document.getElementById("labor_productivity_unit_total").value = obj;
+	  //    }
+      //  );      
+	  //}
 	  
       //170112一旦保留
 	  //使用材料数

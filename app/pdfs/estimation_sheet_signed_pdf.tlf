@@ -642,17 +642,17 @@
       "display": true,
       "description": "",
       "x": 414,
-      "y": 338.5,
-      "width": 165,
-      "height": 10,
+      "y": 337,
+      "width": 171.2,
+      "height": 12.1,
       "style": {
         "font-family": [
-          "Helvetica"
+          "IPAMincho"
         ],
         "font-size": 9,
         "color": "#000000",
         "text-align": "left",
-        "vertical-align": "top",
+        "vertical-align": "middle",
         "line-height": "",
         "line-height-ratio": "",
         "letter-spacing": "",
@@ -662,7 +662,7 @@
       },
       "reference-id": "",
       "value": "",
-      "multiple-line": false,
+      "multiple-line": true,
       "format": {
         "base": "",
         "type": ""

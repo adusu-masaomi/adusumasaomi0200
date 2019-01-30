@@ -26,10 +26,16 @@ class InvoiceListPDF
 	 @last_month = ""
 	 @year = ""
 	 
+     #binding.pry
+     
+     
 	 #$purchase_data.joins(:purchase_order_datum).order("purchase_order_code, purchase_date, id").each do |invoice_header|
      #$invoice_headers.order("invoice_date, customer_id, construction_datum_id").each do |invoice_header|
-     $invoice_headers.order("invoice_code").each do |invoice_header| 
+     
+     #モデルのページングの制限があるので、ここで(limit)解除させる--年２００件として２０年間くらいを最大とする
+     $invoice_headers.order("invoice_code").limit(5000).each do |invoice_header| 
         
+         
          #---見出し---
 		 #dt = Time.now.strftime('%Y/%m/%d %H:%M:%S')
 		 dt = Time.now.strftime('%Y/%m/%d')
@@ -50,8 +56,10 @@ class InvoiceListPDF
 		 end
 		
           #binding.pry
-		    
-		    report.list(:default).add_row do |row|
+		   
+              
+            
+		  report.list(:default).add_row do |row|
 			  
               
               #備考欄の背景色(非表示)
@@ -233,6 +241,7 @@ class InvoiceListPDF
                   end
               end
               
+              
 			  #明細行出力
 			  row.values invoice_code: invoice_header.invoice_code,
 			             invoice_date: invoice_date,
@@ -250,9 +259,8 @@ class InvoiceListPDF
 			    @month = invoice_date.mon
 			    @year = invoice_date.year
               end
-				
-            end 
-
+		      
+          end 
 
 	end	
 #end   
