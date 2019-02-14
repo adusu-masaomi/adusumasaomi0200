@@ -1,6 +1,11 @@
 class QuotationHeader < ActiveRecord::Base
    paginates_per 200  # 1ページあたり項目表示
+   
    belongs_to :ConstructionDatum, :foreign_key => "construction_datum_id"
+   
+   #not work well..
+   #belongs_to :construction_datum, :foreign_key => "construction_datum_id"
+   #accepts_nested_attributes_for :construction_datum, update_only: true    #add190131
    
    belongs_to :customer_master, :foreign_key => "customer_id"
    accepts_nested_attributes_for :customer_master, update_only: true

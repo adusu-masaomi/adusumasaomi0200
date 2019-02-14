@@ -108,10 +108,14 @@ class InvoiceHeadersController < ApplicationController
       if @invoice_header.save
 	  
         #顧客Mも更新
-		if @manual_flag.blank?  #add170809
+		if @manual_flag.blank?  
 	      update_params_customer
 	    end
-	  
+	    
+        #工事担当者を更新
+        #add190131
+        update_construction_personnel
+        
         format.html { redirect_to @invoice_header, notice: 'Invoice header was successfully created.' }
         format.json { render :show, status: :created, location: @invoice_header }
       else
@@ -136,10 +140,13 @@ class InvoiceHeadersController < ApplicationController
       if @invoice_header.update(invoice_header_params)
 
 		#顧客Mも更新
-		if @manual_flag.blank?  #add170809
+		if @manual_flag.blank?  
           update_params_customer
         end
-
+        #工事担当者を更新
+        #add190131
+        update_construction_personnel
+        
         format.html { redirect_to @invoice_header, notice: 'Invoice header was successfully updated.' }
         format.json { render :show, status: :ok, location: @invoice_header }
       else
@@ -207,7 +214,23 @@ class InvoiceHeadersController < ApplicationController
   
     end 
   end
-  
+  #add190131
+  #工事Mの担当者を更新
+  def update_construction_personnel
+    
+    #名称 
+    if params[:invoice_header][:customer_name].present? && params[:invoice_header][:customer_name] != ""
+      id = params[:invoice_header][:construction_datum_id].to_i
+      construction = ConstructionDatum.where(:id => id).first
+      
+      if construction.present?    #マスター削除を考慮
+        construction_params = { personnel: params[:invoice_header][:responsible1] }
+        #更新する
+	    construction.update(construction_params)
+      end
+      
+    end
+  end
   def update_params_customer
   #顧客Mの敬称・担当を更新する(未登録の場合)
     
@@ -225,10 +248,12 @@ class InvoiceHeadersController < ApplicationController
         if params[:invoice_header][:honorific_id].present?
           params[:invoice_header][:customer_master_attributes][:honorific_id] = params[:invoice_header][:honorific_id]
         end
+        
+        #del190131
         #担当1
-        if params[:invoice_header][:responsible1].present?
-          params[:invoice_header][:customer_master_attributes][:responsible1] = params[:invoice_header][:responsible1]
-		end
+        #if params[:invoice_header][:responsible1].present?
+        #  params[:invoice_header][:customer_master_attributes][:responsible1] = params[:invoice_header][:responsible1]
+		#end
 		#担当2
         if params[:invoice_header][:responsible2].present?
           params[:invoice_header][:customer_master_attributes][:responsible2] = params[:invoice_header][:responsible2]

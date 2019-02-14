@@ -580,6 +580,8 @@ $.fn.keepPosition = function(){
        if (typeof bodyDiv != 'undefined'){  //←これがないとエラーが出るケース有
          div_top = bodyDiv.scrollTop();
          $.cookie(key, div_top);
+       
+         
        }
     });
   });

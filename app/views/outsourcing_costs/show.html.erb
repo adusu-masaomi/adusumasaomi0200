@@ -20,8 +20,10 @@
   <dd><%= @outsourcing_cost.unpaid_amount %></dd>
   <dt><strong><%= model_class.human_attribute_name(:payment_due_date) %>:</strong></dt>
   <dd><%= @outsourcing_cost.payment_due_date %></dd>
-  <dt><strong><%= model_class.human_attribute_name(:payment_date) %>:</strong></dt>
+	<dt><strong><%= model_class.human_attribute_name(:payment_date) %>:</strong></dt>
   <dd><%= @outsourcing_cost.payment_date %></dd>
+	<dt><strong><%= model_class.human_attribute_name(:unpaid_payment_date) %>:</strong></dt>
+  <dd><%= @outsourcing_cost.unpaid_payment_date %></dd>
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

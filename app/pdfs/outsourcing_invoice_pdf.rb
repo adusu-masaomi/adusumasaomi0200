@@ -2,12 +2,20 @@ class OutsourcingInvoicePDF
    
   def self.create outsourcing_invoice
      #仕入表(仕入先別)PDF発行
- 
-       # tlfファイルを読み込む
-       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_pdf.tlf")
+     for num in 1..2 do
+  
+         if num == 1
+  
+          # tlfファイルを読み込む
+          report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_pdf.tlf")
        
-        # 1ページ目を開始
-        report.start_new_page
+          # 1ページ目を開始
+          report.start_new_page
+        else
+          report.start_new_page layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_r_pdf.tlf"
+        
+        end
+        
         
         #初期化
         #@flag = nil
@@ -46,8 +54,12 @@ class OutsourcingInvoicePDF
 		report.page.item(:invoice_code).value(outsourcing_cost.invoice_code)
 		 
         #発行日(仕入日)
-        if $purchase_data_current.purchase_date.present?
-		     @gengou = $purchase_data_current.purchase_date
+        #if $purchase_data_current.purchase_date.present?
+		#     @gengou = $purchase_data_current.purchase_date
+        #upd190205
+        #発行日=作業完了日
+        if outsourcing_cost.present? && outsourcing_cost.working_end_date.present?
+		     @gengou = outsourcing_cost.working_end_date
 		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
              
              report.page.item(:purchase_date).value(@gengou)
@@ -156,8 +168,9 @@ class OutsourcingInvoicePDF
         #最終ページの出力はここで定義する
         #page_count = report.page_count.to_s + "頁"
         #report.page.item(:pageno).value(page_count)
-
-		
+    #for文の最終
+    end
+    
         # ThinReports::Reportを返す
         return report
 		

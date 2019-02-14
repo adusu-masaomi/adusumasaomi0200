@@ -61,10 +61,16 @@ class InvoicePDF
 		   @report.page.item(:honorific).value(honorific_name) 
 		   
 		   #担当1
-		   if @invoice_headers.responsible1.present?
-		     responsible = @invoice_headers.responsible1 + "  様"
+		   #upd190131
+           if @invoice_headers.ConstructionDatum.present? && 
+                !@invoice_headers.ConstructionDatum.personnel.blank?
+             responsible = @invoice_headers.ConstructionDatum.personnel + "  様"
 		     @report.page.item(:responsible1).value(responsible)
-		   end
+           end
+           #if @invoice_headers.responsible1.present?
+		   #  responsible = @invoice_headers.responsible1 + "  様"
+		   #  @report.page.item(:responsible1).value(responsible)
+		   #end
 		   #担当2
 		   if @invoice_headers.responsible2.present?
 		     responsible = @invoice_headers.responsible2 + "  様"

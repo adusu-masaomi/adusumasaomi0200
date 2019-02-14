@@ -10,14 +10,17 @@
     <%= search_form_for @q do |f| %>
    
    <%= f.label :material_code, '品番：：' %>
-   <%= f.select :id_in, MaterialMaster.all.map{|st| [st.material_code, st.id]},
-           {include_blank: true},  {style: 'width:900px' , class: "searchableMaterialCode" , multiple: true}  %>
+   <!--<%= f.select :id_in, MaterialMaster.all.map{|st| [st.material_code, st.id]},
+           {include_blank: true},  {style: 'width:900px' , class: "searchableMaterialCode" , multiple: true}  %>-->
+   <%= f.select :id_in, options_from_collection_for_select(MaterialMaster.all, "id", :p_material_code, params[:q].try(:[], :id_in)) ,
+       {include_blank: true}, {style: 'width:900px' , class: "searchableMaterialCode", multiple: true }  %>
+   
    </br>
    
-   
+   <div style="margin-left:-13px;">
    
    <%= f.label :material_code, '　品番(キーワード)：' %>
-   <%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>
+   <%= f.text_field :material_code_or_internal_code_cont, include_blank: true , id: 'material_code' %>
    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemKeyWords()" %>
    
    <%= f.label :material_code, '品名：' %>
@@ -28,7 +31,16 @@
    <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, 
          {style: 'width:220px' , class: "searchableMaker" } %>
    
-  
+   <!--<%= f.label :internal_code, '　社番(キーワード)：' %>
+   <%= f.text_field :internal_code_cont, include_blank: true , id: 'internal_code' %>
+   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearInternalKeyWords()" %>-->
+   
+   </div>
+   
+   <%= f.label :material_category_id, '分類：：' %>
+   <%= f.select :material_category_id_eq, MaterialCategory.all.map{|st| [st.name, st.id]}, {include_blank: true}, 
+         {style: 'width:220px' , class: "searchableCategory" } %>
+   
   	<div>
     	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
         <%= link_to t('.new', :default => t("helpers.links.new")),
@@ -53,7 +65,8 @@
     <tr>
       <!--<th><%= model_class.human_attribute_name(:id) %></th>-->
       <th><%= sort_link(@q, :id, model_class.human_attribute_name(:id), default_order: :desc ) %></th>
-	  <th><%= model_class.human_attribute_name(:material_code) %></th>
+	  <th><%= sort_link(@q, :material_code, model_class.human_attribute_name(:material_code) ) %></th>
+      <th><%= sort_link(@q, :internal_code, model_class.human_attribute_name(:internal_code) ) %></th>
       <th><%= model_class.human_attribute_name(:material_name) %></th>
 	  <th>メーカー名</th>
       <th><%= model_class.human_attribute_name(:list_price) %></th>
@@ -67,6 +80,7 @@
       <tr>
         <td><%= link_to material_master.id, material_master_path(material_master) %></td>
         <td><%= material_master.material_code %></td>
+        <td><%= material_master.internal_code %></td>
         <td><%= material_master.material_name %></td>
         <% if material_master.MakerMaster.present? %>
           <td><%= material_master.MakerMaster.maker_name %></td>
@@ -105,6 +119,7 @@
   //検索可能なリストボックス
   $(document).ready(function(){
         $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        $(".searchableCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
         $(".searchableMaker").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
         
 		//見出し固定用設定追加
@@ -126,6 +141,10 @@
   //品番キーワード検索ボックスを空にする
   function clearItemKeyWords(){
     document.getElementById("material_code").value = "";
+  }
+  //社番キーワード検索ボックスを空にする
+  function clearInternalKeyWords(){
+    document.getElementById("internal_code").value = "";
   }
   //品名検索ボックスを空にする
   function clearItemName(){

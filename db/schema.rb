@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190124020209) do
+ActiveRecord::Schema.define(version: 20190130052237) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -284,6 +284,7 @@ ActiveRecord::Schema.define(version: 20190124020209) do
     t.string   "alias_name",                 limit: 255
     t.date     "reception_date"
     t.integer  "customer_id",                limit: 4
+    t.string   "personnel",                  limit: 255
     t.integer  "site_id",                    limit: 4
     t.date     "construction_start_date"
     t.date     "construction_end_date"
@@ -713,8 +714,11 @@ ActiveRecord::Schema.define(version: 20190124020209) do
   add_index "orders", ["purchase_order_history_id", "sequential_id"], name: "uq_seq", unique: true, using: :btree
 
   create_table "outsourcing_costs", force: :cascade do |t|
+    t.string   "invoice_code",          limit: 255
     t.integer  "construction_datum_id", limit: 4
     t.integer  "staff_id",              limit: 4
+    t.date     "working_start_date"
+    t.date     "working_end_date"
     t.integer  "purchase_amount",       limit: 4
     t.integer  "supplies_expense",      limit: 4
     t.integer  "labor_cost",            limit: 4
@@ -751,10 +755,12 @@ ActiveRecord::Schema.define(version: 20190124020209) do
     t.integer  "supplier_id",                limit: 4
     t.integer  "inventory_division_id",      limit: 4
     t.integer  "unit_price_not_update_flag", limit: 4
+    t.integer  "outsourcing_invoice_flag",   limit: 4,   default: 0
+    t.integer  "outsourcing_payment_flag",   limit: 4,   default: 0
     t.integer  "purchase_header_id",         limit: 4
     t.string   "notes",                      limit: 255
-    t.datetime "created_at",                             null: false
-    t.datetime "update_at",                              null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "update_at",                                          null: false
   end
 
   create_table "purchase_divisions", force: :cascade do |t|

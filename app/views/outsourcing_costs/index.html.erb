@@ -6,7 +6,7 @@
    
    <%= f.label :construction_code, '工事名　' %>
    <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, 
-             {style: 'width:400px' , class: "searchableSelect2_1" } %>
+             {style: 'width:400px' , class: "searchableConstruction" } %>
   
    <%= f.label :staff_id, '社員' %>
    <%= f.select :staff_id_eq, Staff.all.map{|st| [st.staff_name, st.id]}, {include_blank: true}, { id: 'staff_id_eq', style: 'width:220px'} %>
@@ -35,13 +35,16 @@
       <th><%= model_class.human_attribute_name(:labor_cost) %></th>
       <!--<th><%= model_class.human_attribute_name(:misellaneous_expense) %></th>-->
       <!--<th><%= model_class.human_attribute_name(:execution_amount) %></th>-->
-      <th><%= model_class.human_attribute_name(:billing_amount) %></th>
+      <th><%= model_class.human_attribute_name(:billing_amount) %>(税抜)</th>
+      <th><%= model_class.human_attribute_name(:billing_amount) %>(税込)</th>
       <!--<th><%= model_class.human_attribute_name(:purchase_order_amount) %></th>-->
       <th><%= model_class.human_attribute_name(:closing_date) %></th>
       <th><%= model_class.human_attribute_name(:payment_amount) %></th>
       <th><%= model_class.human_attribute_name(:unpaid_amount) %></th>
+      <th>合計</th>
       <th><%= model_class.human_attribute_name(:payment_due_date) %></th>
       <th><%= model_class.human_attribute_name(:payment_date) %></th>
+      <th><%= model_class.human_attribute_name(:unpaid_payment_date) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -50,22 +53,37 @@
     <% @outsourcing_costs.each do |outsourcing_cost| %>
       <tr>
         <td><%= link_to outsourcing_cost.id, outsourcing_cost_path(outsourcing_cost) %></td>
-        <td><%= outsourcing_cost.construction_datum.construction_name %></td>
+        <% if outsourcing_cost.construction_datum.present? %>
+          <td><%= outsourcing_cost.construction_datum.construction_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
         <!--<td><%= outsourcing_cost.staff_id %></td>-->
-        <td><%= outsourcing_cost.staff.staff_name %></td>
+        <% if outsourcing_cost.staff.present? %>
+          <td><%= outsourcing_cost.staff.staff_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
         
         <!--<td><%= outsourcing_cost.purchase_amount %></td>-->
         <!--<td><%= outsourcing_cost.supplies_expense %></td>-->
-        <td><%= outsourcing_cost.labor_cost %></td>
+        <td><%= number_to_currency(outsourcing_cost.labor_cost * $consumption_tax_include, :precision => 0 ) %></td>
         <!--<td><%= outsourcing_cost.misellaneous_expense %></td>-->
         <!--<td><%= outsourcing_cost.execution_amount %></td>-->
-        <td><%= outsourcing_cost.billing_amount %></td>
+        <td><%= number_to_currency(outsourcing_cost.billing_amount, :precision => 0 )  %></td>
+        <td><%= number_to_currency(outsourcing_cost.billing_amount * $consumption_tax_include, :precision => 0 ) %></td>
         <!--<td><%= outsourcing_cost.purchase_order_amount %></td>-->
         <td><%= outsourcing_cost.closing_date %></td>
-        <td><%= outsourcing_cost.payment_amount %></td>
-        <td><%= outsourcing_cost.unpaid_amount %></td>
+        <td><%= number_to_currency(outsourcing_cost.payment_amount, :precision => 0 ) %></td>
+        <td><%= number_to_currency(outsourcing_cost.unpaid_amount, :precision => 0 ) %></td>
+        <% if outsourcing_cost.unpaid_amount.present? %>
+          <td><%= number_to_currency(outsourcing_cost.payment_amount + outsourcing_cost.unpaid_amount, :precision => 0 ) %></td>
+        <% else %>
+          <td><%= number_to_currency(outsourcing_cost.payment_amount , :precision => 0 ) %></td>
+        <% end %>
         <td><%= outsourcing_cost.payment_due_date %></td>
         <td><%= outsourcing_cost.payment_date %></td>
+        <td><%= outsourcing_cost.unpaid_payment_date %></td>
         <td><%=l outsourcing_cost.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
@@ -91,7 +109,8 @@
   //検索可能なリストボックス
   $(document).ready(function(){
 	
-		
+		$(".searchableConstruction").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    
 		//見出し固定用設定追加
 		//var sz = window.parent.screen.width;
 		//var fc = 1;    //デフォルトの固定列数(社長PC基準)

@@ -64,10 +64,16 @@ class DeliverySlipPDF
 		   @report.page.item(:honorific).value(honorific_name) 
 		   
 		   #担当1
-		   if @delivery_slip_headers.responsible1.present?
-		     responsible = @delivery_slip_headers.responsible1 + "  様"
+		   #upd190131
+           if @delivery_slip_headers.ConstructionDatum.present? && 
+                !@delivery_slip_headers.ConstructionDatum.personnel.blank?
+             responsible = @delivery_slip_headers.ConstructionDatum.personnel + "  様"
 		     @report.page.item(:responsible1).value(responsible)
-		   end
+           end
+           #if @delivery_slip_headers.responsible1.present?
+		   #  responsible = @delivery_slip_headers.responsible1 + "  様"
+		   #  @report.page.item(:responsible1).value(responsible)
+		   #end
 		   #担当2
 		   if @delivery_slip_headers.responsible2.present?
 		     responsible = @delivery_slip_headers.responsible2 + "  様"

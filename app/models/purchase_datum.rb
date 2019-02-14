@@ -16,7 +16,8 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :CustomerMaster,  :foreign_key => "customer_id"
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
     belongs_to :purchase_header  
-    #belongs_to :outsourcing_cost    #add190128
+    
+    #belongs_to :outsourcing_cost    #add190213
     
     #belongs_to :material_category #add180626
     
@@ -97,18 +98,22 @@ class PurchaseDatum < ActiveRecord::Base
 	    joins(:MaterialMaster).where("material_masters.material_name like ?", '%' + material_name + '%' )
 	  end
     }
-	
-    #add180626
+    #add190206
+    #scope :with_internal_code, -> (id=1) { 
+	#  if id.present?
+	#    joins(:MaterialMaster).where("material_masters.id = ?", id )
+	#  end
+    #}
+    
     scope :with_material_category, -> (material_category_id=1) { 
 	  if material_category_id.present?
 	    joins(:MaterialMaster).where("material_category_id = ?", material_category_id )
 	  end
     }
     
-    #upd180626
-	def self.ransackable_scopes(auth_object=nil)
-        [:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, :with_material_code_include, 
-         :with_material_category, :with_material_name_include]
+    def self.ransackable_scopes(auth_object=nil)
+        [:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, 
+         :with_material_code_include, :with_material_category, :with_material_name_include]
 	end
 	
 	def self.to_csv(options = {})

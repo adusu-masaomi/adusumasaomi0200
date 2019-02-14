@@ -45,30 +45,27 @@ class PurchaseDataController < ApplicationController
         #ransack保持用コード
         query = params[:q]
 
-        
-        #query ||= eval(cookies[:reset_purchase].to_s)  	#add180929
-        
-        #upd181001 
         #クッキーへのget/putはヘルパーに設定
         cky = get_cookies("recent_search_history_purchase")
         query ||= eval(cky.to_s)   
+        
         
         #
         #クッキーをクリアさせる場合の処理
         if @@clear == true
           query = eval(cky.to_s) 
           @@count += 1
-          #２回目の遷移時に(なぜか)、正常なパラメータが送られてくるので
-          #ここで一旦リセットする
-          if @@count == 2
+          
+          if @@count == 1    #centos(本番)用
+          #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
             @@clear = false
             @@count = 0
           end
         end
         #
         
-        @purchase_order_data_extract = PurchaseOrderDatum.all  #add180403
-        @construction_code_extract = ConstructionDatum.all     #add180830
+        @purchase_order_data_extract = PurchaseOrderDatum.all  
+        @construction_code_extract = ConstructionDatum.all     
         
         #注文番号の絞り込み（登録済みのものだけにする） 
         if query.present? && query[:with_construction].present?
@@ -102,7 +99,6 @@ class PurchaseDataController < ApplicationController
                      "supplier_id_eq"=> supplier_master_id}
           end
 		  
-          #add181001
           #検索用クッキーへも保存
           params[:q] = query
           
@@ -170,6 +166,7 @@ class PurchaseDataController < ApplicationController
     end
     ###
     
+    
 	#kaminari用設定。
 	@purchase_data = @purchase_data.page(params[:page])
 	
@@ -211,6 +208,8 @@ class PurchaseDataController < ApplicationController
     end
     #####
 	
+    
+    
 	respond_to do |format|
 	  
 	  format.html

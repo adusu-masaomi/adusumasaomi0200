@@ -75,13 +75,17 @@ class DeliverySlipHeadersController < ApplicationController
       if @delivery_slip_header.save
         
         #参照コードがあれば内訳マスターをコピー
-	    copyBreakDown
+	      copyBreakDown
         
         #顧客Mも更新
-		if @manual_flag.blank?
+		    if @manual_flag.blank?
           update_params_customer
         end
-		
+		    
+        #工事担当者を更新
+        #add190131
+        update_construction_personnel
+        
         format.html { redirect_to @delivery_slip_header, notice: 'Delivery slip header was successfully created.' }
         format.json { render :show, status: :created, location: @delivery_slip_header }
       else
@@ -99,7 +103,6 @@ class DeliverySlipHeadersController < ApplicationController
     #住所のパラメータを正常化
     adjust_address_params
   
-    #add170809
     #手入力時の顧客マスターの新規登録
   	create_manual_input_customer
   
@@ -114,11 +117,15 @@ class DeliverySlipHeadersController < ApplicationController
 	    #アプデは既存データを書き換えてしまう可能性があるため、保留!
         #copyBreakDown
         
-		#顧客Mも更新
-		if @manual_flag.blank?
+		    #顧客Mも更新
+		    if @manual_flag.blank?
           update_params_customer
-		end
-		
+		    end
+        
+		    #工事担当者を更新
+        #add190131
+        update_construction_personnel
+        
         format.html { redirect_to @delivery_slip_header, notice: 'Delivery slip header was successfully updated.' }
         format.json { render :show, status: :ok, location: @delivery_slip_header }
       else
@@ -203,6 +210,23 @@ class DeliverySlipHeadersController < ApplicationController
     end 
   end
   
+  #add190131
+  #工事Mの担当者を更新
+  def update_construction_personnel
+    #名称 
+    if params[:delivery_slip_header][:customer_name].present? && params[:delivery_slip_header][:customer_name] != ""
+      id = params[:delivery_slip_header][:construction_datum_id].to_i
+      @construction = ConstructionDatum.where(:id => id).first
+      
+      if @construction.present?    #マスター削除を考慮
+        construction_params = { personnel: params[:delivery_slip_header][:responsible1] }
+        #更新する
+	      @construction.update(construction_params)
+      end
+      
+    end
+  end
+  
   def update_params_customer
   #顧客Mの敬称・担当を更新する(未登録の場合)
     
@@ -220,39 +244,39 @@ class DeliverySlipHeadersController < ApplicationController
         if params[:delivery_slip_header][:honorific_id].present?
           params[:delivery_slip_header][:customer_master_attributes][:honorific_id] = params[:delivery_slip_header][:honorific_id]
         end
-        #担当1
-        if params[:delivery_slip_header][:responsible1].present?
-          params[:delivery_slip_header][:customer_master_attributes][:responsible1] = params[:delivery_slip_header][:responsible1]
-		end
-		#担当2
+        #del190131
+        ##担当1
+        #if params[:delivery_slip_header][:responsible1].present?
+        #  params[:delivery_slip_header][:customer_master_attributes][:responsible1] = params[:delivery_slip_header][:responsible1]
+		    #end
+		    #担当2
         if params[:delivery_slip_header][:responsible2].present?
           params[:delivery_slip_header][:customer_master_attributes][:responsible2] = params[:delivery_slip_header][:responsible2]
-		end
+		    end
         
-		#add171010
-        #住所関連/tel,fax追加
-		if params[:delivery_slip_header][:post].present?
+		    #住所関連/tel,fax追加
+		    if params[:delivery_slip_header][:post].present?
           params[:delivery_slip_header][:customer_master_attributes][:post] = params[:delivery_slip_header][:post]
-		end
-		if params[:delivery_slip_header][:address].present?
+		    end
+		    if params[:delivery_slip_header][:address].present?
           params[:delivery_slip_header][:customer_master_attributes][:address] = params[:delivery_slip_header][:address]
-		end
-		if params[:delivery_slip_header][:house_number].present?
+		    end
+		    if params[:delivery_slip_header][:house_number].present?
           params[:delivery_slip_header][:customer_master_attributes][:house_number] = params[:delivery_slip_header][:house_number]
-		end
+		    end
         if params[:delivery_slip_header][:address2].present?
           params[:delivery_slip_header][:customer_master_attributes][:address2] = params[:delivery_slip_header][:address2]
-		end
-		if params[:delivery_slip_header][:tel].present?
+		    end
+		    if params[:delivery_slip_header][:tel].present?
           params[:delivery_slip_header][:customer_master_attributes][:tel_main] = params[:delivery_slip_header][:tel]
-		end
-		if params[:delivery_slip_header][:fax].present?
+		    end
+		    if params[:delivery_slip_header][:fax].present?
           params[:delivery_slip_header][:customer_master_attributes][:fax_main] = params[:delivery_slip_header][:fax]
-		end
+		    end
 		#
 		
 	    #更新する
-	    @delivery_slip_header.update(customer_masters_params)
+	     @delivery_slip_header.update(customer_masters_params)
 	  end
 	  
     end
@@ -301,6 +325,8 @@ class DeliverySlipHeadersController < ApplicationController
   def duplicate_delivery_slip_header
     
     delivery_slip_header = DeliverySlipHeader.where(:delivery_slip_code => params[:delivery_slip_code])
+    #add190131
+    construction_data = ConstructionDatum.where(:id => delivery_slip_header.pluck(:construction_datum_id).flatten.join(" ")).first
     
     if delivery_slip_header.present?
      
@@ -362,9 +388,16 @@ class DeliverySlipHeadersController < ApplicationController
 	     end
 	   end
 	   #
-	   
-	   #担当者1
-	   @responsible1 = delivery_slip_header.pluck(:responsible1).flatten.join(" ")
+     
+     #担当者1
+     #upd190131
+     if construction_data.present? && 
+          !construction_data.personnel.blank?
+       @responsible1 = construction_data.personnel
+     else
+       @responsible1 = delivery_slip_header.pluck(:responsible1).flatten.join(" ")
+     end
+	   #@responsible1 = delivery_slip_header.pluck(:responsible1).flatten.join(" ")
 	   #担当者2
 	   @responsible2 = delivery_slip_header.pluck(:responsible2).flatten.join(" ")
 	   #郵便番号

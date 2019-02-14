@@ -93,10 +93,16 @@ class EstimationSheetPDF
 		   @report.page.item(:honorific).value(honorific_name) 
 		   
 		   #担当1
-		   if @quotation_headers.responsible1.present?
-		     responsible = @quotation_headers.responsible1 + "  様"
+		   #upd190131
+           if @quotation_headers.ConstructionDatum.present? && 
+                !@quotation_headers.ConstructionDatum.personnel.blank?
+             responsible = @quotation_headers.ConstructionDatum.personnel + "  様"
 		     @report.page.item(:responsible1).value(responsible)
-		   end
+           end
+           #if @quotation_headers.responsible1.present?
+		   #  responsible = @quotation_headers.responsible1 + "  様"
+		   #  @report.page.item(:responsible1).value(responsible)
+		   #end
 		   #担当2
 		   if @quotation_headers.responsible2.present?
 		     responsible = @quotation_headers.responsible2 + "  様"

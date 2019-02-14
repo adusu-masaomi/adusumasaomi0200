@@ -852,7 +852,7 @@
       "description": "",
       "x": 272,
       "y": 481.3,
-      "width": 55.9,
+      "width": 65.8,
       "height": 15.3,
       "style": {
         "font-family": [
@@ -870,7 +870,7 @@
         ]
       },
       "texts": [
-        "100%"
+        "現金100%"
       ]
     },
     {
@@ -945,9 +945,9 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 173.4,
+      "x": 172.4,
       "y": 481.3,
-      "width": 34.1,
+      "width": 49.4,
       "height": 15.9,
       "style": {
         "font-family": [
@@ -963,7 +963,7 @@
         "font-style": []
       },
       "texts": [
-        "現金"
+        "支払方法"
       ]
     },
     {

@@ -157,21 +157,24 @@
 	 //
    });
    
-   //フォームロード時のイベント
-   window.onload = function(){
+  //フォームロード時のイベント
+  window.onload = function(){
    
-	 //得意先名を最新の情報にする
-	 var index = document.getElementById("customer_id").selectedIndex;
-	 document.getElementById("customer_name").value = 
+    //得意先名を最新の情報にする
+	var index = document.getElementById("customer_id").selectedIndex;
+	document.getElementById("customer_name").value = 
 	   document.getElementById("customer_id").options[index].innerText;
      
-     //顧客情報の初期値もセットする(未入力の場合)
-	 //add180206
-     setCustomerDefaultBySearch();
+    //顧客情報の初期値もセットする(未入力の場合)
+	setCustomerDefaultBySearch();
+     
+    //add190131
+    //担当者の更新
+    setResponsibleOnload();
     
-   }
+  }
    
-  //顧客情報のセット add180206
+  //顧客情報のセット
   function setCustomerDefaultBySearch(){
     index = parseInt(document.getElementById("customer_id").value);
     
@@ -200,6 +203,11 @@
           obj = document.getElementById("construction_name").textContent;
           document.getElementById("construction_name").value = obj;
 		  
+          //responsible1
+	      //add190131
+          obj = document.getElementById("responsible1").textContent;
+          document.getElementById("responsible1").value = obj;
+          
 		  //add170218
 		  //顧客情報も合わせてセットする
 		  obj = document.getElementById("customer_id_hide").textContent;
@@ -211,6 +219,32 @@
 	  );
 	  
    };
+   
+  //担当者の更新
+  //add190131
+  function setResponsibleOnload()
+  {  
+    //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
+    obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     if (construction_id != "" && construction_id != "1")
+     {
+        $.get("<%= construction_dataz_construction_and_customer_select_path %>",
+	      {id: construction_id },
+          function(data){
+          
+            //responsible1
+	        //add190131
+            obj = document.getElementById("responsible1").textContent;
+            if (obj != "" && document.getElementById("responsible1").value != obj)
+            {
+                document.getElementById("responsible1").value = obj;
+            }
+          }
+	    );
+	 }
+   };
+   
   //振込手数料のセット
   function setCommission()
   {  
@@ -268,9 +302,11 @@
           //fax
 	      obj = document.getElementById("fax").textContent;
           document.getElementById("fax").value = obj;
-		  //responsible1
-	      obj = document.getElementById("responsible1").textContent;
-          document.getElementById("responsible1").value = obj;
+		  
+          //del190131
+          //responsible1
+	      //obj = document.getElementById("responsible1").textContent;
+          //document.getElementById("responsible1").value = obj;
 		  //responsible2
 	      obj = document.getElementById("responsible2").textContent;
           document.getElementById("responsible2").value = obj;

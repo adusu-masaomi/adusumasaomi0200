@@ -28,7 +28,7 @@ class QuotationHeadersController < ApplicationController
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
 	
-	@quotation_headers = @q.result(distinct: true)
+	  @quotation_headers = @q.result(distinct: true)
     @quotation_headers  = @quotation_headers.page(params[:page])
 	
   end
@@ -55,7 +55,9 @@ class QuotationHeadersController < ApplicationController
 
   # GET /quotation_headers/1/edit
   def edit
-  
+    #@construction_data = ConstructionDatum.where(["id = ?", @quotation_header.construction_datum_id])
+    #@quotation_header.build_construction_data
+    
     #顧客Mをビルド
     #@quotation_header.build_customer_master
 	
@@ -79,13 +81,17 @@ class QuotationHeadersController < ApplicationController
     respond_to do |format|
       if @quotation_header.save
 	    
-		#参照コードがあれば内訳マスターをコピー
-	    copyBreakDown
+		    #参照コードがあれば内訳マスターをコピー
+	      copyBreakDown
 		
-	    #顧客Mも更新
-		if @manual_flag.blank?  #add170809
-	      update_params_customer
-		end
+	      #顧客Mも更新
+		    if @manual_flag.blank?  
+	        update_params_customer
+		    end
+        
+        #工事担当者を更新
+        #add190131
+        update_construction_personnel
 		
         format.html { redirect_to @quotation_header, notice: 'Quotation header was successfully created.' }
         format.json { render :show, status: :created, location: @quotation_header }
@@ -112,15 +118,16 @@ class QuotationHeadersController < ApplicationController
     
     respond_to do |format|
       if @quotation_header.update(quotation_header_params)
-	  
-        #参照コードがあれば内訳マスターをコピー
-	    copyBreakDown
-	  
-	    #顧客Mも更新
-		if @manual_flag.blank?  #add170809
-	      update_params_customer
-	    end
-	  
+	      #参照コードがあれば内訳マスターをコピー
+	      copyBreakDown
+	      #顧客Mも更新
+		    if @manual_flag.blank?  #add170809
+	        update_params_customer
+	      end
+        #工事担当者を更新
+        #add190131
+        update_construction_personnel
+
         format.html { redirect_to @quotation_header, notice: 'Quotation header was successfully updated.' }
         format.json { render :show, status: :ok, location: @quotation_header }
       else
@@ -204,59 +211,79 @@ class QuotationHeadersController < ApplicationController
     end 
   end
   
-  
+  #add190131
+  #工事Mの担当者を更新
+  def update_construction_personnel
+    #名称 
+    if params[:quotation_header][:customer_name].present? && params[:quotation_header][:customer_name] != ""
+      id = params[:quotation_header][:construction_datum_id].to_i
+      @construction = ConstructionDatum.where(:id => id).first
+      
+      if @construction.present?    #マスター削除を考慮
+        construction_params = { personnel: params[:quotation_header][:responsible1] }
+        #params[:quotation_header][:construction_datum_attributes][:personnel] = params[:quotation_header][:customer_name]
+        #更新する
+	      @construction.update(construction_params)
+      end
+      
+    end
+  end
+    
   def update_params_customer
   #顧客Mの敬称・担当を更新する(未登録の場合)
     
     if params[:quotation_header][:customer_master_attributes].present?
-	  id = params[:quotation_header][:customer_id].to_i
+	    
+      id = params[:quotation_header][:customer_id].to_i
       @customer_masters = CustomerMaster.find(id)
 
-	  if @customer_masters.present?
-        
-		#名称 add170809
+	    if @customer_masters.present?
+      
+        #名称 
         if params[:quotation_header][:customer_name].present?
           params[:quotation_header][:customer_master_attributes][:customer_name] = params[:quotation_header][:customer_name]
         end
 		
-		#敬称
+		    #敬称
         if params[:quotation_header][:honorific_id].present?
           params[:quotation_header][:customer_master_attributes][:honorific_id] = params[:quotation_header][:honorific_id]
         end
+        
+        #del190131
         #担当1
-        if params[:quotation_header][:responsible1].present?
-          params[:quotation_header][:customer_master_attributes][:responsible1] = params[:quotation_header][:responsible1]
-		end
-		#担当2
+        #if params[:quotation_header][:responsible1].present?
+        #  params[:quotation_header][:customer_master_attributes][:responsible1] = params[:quotation_header][:responsible1]
+		    #end
+		    
+        #担当2
         if params[:quotation_header][:responsible2].present?
           params[:quotation_header][:customer_master_attributes][:responsible2] = params[:quotation_header][:responsible2]
-		end
+		    end
       
-	    #add171010
-        #住所関連/tel,fax追加
-		if params[:quotation_header][:post].present?
+	      #住所関連/tel,fax追加
+		    if params[:quotation_header][:post].present?
           params[:quotation_header][:customer_master_attributes][:post] = params[:quotation_header][:post]
-		end
-		if params[:quotation_header][:address].present?
+		    end
+		    if params[:quotation_header][:address].present?
           params[:quotation_header][:customer_master_attributes][:address] = params[:quotation_header][:address]
-		end
-		if params[:quotation_header][:house_number].present?
+		    end
+		    if params[:quotation_header][:house_number].present?
           params[:quotation_header][:customer_master_attributes][:house_number] = params[:quotation_header][:house_number]
-		end
+		    end
         if params[:quotation_header][:address2].present?
           params[:quotation_header][:customer_master_attributes][:address2] = params[:quotation_header][:address2]
-		end
-		if params[:quotation_header][:tel].present?
+		    end
+		    if params[:quotation_header][:tel].present?
           params[:quotation_header][:customer_master_attributes][:tel_main] = params[:quotation_header][:tel]
-		end
-		if params[:quotation_header][:fax].present?
+		    end
+		    if params[:quotation_header][:fax].present?
           params[:quotation_header][:customer_master_attributes][:fax_main] = params[:quotation_header][:fax]
-		end
-		#
+		    end
+		    #
 	  
-	    #更新する
-	    @quotation_header.update(customer_masters_params)
-	  end
+	      #更新する
+	      @quotation_header.update(customer_masters_params)
+	    end
 	  
     end
   end
@@ -308,109 +335,115 @@ class QuotationHeadersController < ApplicationController
   #見積書データを複製する(一覧データのみ)
   def duplicate_quotation_header
     #quotation_header = QuotationHeader.where(:quotation_code => params[:quotation_code]).first
-	quotation_header = QuotationHeader.where(:quotation_code => params[:quotation_code])
+	  quotation_header = QuotationHeader.where(:quotation_code => params[:quotation_code])
+	  #add190131
+    construction_data = ConstructionDatum.where(:id => quotation_header.pluck(:construction_datum_id).flatten.join(" ")).first
+    
+	  if quotation_header.present?
+      
+	    #請求書有効期間開始日
+	    @invoice_period_start_date = quotation_header.pluck(:invoice_period_start_date).flatten.join(" ")
+	    #請求書有効期間終了日
+	    @invoice_period_end_date = quotation_header.pluck(:invoice_period_end_date).flatten.join(" ")
+	   
+	    #@quotation_date =
+	    #    Array[[quotation_header.pluck(:quotation_date).slice(0).year, quotation_header.pluck(:quotation_date).slice(0).year]]
 	
-	if quotation_header.present?
-     
-	   #請求書有効期間開始日
-	   @invoice_period_start_date = quotation_header.pluck(:invoice_period_start_date).flatten.join(" ")
-	   #請求書有効期間終了日
-	   @invoice_period_end_date = quotation_header.pluck(:invoice_period_end_date).flatten.join(" ")
+	    #請求コード
+	    @invoice_code = quotation_header.pluck(:invoice_code).flatten.join(" ")
+	    #納品コード
+	    @delivery_slip_code = quotation_header.pluck(:delivery_slip_code).flatten.join(" ")
 	   
-	   #@quotation_date =
-	   #    Array[[quotation_header.pluck(:quotation_date).slice(0).year, quotation_header.pluck(:quotation_date).slice(0).year]]
-	
-	   #請求コード
-	   @invoice_code = quotation_header.pluck(:invoice_code).flatten.join(" ")
-	   #納品コード
-	   @delivery_slip_code = quotation_header.pluck(:delivery_slip_code).flatten.join(" ")
+	    ###工事コード
+	    construction_datum_id = quotation_header.pluck(:construction_datum_id).flatten.join(" ")  
 	   
-	   ###工事コード
-	   construction_datum_id = quotation_header.pluck(:construction_datum_id).flatten.join(" ")  
+	    @construction_datum_id = ""
+	    construction = ConstructionDatum.find(construction_datum_id)
+	    if construction.present?
+	      construction_code = construction.construction_code
+	      @construction_datum_id = Array[[construction_code,construction_datum_id]]
+	    end
 	   
-	   @construction_datum_id = ""
-	   construction = ConstructionDatum.find(construction_datum_id)
-	   if construction.present?
-	     construction_code = construction.construction_code
+	    #任意で変更もできるように全ての工事データをセット
+      construction_all = ConstructionDatum.all.pluck(:construction_code, :id)
+      @construction_datum_id = @construction_datum_id + construction_all
+	    #
 	   
-	     @construction_datum_id = Array[[construction_code,construction_datum_id]]
-	   end
+	    ###工事名
+	    @construction_name = quotation_header.pluck(:construction_name).flatten.join(" ")
 	   
-	   #任意で変更もできるように全ての工事データをセット
-       construction_all = ConstructionDatum.all.pluck(:construction_code, :id)
-       @construction_datum_id = @construction_datum_id + construction_all
-	   #
+	    ###得意先
+	    customer_id = quotation_header.pluck(:customer_id).flatten.join(" ")  
 	   
-	   ###工事名
-	   @construction_name = quotation_header.pluck(:construction_name).flatten.join(" ")
+	    customer = CustomerMaster.find(customer_id)
+	    @customer_id = ""
+	    if customer.present?
+	      customer_name = customer.customer_name
+	      @customer_id = Array[[customer_name,customer_id]]
+	    end
+	    #任意で変更もできるように全ての工事データをセット
+      customer_all = CustomerMaster.all.pluck(:customer_name, :id)
+      @customer_id = @customer_id + customer_all
+	    #
 	   
-	   ###得意先
-	   customer_id = quotation_header.pluck(:customer_id).flatten.join(" ")  
+	    #得意先名
+	    @customer_name = quotation_header.pluck(:customer_name).flatten.join(" ")
 	   
-	   customer = CustomerMaster.find(customer_id)
-	   @customer_id = ""
-	   if customer.present?
-	     customer_name = customer.customer_name
-	     @customer_id = Array[[customer_name,customer_id]]
-	   end
-	   #任意で変更もできるように全ての工事データをセット
-       customer_all = CustomerMaster.all.pluck(:customer_name, :id)
-       @customer_id = @customer_id + customer_all
-	   #
+	    #敬称
+	    honorific_id = quotation_header.pluck(:honorific_id).flatten.join(" ").to_i
+	    @honorific_id = Array[CustomerMaster.honorific[honorific_id]]
+	    #あとからも選択できるようにする。
+	    for num in 1..CustomerMaster.honorific.length
+	      number = num -1
+	      if number != honorific_id
+	        @honorific_id = @honorific_id + [CustomerMaster.honorific[number]]
+	      end
+	    end
+	    #
 	   
-	   #得意先名
-	   @customer_name = quotation_header.pluck(:customer_name).flatten.join(" ")
-	   
-	   #敬称
-	   honorific_id = quotation_header.pluck(:honorific_id).flatten.join(" ").to_i
-	   @honorific_id = Array[CustomerMaster.honorific[honorific_id]]
-	   #あとからも選択できるようにする。
-	   for num in 1..CustomerMaster.honorific.length
-	     number = num -1
-	     if number != honorific_id
-	       @honorific_id = @honorific_id + [CustomerMaster.honorific[number]]
-	     end
-	   end
-	   #
-	   
-	   #担当者1
-	   @responsible1 = quotation_header.pluck(:responsible1).flatten.join(" ")
-	   #担当者2
-	   @responsible2 = quotation_header.pluck(:responsible2).flatten.join(" ")
-	   #郵便番号
-	   @post = quotation_header.pluck(:post).flatten.join(" ")
-	   #住所(得意先)
-	   @address = quotation_header.pluck(:address).flatten.join(" ")
-	   #add171012
-	   @house_number = quotation_header.pluck(:house_number).flatten.join(" ")
-	   @address2 = quotation_header.pluck(:address2).flatten.join(" ")
-	   #add end
-	   #tel
-	   @tel = quotation_header.pluck(:tel).flatten.join(" ")
-	   #fax
-	   @fax = quotation_header.pluck(:fax).flatten.join(" ")
-	   #工事期間
-	   @construction_period = quotation_header.pluck(:construction_period).flatten.join(" ")
-	   #郵便番号（工事場所）
-	   @construction_post = quotation_header.pluck(:construction_post).flatten.join(" ")
-	   #工事場所
-	   @construction_place = quotation_header.pluck(:construction_place).flatten.join(" ")
-	   #add171012
-	   @construction_house_number = quotation_header.pluck(:construction_house_number).flatten.join(" ")
-	   @construction_place2 = quotation_header.pluck(:construction_place2).flatten.join(" ")
-	   #add end
-	   
-	   #取引方法
-	   @trading_method = quotation_header.pluck(:trading_method).flatten.join(" ")
-	   #有効期間
-	   @effective_period = quotation_header.pluck(:effective_period).flatten.join(" ")
-	   #NET金額
-	   @net_amount = quotation_header.pluck(:net_amount).flatten.join(" ")
-	   #見積金額
-	   @quote_price = quotation_header.pluck(:quote_price).flatten.join(" ")
-	   #実行金額
-	   @execution_amount = quotation_header.pluck(:execution_amount).flatten.join(" ")
-	end 
+	    #担当者1
+	    #upd190131
+      if construction_data.present? && 
+        !construction_data.personnel.blank?
+        @responsible1 = construction_data.personnel
+      else
+        @responsible1 = quotation_header.pluck(:responsible1).flatten.join(" ")
+      end
+      #@responsible1 = quotation_header.pluck(:responsible1).flatten.join(" ")
+	    #担当者2
+	    @responsible2 = quotation_header.pluck(:responsible2).flatten.join(" ")
+	    #郵便番号
+	    @post = quotation_header.pluck(:post).flatten.join(" ")
+	    #住所(得意先)
+	    @address = quotation_header.pluck(:address).flatten.join(" ")
+	    #add171012
+	    @house_number = quotation_header.pluck(:house_number).flatten.join(" ")
+	    @address2 = quotation_header.pluck(:address2).flatten.join(" ")
+	    #add end
+	    #tel
+	    @tel = quotation_header.pluck(:tel).flatten.join(" ")
+	    #fax
+	    @fax = quotation_header.pluck(:fax).flatten.join(" ")
+	    #工事期間
+	    @construction_period = quotation_header.pluck(:construction_period).flatten.join(" ")
+	    #郵便番号（工事場所）
+	    @construction_post = quotation_header.pluck(:construction_post).flatten.join(" ")
+	    #工事場所
+	    @construction_place = quotation_header.pluck(:construction_place).flatten.join(" ")
+	    @construction_house_number = quotation_header.pluck(:construction_house_number).flatten.join(" ")
+	    @construction_place2 = quotation_header.pluck(:construction_place2).flatten.join(" ")
+	    
+	    #取引方法
+	    @trading_method = quotation_header.pluck(:trading_method).flatten.join(" ")
+	    #有効期間
+	    @effective_period = quotation_header.pluck(:effective_period).flatten.join(" ")
+	    #NET金額
+	    @net_amount = quotation_header.pluck(:net_amount).flatten.join(" ")
+	    #見積金額
+	    @quote_price = quotation_header.pluck(:quote_price).flatten.join(" ")
+	    #実行金額
+	    @execution_amount = quotation_header.pluck(:execution_amount).flatten.join(" ")
+	  end 
     
   end
   
@@ -524,9 +557,14 @@ class QuotationHeadersController < ApplicationController
     
     # 
     def customer_masters_params
-	     #upd170809
-         params.require(:quotation_header).permit(customer_master_attributes: [:id, :customer_name, :honorific_id, :responsible1, :responsible2, 
+       #190131 "customer_name"抹消
+	     params.require(:quotation_header).permit(customer_master_attributes: [:id, :honorific_id, :responsible1, :responsible2, 
                         :post, :address, :house_number, :address2, :tel_main, :fax_main ])
     end
+    #add1901341
+    #def construction_params
+    #   #params.require(:quotation_header).permit(ConstructionDatum_attributes: [:id, :construcion_name, :personnel])
+    #   params.require(:quotation_header).permit(construction_datum_attributes: [:id, :construcion_name, :personnel])
+    #end
 
 end

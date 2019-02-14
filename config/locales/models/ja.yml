@@ -14,6 +14,7 @@ ja:
     supplier_material_code: 仕入先品番
     material_id: 品番
     material_master_id: 品番
+    internal_code: 社内品番
     supplier_id: 仕入業者
     supplier_master_id: 仕入業者
     material_code: 品番
@@ -196,6 +197,7 @@ ja:
     attributes:
        construction_datum:
          order_flag: 受注済
+         personnel: 担当者
        delivery_slip_header:
          delivery_slip_date: 納品日
          delivery_amount: 納品金額
@@ -295,6 +297,7 @@ ja:
          unpaid_amount: 未払金額
          payment_due_date: 支払予定日
          payment_date: 支払日
+         unpaid_payment_date: 未払支払日
        working_category:
          category_name: カテゴリー名
        working_subcategory:

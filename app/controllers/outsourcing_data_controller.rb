@@ -47,9 +47,8 @@ class OutsourcingDataController < ApplicationController
         if @@clear == true
           query = eval(cky.to_s) 
           @@count += 1
-          #２回目の遷移時に(なぜか)、正常なパラメータが送られてくるので
-          #ここで一旦リセットする
-          if @@count == 2
+          if @@count == 1    #centos(本番)用
+          #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
             @@clear = false
             @@count = 0
           end
@@ -127,6 +126,7 @@ class OutsourcingDataController < ApplicationController
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
 		end
 		
+        
         #@q = PurchaseDatum.ransack(params[:q]) 
         #ransack保持用--上記はこれに置き換える
 		@q = PurchaseDatum.ransack(query)
@@ -150,6 +150,9 @@ class OutsourcingDataController < ApplicationController
 
 	@purchase_data = @q.result(distinct: true)
 	
+    
+    
+    
     #add180324
     ###
     #仕入区分のみで検索をした場合は、"入庫"は除外する(在庫区分がヌルの場合のみ検索)。納品書チェックしたい場合等。
@@ -158,6 +161,32 @@ class OutsourcingDataController < ApplicationController
       @purchase_data = @purchase_data.where(:inventory_division_id => nil)
     end
     ###
+    
+         
+    
+    #add190211
+    #支払日で絞る(保留)
+    #############
+    #if params[:q].present? && params[:q][:OutsourcingCost].present? && 
+    #   params[:q][:OutsourcingCost][:payment_date_gteq].present?
+    #   payment_date = params[:q][:OutsourcingCost][:payment_date_gteq]
+    #   if params[:q].present? && params[:q][:supplier_id_eq].present?
+    #     supplier_id = params[:q][:supplier_id_eq].to_i
+    #     case supplier_id
+    #     when 37  #村山電気
+    #       staff_id = 3
+    #     when 31  #須戸
+    #       staff_id = 6
+    #     when 39  #小柳
+    #       staff_id = 5
+    #     else
+    #     end
+    #     outsourcing_costs = OutsourcingCost.where(:payment_date => params[:q][:OutsourcingCost][:payment_date_gteq]).
+    #                       where(:staff_id => staff_id)
+    #   end
+    #end
+    #######
+    
     
 	#kaminari用設定。
 	@purchase_data = @purchase_data.page(params[:page])
@@ -174,9 +203,15 @@ class OutsourcingDataController < ApplicationController
 	@unit_masters = UnitMaster.all
 	@purchase_unit_prices = PurchaseUnitPrice.none  
     
+    
+    
+    
+    
 	#global set
 	$purchase_data = @purchase_data
 	
+    
+    
     #####
     #検索用のパラメータがセットされていたら、グローバルにもセットする
     #if params[:q].present?
@@ -321,7 +356,8 @@ class OutsourcingDataController < ApplicationController
          cky = get_cookies("recent_search_history_purchase")
          query ||= eval(cky.to_s)
     
-         if query["supplier_id_eq"].present?
+         #if query["supplier_id_eq"].present?
+         if query.present? && query["supplier_id_eq"].present?
            @purchase_datum.supplier_id ||= query["supplier_id_eq"]
          end
     
@@ -584,10 +620,27 @@ class OutsourcingDataController < ApplicationController
   #外注用の請求書発行
   def print_outsourcing_invoice(format)
       
-           
       #グローバルにカレントの仕入データをセット
-      $purchase_data_current = @purchase_datum
-  
+      if params[:action] == "create"
+      #新規の場合
+        $purchase_data_current = PurchaseDatum.new
+        
+        #もっとコンパクトにしたいが・・・・
+        $purchase_data_current.purchase_date = params[:purchase_datum][:purchase_date]
+        $purchase_data_current.purchase_order_datum_id = params[:purchase_datum][:purchase_order_datum_id]
+        $purchase_data_current.construction_datum_id = params[:purchase_datum][:construction_datum_id]
+        $purchase_data_current.supplier_id = params[:purchase_datum][:supplier_id]
+        $purchase_data_current.purchase_amount = params[:purchase_datum][:purchase_amount]
+        #
+        
+        
+        #$purchase_data_current = PurchaseDatum.new(@purchase_data_current, params[:purchase_datum])
+        #$purchase_data_current.assign_attributes(params[:purchase_datum])
+        
+      else
+        $purchase_data_current = @purchase_datum
+      end
+      
       format.pdf do
         
         report = OutsourcingInvoicePDF.create @outsourcing_invoice 
@@ -1050,8 +1103,9 @@ class OutsourcingDataController < ApplicationController
     end
     #
     
+    #del190205
     #請求書コードを取得
-    invoice_code = set_invoice_code
+    #invoice_code = set_invoice_code
     
     #労務費を取得
     construction_labor_cost = ConstructionDailyReport.where(:construction_datum_id => 
@@ -1061,9 +1115,21 @@ class OutsourcingDataController < ApplicationController
     working_start_date = ConstructionDailyReport.where(:construction_datum_id => 
          @construction_datum_id).where(:staff_id => staff_id).minimum(:working_date)
     #作業終了日を取得
-    working_end_date = ConstructionDailyReport.where(:construction_datum_id => 
+    @working_end_date = ConstructionDailyReport.where(:construction_datum_id => 
          @construction_datum_id).where(:staff_id => staff_id).maximum(:working_date)
     
+    #請求書コードを取得
+    invoice_code = set_invoice_code
+    
+    #add190205
+    #作業日=作業完了日とする
+    if @working_end_date.present?
+      @purchase_date = @working_end_date
+    end
+    #更新用のパラメータも更新
+    if @purchase_date.present?
+      params[:purchase_datum][:purchase_date] = @purchase_date
+    end
     #binding.pry
     
     #仕入金額をセット(外注労務費の、調整額とみなす)
@@ -1092,13 +1158,13 @@ class OutsourcingDataController < ApplicationController
       outsourcing_params = {invoice_code: invoice_code, construction_datum_id: @construction_datum_id, staff_id: staff_id, 
                             labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
                             payment_due_date: @payment_due_date, working_start_date: working_start_date, 
-                            working_end_date: working_end_date}
+                            working_end_date: @working_end_date}
       outsourcing_cost = OutsourcingCost.create(outsourcing_params)
     else
-    #更新
-      outsourcing_params = {labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
+    #更新(請求書コードも変更)
+      outsourcing_params = {invoice_code: invoice_code, labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
                             payment_due_date: @payment_due_date, working_start_date: working_start_date, 
-                            working_end_date: working_end_date}
+                            working_end_date: @working_end_date}
                             
       outsourcing_cost.update(outsourcing_params)
     end
@@ -1147,16 +1213,71 @@ class OutsourcingDataController < ApplicationController
   #外注用の請求ナンバーを作成
   def set_invoice_code
     
-    purchaseDate = @purchase_date.strftime("%Y%m%d")
+    #purchaseDate = @purchase_date.strftime("%Y%m%d")
+    #upd190205
+    if @working_end_date.nil?
+      search_date = @purchase_date
+      return search_date
+    end
+    
+    purchaseDate = @working_end_date.strftime("%Y%m%d")
     search_date = nil
+    search_date_update = nil
+    
+    #作業日<>完了日
+    differDate = false
+    if @purchase_date != @working_end_date
+      differDate = true
+    end
     
     for i in 1..99 do
       num = "%02d" % i
       search_date = purchaseDate + num
       outsourcing_cost = OutsourcingCost.where(:invoice_code => search_date).first
+      
       if outsourcing_cost.nil?
+        
+        
+        #状況によっては、請求ナンバーを空きコードでアプデしないようにする
+        if params[:action] == "update"  #アプデなら、空きコードでアップしない
+          outsourcing_cost_a = OutsourcingCost.where(:construction_datum_id => params[:purchase_datum][:construction_datum_id]).first
+          if outsourcing_cost_a.present?
+            invoice_code = outsourcing_cost_a.invoice_code.slice(0, 8) 
+                 
+            if invoice_code== @working_end_date.strftime("%Y%m%d")
+              search_date = outsourcing_cost_a.invoice_code
+            end
+          end
+        end
+                
+        #if params[:action] == "update" && differDate == false #アプデなら、空きコードでアップしない
+        #  outsourcing_cost_a = OutsourcingCost.where(:construction_datum_id => params[:purchase_datum][:construction_datum_id]).first
+        #  if outsourcing_cost_a.present?
+        #    if outsourcing_cost_a.invoice_code == @working_end_date.strftime("%Y%m%d")
+        #      search_date = outsourcing_cost_a.invoice_code
+        #    end
+        #  else
+        #    search_date = nil
+        #  end
+        #elsif params[:action] == "update" && differDate == true
+        #  #新規登録時などでも、作業日が完了日と一致していたら、空きコードでアップしない。
+        #  outsourcing_cost_a = OutsourcingCost.where(:construction_datum_id => params[:purchase_datum][:construction_datum_id]).first
+        #  if outsourcing_cost_a.present?
+        #    invoice_code = outsourcing_cost_a.invoice_code.slice(0, 8)   
+        #    if invoice_code == @working_end_date.strftime("%Y%m%d")
+        #      search_date = outsourcing_cost_a.invoice_code
+        #    end
+        #  end
+        #end
+        #
+        
+        #以外なら、＋１のナンバーを返す
         break
       end
+      
+      #add190205
+      search_date_update = purchaseDate + num
+      
     end
     
     return search_date
@@ -1181,6 +1302,8 @@ class OutsourcingDataController < ApplicationController
         @closing_date = nil
         @payment_due_date = nil
     
+        addMonth = 0
+    
         #締め日算出
         if customer.closing_date_division == 1
         #月末の場合
@@ -1191,9 +1314,23 @@ class OutsourcingDataController < ApplicationController
         #日付指定の場合
           #d = params[:purchase_datum][:purchase_date].to_date
           d = @purchase_date
-          if Date.valid_date?(d.year, d.month, customer.closing_date)
-            @closing_date = Date.new(d.year, d.month, customer.closing_date)
+          
+          if d.day < customer.closing_date
+            if Date.valid_date?(d.year, d.month, customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, customer.closing_date)
+            end
+          else
+          #締め日を過ぎていた場合、月＋１
+            addMonth += 1
+            
+            d = d >> addMonth
+            
+            if Date.valid_date?(d.year, d.month, customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, customer.closing_date) 
+            end
           end
+          
+          
         end
         
         #支払日算出
@@ -1202,7 +1339,8 @@ class OutsourcingDataController < ApplicationController
         if customer.due_date.present?
           if Date.valid_date?(d.year, d.month, customer.due_date)
             d2 = Date.new(d.year, d.month, customer.due_date)
-            addMonth = customer.due_date_division
+            #addMonth = customer.due_date_division
+            addMonth = customer.due_date_division + addMonth
             @payment_due_date = d2 >> addMonth
           end
         end
@@ -1214,6 +1352,82 @@ class OutsourcingDataController < ApplicationController
   #####
   
   # ajax
+  
+  #add190205
+  #応急対応
+  #仕入日に、作業完了日を一括で上書きさせる
+  def update_all_purchase_date
+    #@purchase_datum
+    #外注で絞り出す
+    purchase_data = PurchaseDatum.all.where(:supplier_id => params[:supplier_id])
+    
+    staff_id = 0
+    
+    case params[:supplier_id]
+    when "37"  #村山電気
+      staff_id = 3
+    when "31"  #須戸
+      staff_id = 6
+    when "39"  #小柳
+      staff_id = 5
+    else
+    end
+    #
+    
+    cnt = 0
+    if staff_id > 0
+      purchase_data.each do |purchase_datum| 
+    
+        construction_data = ConstructionDatum.where(:id => purchase_datum.construction_datum_id).first
+        if construction_data.present?
+          #作業終了日を取得
+          working_end_date = ConstructionDailyReport.where(:construction_datum_id => 
+             purchase_datum.construction_datum_id).where(:staff_id => staff_id).maximum(:working_date)
+    
+          if working_end_date.present?
+            if working_end_date != purchase_datum.purchase_date
+            #作業完了日＜＞仕入日ならアプデ
+              #purchase_datum_tmp = PurchaseDatum.where(purchase_datum.id).first
+              
+              #(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
+              #       :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
+              #       :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :outsourcing_invoice_flag, 
+              #       :notes, :purchase_header_id )
+              
+              #purchase_data_params = {purchase_date: working_end_date, slip_code: purchase_datum.slip_code, purchase_order_datum_id: purchase_datum.purchase_order_datum_id,
+              #                        construction_datum_id: purchase_datum.construction_datum_id, material_id: purchase_datum.material_id, material_code: 
+              #                        purchase_datum.material_code, material_name: purchase_datum.material_name, maker_id: purchase_datum.maker_id, 
+              #                        maker_name: purchase_datum.maker_name, quantity: purchase_datum.quantity, unit_id: purchase_datum.unit_id, purchase_unit_price: 
+              #                        purchase_datum.purchase_unit_price, purchase_amount: purchase_datum.purchase_amount, list_price: purchase_datum.list_price, 
+              #                        division_id: purchase_datum.division_id, supplier_id: purchase_datum.supplier_id, inventory_division_id: purchase_datum.inventory_division_id, 
+              #                        unit_price_not_update_flag: purchase_datum.unit_price_not_update_flag, outsourcing_invoice_flag: purchase_datum.outsourcing_invoice_flag, 
+              #                        notes: purchase_datum.notes, purchase_header_id: purchase_datum.purchase_header_id}
+              #purchase_tmp = purchase_datum_tmp.assign_attributes(purchase_data_params)
+              
+              #purchase_data_params = {purchase_date: working_end_date}
+              
+              #update_check = purchase_tmp.save!(:validate => false)
+              update_check = purchase_datum.update_columns(purchase_date: working_end_date)
+              if update_check != false
+              #   break
+                cnt += 1
+              end
+            end
+          end
+        end
+      end
+      
+    end
+    
+    #binding.pry
+    
+    flash[:notice] = "一括更新完了しました。"
+    
+    
+    
+  end
+  #
+  
   
   #add190124
   #外注の場合に、労務費をセットする

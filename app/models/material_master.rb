@@ -69,6 +69,12 @@ class MaterialMaster < ActiveRecord::Base
       else 
         material_code = self.material_code
       end
+      #add190206
+      #社内コードがあれば優先
+      if !self.internal_code.blank?
+        material_code = self.internal_code
+      end
+      #
       if self.material_name.nil?
         material_name = "-"
       else 
@@ -84,6 +90,21 @@ class MaterialMaster < ActiveRecord::Base
 	  #上記だと著しく遅くなる・・・
 	  
 	  material_code + ':' + material_name 
+    end
+    
+    #add190206
+    #リスト表示用(CDのみ)
+	def p_material_code
+      material_code = "-"
+      if !self.material_code.nil?
+        material_code = self.material_code
+      end
+      #社内コードがあれば優先
+      if !self.internal_code.blank?
+        material_code = self.internal_code
+      end
+      #
+      material_code
     end
 
 end

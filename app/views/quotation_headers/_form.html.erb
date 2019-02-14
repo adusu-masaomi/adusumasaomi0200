@@ -178,6 +178,9 @@
 	 
    });
   
+  
+ 
+  
   //フォームロード時のイベント
   window.onload = function(){
     
@@ -189,6 +192,11 @@
     //顧客情報の初期値もセットする(未入力の場合)
     //add180206
     setCustomerDefaultBySearch();
+    
+    //add190131
+    //担当者の更新
+    setResponsibleOnload();
+     
   }
   
   //顧客情報のセット add180206
@@ -220,7 +228,6 @@
           obj = document.getElementById("construction_name").textContent;
           document.getElementById("construction_name").value = obj;
 		  
-		  //add170830
 		  obj = document.getElementById("construction_post").textContent;
           document.getElementById("construction_post").value = obj;
 		  
@@ -234,6 +241,11 @@
           document.getElementById("construction_place2").value = obj;
 		  //
 		  
+          //responsible1
+	      //add190131
+          obj = document.getElementById("responsible1").textContent;
+          document.getElementById("responsible1").value = obj;
+          
 		  //add170218
 		  //顧客情報も合わせてセットする
 		  obj = document.getElementById("customer_id_hide").textContent;
@@ -246,6 +258,33 @@
 	  );
 	  
    };
+   
+  
+  //担当者の更新
+  //add190131
+  function setResponsibleOnload()
+  {  
+    //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
+    obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     if (construction_id != "" && construction_id != "1")
+     {
+        $.get("<%= construction_dataz_construction_and_customer_select_path %>",
+	      {id: construction_id },
+          function(data){
+          
+            //responsible1
+	        //add190131
+            obj = document.getElementById("responsible1").textContent;
+            if (obj != "" && document.getElementById("responsible1").value != obj)
+            {
+                document.getElementById("responsible1").value = obj;
+            }
+          }
+	    );
+	 }
+   };
+   
    
    
   //見積一覧データをコピーする
@@ -396,13 +435,17 @@
 	      obj = document.getElementById("fax").textContent;
           document.getElementById("fax").value = obj;
 		  //responsible1
-	      obj = document.getElementById("responsible1").textContent;
-          document.getElementById("responsible1").value = obj;
+	      //del190131
+          //obj = document.getElementById("responsible1").textContent;
+          //document.getElementById("responsible1").value = obj;
 		  //responsible2
 	      obj = document.getElementById("responsible2").textContent;
           document.getElementById("responsible2").value = obj;
 		  
-		  //debugger;
+          //担当名
+		  //add190131
+          //obj = document.getElementById("construction_name").textContent;
+          //document.getElementById("construction_name").value = obj;
 		  
 		 }
 	  );

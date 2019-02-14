@@ -550,11 +550,10 @@ class ConstructionDataController < ApplicationController
      @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
 	 
-	 #add170830
 	 #郵便番号・住所
 	 @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
 	 add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
-	 #番地  add171006(仮)
+	 #番地  
 	 num = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
 	 add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
 	 
@@ -568,17 +567,14 @@ class ConstructionDataController < ApplicationController
 	   @house_number = num 
 	 end
 	 
-	 #add171006(仮)
-	 #if num.present?
-	 #  @address += num 
-	 #end
-	 
 	 if add2.present?
 	   @address2 = add2 
-	   #@address += add2 
 	 end
-	 #add end
 	 
+     #担当名追加
+     #add190131
+     @personnel = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:personnel).flatten.join(" ")
+     
   end
   
   #見積書をもとに、初期情報をセットする
@@ -624,7 +620,7 @@ class ConstructionDataController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_datum_params
-      params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :site_id, :construction_start_date, 
+      params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :personnel, :site_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
       :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
     end

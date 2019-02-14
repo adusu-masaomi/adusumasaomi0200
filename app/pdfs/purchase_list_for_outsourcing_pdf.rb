@@ -18,6 +18,9 @@ class PurchaseListForOutsourcingPDF
         @purchase_order_code  = ""
         @purchase_amount_subtotal = 0
         @purchase_amount_total = 0
+        #add190212
+        @payment_amount_total = 0
+        @unpaid_amount_total = 0
 
         $purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum| 
         #ソート順は仕入日、注文ナンバーの順とする。
@@ -35,8 +38,10 @@ class PurchaseListForOutsourcingPDF
 		     report.page.item(:construction_name).value(purchase_datum.construction_datum.construction_name)
 		   end
 		   if $customer_flag == true
-		     report.page.item(:customer_name).value(purchase_datum.construction_datum.CustomerMaster.customer_name)
-		   end
+             #if purchase_datum.construction_datum.CustomerMaster.customer_name.present?
+		      # report.page.item(:customer_name).value(purchase_datum.construction_datum.CustomerMaster.customer_name)
+		     #end
+           end
 		   
 		   if $supplier_flag == true
 		     report.page.item(:supplier_name).value(purchase_datum.SupplierMaster.supplier_name)
@@ -50,14 +55,14 @@ class PurchaseListForOutsourcingPDF
 		
          #外注費データを取得
          payment_date = nil
-         
-         #binding.pry
+         unpaid_payment_date = nil
          
          staff_id = ::ApplicationController.helpers.getSupplierToStaff(purchase_datum.supplier_id)
          outsourcing_cost = OutsourcingCost.where(:construction_datum_id => 
             purchase_datum.construction_datum_id).where(:staff_id => staff_id).first
          if outsourcing_cost.present?
            payment_date = outsourcing_cost.payment_date
+           unpaid_payment_date = outsourcing_cost.unpaid_payment_date
            payment_amount = outsourcing_cost.payment_amount
            unpaid_amount = outsourcing_cost.unpaid_amount
          end
@@ -79,6 +84,18 @@ class PurchaseListForOutsourcingPDF
 		  @purchase_amount_subtotal = @purchase_amount_subtotal + purchase_datum.purchase_amount
 		  @purchase_amount_total = @purchase_amount_total + purchase_datum.purchase_amount
 		end
+        
+        if outsourcing_cost.present?
+          #支払金額計
+          if !outsourcing_cost.payment_amount.blank?
+            @payment_amount_total += outsourcing_cost.payment_amount
+          end
+          #未払金額計
+          if !outsourcing_cost.unpaid_amount.blank?
+            @unpaid_amount_total += outsourcing_cost.unpaid_amount
+          end
+        end
+        
         
         #add190124
         construction_code = ""
@@ -167,8 +184,45 @@ class PurchaseListForOutsourcingPDF
                                   payment_due_date: @payment_due_date,
                                   payment_date: payment_date,
                                   payment_amount: payment_amount,
-                                  unpaid_amount: unpaid_amount
-	                    
+                                  unpaid_amount: unpaid_amount,
+                                  unpaid_payment_date: unpaid_payment_date
+                       
+                       if purchase_datum.outsourcing_payment_flag == 1
+                       #支払済みの場合の色
+                         #row.item(:fmeDetail).styles(:fill_color => '#BF00FF')
+                         #画面のままの色だと濃すぎるので、印刷用に薄くする
+                         row.item(:fmeDetail).styles(:fill_color => '#CD70EC')  
+                         #線が隠れるので色を戻す
+                         row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                       elsif purchase_datum.outsourcing_invoice_flag == 1
+	                   #請求済みの場合の色
+                         row.item(:fmeDetail).styles(:fill_color => '#E3CEF6')  
+                         #線が隠れるので色を戻す
+                         row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                       end
+                       
             end 
 
 
@@ -197,10 +251,23 @@ class PurchaseListForOutsourcingPDF
         formatNum()
 		@purchase_amount_total_tax_in = @num
         
+        #支払金額計
+        @num = @payment_amount_total
+        formatNum()
+		@payment_amount_total = @num
+        
+        #未払金額計
+        @num = @unpaid_amount_total
+        formatNum()
+		@unpaid_amount_total = @num
+        
+        
         #合計表示
         report.list(:default).add_row  memo: "合計", 
                                           purchase_amount: @purchase_amount_total,
-                                          purchase_amount_tax_in: @purchase_amount_total_tax_in
+                                          purchase_amount_tax_in: @purchase_amount_total_tax_in,
+                                          payment_amount: @payment_amount_total, 
+                                          unpaid_amount: @unpaid_amount_total
 		
         # ThinReports::Reportを返す
         return report
@@ -211,6 +278,7 @@ end
    
 
   #得意先から締め日・支払日を算出
+  #本来、コントローラと共通化させなければならない・・・・
   def get_customer_date_info
     
     require "date"
@@ -225,6 +293,8 @@ end
     
     if customer.present?
         
+        addMonth = 0
+        
         #締め日算出
         if customer.closing_date_division == 1
         #月末の場合
@@ -235,9 +305,25 @@ end
         #日付指定の場合
           #d = params[:purchase_datum][:purchase_date].to_date
           d = @purchase_date
-          if Date.valid_date?(d.year, d.month, customer.closing_date)
-            @closing_date = Date.new(d.year, d.month, customer.closing_date)
+          
+          if d.day < customer.closing_date
+            if Date.valid_date?(d.year, d.month, customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, customer.closing_date)
+            end
+          else
+          #締め日を過ぎていた場合、月＋１
+            addMonth += 1
+            
+            d = d >> addMonth
+            
+            if Date.valid_date?(d.year, d.month, customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, customer.closing_date)
+            end
           end
+          
+          #if Date.valid_date?(d.year, d.month, customer.closing_date)
+          #  @closing_date = Date.new(d.year, d.month, customer.closing_date)
+          #end
         end
         
         #支払日算出
@@ -246,7 +332,8 @@ end
         if customer.due_date.present?
           if Date.valid_date?(d.year, d.month, customer.due_date)
             d2 = Date.new(d.year, d.month, customer.due_date)
-            addMonth = customer.due_date_division
+            #addMonth = customer.due_date_division
+            addMonth = customer.due_date_division + addMonth
             @payment_due_date = d2 >> addMonth
           end
         end

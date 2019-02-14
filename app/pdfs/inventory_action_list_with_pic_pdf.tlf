@@ -32,15 +32,15 @@
       "type": "list",
       "display": true,
       "description": "",
-      "x": 7,
+      "x": 10,
       "y": 57,
-      "width": 600,
+      "width": 575,
       "height": 770,
       "header": {
         "enabled": true,
         "height": 18.8,
         "translate": {
-          "x": -13,
+          "x": -10,
           "y": -40.7
         },
         "items": [
@@ -51,7 +51,7 @@
             "description": "",
             "x": 20,
             "y": 97.7,
-            "width": 575,
+            "width": 570,
             "height": 18.8,
             "style": {
               "border-color": "#000000",
@@ -380,7 +380,7 @@
       "detail": {
         "height": 40.4,
         "translate": {
-          "x": -13,
+          "x": -10,
           "y": -64.8
         },
         "items": [
@@ -391,7 +391,7 @@
             "description": "",
             "x": 20,
             "y": 140.6,
-            "width": 575,
+            "width": 570,
             "height": 40.4,
             "style": {
               "border-color": "#000000",
@@ -732,7 +732,7 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 547,
+            "x": 545,
             "y": 152.8,
             "width": 43.2,
             "height": 11.1,
@@ -830,7 +830,7 @@
         "enabled": true,
         "height": 10,
         "translate": {
-          "x": -13,
+          "x": -10,
           "y": -67.3
         },
         "items": []
@@ -839,7 +839,7 @@
         "enabled": true,
         "height": 8.4,
         "translate": {
-          "x": -13,
+          "x": -10,
           "y": -89.5
         },
         "items": []
@@ -955,7 +955,7 @@
       20,
       0,
       0,
-      40
+      20
     ]
   }
 }

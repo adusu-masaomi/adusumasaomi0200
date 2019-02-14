@@ -32,16 +32,16 @@
       "type": "list",
       "display": true,
       "description": "",
-      "x": 7,
-      "y": 57,
-      "width": 600,
-      "height": 770,
+      "x": 10,
+      "y": 56.9,
+      "width": 576,
+      "height": 770.1,
       "header": {
         "enabled": true,
         "height": 18.8,
         "translate": {
-          "x": -13,
-          "y": -40.7
+          "x": -9,
+          "y": -40.8
         },
         "items": [
           {
@@ -51,7 +51,7 @@
             "description": "",
             "x": 20,
             "y": 97.7,
-            "width": 575,
+            "width": 570,
             "height": 18.8,
             "style": {
               "border-color": "#ff0000",
@@ -298,7 +298,7 @@
             "type": "text",
             "display": true,
             "description": "",
-            "x": 546,
+            "x": 544,
             "y": 102.7,
             "width": 41.5,
             "height": 11.1,
@@ -380,8 +380,8 @@
       "detail": {
         "height": 16.8,
         "translate": {
-          "x": -13,
-          "y": -64.8
+          "x": -9,
+          "y": -64.9
         },
         "items": [
           {
@@ -391,7 +391,7 @@
             "description": "",
             "x": 20,
             "y": 140.6,
-            "width": 575,
+            "width": 570,
             "height": 16,
             "style": {
               "border-color": "#ff0000",
@@ -732,7 +732,7 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 547,
+            "x": 545,
             "y": 144.8,
             "width": 43.2,
             "height": 11.1,
@@ -830,8 +830,8 @@
         "enabled": true,
         "height": 1.7,
         "translate": {
-          "x": -13,
-          "y": -90.9
+          "x": -9,
+          "y": -91
         },
         "items": []
       },
@@ -839,12 +839,12 @@
         "enabled": true,
         "height": 3.3,
         "translate": {
-          "x": -13,
-          "y": -121.4
+          "x": -9,
+          "y": -121.5
         },
         "items": []
       },
-      "content-height": 751.2,
+      "content-height": 751.3000000000001,
       "auto-page-break": true
     },
     {
@@ -852,7 +852,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 544,
+      "x": 538.2,
       "y": 42,
       "width": 38,
       "height": 11.1,
@@ -884,7 +884,7 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 465.8,
+      "x": 460,
       "y": 27,
       "width": 116.5,
       "height": 11.1,
@@ -955,7 +955,7 @@
       20,
       0,
       0,
-      40
+      20
     ]
   }
 }

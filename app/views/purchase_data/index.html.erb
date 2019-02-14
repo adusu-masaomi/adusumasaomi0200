@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = PurchaseDatum -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px" >
@@ -76,14 +77,16 @@
   <% end %>
     
   <%= f.label :material_code, '品番：：' %>
-  <!--<%= f.select :material_code_eq, options_from_collection_for_select(PurchaseDatum.group(:material_code), "material_code","material_code" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
-  <!--<%= f.select :with_material, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_code]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
-  <%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>
+  <!--<%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
+  <!--upd190207-->
+  <%= f.select :with_material_code, options_from_collection_for_select(MaterialMaster.all, "id", :p_material_code, params[:q].try(:[], :with_material_code)) ,
+       {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" }  %>
+       
   <!--モバイル用対応  add180830-->
   <% if browser.platform.ios? || browser.platform.android? %>
     <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterial()" %>
   <% end %>
-  
+    
   <%= f.label :material_category_id, '分類：：' %>
   <%= f.select :with_material_category, MaterialCategory.order("seq asc").all.map{|st| [st.name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCategory" } %>
   <!--モバイル用対応  add180830-->
@@ -106,6 +109,7 @@
   <!--add180117 クリアボタン追加-->
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %>
   
+  <!--必要なし？-->
   <%= f.label :material_code, '品名（手入力）：' %>
   <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %>
 
@@ -119,10 +123,10 @@
                :onclick => "clearAllConditions()" %>
        <%= link_to "仕入表(様式１)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "1"),
-            :class => 'btn  btn-lightgreen500_ftg', :target=>["_blank"] %>
+            :class => 'btn  btn-lightgreen500_ftg keep-disp', :target=>["_blank"] %>
       <%= link_to "仕入表(様式２)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "2"),
-            :class => 'btn  btn-pink300_ftg', :target=>["_blank"] %>
+            :class => 'btn  btn-pink300_ftg keep-disp', :target=>["_blank"] %>
        <!--保留
        <%= link_to "請求一覧(外注)",
             purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "3"),
@@ -131,7 +135,7 @@
        <%= link_to '新規作成',
             new_purchase_datum_path(:new_flag => "0", construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
             supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag] ),
-            :class => 'btn btn-primary' %>
+            :class => 'btn btn-primary keep-disp' %>
        <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
 	   <!--<%= link_to t('.back', :default => t("工事費集計へ")), construction_costs_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                                    :class => 'btn btn-lime500_rsd keep-disp'  %>-->
@@ -193,7 +197,7 @@
     <% @purchase_data.order("id desc").each  do  |purchase_datum| %>
       <tr>
         <td style="font-size : 12px;"><%= link_to purchase_datum.id, purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
-                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]) %></td>
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'keep-disp'  %></td>
         <td style="font-size : 12px;"><%= purchase_datum.purchase_date %></td>
         <% if purchase_datum.purchase_order_datum.nil? %>
            <td>-</td>
@@ -294,7 +298,7 @@
         <td>
           <%= link_to '編集',
                       edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
-                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs' %>
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs keep-disp' %>
           <!--集計ボタン(保留)-->
           <!--<%= link_to '集計',
                       edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
@@ -304,7 +308,7 @@
                       supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
         <td><%=l purchase_datum.created_at.in_time_zone('Tokyo') %></td>
         
@@ -344,6 +348,7 @@
         $(".searchableCustomerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
 
         $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        //$(".searchableInternalCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 
         $(".searchableMaterialCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
 
@@ -372,6 +377,9 @@
 	 }
 	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
 	 //
+     
+     //add190205
+     $('form').keepPosition();
      
       //add190124
      //請求済（外注用）チェックでリアルタイム更新する
@@ -417,6 +425,7 @@
     $(".searchableConstructionCode").val(null).trigger("change");
     $(".searchableCustomerName").val(null).trigger("change"); 
     $(".searchableMaterialCode").val(null).trigger("change"); 
+    //$(".searchableInternalCode").val(null).trigger("change"); 
     $(".searchableMakerName").val(null).trigger("change"); 
     $(".searchablePurchaseDivison").val(null).trigger("change"); 
     $(".searchableSupplierName").val(null).trigger("change"); 

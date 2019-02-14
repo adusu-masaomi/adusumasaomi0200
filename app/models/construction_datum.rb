@@ -12,7 +12,9 @@ class ConstructionDatum < ActiveRecord::Base
 	has_many :construction_attachments, dependent: :destroy
     accepts_nested_attributes_for :construction_attachments, allow_destroy: true
     #
-    
+    #dd190131
+    #has_one :quotation_header
+   
 	#発行日用
     attr_accessor :issue_date
 	#作業日・作業者（指示書発行一時用）

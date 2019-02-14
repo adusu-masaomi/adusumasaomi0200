@@ -206,6 +206,9 @@ Rails.application.routes.draw do
   
   get '/material_masterz/get_material_id' => 'material_masters#get_material_id'
   
+  #add190205
+  get '/outsourcing_datum/update_all_purchase_date' => 'outsourcing_data#update_all_purchase_date'
+  
   get '/purchase_datum/unit_price_select' => 'purchase_data#unit_price_select'
   get '/purchase_datum/list_price_select' => 'purchase_data#list_price_select'
   get '/purchase_datum/maker_select' => 'purchase_data#maker_select'

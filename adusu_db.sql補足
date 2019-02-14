@@ -9,3 +9,4 @@ mysql -u adusu -p adusu_db < adusu_db.sql
 (pw:Adusu2016%)
 
 *会計システムにも影響が出るので、別途、migrateする
+"python manage.py migrate --fake account"
