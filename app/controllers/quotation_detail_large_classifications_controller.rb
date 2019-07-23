@@ -384,7 +384,9 @@ class QuotationDetailLargeClassificationsController < ApplicationController
       @quotation_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
       new_record = @quotation_detail_large_classification.deep_clone include: :quotation_detail_middle_classifications
     
-      status = new_record.save
+      #status = new_record.save
+      #upd190225
+      status = new_record.save(validate: false)
      
     #respond_to do |format|
     
@@ -1018,14 +1020,18 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  end
 	  
 	  if @quotation_header.present?
-        if @quotation_header.quotation_code.present?
-		  
+      if @quotation_header.quotation_code.present?
+		    
+        #upd190307
+        #一律で仮コードセット
+        invoice_code = $HEADER_CODE_MAX
+        
 		  #add170310 見出しコードが空の場合は仮番号をセット。
-		  if @quotation_header.invoice_code.blank?
-		    invoice_code = $HEADER_CODE_MAX
-          else
-            invoice_code = @quotation_header.invoice_code
-		  end
+		  #if @quotation_header.invoice_code.blank?
+		  #  invoice_code = $HEADER_CODE_MAX
+      #else
+      #  invoice_code = @quotation_header.invoice_code
+		  #end
 		  #
 		  
           invoice_header_params = { invoice_code: invoice_code, quotation_code:  @quotation_header.quotation_code, 
@@ -1162,12 +1168,15 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	    @quotation_header = QuotationHeader.find(params[:quotation_header_id])
 	  end
 	  
-	  #見出しコードが空の場合は仮番号をセット。
-	   if @quotation_header.delivery_slip_code.blank?
-	     delivery_slip_code = $HEADER_CODE_MAX
-       else
-         delivery_slip_code = @quotation_header.delivery_slip_code
-	   end
+    #upd190307
+    delivery_slip_code = $HEADER_CODE_MAX 
+    
+	   #見出しコードが空の場合は仮番号をセット。
+	   #if @quotation_header.delivery_slip_code.blank?
+	   #  delivery_slip_code = $HEADER_CODE_MAX
+     #else
+     #  delivery_slip_code = @quotation_header.delivery_slip_code
+	   #end
 	   #
 		  
 	  if @quotation_header.present?
@@ -1181,7 +1190,8 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   tel: @quotation_header.tel, fax: @quotation_header.fax, construction_period: @quotation_header.construction_period, 
                                   construction_post: @quotation_header.construction_post, construction_place: @quotation_header.construction_place, 
                                   construction_house_number: @quotation_header.construction_house_number, construction_place2: @quotation_header.construction_place2, 
-                                  delivery_amount: @quotation_header.quote_price, execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
+                                  delivery_amount: @quotation_header.quote_price, 
+                                  execution_amount: @quotation_header.execution_amount, last_line_number: @quotation_header.last_line_number} 
           #上記、見積日は移行しないものとする。
           @deliver_slip_header = DeliverySlipHeader.new(delivery_slip_header_params)
           if @deliver_slip_header.save(:validate => false)   

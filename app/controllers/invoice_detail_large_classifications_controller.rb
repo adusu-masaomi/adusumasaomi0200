@@ -852,12 +852,17 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 
 	  if @invoice_header.present?
         if @invoice_header.invoice_code.present?
+          
+          #upd190307
+          #一律で仮番号をセット
+          delivery_slip_code = $HEADER_CODE_MAX
+          
           #add170310 見出しコードが空の場合は仮番号をセット。
-          if @invoice_header.delivery_slip_code.blank?
-            delivery_slip_code = $HEADER_CODE_MAX
-          else
-            delivery_slip_code = @invoice_header.delivery_slip_code
-          end
+          #if @invoice_header.delivery_slip_code.blank?
+          #  delivery_slip_code = $HEADER_CODE_MAX
+          #else
+          #  delivery_slip_code = @invoice_header.delivery_slip_code
+          #end
           #
 		 
           delivery_slip_header_params = { delivery_slip_code:  delivery_slip_code, quotation_code:  @invoice_header.quotation_code, 
@@ -994,13 +999,17 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 	 
 	  if @invoice_header.present?
 	    if @invoice_header.invoice_code.present?
-
+          
+          #upd190307
+          #一律で仮コードをセット
+          quotation_code = $HEADER_CODE_MAX
+          
           #add170310 見出しコードが空の場合は仮番号をセット。
-          if @invoice_header.quotation_code.blank?
-            quotation_code = $HEADER_CODE_MAX
-          else
-            quotation_code = @invoice_header.quotation_code
-          end
+          #if @invoice_header.quotation_code.blank?
+          #  quotation_code = $HEADER_CODE_MAX
+          #else
+          #  quotation_code = @invoice_header.quotation_code
+          #end
 		  #
 
           quotation_header_params = { quotation_code:  quotation_code, invoice_code:  @invoice_header.invoice_code, 

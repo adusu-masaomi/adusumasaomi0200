@@ -96,6 +96,8 @@ class MaterialMastersController < ApplicationController
   def get_material_id
     @material_id = MaterialMaster.where(:material_code => params[:material_code]).where("id is NOT NULL").pluck(:id).flatten.join(" ")
     
+    #binding.pry
+    
     #add180215
     #コードの該当がなければ、手入力とみなす。
     if @material_id == ""

@@ -44,7 +44,7 @@
   
   <%= f.input :material_name,  input_html:{ id: "material_name", style: 'width:400px',  :class => "material_name", :tabindex=>"1" } %>
   
-  <!--以下スペースあり-->
+  <!--スペース-->
   &nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.collection_select :maker_id, @maker_masters.all, :id, :maker_name, {:selected => f.object.maker_id || 1} , 
       {class: "searchableSelect1_3 form-control" , id: "maker_id" , style: 'width:200px;margin-left:-20px', :tabindex => "3" } %>
@@ -57,6 +57,11 @@
   <% @notes = MaterialMaster.where(:id => f.object.material_id).where("id is NOT NULL").pluck(:notes).flatten.join(" ") %>
   
   <%= f.input :notes,  input_html:{ id: "notes",  style: 'width:610px' , :tabindex=>"5", :value => @notes} %>
+  
+  <!--スペース-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.collection_select :material_category_id, @material_categories.all, :id, :name, {:include_blank => true, :selected => f.object.material_category_id || nil} , 
+      {class: "searchableSelect1_4 form-control" , id: "material_category_id" , style: 'width:200px;margin-left:-20px', :tabindex => "6" } %>
   
 </div>
 </div>
@@ -192,6 +197,9 @@
   //各値の自動セット-ajax
   function setItem(item_id, selectedIndex)
   {
+  
+         //debugger;
+  
 		 id = parseInt(item_id);
         
 		 //add170804
@@ -208,11 +216,16 @@
 				//obj = document.getElementById("material_code").textContent;
 				//document.getElementsByName("material_code[]")[selected_index].value = obj;
 				
-				//upd171030
+                //upd171030
 				obj = document.getElementById("material_code_hide").textContent;
 				var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]"
 			    document.getElementsByName(nm)[0].value = obj;
 			    
+                //debugger;
+                
+                //add190226
+                $(".searchInsertMaterial").trigger("change.select2"); 
+                
 				//商品名をセット
 				//obj = document.getElementById("material_name").textContent;
 				//document.getElementsByName("material_name[]")[selected_index].value = obj;
@@ -240,22 +253,15 @@
 		        }
 				
 				//メーカー名をセット
-				//obj = document.getElementById("maker_name").textContent;
-				//document.getElementsByName("maker_name[]")[selected_index].value = obj;
 				obj = document.getElementById("maker_id_hide").textContent;
 			    if (obj != null){
 		          var index = parseInt(obj);
-				  
 				  gTrigger = true;
-				  
 				  //$(".searchableSelect1_3")[selected_index].value = index; 
 				  nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][maker_id]"
 				  document.getElementsByName(nm)[0].value = index; 
-				  
-				  
 				  $(".searchableSelect1_3").trigger("change"); 
-		       
-				}
+		        }
 				
 				   
 				gTrigger = false;
@@ -268,6 +274,19 @@
 				nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][list_price]"
 				document.getElementsByName(nm)[0].value = obj; 
 				
+                //add190226
+                //分類をセット
+				obj = document.getElementById("material_category_id_hide").textContent;
+			    if (obj != null){
+		          var index = parseInt(obj);
+				  gTrigger = true;
+				  //$(".searchableSelect1_4")[selected_index].value = index; 
+				  nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_category_id]"
+				  document.getElementsByName(nm)[0].value = index; 
+				  $(".searchableSelect1_4").trigger("change.select2"); 
+		        }
+                
+                gTrigger = false;
 			
 			  }
             );
@@ -324,16 +343,12 @@
        var current = document.activeElement;
 		gControl_id = current.id
 		
-		
+        
 		//if (gSelectedIndex == 0){
 		   
 		   if (gControl_id.substr(-8,8) == "quantity") {
 		   //数量のみ変更した場合
 		     
-			 //gTop = current.offsetTop;
-			 //selectedIndex  = getSelectedChildIndexSome(2);
-			 //gSelectedIndex = selectedIndex;
-			 
              //name属性に埋め込まれているIDを抜き出す
 	         var controlName = document.activeElement.name;
 	         var selectedIndex = 0;
@@ -349,7 +364,18 @@
 			 document.getElementsByName(nm)[0].focus();
 			 
 			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
-			 
+		   }else if (gControl_id == "notes") {
+           //add190226
+           //備考→分類
+             //name属性に埋め込まれているIDを抜き出す
+	         var controlName = document.activeElement.name;
+	         var selectedIndex = 0;
+	         selectedIndex = controlName.slice(42);
+		     selectedIndex = selectedIndex.slice(0,-8);
+             
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_category_id]"
+			 document.getElementsByName(nm)[0].focus();
+             
 		   }else if (gControl_id == "maker_id") {
            //メーカーの場合→プルダウンはここへ飛ばない。
 		   //  gTop = current.offsetTop;
@@ -448,6 +474,7 @@
   function searchItemCode(t){
   //function searchItemCode(itemCode){
       
+      
       //add180215
       var itemCode = t.value;
       
@@ -486,9 +513,12 @@
 			   
 			  nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]"
 			  document.getElementsByName(nm)[0].value = material_id;
-			 
+			  
 			  //$(".searchableSelect1_1").trigger("change")[selectedIndex];
-			  $(".searchableSelect1_1").trigger("change");
+			  //$(".searchableSelect1_1").trigger("change");
+              //upd190225 
+              //トリガー後のイベントは発生させたくないので、以下のようにする。
+              $(".searchableSelect1_1").trigger("change.select2");
 			  
               //triggerはうまくいかないので直接セット
 			  //gMaterial_id = material_id;  

@@ -5,7 +5,10 @@ class DeliverySlipPDF
   #upd170626
   def self.create delivery_slip_detail_large_classifications
 	#納品書PDF発行
- 
+       #新元号対応 190401
+       require "date"
+       d_heisei_limit = Date.parse("2019/5/1")
+       
        # tlfファイルを読み込む
        if $print_type == "1"
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_pdf.tlf")
@@ -15,9 +18,7 @@ class DeliverySlipPDF
 	   
 		# 1ページ目を開始
         @report.start_new_page
-	            @flag = nil
-		 
-
+	    @flag = nil 
 		
        #$delivery_slip_detail_large_classifications.order(:line_number).each do |delivery_slip_detail_large_classification|
        #upd170626
@@ -103,11 +104,48 @@ class DeliverySlipPDF
 		     @report.page.item(:delivery_amount_tax_only).value(@delivery_amount_tax_only) 
 		   end
 		   
+           
+           #add 190723
+           #工事期間
+		   @report.page.item(:construction_period).value(@delivery_slip_headers.construction_period) 
+		 
+		   #住所（工事場所）
+		   all_address = ""
+           if @delivery_slip_headers.construction_post.present?
+             all_address = @delivery_slip_headers.construction_post + "　"
+           end
+           #
+           
+           all_address += @delivery_slip_headers.construction_place
+		   if @delivery_slip_headers.construction_house_number.present?
+		     all_address += @delivery_slip_headers.construction_house_number
+		   end
+		   if @delivery_slip_headers.construction_place2.present?
+		     all_address += "　" + @delivery_slip_headers.construction_place2
+		   end
+		   @report.page.item(:construction_place).value(all_address) 
+		   #add end
+           
+           
+           
            #納品日
 		   if @delivery_slip_headers.delivery_slip_date.present?
 		     @gengou = @delivery_slip_headers.delivery_slip_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:delivery_slip_date).value(@gengou) 
+		    
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
             #空でも文字を出す add180515
              empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
@@ -189,6 +227,9 @@ class DeliverySlipPDF
   end
   def self.set_detail_data
      
+     
+     
+     
 	 #納品書(表紙)のページ番号をマイナスさせるためのカウンター。
 	 @estimation_sheet_pages = @report.page_count 
 	 
@@ -216,7 +257,10 @@ class DeliverySlipPDF
   def self.delivery_slip_detailed_statement
   #内訳書PDF発行(A4縦ver)
       
-	  
+	 #新元号対応 190401
+       require "date"
+       d_heisei_limit = Date.parse("2019/5/1")
+
       @@delivery_slip_price = 0
     
 	  # 1ページ目を開始
@@ -261,8 +305,22 @@ class DeliverySlipPDF
 		   
 		   if @delivery_slip_headers.delivery_slip_date.present?
              @gengou = @delivery_slip_headers.delivery_slip_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:delivery_slip_date).value(@gengou) 
+		     
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             
+             @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
             #空でも文字を出す add180515
              empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"

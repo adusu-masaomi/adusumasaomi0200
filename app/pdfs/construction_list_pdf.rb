@@ -3,6 +3,10 @@ class ConstructionListPDF
   
   def self.create construction_list	
 	#工事一覧表PDF発行
+       #新元号対応 190401
+       require "date"
+       @d_heisei_limit = Date.parse("2019/5/1")
+  
  
        # tlfファイルを読み込む
        report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_list_pdf.tlf")
@@ -67,10 +71,23 @@ class ConstructionListPDF
    
 end
    
+   
 def setGenGouDate(inDate)
   gengouDate = inDate
-  gengouDate = $gengo_name + "#{gengouDate.year - $gengo_minus_ad}年#{gengouDate.strftime('%-m')}月#{gengouDate.strftime('%-d')}日"
-
+  
+  #元号変わったらここも要変更
+  if gengouDate >= @d_heisei_limit
+  #令和
+    if gengouDate.year - $gengo_minus_ad_2 == 1
+    #１年の場合は元年と表記
+      gengouDate = $gengo_name_2 + "元年#{gengouDate.strftime('%-m')}月#{gengouDate.strftime('%-d')}日"
+    else
+      gengouDate = $gengo_name_2 + "#{gengouDate.year - $gengo_minus_ad_2}年#{gengouDate.strftime('%-m')}月#{gengouDate.strftime('%-d')}日"
+    end
+  else
+  #平成
+    gengouDate = $gengo_name + "#{gengouDate.year - $gengo_minus_ad}年#{gengouDate.strftime('%-m')}月#{gengouDate.strftime('%-d')}日"
+  end
   return gengouDate
 end
    

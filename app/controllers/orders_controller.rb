@@ -78,6 +78,6 @@ class OrdersController < ApplicationController
       params.require(:order).permit(:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity)
     end
 	def purchase_order_datum_params
-      params.require(:purchase_order_datum).permit(orders_attributes: [:purchase_order_history_id, :material_id, :material_code, :material_name, :quantity])
+      params.require(:purchase_order_datum).permit(orders_attributes: [:purchase_order_history_id, :material_id, :material_code, :material_name, :quantity, :material_category_id])
     end
 end

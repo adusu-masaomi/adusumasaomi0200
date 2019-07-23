@@ -11,6 +11,11 @@
   <!-- kaminari用追加箇所終了 -->
   
   <%= search_form_for @q, url: outsourcing_data_path , :html => {:style=> 'width:1920px' } do |f| %>
+  
+  <%= f.label :supplier_id, '外注先：：' %>
+  <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
+  <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {id: 'supplier_id', style: 'width:220px' , class: "searchableSupplierName" } %>
+  
   <%= f.label :purchase_date, '作成日' %>
   <%= f.text_field :purchase_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'purchase_date_start'   %>
   
@@ -26,7 +31,20 @@
     <%= m.label :purchase_date, '支払日' %>
     <%= m.text_field :payment_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date'   %>
   <% end %>-->
-
+  
+  <%= f.label :purchase_date, '支払日' %>
+  <%= f.text_field :payment_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date_start'   %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartPaymentDate()" %>
+  <%= f.label :purchase_date, '～' %>
+  <%= f.text_field :payment_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'payment_date_end'  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndPaymentDate()" %>
+  
+  <%= f.label :purchase_due_date, '支払予定日' %>
+  <%= f.text_field :payment_due_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_due_date_start'   %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartPaymentDueDate()" %>
+  <%= f.label :purchase_due_date, '～' %>
+  <%= f.text_field :payment_due_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'payment_due_date_end'  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndPaymentDueDate()" %>
   
   <!--<%= f.label :maker_code, 'メーカー：：' %>
   <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %>
@@ -34,9 +52,6 @@
   <%= f.text_field :slip_code_eq, include_blank: true, id: 'slip_code'  %>
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSlipCode()" %>-->
   
-  <%= f.label :supplier_id, '外注先：：' %>
-  <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
-  <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {id: 'supplier_id', style: 'width:220px' , class: "searchableSupplierName" } %>
   
   <!--モバイル用対応  add180830-->
   <% if browser.platform.ios? || browser.platform.android? %>
@@ -115,6 +130,9 @@
        <%= link_to "請求一覧(外注)",
             outsourcing_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "3"),
             :class => 'btn  btn-purple300_ftg keep-disp', :target=>["_blank"] %>
+       <%= link_to "中越用",
+            outsourcing_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "4"),
+            :class => 'btn  btn-bluegrey100_ftg keep-disp', :target=>["_blank"] %>
        <%= link_to '新規作成',
             new_outsourcing_datum_path(:new_flag => "0", construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
             supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag] ),
@@ -500,15 +518,33 @@
  }
  //
  
- //開始日を空にする
+ //開始日(作成日)を空にする
  function clearStartDate(){
    document.getElementById("purchase_date_start").value = "";
  }
- //開始日を空にする
+ //終了日(作成日)を空にする
  function clearEndDate(){
    document.getElementById("purchase_date_end").value = "";
  }
  
+ //開始日(支払日)を空にする
+ function clearStartPaymentDate(){
+   document.getElementById("payment_date_start").value = "";
+ }
+ //終了日(支払日)を空にする
+ function clearEndPaymentDate(){
+   document.getElementById("payment_date_end").value = "";
+ }
+ 
+ //開始日(支払予定日)を空にする
+ function clearStartPaymentDueDate(){
+   document.getElementById("payment_due_date_start").value = "";
+ }
+ //終了日(支払予定日)を空にする
+ function clearEndPaymentDueDate(){
+   document.getElementById("payment_due_date_end").value = "";
+ }
+  
  //キーワードの品番を空にする
  function clearItemCodeKeyWords(){
    document.getElementById("material_code").value = "";

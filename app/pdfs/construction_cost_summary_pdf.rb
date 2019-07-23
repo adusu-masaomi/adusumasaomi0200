@@ -3,25 +3,28 @@ class ConstructionCostSummaryPDF
   
   def self.create construction_cost_summary	
 	#仕入表PDF発行
- 
-       #@@page_number = 0
+      
+      #新元号対応 190401
+      require "date"
+      d_heisei_limit = Date.parse("2019/5/1")
+      
+      #@@page_number = 0
       #report = ThinReports::Report.create do |report|
 	  
+	  #binding.pry
+       
+      # tlfファイルを読み込む
+      if $print_type_costs != "1"
+        report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_pdf.tlf")
+      else
+	  #工事集計PDF用  add180118
+	    report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_black_pdf.tlf")
 	   
-       # tlfファイルを読み込む
-       if $print_type_costs != "1"
-         report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_pdf.tlf")
-       else
-	   #工事集計PDF用  add180118
-	     report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/construction_cost_summary_black_pdf.tlf")
-	   
-	   end
+	  end
        #report = ThinReports::Report.create do |r|
 	  
 	  # 1ページ目を開始
       report.start_new_page
-
-
       
 	  @flag = nil
 		 
@@ -37,7 +40,6 @@ class ConstructionCostSummaryPDF
 	  
 	
 	   
-	  
 		 #---見出し---
          page_count = report.page_count.to_s + "頁"
 
@@ -56,18 +58,54 @@ class ConstructionCostSummaryPDF
 		 
 		   #発行日
 		   @gengou = Date.today
-		   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   report.page.item(:issue_date).value(@gengou)
-			 
-		   
-		   #最終作業日
-		   if construction_costs.construction_datum.construction_end_date.present?
-		     @gengou = construction_costs.construction_datum.construction_end_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     report.page.item(:construction_end_date).value(@gengou) 
-		   end
+           
+           #元号変わったらここも要変更
+           if @gengou >= d_heisei_limit
+		     #令和
+             if @gengou.year - $gengo_minus_ad_2 == 1
+             #１年の場合は元年と表記
+               @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             else
+               @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+           else
+             #平成
+             @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           end
+           
+           report.page.item(:issue_date).value(@gengou)
 		   
            
+		   #最終作業日
+		   null_date = Date.parse("2000/1/1")
+           
+           #if construction_costs.construction_datum.construction_end_date.present?
+           if construction_costs.construction_datum.construction_end_date.present? && 
+              construction_costs.construction_datum.construction_end_date != null_date
+           
+             @gengou = construction_costs.construction_datum.construction_end_date
+		     
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             
+             report.page.item(:construction_end_date).value(@gengou) 
+		   
+           else
+             
+             @gengou = "　　　　　　　"
+             report.page.item(:construction_end_date).value(@gengou)
+           
+           end
+		   
 		 end
 	
 	    

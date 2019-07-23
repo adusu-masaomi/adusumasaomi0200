@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20190130052237) do
+ActiveRecord::Schema.define(version: 20190226023910) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -677,6 +677,7 @@ ActiveRecord::Schema.define(version: 20190130052237) do
 
   create_table "material_masters", force: :cascade do |t|
     t.string   "material_code",                    limit: 255
+    t.string   "internal_code",                    limit: 255
     t.string   "material_name",                    limit: 255
     t.integer  "maker_id",                         limit: 4
     t.integer  "unit_id",                          limit: 4
@@ -709,6 +710,7 @@ ActiveRecord::Schema.define(version: 20190130052237) do
     t.integer  "sequential_id",             limit: 4,   null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
+    t.integer  "material_category_id",      limit: 4
   end
 
   add_index "orders", ["purchase_order_history_id", "sequential_id"], name: "uq_seq", unique: true, using: :btree
@@ -731,6 +733,7 @@ ActiveRecord::Schema.define(version: 20190130052237) do
     t.integer  "unpaid_amount",         limit: 4
     t.date     "payment_due_date"
     t.date     "payment_date"
+    t.date     "unpaid_payment_date"
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
   end

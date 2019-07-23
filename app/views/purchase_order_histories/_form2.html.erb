@@ -86,6 +86,10 @@
    
    <%= f.collection_select :material_id_select_hide, @material_masters.all, :id, :p_material_code_name,  {} , 
       {id:"material_id_select_hide", hidden: true } %>
+    
+   <!--add190226-->
+   <%= f.collection_select :material_code_select_hide, @material_masters.all, :material_code, :material_code,  {} , 
+      {id:"material_code_select_hide", hidden: true } %>
    
    <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
    <%= f.input :material_id_hide, input_html:{id: "material_id_hide" }, as: :hidden %>
@@ -96,6 +100,8 @@
    <%= f.input :material_name_hide,  input_html:{id:"material_name_hide" }, as: :hidden %>
    <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %>
    <%= f.input :list_price_hide,  input_html:{id:"list_price_hide", }, as: :hidden %>
+   <!--add190226-->
+   <%= f.input :material_category_id_hide,  input_html:{id:"material_category_id_hide", }, as: :hidden %>
    <!-- -->
    
    <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
@@ -147,7 +153,7 @@
 <script type="text/javascript">
 
   var disp_flag = 0;
-
+  var material_code = "";
   
   //フォーム上の制御
   $(document).ready(function(){
@@ -197,6 +203,7 @@
 	     }
 	   });
 	  
+       $(".searchableSelect1_1").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST  });
 	   //資材リスト操作後処理(既に登録済み)
 	   $( ".searchableSelect1_1" ).on("select2:open", function (e) {
 	       //一旦ここでY座標を取得
@@ -205,6 +212,9 @@
        });
 	   
 	   $( ".searchableSelect1_1" ).change(function(e) {
+       
+         //debugger;
+       
          //品番IDを取得
 		 gMaterial_id = $(this)[0].value;
 		 //name属性に埋め込まれているIDを抜き出す
@@ -247,7 +257,7 @@
 	  
        //メーカー
        //add180411
-       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true});
 	   //add end
        
 	   //メーカー操作後処理(既に登録済み)
@@ -270,9 +280,11 @@
 			setNextControlOnSelect(e,1);
        });
 	  
-	   //add 180213
+	   //
        $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
 	   $(".searchInsertMaterial").change(function(e) {
+          
+          
           searchItemCode(this);
        });
        $( ".searchInsertMaterial" ).on("select2:close", function (e) {
@@ -290,7 +302,17 @@
 	     }
          e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
        });
-       //add end
+       //add190226
+       //分類
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+       $( ".searchableSelect1_4" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //分類からアイテム抽出する
+		 setMaterialExtractByCategory(obj);
+       });
+       //
  });  
 
 //$(".message-class").on('click', function(){
@@ -307,6 +329,7 @@ gTop = 0;
 gTrigger = false;
 
 //明細フォーム新規追加時の制御
+//※更新時は、上記の"document.loadで発生するので、同様に直す！"
 $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    
     //連番をセットする
@@ -320,13 +343,12 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
     ///////
     //明細フォーム用(追加時のみ、ここが使用されるらしい。)
 	//検索可能なリストボックス(品名の場合)
-    $(".searchableSelect1_1").select2({ theme: "classic" });
+    $(".searchableSelect1_1").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST  });
     
 	 $( ".searchableSelect1_1" ).change(function(e) {
+     //$('.searchableSelect1_1').on("select2:close", function (e) {
      	
-         //171028 インデックスが取れないので
-		 // 大幅改修中！！！！！！！！！！！！
-		 
+         
 		 //品番IDを取得
 		 gMaterial_id = $(this)[0].value;
 		 
@@ -339,7 +361,9 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 		 selectedIndex = selectedIndex.slice(0,-14);
 		 //
 		 
-		 setItem(gMaterial_id, selectedIndex);
+		 //debugger;
+         
+         setItem(gMaterial_id, selectedIndex);
      
 	
        });
@@ -380,9 +404,6 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
        $( ".searchableSelect1_2" ).on("select2:close", function (e) {
          
-		 //171028 インデックスが取れないので
-		 // 大幅改修中！！！！！！！！！！！！
-		 
 		 //name属性に埋め込まれているIDを抜き出す
 	     var controlName = $(this)[0].name;
 	     var selectedIndex = 0;
@@ -404,10 +425,9 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	   
 	   //メーカー(新規追加時)
        //$(".searchableSelect1_3").select2({ theme: "classic" });
-       //upd180411
-       $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true, allowClear: true , placeholder: MESSAGE_LIST});
 	   
-	 //メーカー操作後の処理(新規追加時)
+	   //メーカー操作後の処理(新規追加時)
 	   $( ".searchableSelect1_3" ).on("select2:open", function (e) {
 	       //Y座標を取得
 		   gTop = $(this)[0].offsetTop;
@@ -426,7 +446,9 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
          //次のコントロールへフォーカスを移す
 			setNextControlOnSelect(e,1);
 	   });
-       //add 180213
+       
+       //
+       //$(".searchInsertMaterial").select2({ theme: "classic", tags: true, allowClear: true , placeholder: MESSAGE_LIST });
        $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
        $(".searchInsertMaterial").change(function(e) {
           searchItemCode(this);
@@ -446,7 +468,16 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	     }
          e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
        });
-       //add end
+       //
+       //add190226
+       //分類
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+       $( ".searchableSelect1_4" ).change(function(e) {
+         obj = $(this);
+		 //分類からアイテム抽出する
+		 setMaterialExtractByCategory(obj);
+       });
+       //
     
 	//商品コードクリック時にインデックスを取得、更にプルダウンと照合する
 	//新規登録の、商品コードを変更した場合。
@@ -546,7 +577,6 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
  }
  
  //メーカー別にアイテムを抽出する処理
- //add171101
  function setMaterialExtractByMaker(obj){
  
    //name属性に埋め込まれているIDを抜き出す
@@ -560,6 +590,9 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
    	 //var maker_id = $(this)[0].value;
      var maker_id = obj[0].value;
      
+     var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+     material_code = document.getElementsByName(nm)[0].value;
+     
      if (isNaN(maker_id) == false){
      //add180411 idが名称の場合（メーカー新規）を除外
      
@@ -572,11 +605,71 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
              var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
 	         document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
 	       }
+           if (material_code == "")
+           //商品コードが手入力されていたら、そのままにする
+           {
+             //商品コード
+             if (document.getElementById("material_code_select_hide").innerHTML != "") {
+               var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+	           document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_code_select_hide").innerHTML;
+             }
+           }
 	     });
      }
    }	 
    //
  }
+ 
+ 
+ //分類別にアイテムを抽出する処理
+ 
+ function setMaterialExtractByCategory(obj){
+ 
+   //name属性に埋め込まれているIDを抜き出す
+   var controlName = obj[0].name;
+   var selectedIndex = 0;
+   selectedIndex = controlName.slice(42);
+   selectedIndex = selectedIndex.slice(0,-23);
+   
+   //
+		   
+   if (gTrigger == false){
+   	 var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+     var material_id = document.getElementsByName(nm)[0].value;
+     //
+     var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+     material_code = document.getElementsByName(nm)[0].value;
+       
+        
+     var material_category_id = obj[0].value;
+     
+     //if (isNaN(material_category_id) == false){  //手入力(未選択)状態の場合のみ有効
+     if (material_id == "1" || material_id == "" )
+     {
+	   //メーカーIDから該当する品番リストを取得する
+       $.get("<%= purchase_order_historiez_material_extract_by_category_path %>",
+        {material_category_id: material_category_id},
+         function(data){
+	   
+	       if (document.getElementById("material_id_select_hide").innerHTML != "") {
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+	         document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	       }
+           
+           if (material_code == "")
+           //商品コードが手入力されていたら、そのままにする
+           {
+             //商品コード
+             if (document.getElementById("material_code_select_hide").innerHTML != "") {
+               var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+	           document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_code_select_hide").innerHTML;
+             }
+           }
+	     });
+     }
+   }	 
+ }
+ 
  
  //入力チェック(eメール用）
  function submitAfterValidationEmail(){

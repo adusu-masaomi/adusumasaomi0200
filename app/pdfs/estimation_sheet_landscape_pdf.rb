@@ -5,6 +5,9 @@ class EstimationSheetLandscapePDF
   def self.create quotation_detail_large_classifications
 	#見積書PDF発行
        
+       #新元号対応 190401
+       require "date"
+       
        # tlfファイルを読み込む
 	   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_landscape_pdf.tlf")
 
@@ -84,8 +87,24 @@ class EstimationSheetLandscapePDF
 		   #元号変わったらここも要変更
 		   if @quotation_headers.quotation_date.present?
 		     @gengou = @quotation_headers.quotation_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		   end
+             
+             #新元号対応 190401
+             #require "date"
+             d_heisei_limit = Date.parse("2019/5/1");
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+                #令和
+                if @gengou.year - $gengo_minus_ad_2 == 1
+                #１年の場合は元年と表記
+                  @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+                else
+                  @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+                end
+             else
+                #平成
+		        @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+           end
 		  
 		   #NET金額
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
@@ -394,9 +413,24 @@ class EstimationSheetLandscapePDF
 		 
 		   if @quotation_headers.quotation_date.present?
              @gengou = @quotation_headers.quotation_date
-		     #元号変わったらここも要変更
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:quotation_date).value(@gengou) 
+             
+             #新元号対応 190401
+             #require "date"
+             d_heisei_limit = Date.parse("2019/5/1")
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+		     #平成
+                @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             @report.page.item(:quotation_date).value(@gengou) 
 		  end
 		 
 		  #upd170626

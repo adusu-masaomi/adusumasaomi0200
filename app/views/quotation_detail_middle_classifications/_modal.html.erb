@@ -246,6 +246,9 @@
      });
      $( ".searchableSelect2_3" ).change(function(e) {
          setWorkingMiddleItem();
+         
+         //add190723;
+         setUnitPriceThenCalc();  //単価・金額を計算
      });
 	 //単位--select2のタブインデックスはここで指定。
      $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
@@ -474,6 +477,39 @@
 	 );
   }
   
+  //単価・金額を計算
+  //add190723
+  function setUnitPriceThenCalc()
+  {
+      obj = document.getElementById("working_middle_item_id");
+      working_middle_item_id = parseInt(obj.value);
+      
+      //見積単価
+      $.get("<%= quotation_detail_middle_classificationz_working_unit_price_select_path %>",
+       {id: working_middle_item_id },
+          function(data){
+            obj = document.getElementById("working_unit_price").textContent;
+            document.getElementById("working_unit_price").value = obj;
+ 		    
+            //実行単価
+            $.get("<%= quotation_detail_middle_classificationz_execution_unit_price_select_path %>",
+            {id: working_middle_item_id },
+            function(data){
+                obj = document.getElementById("execution_unit_price").textContent;
+                document.getElementById("execution_unit_price").value = obj;
+              
+                //金額も計算 add190723
+                //(ajaxの時間差を考慮してここにセット)
+	            calcTotalPrice();
+              }
+            ); 
+
+          }
+      ); 
+      
+      
+  }
+  
   //各値の自動セット-ajax
   function setWorkingMiddleItem()
   {  
@@ -491,12 +527,12 @@
       $.get("<%= quotation_detail_middle_classificationz_working_middle_item_select_path %>",
        {id: working_middle_item_id },
         function(data){
-          obj = document.getElementById("working_middle_item_name").textContent;
-          document.getElementById("working_middle_item_name").value = obj;
-		  //短縮名へも初期値としてセット
-		  //170112一旦保留
-		  //document.getElementById("working_middle_item_short_name").value = obj;
-		  }
+            obj = document.getElementById("working_middle_item_name").textContent;
+            document.getElementById("working_middle_item_name").value = obj;
+		    //短縮名へも初期値としてセット
+		    //170112一旦保留
+		    //document.getElementById("working_middle_item_short_name").value = obj;
+		}
       );
      
       //仕様
@@ -519,55 +555,28 @@
         }
       );       
 	  
+      //別ルーチンへ移動  upd190723
       //見積単価
-      $.get("<%= quotation_detail_middle_classificationz_working_unit_price_select_path %>",
-       {id: working_middle_item_id },
-        function(data){
-          obj = document.getElementById("working_unit_price").textContent;
-          document.getElementById("working_unit_price").value = obj;
-		  }
-      ); 
+      //$.get("<%= quotation_detail_middle_classificationz_working_unit_price_select_path %>",
+      // {id: working_middle_item_id },
+      //  function(data){
+      //    obj = document.getElementById("working_unit_price").textContent;
+      //    document.getElementById("working_unit_price").value = obj;
+ 	  //   
+      //      //金額も計算 add190723
+      //      //(ajaxの時間差を考慮してここにセット)
+	  //      calcTotalPrice();
+      //    }
+      //); 
       //実行単価
-      $.get("<%= quotation_detail_middle_classificationz_execution_unit_price_select_path %>",
-       {id: working_middle_item_id },
-        function(data){
-          obj = document.getElementById("execution_unit_price").textContent;
-          document.getElementById("execution_unit_price").value = obj;
-		  }
-      );
-      //材料ID(後から選択ができないので保留・・・)
-      //$.get("<%= quotation_detail_middle_classificationz_material_id_select_path %>",
+      //$.get("<%= quotation_detail_middle_classificationz_execution_unit_price_select_path %>",
       // {id: working_middle_item_id },
       //  function(data){
-      //  }
-      //);       
-      //170112一旦保留
-	  //材料名
-      //$.get("<%= quotation_detail_middle_classificationz_quotation_material_name_select_path %>",
-      // {id: working_middle_item_id },
-      //  function(data){
-      //    obj = document.getElementById("quotation_material_name").textContent;
-      //    document.getElementById("quotation_material_name").value = obj;
-	  //  }
-      //);      
-      //170112一旦保留
-	  //材料単価
-      //$.get("<%= quotation_detail_middle_classificationz_material_unit_price_select_path %>",
-      // {id: working_middle_item_id },
-      //  function(data){
-      //    obj = document.getElementById("material_unit_price").textContent;
-      //    document.getElementById("material_unit_price").value = obj;
-	  //  }
-      //);      
-      //170112一旦保留
-	  //労務単価
-      //$.get("<%= quotation_detail_middle_classificationz_labor_unit_price_select_path %>",
-      // {id: working_middle_item_id },
-      //  function(data){
-      //    obj = document.getElementById("labor_unit_price").textContent;
-      //    document.getElementById("labor_unit_price").value = obj;
-	  //  }
-      //);      
+      //    obj = document.getElementById("execution_unit_price").textContent;
+      //    document.getElementById("execution_unit_price").value = obj;
+      //	  }
+      //);
+      
       
       //歩掛り
       $.get("<%= quotation_detail_middle_classificationz_labor_productivity_unit_select_path %>",

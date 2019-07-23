@@ -365,7 +365,10 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     if @status != "fixed"
       @delivery_slip_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
       new_record = @delivery_slip_detail_large_classification.deep_clone include: :delivery_slip_detail_middle_classifications
-      status = new_record.save
+      
+      #status = new_record.save
+      #upd190225
+      status = new_record.save(validate: false)
      
       #respond_to do |format|
       if status == true
@@ -976,14 +979,18 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	  end
 	  
 	  if @delivery_slip_header.present?
-        if @delivery_slip_header.delivery_slip_code.present?
+      if @delivery_slip_header.delivery_slip_code.present?
 		
-		  #見出しコードが空の場合は仮番号をセット。
-		  if @delivery_slip_header.invoice_code.blank?
-		    invoice_code = $HEADER_CODE_MAX
-          else
-            invoice_code = @delivery_slip_header.invoice_code
-		  end
+        #upd190307
+        #一律で仮コードセット
+        invoice_code = $HEADER_CODE_MAX
+        
+		  ##見出しコードが空の場合は仮番号をセット。
+		  #if @delivery_slip_header.invoice_code.blank?
+		  #  invoice_code = $HEADER_CODE_MAX
+      #else
+      #  invoice_code = @delivery_slip_header.invoice_code
+		  #end
 		  #
 		
           invoice_header_params = { invoice_code: invoice_code, delivery_slip_code:  @delivery_slip_header.quotation_code, 
@@ -1113,14 +1120,19 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	 
 	  if @delivery_slip_header.present? 
 	    if @delivery_slip_header.delivery_slip_code.present?
-		
-          #見出しコードが空の場合は仮番号をセット。
-		  if @delivery_slip_header.quotation_code.blank?
-		    quotation_code = $HEADER_CODE_MAX
-          else
-            quotation_code = @delivery_slip_header.quotation_code
-		  end
-		  #
+		    
+        #仮番号をセット。
+        #(昨年時などの古いコードがそのまま入っていると、わからなくなるため、一律で仮番号を入れることにする。)
+        quotation_code = $HEADER_CODE_MAX
+        
+        #upd(del)190307
+        #見出しコードが空の場合は仮番号をセット。
+		    #if @delivery_slip_header.quotation_code.blank?
+		    #  quotation_code = $HEADER_CODE_MAX
+        #else
+        #  quotation_code = @delivery_slip_header.quotation_code
+		    #end
+		    #
 				
           quotation_header_params = { quotation_code: quotation_code, invoice_code:  @delivery_slip_header.invoice_code, 
                                   delivery_slip_code:  @delivery_slip_header.delivery_slip_code, 

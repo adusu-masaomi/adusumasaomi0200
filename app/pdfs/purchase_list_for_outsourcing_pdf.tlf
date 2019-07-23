@@ -1250,9 +1250,9 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 796,
-      "y": 45,
-      "width": 29.3,
+      "x": 802.3,
+      "y": 60,
+      "width": 23,
       "height": 10.5,
       "style": {
         "font-family": [
@@ -1266,7 +1266,7 @@
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1412,6 +1412,38 @@
       "texts": [
         "支払日"
       ]
+    },
+    {
+      "id": "issue_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 740,
+      "y": 44,
+      "width": 85.3,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
     }
   ],
   "state": {

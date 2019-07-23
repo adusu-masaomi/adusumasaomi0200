@@ -360,7 +360,10 @@ class QuotationMaterialHeadersController < ApplicationController
     #add180928
     #備考１〜３のいずれかへセット
     set_notes_before_save
-      
+    
+    #add190422
+    #仕入先未登録の場合にセット
+    set_supplier_before_save
    
     #パラーメータ補完＆メール送信する
     set_params_complement
@@ -407,7 +410,10 @@ class QuotationMaterialHeadersController < ApplicationController
       #add180928
       #備考１〜３のいずれかへセット
       set_notes_before_save
-	
+	    
+      #仕入先未登録の場合にセット
+      set_supplier_before_save
+    
       #すでに登録していた注文データは一旦抹消する。
 	    destroy_before_update
 	
@@ -940,6 +946,57 @@ class QuotationMaterialHeadersController < ApplicationController
 		  
 	end
 	
+  end
+
+  #add190422
+  #保存前に、選択した仕入先をセット
+  def set_supplier_before_save
+    
+    supplier_set = false
+    
+    if params[:quotation_material_header][:supplier_master_id] != "1" && 
+       !params[:quotation_material_header][:supplier_master_id].blank?
+    #画面左上の仕入先が選択されていたらor１以外
+    
+       #既存ならそのまま
+       if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1] || 
+          params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2] ||
+          params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_3]
+         
+         supplier_set = true
+       end
+    
+      #仕入先１
+      if !supplier_set
+        if params[:quotation_material_header][:supplier_id_1].blank?
+	        if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_1]
+            supplier_set = true
+            params[:quotation_material_header][:supplier_id_1] = params[:quotation_material_header][:supplier_master_id]
+          end
+        end
+      end
+    
+      #仕入先２
+      if !supplier_set
+        if params[:quotation_material_header][:supplier_id_2].blank?
+	        if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_2]
+            supplier_set = true
+            params[:quotation_material_header][:supplier_id_2] = params[:quotation_material_header][:supplier_master_id]
+          end
+        end 
+      end
+      #仕入先３
+      if !supplier_set
+        if params[:quotation_material_header][:supplier_id_3].blank?
+	        if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_3]
+            supplier_set = true
+            params[:quotation_material_header][:supplier_id_3] = params[:quotation_material_header][:supplier_master_id]
+          end
+        end 
+      end
+      
+    end
+    
   end
 
   #保存前に、備考１〜３のいずれかへセット

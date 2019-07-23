@@ -87,8 +87,22 @@ class InvoiceListPDF
 			  payment_date_formatted = ""
 			  if invoice_header.payment_date.present?
 			    gengou = invoice_header.payment_date
-		        payment_date_formatted = $GENGO_ALPHABET + "#{gengou.year - $gengo_minus_ad}.#{gengou.strftime('%-m')}.#{gengou.strftime('%-d')}"
-		      end
+		        
+                #新元号対応 190401
+                require "date"
+                d_heisei_limit = Date.parse("2019/5/1");
+                
+                if gengou >= d_heisei_limit
+                #新元号
+                    payment_date_formatted = $GENGO_ALPHABET_2 + "#{gengou.year - $gengo_minus_ad_2}.#{gengou.strftime('%-m')}.#{gengou.strftime('%-d')}"
+                
+                else
+                #平成
+                    payment_date_formatted = $GENGO_ALPHABET + "#{gengou.year - $gengo_minus_ad}.#{gengou.strftime('%-m')}.#{gengou.strftime('%-d')}"
+		        end
+                #
+                
+              end
 			  #支払方法
 			  payment_method = ""
 			  

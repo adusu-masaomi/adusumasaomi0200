@@ -69,21 +69,28 @@ class ConstructionDailyReportsController < ApplicationController
 	  #pdf
       #global set
       $construction_daily_reports = @construction_daily_reports
+      $outsoucing_staff = nil   #add190306
+      
       
 	  format.pdf do
         case params[:pdf_flag] 
 		  when "1"
           #労務費集計表
 		    if confirm_outsourcing == false
-            #縦型PDF
+            #縦型PDF（外注のいない場合）
 			  if exist_takano == false
                 report = LaborCostSummaryPDF.create @construction_daily_reports 
 			  else
 			    report = LaborCostSummaryMasaomiPDF.create @construction_daily_reports
 			  end
             else
-            #横型PDF
-              report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
+            #横型PDF（外注のいる場合）
+              if exist_takano == false
+                report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
+              else
+              #外注＆高野いる場合(ただし、小柳・須戸・高野のペアはないものとする)
+                report = LaborCostSummaryOutsourcingTakanoPDF.create @construction_daily_reports
+              end
 		    end
 		  when "2"
           #作業日報
@@ -181,10 +188,20 @@ class ConstructionDailyReportsController < ApplicationController
   def confirm_outsourcing
   #外注さんが作業に関わっているかどうかのチェック(PDF用)
   #(社員IDが5または6の場合。)
-    outsourcing = @construction_daily_reports.where('staff_id= ? OR staff_id= ?', '5', '6')
+    #outsourcing = @construction_daily_reports.where('staff_id= ? OR staff_id= ?', '5', '6')
+    check_outsourcing_5 = @construction_daily_reports.where('staff_id= ?', '5')
+    if check_outsourcing_5.present?
+      $outsoucing_staff = 5
+    else
+      check_outsourcing_6 = @construction_daily_reports.where('staff_id= ?', '6')
+      if check_outsourcing_6.present?
+        $outsoucing_staff = 6
+      end
+    end
     
-    if outsourcing.present?
-       return true
+    #if check_outsourcing.present?
+    if $outsoucing_staff.present?
+      return true
 	else   
 	   return false
     end

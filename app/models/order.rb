@@ -17,6 +17,10 @@ class Order < ActiveRecord::Base
   #メーカーID用
   attr_accessor :maker_id_hide
   
+  #add190226
+  #明細、分類（選択）用
+  #attr_accessor :material_category_id
+  
   #単位
   #add170804
   attr_accessor :unit_id_hide

@@ -69,8 +69,6 @@ class OutsourcingDataController < ApplicationController
         end
         ##upd end
         
-        #binding.pry
-        
         case params[:move_flag]
 		when "1"
           #工事一覧画面から遷移した場合
@@ -249,7 +247,8 @@ class OutsourcingDataController < ApplicationController
 	  #$purchase_data = @purchase_data
 	  
 	  @print_type = params[:print_type]
-	
+	  $no_color = false   #add190412
+    
 	  format.pdf do
         
 		
@@ -260,6 +259,10 @@ class OutsourcingDataController < ApplicationController
           report = PurchaseListBySupplierPDF.create @purchase_list_by_supplier
         when "3"
           #外注用請求
+          report = PurchaseListForOutsourcingPDF.create @purchase_list_for_outsourcing
+        when "4"
+          #外注用請求(色なし)
+          $no_color = true
           report = PurchaseListForOutsourcingPDF.create @purchase_list_for_outsourcing
 		#when "4"
         #    #外注用請求書（１ページ）
@@ -307,7 +310,6 @@ class OutsourcingDataController < ApplicationController
 	#add171216
 	@@purchase_datum_unit_price_not_update_flag = @purchase_datum.unit_price_not_update_flag
     
-    #binding.pry
   end
 
   # GET /purchase_data/new
@@ -337,8 +339,7 @@ class OutsourcingDataController < ApplicationController
        #@purchase_order_data ||= PurchaseOrderDatum.all
      
 
-      #binding.pry
-
+      
        #初期値をセット(show画面からの遷移時のみ)
 	   if @@new_flag == "1"
          @purchase_datum.purchase_date ||= @@purchase_datum_purchase_date
@@ -368,7 +369,6 @@ class OutsourcingDataController < ApplicationController
       #伝票が登録済みかチェック
       check_complete_flag
       
-      #binding.pry
   end
 
   #add180224
@@ -384,8 +384,7 @@ class OutsourcingDataController < ApplicationController
   # GET /purchase_data/1/edit
   def edit
   
-    #binding.pry
-  
+    
     @purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
     @material_masters = MaterialMaster.where(["id = ?", @purchase_datum.material_id]).pluck(:list_price)
 	@maker_masters = MakerMaster.where(["id = ?", @purchase_datum.material_id])
@@ -440,6 +439,11 @@ class OutsourcingDataController < ApplicationController
       outsourcing_invoice_flag = true
       @ajax_flag = false
       set_default_outsourcing_data  #外注費データの初期値をセット
+    
+      #add190426
+      #支払予定日を仕入データへもセットする
+      @purchase_datum.payment_due_date = @payment_due_date
+      
     end
     
     respond_to do |format|
@@ -517,14 +521,12 @@ class OutsourcingDataController < ApplicationController
   # PATCH/PUT /purchase_data/1.json
   def update
   
-    #binding.pry
-  
-   #viewで分解されたパラメータを、正常更新できるように復元させる。
-   adjust_purchase_date_params
+    #viewで分解されたパラメータを、正常更新できるように復元させる。
+    adjust_purchase_date_params
    
     #登録済みフラグをセット(伝票重複防止のため)
     #add180223
-   get_registerd_flag_param
+    get_registerd_flag_param
 		
    
    #仕入単価Mも更新する 
@@ -567,9 +569,9 @@ class OutsourcingDataController < ApplicationController
      outsourcing_invoice_flag = true
      @ajax_flag = false
      set_default_outsourcing_data  #外注費データの初期値をセット
+     
    end
    
-   #binding.pry
    
    respond_to do |format|
       update_check = false
@@ -579,6 +581,13 @@ class OutsourcingDataController < ApplicationController
       #ヴァリデーションを無効にする
       #確定申告などで編集する場合を考慮。
       @purchase_datum.assign_attributes(purchase_datum_params)
+      
+      #add190426
+      #支払予定日を仕入データへもセットする
+      if @payment_due_date.present?
+        @purchase_datum.payment_due_date = @payment_due_date
+      end
+      
       update_check = @purchase_datum.save!(:validate => false)
       
       #end
@@ -804,8 +813,7 @@ class OutsourcingDataController < ApplicationController
 	   #if str[0,1] == "M" || str[0,1] == "O"
        #upd180220
        if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
-	     #binding.pry
-		 @outsourcing_flag = "1"
+	     @outsourcing_flag = "1"
 	   end
 	   #
 	   
@@ -818,7 +826,6 @@ class OutsourcingDataController < ApplicationController
        end
 	 end
 	 
-     #binding.pry
      #add190129
      #@purchase_order_data ||= PurchaseOrderDatum.all
 	 
@@ -1016,7 +1023,6 @@ class OutsourcingDataController < ApplicationController
 	     material_id = @material_master.id
 		 supplier_id = params[:purchase_datum][:supplier_id]
 		 
-		# binding.pry
 		 
 		 if params[:purchase_datum][:supplier_material_code].present?
 		   supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
@@ -1031,7 +1037,6 @@ class OutsourcingDataController < ApplicationController
                   unit_id: params[:purchase_datum][:unit_id]}
 	     @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
          
-         #binding.pry
          
            #仕入データのマスターIDも更新する  add180407
 		   @purchase_datum.material_id = @material_master.id
@@ -1130,7 +1135,6 @@ class OutsourcingDataController < ApplicationController
     if @purchase_date.present?
       params[:purchase_datum][:purchase_date] = @purchase_date
     end
-    #binding.pry
     
     #仕入金額をセット(外注労務費の、調整額とみなす)
     billing_amount = 0
@@ -1165,12 +1169,12 @@ class OutsourcingDataController < ApplicationController
       outsourcing_params = {invoice_code: invoice_code, labor_cost: construction_labor_cost, billing_amount: billing_amount, closing_date: @closing_date, 
                             payment_due_date: @payment_due_date, working_start_date: working_start_date, 
                             working_end_date: @working_end_date}
-                            
+      
       outsourcing_cost.update(outsourcing_params)
     end
     #@construction_costs[0].execution_amount = execution_amount
     #end
-	
+	   
   end
   
   #外注費データの初期値をセットする(ajax)
@@ -1337,12 +1341,33 @@ class OutsourcingDataController < ApplicationController
         #d = params[:purchase_datum][:purchase_date].to_date
         d = @purchase_date
         if customer.due_date.present?
-          if Date.valid_date?(d.year, d.month, customer.due_date)
-            d2 = Date.new(d.year, d.month, customer.due_date)
-            #addMonth = customer.due_date_division
-            addMonth = customer.due_date_division + addMonth
-            @payment_due_date = d2 >> addMonth
+          
+          if customer.due_date >= 28   #月末とみなす
+            d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
+            
+            addMonth = customer.due_date_division 
+            
+            d2 = d2 >> addMonth
+            d2 = Date.new(d2.year, d2.month, -1)
+            
+            @payment_due_date = d2
+          
+          else
+          ##月末の扱いでなければ、そのまま
+            if Date.valid_date?(d.year, d.month, customer.due_date)
+              d2 = Date.new(d.year, d.month, customer.due_date)
+            
+              addMonth = customer.due_date_division + addMonth
+              @payment_due_date = d2 >> addMonth
+            
+            end
           end
+          
+          #if Date.valid_date?(d.year, d.month, customer.due_date)
+            #d2 = Date.new(d.year, d.month, customer.due_date)
+            #addMonth = customer.due_date_division
+            
+          #end
         end
         
     end
@@ -1419,8 +1444,6 @@ class OutsourcingDataController < ApplicationController
       
     end
     
-    #binding.pry
-    
     flash[:notice] = "一括更新完了しました。"
     
     
@@ -1487,8 +1510,6 @@ class OutsourcingDataController < ApplicationController
   def maker_select
      @maker_masters = MaterialMaster.with_maker.where(:id => params[:material_id]).pluck("maker_masters.maker_name, maker_masters.id")
      
-	 #binding.pry
-	 
 	 #未登録(-)の場合はセットしない。
      #if @maker_masters == [["-",1]]
      #upd170707

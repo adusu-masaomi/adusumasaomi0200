@@ -26,6 +26,11 @@ class PurchaseListForOutsourcingPDF
         #ソート順は仕入日、注文ナンバーの順とする。
 		
         #---見出し---
+         #発行日
+         dt = Time.now.strftime('%Y/%m/%d')
+         dt += " 現在"
+		 report.page.item(:issue_date).value(dt)
+        
          page_count = report.page_count.to_s + "頁"
 		 report.page.item(:pageno).value(page_count)
 
@@ -191,36 +196,40 @@ class PurchaseListForOutsourcingPDF
                        #支払済みの場合の色
                          #row.item(:fmeDetail).styles(:fill_color => '#BF00FF')
                          #画面のままの色だと濃すぎるので、印刷用に薄くする
-                         row.item(:fmeDetail).styles(:fill_color => '#CD70EC')  
-                         #線が隠れるので色を戻す
-                         row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         if !$no_color 
+                            row.item(:fmeDetail).styles(:fill_color => '#CD70EC')  
+                            #線が隠れるので色を戻す
+                            row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         end
                        elsif purchase_datum.outsourcing_invoice_flag == 1
 	                   #請求済みの場合の色
-                         row.item(:fmeDetail).styles(:fill_color => '#E3CEF6')  
-                         #線が隠れるので色を戻す
-                         row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
-                         row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         if !$no_color 
+                            row.item(:fmeDetail).styles(:fill_color => '#E3CEF6')  
+                            #線が隠れるので色を戻す
+                            row.item(:detail_line_1).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_2).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_3).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_4).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_5).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_6).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_7).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_8).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_9).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_10).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_11).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                            row.item(:detail_line_12).styles(:fill_color => '#F2EAEF')  if purchase_datum.outsourcing_invoice_flag == 1
+                         end
                        end
                        
             end 
@@ -327,15 +336,25 @@ end
         end
         
         #支払日算出
-        #d = params[:purchase_datum][:purchase_date].to_date
         d = @purchase_date
         if customer.due_date.present?
-          if Date.valid_date?(d.year, d.month, customer.due_date)
-            d2 = Date.new(d.year, d.month, customer.due_date)
-            #addMonth = customer.due_date_division
-            addMonth = customer.due_date_division + addMonth
-            @payment_due_date = d2 >> addMonth
+          
+          if customer.due_date >= 28   #月末とみなす
+            d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
+            addMonth = customer.due_date_division 
+            d2 = d2 >> addMonth
+            d2 = Date.new(d2.year, d2.month, -1)
+            @payment_due_date = d2
+          
+          else
+          ##月末の扱いでなければ、そのまま
+            if Date.valid_date?(d.year, d.month, customer.due_date)
+                d2 = Date.new(d.year, d.month, customer.due_date)
+                addMonth = customer.due_date_division + addMonth
+                @payment_due_date = d2 >> addMonth
+            end
           end
+          
         end
         
     end

@@ -371,7 +371,6 @@ class PurchaseOrderHistoriesController < ApplicationController
 		
 		if @purchase_order_history.update(purchase_order_history_params)
           
-		  #binding.pry
 		  
 		  #メール送信する
 		  send_email
@@ -446,34 +445,19 @@ class PurchaseOrderHistoriesController < ApplicationController
 	end
 	#
 	
-	
-	
-    if params[:purchase_order_history][:orders_attributes].present?
+	if params[:purchase_order_history][:orders_attributes].present?
 	
 	    params[:purchase_order_history][:orders_attributes].values.each do |item|
 		
-		 
-		  ######
-          #item[:quantity] = params[:quantity][i]
-		  #upd170906 数値は全角入力の場合、半角に変換する
-		  #if  params[:quantity][i].to_i == 0
-		  #  params[:quantity][i] = params[:quantity][i].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
-		  #end
-		  #item[:quantity] = params[:quantity][i].to_i
 		  
-		  #upd171030
-		  if  item[:quantity].to_i == 0
+          if  item[:quantity].to_i == 0
 		    item[:quantity] = item[:quantity].tr('０-９ａ-ｚＡ-Ｚ', '0-9a-zA-Z')
 		  end
 		  item[:quantity] = item[:quantity].to_i
-		  ###
 		  
 		  
-		  #@maker_master = MakerMaster.find(item[:maker_id])
-          #upd180411
-          @maker_master = MakerMaster.where(:id => item[:maker_id]).first
+		  @maker_master = MakerMaster.where(:id => item[:maker_id]).first
           
-          #add180411
           #メーカーを手入力した場合の新規登録
           if @maker_master.nil?
             #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
@@ -510,27 +494,24 @@ class PurchaseOrderHistoriesController < ApplicationController
                 item[:list_price] = @material_master.list_price
 			  end
 			  
-              #del180411
-			  #if item[:material_name] != @material_master.material_name
-			  ##マスターの品名を変更した場合は、商品マスターへ反映させる。
-			  #  materials = MaterialMaster.where(:id => @material_master.id).first
-			  #  if materials.present?
-              #    materials.update_attributes!(:material_name => item[:material_name] )
-              #  end 
-			  #end
-			  
              
-			  #if item[:maker_id] != @material_master.maker_id
+			  #if (item[:material_name] != @material_master.material_name) || 
+              #   (item[:maker_id] != @material_master.maker_id)
+              
+              #upd190226
               if (item[:material_name] != @material_master.material_name) || 
-                 (item[:maker_id] != @material_master.maker_id)
+                 (item[:maker_id] != @material_master.maker_id ||
+                  item[:material_category_id] != @material_master.material_category_id)
+                 
 			  #品名・メーカーを登録or変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  #materials.update_attributes!(:maker_id => item[:maker_id] )
-                  #upd180411 
                   #品名・メーカーIDをそれぞれ更新
+                  #materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
+                  #                             :notes => item[:notes] )
+                  #upd190226
                   materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
-                                               :notes => item[:notes] )
+                                               :notes => item[:notes], :material_category_id => item[:material_category_id] )
                 end 
 			  end
 			  
@@ -567,14 +548,17 @@ class PurchaseOrderHistoriesController < ApplicationController
 				@material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			    #商品マスターへセット(商品コード存在しない場合)
 			    if @material_master.nil?
-				  #material_master_params = {material_code: params[:material_code][i], material_name: params[:material_name][i], 
-                  #                      maker_id: params[:maker_id][i], list_price: params[:list_price][i] }
-                  #upd 180922 notes追加
-				  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes] }
+				  #material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                  #                      maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes] }
+                  
+                  #upd190226
+                  material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
+                                        maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes], 
+                                        material_category_id: item[:material_category_id] }
+                  
+                  
                   @material_master = MaterialMaster.create(material_master_params)
                   
-                  #add180215
                   #生成された商品ＩＤをorderへセットする。
                   if @material_master.present?
                     item[:material_id] = @material_master.id
@@ -710,6 +694,9 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
      @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
 	 
+     #add190226
+     @material_category_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_category_id).flatten.join(" ")
+     
 	 @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
 	 #add170914 該当なければひとまず”個”にする
@@ -732,8 +719,49 @@ class PurchaseOrderHistoriesController < ApplicationController
 	   #次に抽出されたアイテムをセット
 	   @material_extract += MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").
         pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+        
+       
+       #add190226 
+       #商品コードも同様
+       @material_extract_category_code = MaterialMaster.where(:id => 1).where("id is NOT NULL").
+        pluck("material_masters.material_code, material_masters.material_code")
+       @material_extract_category_code += MaterialMaster.where(:maker_id => params[:maker_id]).where("id is NOT NULL").
+        pluck("material_masters.material_code, material_masters.material_code")
+       #
      #end
 	
+  end
+  #add190226
+  #分類から該当する商品を取得
+  def material_extract_by_category
+  
+   
+    if !(params[:material_category_id].blank?)
+  
+       #まず手入力用IDをセット。
+       @material_extract_category = MaterialMaster.where(:id => 1).where("id is NOT NULL").
+        pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+	   #次に抽出されたアイテムをセット
+	   @material_extract_category += MaterialMaster.where(:material_category_id => params[:material_category_id]).where("id is NOT NULL").
+        pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+    
+       #商品コードも同様
+       @material_extract_category_code = MaterialMaster.where(:id => 1).where("id is NOT NULL").
+        pluck("material_masters.material_code, material_masters.material_code")
+       @material_extract_category_code += MaterialMaster.where(:material_category_id => params[:material_category_id]).where("id is NOT NULL").
+        pluck("material_masters.material_code, material_masters.material_code")
+        
+       
+    else
+      #未選択状態の場合は、全て表示
+      @material_extract_category = MaterialMaster.all.
+        pluck("CONCAT(material_masters.material_code, ':' , material_masters.material_name), material_masters.id")
+      
+      #商品コードも同様      
+      @material_extract_category_code = MaterialMaster.all.
+        pluck("material_masters.material_code, material_masters.material_code")
+      
+	end
   end
   
   #add170721
@@ -760,7 +788,9 @@ class PurchaseOrderHistoriesController < ApplicationController
       @material_masters = MaterialMaster.all
 	  @unit_masters = UnitMaster.all
 	  @maker_masters = MakerMaster.all
-	  
+	  #add190226
+      @material_categories = MaterialCategory.all
+      
 	  #@seq = 0 #画面の連番用
 	end
 
@@ -772,7 +802,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #upd170616 メーカー名は抹消
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, :notes, 
 	                  orders_attributes: [:id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
-                     :maker_id, :list_price, :mail_sent_flag, :_destroy])
+                     :maker_id, :list_price, :material_category_id, :mail_sent_flag, :_destroy])
     end
 
 end

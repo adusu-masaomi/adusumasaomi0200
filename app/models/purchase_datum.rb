@@ -111,6 +111,13 @@ class PurchaseDatum < ActiveRecord::Base
 	  end
     }
     
+    #add190401
+    #scope :with_payment_date_gteq, -> (payment_date=1) { 
+	#  if payment_date.present?
+	#    joins(:OutsourcingCost).where("payment_date => ?", payment_date )
+	#  end
+    #}
+    
     def self.ransackable_scopes(auth_object=nil)
         [:with_purchase_order, :with_customer, :with_construction, :with_material, :with_material_code, 
          :with_material_code_include, :with_material_category, :with_material_name_include]

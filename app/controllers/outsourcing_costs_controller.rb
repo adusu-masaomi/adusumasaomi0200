@@ -118,7 +118,15 @@ class OutsourcingCostsController < ApplicationController
                 
                 update_flag = true
                 
-                purchase_params = {outsourcing_payment_flag: 1}
+                payment_due_date_str = params[:outsourcing_cost]["payment_due_date(1i)"] + "-" + params[:outsourcing_cost]["payment_due_date(2i)"] + 
+                                          "-" + params[:outsourcing_cost]["payment_due_date(3i)"]
+                payment_due_date = Date.strptime(payment_due_date_str, '%Y-%m-%d')  
+                
+                payment_date_str = params[:outsourcing_cost]["payment_date(1i)"] + "-" + params[:outsourcing_cost]["payment_date(2i)"] + "-" + params[:outsourcing_cost]["payment_date(3i)"]
+                payment_date = Date.strptime(payment_date_str, '%Y-%m-%d')  
+                                
+                #purchase_params = {outsourcing_payment_flag: 1}
+                purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date}
                 
                 #ヴァリデーションしない
                 purchase_data.assign_attributes(purchase_params)
@@ -131,6 +139,29 @@ class OutsourcingCostsController < ApplicationController
             
          end
        end
+    
+    
+    
+    elsif params[:outsourcing_cost]["payment_due_date(1i)"].present? && params[:outsourcing_cost]["payment_due_date(2i)"].present? && 
+       params[:outsourcing_cost]["payment_due_date(3i)"].present? 
+       
+       #支払予定日のみ更新
+       if purchase_data.present?
+                
+          update_flag = true
+                
+          payment_due_date_str = params[:outsourcing_cost]["payment_due_date(1i)"] + "-" + params[:outsourcing_cost]["payment_due_date(2i)"] + 
+                                          "-" + params[:outsourcing_cost]["payment_due_date(3i)"]
+          payment_due_date = Date.strptime(payment_due_date_str, '%Y-%m-%d')  
+                
+          purchase_params = {payment_due_date: payment_due_date}
+                
+          #ヴァリデーションしない
+          purchase_data.assign_attributes(purchase_params)
+          purchase_data.save!(:validate => false)
+      end    
+    
+    
     end
     
     #支払完了でなければ、チェック解除して更新する

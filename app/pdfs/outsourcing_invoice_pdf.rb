@@ -1,6 +1,11 @@
 class OutsourcingInvoicePDF
    
   def self.create outsourcing_invoice
+     
+     #新元号対応 190401
+     require "date"
+     d_heisei_limit = Date.parse("2019/5/1")
+  
      #仕入表(仕入先別)PDF発行
      for num in 1..2 do
   
@@ -60,8 +65,20 @@ class OutsourcingInvoicePDF
         #発行日=作業完了日
         if outsourcing_cost.present? && outsourcing_cost.working_end_date.present?
 		     @gengou = outsourcing_cost.working_end_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-             
+		       
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #元号変わったらここも要変更
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
              report.page.item(:purchase_date).value(@gengou)
         end
         
@@ -72,6 +89,8 @@ class OutsourcingInvoicePDF
         report.page.item(:supplier_position).value(@supplier_position)
         report.page.item(:supplier_responsible).value(@supplier_responsible)
         report.page.item(:supplier_tel).value(@supplier_tel)
+        report.page.item(:supplier_fax_label).value(@supplier_fax_label)  #add190514
+        report.page.item(:supplier_fax).value(@supplier_fax)              #add190514
         #
         
         #注文No
@@ -80,8 +99,18 @@ class OutsourcingInvoicePDF
         #工事コード
         report.page.item(:construction_code).value($purchase_data_current.construction_datum.construction_code) 
         
+        #upd190722
+        #件名には備考も加える
+        if $purchase_data_current.notes.blank?
+            construction_name = $purchase_data_current.construction_datum.construction_name
+        else
+            construction_name = $purchase_data_current.construction_datum.construction_name + "（" + $purchase_data_current.notes + "）"
+        end
+        
         #件名
-        report.page.item(:construction_name).value($purchase_data_current.construction_datum.construction_name) 
+        #report.page.item(:construction_name).value($purchase_data_current.construction_datum.construction_name)
+        #up190722
+        report.page.item(:construction_name).value(construction_name) 
         
         #得意先名
         report.page.item(:customer_name).value($purchase_data_current.construction_datum.CustomerMaster.customer_name) 
@@ -102,27 +131,76 @@ class OutsourcingInvoicePDF
         #着工日
         if outsourcing_cost.present? && outsourcing_cost.working_start_date.present?
 		   @gengou = outsourcing_cost.working_start_date
-		   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		   #元号変わったらここも要変更
+           if @gengou >= d_heisei_limit
+           #令和
+             if @gengou.year - $gengo_minus_ad_2 == 1
+             #１年の場合は元年と表記
+               @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             else
+               @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+           else
+           #平成
+             @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           end
            report.page.item(:working_start_date).value(@gengou)
         end
         #完了日
         if outsourcing_cost.present? && outsourcing_cost.working_end_date.present?
 		   @gengou = outsourcing_cost.working_end_date
-		   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		   #元号変わったらここも要変更
+           if @gengou >= d_heisei_limit
+           #令和
+             if @gengou.year - $gengo_minus_ad_2 == 1
+             #１年の場合は元年と表記
+               @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             else
+               @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+           else
+           #平成
+             @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           end
            report.page.item(:working_end_date).value(@gengou)
         end
         
         #締め日
         if outsourcing_cost.present? && outsourcing_cost.closing_date.present?
 		   @gengou = outsourcing_cost.closing_date
-		   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           #元号変わったらここも要変更
+           if @gengou >= d_heisei_limit
+           #令和
+             if @gengou.year - $gengo_minus_ad_2 == 1
+             #１年の場合は元年と表記
+               @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             else
+               @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+           else
+           #平成
+		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           end
            report.page.item(:closing_date).value(@gengou)
         end
         
         #支払予定日
         if outsourcing_cost.present? && outsourcing_cost.payment_due_date.present?
 		   @gengou = outsourcing_cost.payment_due_date
-		   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		   #元号変わったらここも要変更
+           if @gengou >= d_heisei_limit
+           #令和
+             if @gengou.year - $gengo_minus_ad_2 == 1
+             #１年の場合は元年と表記
+             #↑次回は１本化しておく！！！
+               @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             else
+               @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+           else
+           #平成
+             @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+           end
            report.page.item(:payment_due_date).value(@gengou)
         end
         
@@ -188,6 +266,8 @@ end
     @supplier_position = ""
     @supplier_responsible = ""
     @supplier_tel = ""
+    @supplier_fax_label = ""  #add190514
+    @supplier_fax = ""        #add190514
     #
     @supplier_bank_name = ""
     @supplier_bank_branch_name = ""
@@ -217,6 +297,8 @@ end
       @supplier_position = "代表"
       @supplier_responsible = "須戸　剛"
       @supplier_tel = "0256-45-3205"
+      @supplier_fax_label = "FAX"     #add190514
+      @supplier_fax = "0256-45-3064"  #add190514
       #
       @supplier_bank_name = "三條信用組合"
       @supplier_bank_branch_name = "栄支店"
@@ -271,10 +353,12 @@ end
           end
         end
         
+        
         #支払日算出
         #d = params[:purchase_datum][:purchase_date].to_date
         d = @purchase_date
         if customer.due_date.present?
+          
           if Date.valid_date?(d.year, d.month, customer.due_date)
             d2 = Date.new(d.year, d.month, customer.due_date)
             addMonth = customer.due_date_division

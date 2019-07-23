@@ -40,9 +40,11 @@ class InventoryListPDF
         
 		
         #---見出し---
-		 report.page.item(:issue_date).value(Date.today)
+		 #report.page.item(:issue_date).value(Date.today)
 		 
-		 dt = Time.now.strftime('%Y/%m/%d %H:%M:%S')
+		 #dt = Time.now.strftime('%Y/%m/%d %H:%M:%S')
+         #upd190215
+         dt = Time.now.strftime('%Y/%m/%d')
 		 report.page.item(:issue_date).value(dt)
 		 #DateTime.now.strftime('%m/%d/%Y')
 		 

@@ -21,20 +21,26 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	attr_accessor :construction_name
 	attr_accessor :supplier_name
 	
-	#資材ID自動セット用
+    #資材ID自動セット用
 	attr_accessor :material_id_hide
 	attr_accessor :material_id_select_hide
 	#資材コード(ajax明細用)
 	attr_accessor :material_code_hide
+    #add190226
+    attr_accessor :material_code_select_hide
 	#資材名(ajax明細用)
 	attr_accessor :material_name_hide
 	#メーカーID用(ajax明細用)
     attr_accessor :maker_id_hide
+    
     #単位(ajax明細用)
     attr_accessor :unit_id_hide
 	#定価(ajax明細用)
     attr_accessor :list_price_hide
-  
+    #add190226
+    #分類(ajax明細用)
+    attr_accessor :material_category_id_hide
+    
 	#工事画面からの遷移にて使用
 	#attr_accessor :construction_id
 	#attr_accessor :move_flag

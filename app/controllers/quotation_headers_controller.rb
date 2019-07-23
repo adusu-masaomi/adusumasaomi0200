@@ -471,43 +471,43 @@ class QuotationHeadersController < ApplicationController
 	
       #コピー元の一覧テーブルをセット
       #quotation_header = QuotationHeader.find(@quotation_header.quotation_header_origin_id)
-	  #upd171106
-	  quotation_header = QuotationHeader.find(params[:quotation_header][:quotation_header_origin_id])
+	    #upd171106
+	    quotation_header = QuotationHeader.find(params[:quotation_header][:quotation_header_origin_id])
       
-	  new_header_id = @quotation_header.id
-	  #内訳データ抹消(コピー先)
-	  QuotationDetailLargeClassification.where(quotation_header_id: new_header_id).destroy_all
+	    new_header_id = @quotation_header.id
+	    
+      if !QuotationDetailLargeClassification.exists?(quotation_header_id: new_header_id)   #upd190307
+      #アプデも考慮し、あくまでも内訳データが存在しない場合のみ、コピーするようにする。
+      
+        #内訳データ抹消(コピー先)
+	      QuotationDetailLargeClassification.where(quotation_header_id: new_header_id).destroy_all
 	  
-	  
-	  @qdlc = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header.id)
-      if @qdlc.present?
-        @qdlc.each do |qdlc|
+	      @qdlc = QuotationDetailLargeClassification.where(quotation_header_id: quotation_header.id)
+        if @qdlc.present?
+          @qdlc.each do |qdlc|
           
-		  #内訳データのコピー元をコピー先オブジェクトへセット
-		  new_qdlc = qdlc.dup
+		        #内訳データのコピー元をコピー先オブジェクトへセット
+		        new_qdlc = qdlc.dup
 		  
-		  #コピー元の内訳IDを保持しておく
-		  old_large_classification_id = qdlc.id
+		        #コピー元の内訳IDを保持しておく
+		        old_large_classification_id = qdlc.id
 		  
+		        #ヘッダIDを新しいものに置き換える
+            new_qdlc.quotation_header_id = new_header_id
 		  
-		  #ヘッダIDを新しいものに置き換える
-          new_qdlc.quotation_header_id = new_header_id
+	          #更新する
+		        new_qdlc.save!(:validate => false)
 		  
+		        #明細用にキーをセット
+		        new_large_classification_id = new_qdlc.id
 		  
-	      #更新する
-		  new_qdlc.save!(:validate => false)
-		  
-		  
-		  #明細用にキーをセット
-		  new_large_classification_id = new_qdlc.id
-		  
-		  #明細のコピー
-		  copyDetail(new_header_id, new_large_classification_id,old_large_classification_id)
-		  
+		        #明細のコピー
+		        copyDetail(new_header_id, new_large_classification_id,old_large_classification_id)
+		      end
         end
-      end	
-    
-	end
+  
+      end
+	  end
   end
   
   #明細データを参照元からコピー

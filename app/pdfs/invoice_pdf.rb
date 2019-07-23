@@ -6,6 +6,10 @@ class InvoicePDF
   def self.create invoice_detail_large_classifications
 	#請求書PDF発行
  
+       #新元号対応 190401
+       require "date"
+       d_heisei_limit = Date.parse("2019/5/1")
+ 
        # tlfファイルを読み込む
 	   if $print_type == "1"
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
@@ -61,21 +65,23 @@ class InvoicePDF
 		   @report.page.item(:honorific).value(honorific_name) 
 		   
 		   #担当1
-		   #upd190131
-           if @invoice_headers.ConstructionDatum.present? && 
-                !@invoice_headers.ConstructionDatum.personnel.blank?
-             responsible = @invoice_headers.ConstructionDatum.personnel + "  様"
-		     @report.page.item(:responsible1).value(responsible)
-           end
+		   #del190225
+           #upd190131
+           #if @invoice_headers.ConstructionDatum.present? && 
+           #     !@invoice_headers.ConstructionDatum.personnel.blank?
+           #  responsible = @invoice_headers.ConstructionDatum.personnel + "  様"
+		   #  @report.page.item(:responsible1).value(responsible)
+           #end
            #if @invoice_headers.responsible1.present?
 		   #  responsible = @invoice_headers.responsible1 + "  様"
 		   #  @report.page.item(:responsible1).value(responsible)
 		   #end
+           #del190225
 		   #担当2
-		   if @invoice_headers.responsible2.present?
-		     responsible = @invoice_headers.responsible2 + "  様"
-		     @report.page.item(:responsible2).value(responsible)
-		   end
+		   #if @invoice_headers.responsible2.present?
+		   #  responsible = @invoice_headers.responsible2 + "  様"
+		   #  @report.page.item(:responsible2).value(responsible)
+		   #end
 		   
 		   #件名
 		   @report.page.item(:construction_name).value(@invoice_headers.construction_name) 
@@ -103,15 +109,43 @@ class InvoicePDF
 		   #対象期間(開始)
 		   if @invoice_headers.invoice_period_start_date.present?
 		     @gengou = @invoice_headers.invoice_period_start_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:invoice_period_start_date).value(@gengou)
+             
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+		         @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               end
+             else
+             #平成
+                @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             
+             @report.page.item(:invoice_period_start_date).value(@gengou)
            end
 		   
 		   #対象期間(終了)
 		   if @invoice_headers.invoice_period_end_date.present?
 		     @gengou = @invoice_headers.invoice_period_end_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-			 @report.page.item(:invoice_period_end_date).value(@gengou)
+		     
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit 
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else  
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+			   end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+             
+             @report.page.item(:invoice_period_end_date).value(@gengou)
 		   end
 	
 		   #支払期限
@@ -119,8 +153,22 @@ class InvoicePDF
 		 
 		   if @invoice_headers.invoice_date.present?
 		     @gengou = @invoice_headers.invoice_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:invoice_date).value(@gengou) 
+             
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+		     #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		       end
+             else
+             #平成
+                @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     end
+             
+             @report.page.item(:invoice_date).value(@gengou) 
 		   else
              #空でも文字を出す add180515
              empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
@@ -221,6 +269,9 @@ class InvoicePDF
   def self.invoice_detailed_statement
   #内訳書PDF発行(A4縦ver)
       
+      #新元号対応 190401
+      require "date"
+      d_heisei_limit = Date.parse("2019/5/1")
 	  
       @@invoice_price = 0
     
@@ -255,8 +306,22 @@ class InvoicePDF
 		   
 		   if @invoice_headers.invoice_date.present?
              @gengou = @invoice_headers.invoice_date
-		     @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     @report.page.item(:invoice_date).value(@gengou) 
+		     
+             #元号変わったらここも要変更
+             if @gengou >= d_heisei_limit
+             #令和
+               if @gengou.year - $gengo_minus_ad_2 == 1
+               #１年の場合は元年と表記
+                 @gengou_2 = $gengo_name + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+               else
+                 @gengou_2 = $gengo_name + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		       end
+             else
+             #平成
+               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             end
+             
+             @report.page.item(:invoice_date).value(@gengou) 
 		   else
              #空でも文字を出す add180515
              empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"

@@ -241,6 +241,9 @@
      });
      $( ".searchableSelect2_3" ).change(function(e) {
          setWorkingMiddleItem();
+         //add190723
+         //単価・金額を計算
+         setUnitPriceThenCalc();
      });
 	 //単位--select2のタブインデックスはここで指定。
 	 $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
@@ -585,6 +588,39 @@
       );
   }
   
+  //単価・金額を計算
+  //add190723
+  function setUnitPriceThenCalc()
+  {
+      obj = document.getElementById("working_middle_item_id");
+      working_middle_item_id = parseInt(obj.value);
+      
+      //見積単価
+      $.get("<%= delivery_slip_detail_middle_classificationz_working_unit_price_select_path %>",
+       {id: working_middle_item_id },
+          function(data){
+              obj = document.getElementById("working_unit_price").textContent;
+              document.getElementById("working_unit_price").value = obj;
+	      
+              //実行単価
+              $.get("<%= delivery_slip_detail_middle_classificationz_execution_unit_price_select_path %>",
+              {id: working_middle_item_id },
+                function(data){
+                  obj = document.getElementById("execution_unit_price").textContent;
+                  document.getElementById("execution_unit_price").value = obj;
+		          
+                  //金額も計算 add190723
+                  //(ajaxの時間差を考慮してここにセット)
+                  calcTotalPrice();
+                }
+                
+              );
+          
+          }
+      ); 
+      
+  }
+  
   //各値の自動セット-ajax
   function setWorkingMiddleItem()
   {  
@@ -630,22 +666,24 @@
         }
       );       
 	  
+      //190723別処理へ移動
       //見積単価
-      $.get("<%= delivery_slip_detail_middle_classificationz_working_unit_price_select_path %>",
-       {id: working_middle_item_id },
-        function(data){
-          obj = document.getElementById("working_unit_price").textContent;
-          document.getElementById("working_unit_price").value = obj;
-		  }
-      ); 
-      //実行単価
-      $.get("<%= delivery_slip_detail_middle_classificationz_execution_unit_price_select_path %>",
-       {id: working_middle_item_id },
-        function(data){
-          obj = document.getElementById("execution_unit_price").textContent;
-          document.getElementById("execution_unit_price").value = obj;
-		  }
-      );
+      //$.get("<%= delivery_slip_detail_middle_classificationz_working_unit_price_select_path %>",
+      // {id: working_middle_item_id },
+      //  function(data){
+      //    obj = document.getElementById("working_unit_price").textContent;
+      //    document.getElementById("working_unit_price").value = obj;
+	  //	  }
+      //); 
+      ////実行単価
+      //$.get("<%= delivery_slip_detail_middle_classificationz_execution_unit_price_select_path %>",
+      // {id: working_middle_item_id },
+      //  function(data){
+      //    obj = document.getElementById("execution_unit_price").textContent;
+      //    document.getElementById("execution_unit_price").value = obj;
+	  //   }
+      //);
+      
       //材料ID(後から選択ができないので保留・・・)
       //$.get("<%= delivery_slip_detail_middle_classificationz_material_id_select_path %>",
       // {id: working_middle_item_id },

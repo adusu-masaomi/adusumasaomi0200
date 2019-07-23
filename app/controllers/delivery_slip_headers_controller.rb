@@ -115,7 +115,7 @@ class DeliverySlipHeadersController < ApplicationController
         
         #参照コードがあれば内訳マスターをコピー
 	    #アプデは既存データを書き換えてしまう可能性があるため、保留!
-        #copyBreakDown
+        copyBreakDown
         
 		    #顧客Mも更新
 		    if @manual_flag.blank?
@@ -456,26 +456,29 @@ class DeliverySlipHeadersController < ApplicationController
 	  #コピー元の一覧テーブルをセット
       delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header][:delivery_slip_header_origin_id])
       new_header_id = @delivery_slip_header.id
-	  #内訳データ抹消(コピー先)
-	  DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: new_header_id).destroy_all
-	  @dsdlc = DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: delivery_slip_header.id)
-      if @dsdlc.present?
-        @dsdlc.each do |dsdlc|
-          
-		  #内訳データのコピー元をコピー先オブジェクトへセット
-		  new_dsdlc = dsdlc.dup
-		  #コピー元の内訳IDを保持しておく
-		  old_large_classification_id = dsdlc.id
-		  #ヘッダIDを新しいものに置き換える
-          new_dsdlc.delivery_slip_header_id = new_header_id
-		  #更新する
-		  new_dsdlc.save!(:validate => false)
-		  #明細用にキーをセット
-		  new_large_classification_id = new_dsdlc.id
-		  #明細のコピー
-		  copyDetail(new_header_id, new_large_classification_id,old_large_classification_id)
-		end
-      end	
+	    
+      #内訳データ抹消(コピー先)
+	    if !DeliverySlipDetailLargeClassification.exists?(delivery_slip_header_id: new_header_id)   #upd190307
+        DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: new_header_id).destroy_all
+	      @dsdlc = DeliverySlipDetailLargeClassification.where(delivery_slip_header_id: delivery_slip_header.id)
+      
+        if @dsdlc.present?
+          @dsdlc.each do |dsdlc|
+            #内訳データのコピー元をコピー先オブジェクトへセット
+		        new_dsdlc = dsdlc.dup
+		        #コピー元の内訳IDを保持しておく
+		        old_large_classification_id = dsdlc.id
+		        #ヘッダIDを新しいものに置き換える
+            new_dsdlc.delivery_slip_header_id = new_header_id
+		        #更新する
+		        new_dsdlc.save!(:validate => false)
+		        #明細用にキーをセット
+		        new_large_classification_id = new_dsdlc.id
+		        #明細のコピー
+		        copyDetail(new_header_id, new_large_classification_id,old_large_classification_id)
+		      end
+        end
+      end 
     end
   end
   #明細データを参照元からコピー

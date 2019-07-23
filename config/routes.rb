@@ -249,8 +249,9 @@ Rails.application.routes.draw do
   get "/purchase_order_historiez/material_select" => 'purchase_order_histories#material_select'
   get "/purchase_order_historiez/set_sequence" => 'purchase_order_histories#set_sequence'
   
-  #add171101
   get "/purchase_order_historiez/material_extract" => 'purchase_order_histories#material_extract'
+  #add190226
+  get "/purchase_order_historiez/material_extract_by_category" => 'purchase_order_histories#material_extract_by_category'
   
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'

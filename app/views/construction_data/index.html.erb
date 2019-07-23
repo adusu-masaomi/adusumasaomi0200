@@ -122,6 +122,7 @@
       <th><%= model_class.human_attribute_name(:construction_name) %></th>
       <th><%= model_class.human_attribute_name(:reception_date) %></th>
       <th><%= model_class.human_attribute_name(:customer_name) %></th>
+      <th>締日</th>
       <!--<th><%= model_class.human_attribute_name(:construction_period_start) %></th>-->
       <!--<th><%= model_class.human_attribute_name(:construction_period_end) %></th>-->
 	  <th><%= model_class.human_attribute_name(:construction_end_date) %></th>
@@ -204,6 +205,13 @@
         
 		<% if construction_datum.CustomerMaster.present? %>
           <td><%= construction_datum.CustomerMaster.customer_name %></td>
+        <% else %>
+		  <td>-</td>
+        <% end %>
+        
+        <!--add190612 締日追加-->
+        <% if construction_datum.CustomerMaster.present? && construction_datum.CustomerMaster.closing_date > 0 %>
+          <td><%= construction_datum.CustomerMaster.closing_date %></td>
         <% else %>
 		  <td>-</td>
         <% end %>

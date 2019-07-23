@@ -52,9 +52,10 @@ class ConstructionDatum < ActiveRecord::Base
     after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
 	scope :with_id,  -> { joins(:purchase_order_datum) }
-	
+	scope :with_customer, -> { joins(:CustomerMaster) }  #add190612
+    
 	def self.ransackable_scopes(auth_object=nil)
-  		[:with_id]
+  		[:with_id, :with_customer]
 	end
 	
 	#緯度経度保存用アドレス

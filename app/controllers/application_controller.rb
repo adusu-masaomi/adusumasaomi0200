@@ -33,10 +33,13 @@ class ApplicationController < ActionController::Base
   
     
   #元号の設定(改定時はここを変更する)
-  $gengo_name = "平成"
-  $GENGO_ALPHABET = "H"
+  $gengo_name = "平成"      #平成の場合
+  $gengo_name_2 = "令和"    #令和 〃
+  $GENGO_ALPHABET = "H"    #平成の場合
+  $GENGO_ALPHABET_2 = "R"  #令和 〃
   #$ad = 1988
-  $gengo_minus_ad = 1988
+  $gengo_minus_ad = 1988   #平成の場合
+  $gengo_minus_ad_2 = 2018
   
   #消費税の設定(改定時はここを変更する)
   $consumption_tax_only = 0.08

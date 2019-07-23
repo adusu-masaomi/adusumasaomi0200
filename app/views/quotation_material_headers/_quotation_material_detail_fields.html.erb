@@ -696,8 +696,11 @@
 			  document.getElementsByName(nm)[0].value = material_id;
 			  //$(".searchableSelect1_1")[selectedIndex].value = material_id;
 			  
-			  $(".searchableSelect1_1").trigger("change")[selectedIndex];
+			  //$(".searchableSelect1_1").trigger("change")[selectedIndex];
 			  
+              //upd190225
+              $(".searchableSelect1_1").trigger("change.select2")
+              
 			  //triggerはうまくいかないので直接セット
 			  setItem(material_id, selectedIndex);
 			  

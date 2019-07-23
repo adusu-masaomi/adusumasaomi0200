@@ -110,7 +110,11 @@
   
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
   
-  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />
+  <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
+  
+  <%= f.button_tag "登録する", :type => 'button', :class => "btn btn-primary", 
+               :onclick => "alertAfterValidation()" %>
+  
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 delivery_slip_headers_path, :class => 'btn btn-default' %>
 <% end %>
@@ -411,7 +415,13 @@
 	  );
    };
   
-  
+   //登録時、納品参照コードが入力されていれば、メッセージを出す
+   function alertAfterValidation() {
+     if (document.getElementById("delivery_slip_header_origin_id").selectedIndex > 0){
+       alert('納品書データを参照元コードよりコピーします。');
+     }
+     document.forms[0].submit();
+   }
   
  
  
