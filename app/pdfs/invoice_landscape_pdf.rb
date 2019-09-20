@@ -45,9 +45,9 @@ class InvoiceLandscapePDF
 		 #---見出し---
 		 
 		 #消費税率
-         consumption_tax = $consumption_tax_only
+         #consumption_tax = $consumption_tax_only
 		 #消費税率(込)
-		 consumption_tax_in = $consumption_tax_include
+		 #consumption_tax_in = $consumption_tax_include
 		 
 		 if @flag.nil? 
 		 
@@ -63,14 +63,31 @@ class InvoiceLandscapePDF
 		   @construction_costs = ConstructionCost.find_by(construction_datum_id: @invoice_headers.construction_datum_id)
 		       
 		   #消費税
+           
+           date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+           
 		   if @invoice_headers.billing_amount.present?
 		     #消費税のみの金額
-		     @billing_amount_tax_only = @invoice_headers.billing_amount * consumption_tax 
+		     #@billing_amount_tax_only = @invoice_headers.billing_amount * consumption_tax 
+             #if @invoice_headers.invoice_date < date_per_ten_start
+             #upd190919
+             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+               @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only
+             else
+               @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only_per_ten
+             end
+             
              #消費税込み金額(add170725)
-             @billing_amount_tax_in = @invoice_headers.billing_amount * consumption_tax_in
+             #@billing_amount_tax_in = @invoice_headers.billing_amount * consumption_tax_in
+             #if @invoice_headers.invoice_date < date_per_ten_start
+             #upd190919
+             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+               @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include
+             else
+               @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include_per_ten
+             end
 		   end
-		 
-		 
+		 		 
 		   if @invoice_headers.invoice_date.present?
 		     @gengou = @invoice_headers.invoice_date
              
@@ -217,12 +234,22 @@ class InvoiceLandscapePDF
                       @quantity = invoice_detail_large_classification.quantity
                       if @quantity == 0 
                         @quantity = ""
-                      end  
+                      end 
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @quantity.present?
+                        @quantity = "%.2g" %  @quantity
+                      end
+ 
                       @execution_quantity = invoice_detail_large_classification.execution_quantity
                       if @execution_quantity == 0 
                         @execution_quantity = ""
-                      end  
-                      
+                      end
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @execution_quantity.present?
+                        @execution_quantity = "%.2g" %  @execution_quantity  
+                      end
 					  if invoice_detail_large_classification.WorkingUnit.present?
                         @unit_name = invoice_detail_large_classification.WorkingUnit.working_unit_name
 				      else
@@ -415,11 +442,21 @@ class InvoiceLandscapePDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @quantity.present?
+                    @quantity = "%.2g" %  @quantity
+                  end
+                  
                   @execution_quantity = invoice_detail_middle_classification.execution_quantity
                   if @execution_quantity == 0 
                     @execution_quantity = ""
                   end  
-                  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @execution_quantity.present?
+                    @execution_quantity = "%.2g" %  @execution_quantity
+                  end
 				  if invoice_detail_middle_classification.WorkingUnit.present?
 				    @unit_name = invoice_detail_middle_classification.WorkingUnit.working_unit_name
                   else

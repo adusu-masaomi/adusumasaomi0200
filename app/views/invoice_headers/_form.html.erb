@@ -21,7 +21,7 @@
   <div style="margin-left : -0px">
   <%= f.input :quotation_code, input_html:{:tabindex=>"0", style: 'width:150px', :class => 'sbc_field' } %>
   </div>
-  <%= f.input :invoice_date, :include_blank => true, label_html:{style: 'margin-top: -30px;'}, input_html:{:tabindex=>"1",style: 'width:100px;margin-top:-0px;'} %>
+  <%= f.input :invoice_date, :include_blank => true, label_html:{style: 'margin-top: -30px;'}, input_html:{id:"invoice_date", :tabindex=>"1",style: 'width:100px;margin-top:-0px;'} %>
   <div class="col-md-6" , style="margin-left : -15px">
      <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{:tabindex=>"2",style: 'width:100px'} %>
   </div>
@@ -84,14 +84,14 @@
   </br></br></br></br></br></br>
   
   <div class="col-md-4" ,  style="margin-left : -15px;margin-top : -10px">
-  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"20", style: 'width:200px;', :onchange => "setCommission()" } %>
+  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"20", style: 'width:200px;', :onchange => "setCommission(this.form)" } %>
   </div>
   
   <div class="col-md-4" ,  style="margin-left : 0px;margin-top : -5px">
   <%= f.label :"支払方法", {:class => "my-custom-class-l"}  %></br>
   <%= f.select :payment_method_id, InvoiceHeader.payment_method, {:selected => @invoice_header.payment_method_id || 0}, 
   {id:'payment_method_id', :class => "my-custom-class", style: 'width:140px;height:30px;margin-left:-10px;margin-top:5px;font-size:16px;background-color:#ffffff;', 
-  :tabindex=>"21", :onchange => "setCommission()" } %>
+  :tabindex=>"21", :onchange => "setCommission(this.form)" } %>
   </div>
   
   <div class="col-md-3" ,  style="margin-left : 0px;margin-top : -10px">
@@ -246,7 +246,7 @@
    };
    
   //振込手数料のセット
-  function setCommission()
+  function setCommission(f)
   {  
     var payment_method = document.getElementById("payment_method_id").value;
 	payment_method = parseInt(payment_method)
@@ -258,7 +258,10 @@
       var obj2 = document.getElementById("deposit_amount");
       if (obj1.value > 0 && obj2.value > 0 ){
 	  
-	    billing_amount_tax_in = parseInt(obj1.value * CONSUMPTION_TAX_INCLUDE);
+        //test
+        billing_amount_tax_in = setTaxIn(f, obj1.value)
+      
+	    //billing_amount_tax_in = parseInt(obj1.value * CONSUMPTION_TAX_INCLUDE);
 	    
 		//upd170727
         //var commission = obj1.value - obj2.value;
@@ -270,7 +273,45 @@
       document.getElementById("commission").value = 0;
 	}
   }
-   //顧客情報のセット
+  
+  //add190824
+  //請求日から判断し、消費税込金額を算出する
+  function setTaxIn(f, amount)
+  {
+    //invoice_date
+    var year = f.invoice_date[0].value;
+    var month = f.invoice_date[1].value;
+    var date = f.invoice_date[2].value;
+    
+    if (year == null || month == null || date == null)
+    {
+      return 0;
+    }
+    
+    //ex.月は0から始まるので-1
+    var invoiceDate = new Date(year, month - 1, date, 0, 0, 0);
+    var tenPerStartDate = new Date(2019, 10 - 1, 1, 0, 0, 0);
+    
+    var billing_amount_tax_in = 0;
+    //billing_amount_tax_in = parseInt(obj1.value * CONSUMPTION_TAX_INCLUDE);
+    
+    debugger;
+    
+    if (invoiceDate >= tenPerStartDate)
+    {
+      //10%開始日以降？
+      billing_amount_tax_in = parseInt(amount * CONSUMPTION_TAX_INCLUDE_PER_TEN);
+    }
+    else
+    {
+      //8%(5%以下の時代は考慮していない)
+      billing_amount_tax_in = parseInt(amount * CONSUMPTION_TAX_INCLUDE);
+    }
+    
+    return billing_amount_tax_in;  
+  }
+    
+  //顧客情報のセット
   function setCustomerInfoDefault()
   {  
     obj = document.getElementById("customer_id");

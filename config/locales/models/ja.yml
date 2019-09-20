@@ -141,7 +141,7 @@ ja:
     longitude: 経度
     house_number: 番地
     address2: 建物名
-       
+    execution_amount_with_tax: 税込実行金額
   activerecord:
     models:
        material_master: 資材マスター
@@ -206,6 +206,8 @@ ja:
          construction_datum_id: 工事
          responsible: 担当者
          email: Email
+       quotation_header:
+         quote_price_with_tax: 税込見積金額
        quotation_header_history:
          issue_date: 作成日時
        quotation_detail_large_classification:

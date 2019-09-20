@@ -216,8 +216,17 @@ class OutsourcingInvoicePDF
         purchase_amount_tax_in = 0
         
         if $purchase_data_current.purchase_amount > 0
-          purchase_amount_tax_only = $purchase_data_current.purchase_amount * $consumption_tax_only
-          purchase_amount_tax_in = $purchase_data_current.purchase_amount * $consumption_tax_include
+        
+          date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+          if $purchase_data_current.purchase_date < date_per_ten_start
+          #消費税8%の場合
+            purchase_amount_tax_only = $purchase_data_current.purchase_amount * $consumption_tax_only
+            purchase_amount_tax_in = $purchase_data_current.purchase_amount * $consumption_tax_include
+          else
+          #消費税10%の場合
+            purchase_amount_tax_only = $purchase_data_current.purchase_amount * $consumption_tax_only_per_ten
+            purchase_amount_tax_in = $purchase_data_current.purchase_amount * $consumption_tax_include_per_ten
+          end
         end
         
         #税額

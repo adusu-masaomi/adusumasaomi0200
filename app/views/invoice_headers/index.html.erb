@@ -140,8 +140,14 @@
         <td align="right"><%= number_to_currency(invoice_header.billing_amount,  precision: 0) %></td>
 		<% if invoice_header.billing_amount.present? %>
 		<!--請求金額ありの場合のみ、税込金額をかける-->
-		  <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>
-		<% else %>
+          <!--<td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>-->
+          <!--upd190823消費税10%対応-->
+          <% if invoice_header.invoice_date.present? && invoice_header.invoice_date >= Date.new(2019,10,1) %>
+            <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include_per_ten,  precision: 0) %></td>
+		  <% else %>
+            <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>
+          <% end %>
+        <% else %>
 		  <td align="right"><%= number_to_currency(invoice_header.billing_amount,  precision: 0) %></td>
 		<% end %>
         <!--<td align="right"><%= number_to_currency(invoice_header.execution_amount,  precision: 0) %></td>-->

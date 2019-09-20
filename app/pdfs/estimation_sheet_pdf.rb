@@ -118,16 +118,34 @@ class EstimationSheetPDF
 		   #見積No
 		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
 		 
+           date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+         
            #税込見積合計金額	 
 		   if @quotation_headers.quote_price.present?
-             @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
-		     @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
+             #if @quotation_headers.quotation_date < date_per_ten_start
+             #upd190919
+             if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+             #消費税8%の場合 
+               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
+		     else
+             #消費税10%の場合 
+               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
+             end
+             @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
 		   end
 		   
 		   #消費税
 		   if @quotation_headers.quote_price.present?
-		     @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
-		     @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
+		     #if @quotation_headers.quotation_date < date_per_ten_start
+             #upd190919
+             if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+             #消費税8%の場合  
+               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
+             else
+             #消費税10%の場合
+               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
+             end
+             @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
 		   end
 		 
 		   #工事期間
@@ -171,7 +189,10 @@ class EstimationSheetPDF
              d_heisei_limit = Date.parse("2019/5/1");
              
 		     #元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             #binding.pry
              if @gengou >= d_heisei_limit
+             #if @gengou.blank? || @gengou >= d_heisei_limit
                 #令和
                 if @gengou.year - $gengo_minus_ad_2 == 1
                 #１年の場合は元年と表記
@@ -187,7 +208,9 @@ class EstimationSheetPDF
              @report.page.item(:quotation_date).value(@gengou) 
 		   else
            #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #upd190919
+             empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:quotation_date).value(empty_string) 
            end
 		   
@@ -213,7 +236,11 @@ class EstimationSheetPDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
-                      
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @quantity.present? 
+                      	@quantity = "%.2g" %  @quantity
+                      end
 					  if quotation_detail_large_classification.WorkingUnit.present?
 					    @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
 					  else 
@@ -363,7 +390,9 @@ class EstimationSheetPDF
              #新元号対応 190401
              #require "date"
              d_heisei_limit = Date.parse("2019/5/1");
+                         
              #元号変わったらここも要変更
+             #if @gengou.blank? || @gengou >= d_heisei_limit
              if @gengou >= d_heisei_limit
                 #令和
                 if @gengou.year - $gengo_minus_ad_2 == 1
@@ -380,7 +409,9 @@ class EstimationSheetPDF
 		     @report.page.item(:quotation_date).value(@gengou) 
 		   else
            #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #upd190919 空白はなら令和に
+             empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:quotation_date).value(empty_string) 
            end
 		   
@@ -421,6 +452,10 @@ class EstimationSheetPDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  @quantity = "%.2g" %  @quantity
+                      
                   if quotation_detail_middle_classification.WorkingUnit.present?
                      @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
                   end 

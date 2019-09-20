@@ -581,17 +581,21 @@
 	//請求金額計算
     var obj3 = document.getElementById("working_unit_price");      
     if (obj3.value > 0){ 
-      var num = parseInt(obj1.value) * parseInt(obj3.value);
-      document.getElementById("invoice_price").value = num;
+      //var num = parseInt(obj1.value) * parseInt(obj3.value);
+      //upd190904
+      var num = obj1.value * obj3.value;
+      document.getElementById("invoice_price").value = parseInt(num);
     };
-    //実行金額計算(仮)
+    //実行金額計算
     var obj3 = document.getElementById("execution_unit_price");
    
     if (obj3.value > 0){ 
       //var num = parseInt(obj1.value) * parseInt(obj3.value);
       if (obj2.value > 0){
-        var num = parseInt(obj2.value) * parseInt(obj3.value);
-        document.getElementById("execution_price").value = num;
+        //var num = parseInt(obj2.value) * parseInt(obj3.value);
+        //upd190904
+        var num = obj2.value * obj3.value;
+        document.getElementById("execution_price").value = parseInt(num);
       } 
     }
 	

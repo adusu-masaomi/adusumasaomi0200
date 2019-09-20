@@ -95,14 +95,38 @@ class InvoicePDF
            end
 		 
            #税込見積合計金額	 
+           
+           date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+            
 		   if @invoice_headers.billing_amount.present?
-             @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include
-		     @report.page.item(:billing_amount_tax_in).value(@billing_amount_tax_in) 
+            
+             
+             #if @invoice_headers.invoice_date < date_per_ten_start
+             #upd190919
+             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+             #消費税8%の場合 
+               @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include
+		     else
+             #消費税10%の場合 
+               @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include_per_ten
+             end
+             
+             @report.page.item(:billing_amount_tax_in).value(@billing_amount_tax_in) 
 		   end
 		   
 		   #消費税
 		   if @invoice_headers.billing_amount.present?
-		     @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only  
+		     
+             #if @invoice_headers.invoice_date < date_per_ten_start
+             #upd190919
+             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+               #消費税8%の場合
+               @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only
+             else
+               #消費税10%の場合
+               @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only_per_ten
+             end  
+             
 		     @report.page.item(:billing_amount_tax_only).value(@billing_amount_tax_only) 
 		   end
 		 
@@ -170,8 +194,10 @@ class InvoicePDF
              
              @report.page.item(:invoice_date).value(@gengou) 
 		   else
-             #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #空でも文字を出す 
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #upd190920 空白なら最新の元号とする(本来なら切替日で切替必要だがレアケースなので省略)
+             empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:invoice_date).value(empty_string) 
            end
 		   
@@ -187,7 +213,10 @@ class InvoicePDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
-					  
+					  #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      @quantity = "%.2g" %  @quantity
+                  
 					  if invoice_detail_large_classification.WorkingUnit.present?
                         @unit_name = invoice_detail_large_classification.WorkingUnit.working_unit_name
 				      else 
@@ -323,8 +352,9 @@ class InvoicePDF
              
              @report.page.item(:invoice_date).value(@gengou) 
 		   else
-             #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #空でも文字を出す 
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             empty_string =  $gengou_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:invoice_date).value(empty_string) 
            end
 		   
@@ -357,7 +387,12 @@ class InvoicePDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
-				  
+				  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @quantity.present?
+                    @quantity = "%.2g" %  @quantity
+                  end
+                  
 				  if invoice_detail_middle_classification.WorkingUnit.present?
                     @unit_name = invoice_detail_middle_classification.WorkingUnit.working_unit_name
                   else

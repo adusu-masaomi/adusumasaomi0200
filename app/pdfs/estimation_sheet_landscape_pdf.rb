@@ -52,8 +52,8 @@ class EstimationSheetLandscapePDF
 		   
 		 #---見出し---
 		 
-         consumption_tax = $consumption_tax_only         #消費税率 
-		 consumption_tax_in = $consumption_tax_include   #消費税率(込) 
+         #consumption_tax = $consumption_tax_only         #消費税率 
+		 #consumption_tax_in = $consumption_tax_include   #消費税率(込) 
 		 
 		 if @flag.nil? 
 		 
@@ -80,8 +80,18 @@ class EstimationSheetLandscapePDF
            #@report.page.item(:post).value(@quotation_headers.post) 
 		   
 		   #消費税
-		   if @quotation_headers.quote_price.present?
-		     @quote_price_tax_only = @quotation_headers.quote_price * consumption_tax  
+		   date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+           
+           if @quotation_headers.quote_price.present?
+		     #@quote_price_tax_only = @quotation_headers.quote_price * consumption_tax
+             #if @quotation_headers.quotation_date < date_per_ten_start
+             if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+             #消費税8%
+               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
+             else
+             #消費税10%
+               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
+             end
 		   end
 		   
 		   #元号変わったらここも要変更
@@ -215,8 +225,17 @@ class EstimationSheetLandscapePDF
 		   
 		   @execution_amount_tax_only = 0
 		   if @quotation_headers.execution_amount != 0
-              @execution_amount_tax_only = @quotation_headers.execution_amount * consumption_tax   #増税時注意！！
-			  @report.page.item(:execution_amount_tax_only).value(@execution_amount_tax_only)
+              #if @quotation_headers.quotation_date < date_per_ten_start
+              #upd190919
+              if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+              #消費税8%
+                #@execution_amount_tax_only = @quotation_headers.execution_amount * consumption_tax   #増税時注意！！
+                @execution_amount_tax_only = @quotation_headers.execution_amount * $consumption_tax_only   
+			  else
+              #消費税10%
+                @execution_amount_tax_only = @quotation_headers.execution_amount * $consumption_tax_only_per_ten
+              end
+              @report.page.item(:execution_amount_tax_only).value(@execution_amount_tax_only)
 		   end
 		   
 		   #利益
@@ -236,10 +255,20 @@ class EstimationSheetLandscapePDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @quantity.present?
+                        @quantity = "%.2g" %  @quantity
+                      end
                       @execution_quantity = quotation_detail_large_classification.execution_quantity
                       if @execution_quantity == 0 
                         @execution_quantity = ""
                       end  
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @execution_quantity.present?
+                        @execution_quantity = "%.2g" %  @execution_quantity
+                      end
                       
                       if quotation_detail_large_classification.WorkingUnit.present?
 					    @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
@@ -483,10 +512,21 @@ class EstimationSheetLandscapePDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @quantity.present?
+                    @quantity = "%.2g" %  @quantity
+                  end
+
                   @execution_quantity = quotation_detail_middle_classification.execution_quantity
                   if @execution_quantity == 0 
                     @execution_quantity = ""
                   end  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @execution_quantity.present?
+                     @execution_quantity = "%.2g" %  @execution_quantity
+                  end
                   #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
 				  if quotation_detail_middle_classification.WorkingUnit.present?
                     @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name

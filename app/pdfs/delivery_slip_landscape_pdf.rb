@@ -44,8 +44,8 @@ class DeliverySlipLandscapePDF
 		   
 		 #---見出し---
 		 
-         consumption_tax = $consumption_tax_only        #消費税率 
-		 consumption_tax_in = $consumption_tax_include  #消費税率(込)
+         #consumption_tax = $consumption_tax_only        #消費税率 
+		 #consumption_tax_in = $consumption_tax_include  #消費税率(込)
 		 
 		 if @flag.nil? 
 		 
@@ -59,12 +59,19 @@ class DeliverySlipLandscapePDF
 		   @customer_masters = CustomerMaster.find(@delivery_slip_headers.customer_id)
 		   
 		   #消費税
-		   #if @delivery_slip_headers.quote_price.present?
-		   #  @quote_price_tax_only = @delivery_slip_headers.quote_price * consumption_tax  
-		   #end
+           date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+           
 		   if @delivery_slip_headers.delivery_amount.present?
-		     @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * consumption_tax  
-		   end
+             #if @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #upd190919
+             if @delivery_slip_headers.delivery_slip_date.nil? || @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #消費税8%
+		       @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * $consumption_tax_only  
+		     else
+             #消費税10%
+		       @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * $consumption_tax_only_per_ten
+             end
+           end
 		   
 		   
 		   #元号
@@ -188,8 +195,17 @@ class DeliverySlipLandscapePDF
 		   
 		   @execution_amount_tax_only = 0
 		   if @delivery_slip_headers.execution_amount != 0
-              @execution_amount_tax_only = @delivery_slip_headers.execution_amount * consumption_tax   
-			  @report.page.item(:execution_amount_tax_only).value(@execution_amount_tax_only)
+              #if @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+              #upd190919
+              #if @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+              if @delivery_slip_headers.delivery_slip_date.nil? || @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+              #消費税8%
+                @execution_amount_tax_only = @delivery_slip_headers.execution_amount * $consumption_tax_only   
+			  else
+              #消費税10%
+                @execution_amount_tax_only = @delivery_slip_headers.execution_amount * $consumption_tax_only_per_ten
+              end
+              @report.page.item(:execution_amount_tax_only).value(@execution_amount_tax_only)
 		   end
 		   
 		   #利益
@@ -210,11 +226,22 @@ class DeliverySlipLandscapePDF
                       if @quantity == 0 
                         @quantity = ""
                       end  
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @quantity.present?
+                        @quantity = "%.2g" %  @quantity
+                      end
+                      
                       @execution_quantity = delivery_slip_detail_large_classification.execution_quantity
                       if @execution_quantity == 0 
                         @execution_quantity = ""
                       end  
                       
+                      #add190903
+                      #小数点以下１位があれば表示、なければ非表示
+                      if @execution_quantity.present?
+                        @execution_quantity = "%.2g" %  @execution_quantity
+                      end
                       #@unit_name = delivery_slip_detail_large_classification.DeliverySlipUnit.delivery_slip_unit_name
 					  if delivery_slip_detail_large_classification.WorkingUnit.present?
                         @unit_name = delivery_slip_detail_large_classification.WorkingUnit.working_unit_name
@@ -427,11 +454,20 @@ class DeliverySlipLandscapePDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @quantity.present?
+                    @quantity = "%.2g" %  @quantity
+                  end
                   @execution_quantity = delivery_slip_detail_middle_classification.execution_quantity
                   if @execution_quantity == 0 
                     @execution_quantity = ""
                   end  
-                  
+                  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @execution_quantity.present?
+                    @execution_quantity = "%.2g" %  @execution_quantity
+                  end
 				  if delivery_slip_detail_middle_classification.WorkingUnit.present?
 				    @unit_name = delivery_slip_detail_middle_classification.WorkingUnit.working_unit_name
                   else

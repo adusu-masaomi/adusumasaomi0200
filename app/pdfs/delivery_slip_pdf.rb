@@ -91,17 +91,36 @@ class DeliverySlipPDF
 		   else
 		     @report.page.item(:delivery_slip_code).value(@delivery_slip_headers.delivery_slip_code)
 		   end
-		 
+		   
+           #消費税
+           date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
+           
            #税込見積合計金額	 
 		   if @delivery_slip_headers.delivery_amount.present?
-             @delivery_amount_tax_in = @delivery_slip_headers.delivery_amount * $consumption_tax_include  
-		     @report.page.item(:delivery_amount_tax_in).value(@delivery_amount_tax_in) 
+             #if @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #upd190919
+             if @delivery_slip_headers.delivery_slip_date.nil? || @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #消費税8%
+               @delivery_amount_tax_in = @delivery_slip_headers.delivery_amount * $consumption_tax_include  
+             else
+             #消費税10%
+               @delivery_amount_tax_in = @delivery_slip_headers.delivery_amount * $consumption_tax_include_per_ten
+             end
+             @report.page.item(:delivery_amount_tax_in).value(@delivery_amount_tax_in) 
 		   end
 		   
 		   #消費税
 		   if @delivery_slip_headers.delivery_amount.present?
-		     @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * $consumption_tax_only  
-		     @report.page.item(:delivery_amount_tax_only).value(@delivery_amount_tax_only) 
+		     #if @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #upd190919
+             if @delivery_slip_headers.delivery_slip_date.nil? || @delivery_slip_headers.delivery_slip_date < date_per_ten_start
+             #消費税8%
+               @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * $consumption_tax_only  
+		     else
+             #消費税10%
+               @delivery_amount_tax_only = @delivery_slip_headers.delivery_amount * $consumption_tax_only_per_ten
+             end
+             @report.page.item(:delivery_amount_tax_only).value(@delivery_amount_tax_only) 
 		   end
 		   
            
@@ -147,8 +166,10 @@ class DeliverySlipPDF
 		     end
              @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
-            #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+            #空でも文字を出す 
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #upd190920
+             empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:delivery_slip_date).value(empty_string) 
            end
 		   
@@ -173,6 +194,10 @@ class DeliverySlipPDF
                         @quantity = ""
                       end  
                       
+                      #add190903
+                      if @quantity.present?
+                        @quantity = "%.2g" %  @quantity
+                      end
 					  if delivery_slip_detail_large_classification.WorkingUnit.present?
 					    @unit_name = delivery_slip_detail_large_classification.WorkingUnit.working_unit_name
 					  else 
@@ -322,8 +347,10 @@ class DeliverySlipPDF
              
              @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
-            #空でも文字を出す add180515
-             empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+            #空でも文字を出す 
+             #empty_string =  $gengo_name + "　　" + "年" + "　　" + "月" + "　　" + "日"
+             #upd190920
+             empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
              @report.page.item(:delivery_slip_date).value(empty_string) 
            end
 		   
@@ -359,7 +386,11 @@ class DeliverySlipPDF
                   if @quantity == 0 
                     @quantity = ""
                   end  
-				  
+				  #add190903
+                  #小数点以下１位があれば表示、なければ非表示
+                  if @quantity.present?
+                    @quantity = "%.2g" %  @quantity
+                  end
 				  if delivery_slip_detail_middle_classification.WorkingUnit.present?
                     @unit_name = delivery_slip_detail_middle_classification.WorkingUnit.working_unit_name
 			      else 
@@ -400,7 +431,7 @@ class DeliverySlipPDF
 					  @@delivery_slip_price += num
 					end
                   end
-                  	  
+                  
                   row.values working_middle_item_name: item_name,
                    working_middle_specification: delivery_slip_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,

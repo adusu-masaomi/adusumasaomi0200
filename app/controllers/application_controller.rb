@@ -31,7 +31,6 @@ class ApplicationController < ActionController::Base
   ### ここまで追加(ログイン) ###
   
   
-    
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"      #平成の場合
   $gengo_name_2 = "令和"    #令和 〃
@@ -44,6 +43,10 @@ class ApplicationController < ActionController::Base
   #消費税の設定(改定時はここを変更する)
   $consumption_tax_only = 0.08
   $consumption_tax_include = 1.08
+  
+  #消費税１０％の対応
+  $consumption_tax_only_per_ten = 0.10
+  $consumption_tax_include_per_ten = 1.10
   
   #add170308
   #見積等での工事種別の定数
