@@ -67,7 +67,7 @@ GEM
       activemodel (>= 4.0.0)
       activesupport (>= 4.0.0)
       mime-types (>= 1.16)
-    chartkick (2.2.4)
+    chartkick (3.3.0)
     cocoon (1.2.10)
     coderay (1.1.1)
     coffee-rails (4.1.1)
