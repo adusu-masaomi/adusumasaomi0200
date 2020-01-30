@@ -1,0 +1,473 @@
+<%= simple_form_for @quotation_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @quotation_header.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @quotation_header.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @quotation_header.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
+  <div class="col-sm-3" , style="margin-left : -15px">
+  <%= f.input :quotation_code, input_html:{:tabindex=>"0", style: 'width:130px'} %>
+  </div>
+  <div class="col-sm-3", style="margin-left : -0px">
+  <%= f.input :invoice_code, input_html:{ id:"invoice_code", :tabindex=>"0", style: 'width:130px'} %>
+  </div>
+  <div class="col-sm-3", style="margin-left : -0px">
+  <%= f.input :delivery_slip_code, input_html:{ id:"delivery_slip_code", :tabindex=>"0", style: 'width:130px'} %>
+  </div>
+  
+  <div class="col-md-3", style="margin-left : -0px;margin-top:10px;">
+  
+  <%= f.label :"見積コード（参照）" , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :quotation_header_origin_id, QuotationHeader.order('quotation_code desc').all, :id, :quotation_code, {:include_blank => true} , 
+  {id:"quotation_header_origin_id", :onchange => "CopyQuotationHeader()", class: "searchableQuotationOrigin" , style: 'width:150px' } %>
+
+  </div>
+  </br></br></br></br></br>
+  
+  <%= f.input :quotation_date, :include_blank => true, input_html:{ id:"quotation_date", :tabindex=>"1",style: 'width:100px'} %>
+  <div class="col-md-6" , style="margin-left : -15px">
+   <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{ id:"invoice_period_start_date", :tabindex=>"2",style: 'width:100px'} %>
+  </div>
+  <div style="margin-left : 0px">
+     <%= f.input :invoice_period_end_date, :include_blank => true, input_html:{ id:"invoice_period_end_date", :tabindex=>"3",style: 'width:100px'} %>
+  </div></br>
+  
+  <%= f.label :"件名Ｎｏ(＊該当無→”-”)" , {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.input :construction_datum_id %>-->
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:selected => @quotation_header.construction_datum_id || 1, :include_blank => true} , 
+      {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"4",  style: 'width:220px' } %></br>
+  <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"5", style: 'ime-mode:active'} %>
+  <%= f.label :"得意先(＊該当無→”＜手入力用＞”)", {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.input :customer_id %>-->
+  <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:selected => @quotation_header.customer_id || 1 } , 
+     {id:'customer_id', :class => "searchableCustomerName",  style: 'width:330px' , :tabindex=>"6"} %></br>
+  <%= f.input :customer_name , label: "得意先名（手入力用）", input_html:{id:"customer_name", :tabindex=>"7", style: 'ime-mode:active'} %>
+  <%= f.label :"敬称", {:class => "my-custom-class-l"}  %></br>
+  
+  <div class="col-xs-3" ,  style="margin-left : -15px">
+  <%= f.select :honorific_id, CustomerMaster.honorific, {:selected => @quotation_header.honorific_id || 0}, 
+        {id:'honorific_id', :tabindex=>"8", :class => "my-custom-class", style: 'width:90px;height:25px;font-size:16px;'} %>
+  </div>
+  <div class="col-xs-3" ,  style="margin-left : -60px;margin-top : -30px">
+  <%= f.input :responsible1, input_html:{id:'responsible1', :tabindex=>"9", style: "width:220px;"}  %>
+  </div>
+  <div class="col-xs-3" ,  style="margin-left : 60px;margin-top : -30px">
+  <%= f.input :responsible2, input_html:{id:'responsible2', :tabindex=>"10", style: "width:220px;"} %>
+  </div>
+  </br></br></br>
+  <%= f.input :post,  label:"郵便番号（得意先※マスターに反映されます）", input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"11"} %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+  <%= f.input :address, label:"住所（得意先※マスターに反映されます）", hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"12",
+                        :onkeydown => "setPostAuto($(this).val(), 'post', event)"} %>
+  </div>
+  
+  <!--add171010-->
+  <%= f.input :house_number , hint: "＊番地のみ入力して下さい。", label:"番地（得意先※マスターに反映されます）", input_html:{id:"house_number", style: 'width:320px', :tabindex=>"13"} %>
+  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。",  label:"建物（得意先※マスターに反映されます）", label_html:{style: 'margin-top : -30px;'},  input_html:{id:"address2", style: 'width:320px;', :tabindex=>"14"} %>
+  <!--add end-->
+  
+  <%= f.input :tel, input_html:{id:"tel", :tabindex=>"15"} %>
+  <%= f.input :fax, input_html:{id:"fax", :tabindex=>"16"} %>
+  <%= f.input :construction_period, input_html:{id:"construction_period", :tabindex=>"17"}  %>
+  <%= f.input :construction_post, label:"郵便番号（工事場所）", input_html:{ id:"construction_post", :onchange => "formatPost2(id)", 
+       :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');", :tabindex=>"18"}  %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{ id:"construction_place", style: 'width:320px;', 
+        name:"construction_place", :tabindex=>"19", :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
+  </div>
+  
+  <!--add171010-->
+  <%= f.input :construction_house_number , hint: "＊番地のみ入力して下さい。", label:"番地（工事場所）", input_html:{id:"construction_house_number",
+              style: 'width:320px', :tabindex=>"20"} %>
+  <%= f.input :construction_place2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（工事場所）", label_html:{style: 'margin-top : -30px;'},  
+            input_html:{id:"construction_place2", style: 'width:320px;', :tabindex=>"21"} %>
+  <!--add end-->
+  
+  <%= f.input :trading_method, input_html:{ id:"trading_method", :tabindex=>"22"}  %>
+  <%= f.input :effective_period, input_html:{ id:"effective_period", :tabindex=>"23"}  %>
+  <%= f.input :net_amount, input_html:{ id:"net_amount", :tabindex=>"24"}  %>
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", style: 'width:320px;', :tabindex=>"25"} %>
+  </div>
+  <%= f.input :quote_price_with_tax, hint: "＊端数調整が必要な場合のみ入力して下さい。" , input_html:{ id:"quote_price_with_tax", style: 'width:320px;', :tabindex=>"26"} %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", style: 'width:320px;', :tabindex=>"27"}  %>
+  </div>
+  <%= f.input :execution_amount_with_tax, hint: "＊端数調整が必要な場合のみ入力して下さい。" , input_html:{ id:"execution_amount_with_tax", style: 'width:320px;', :tabindex=>"28"} %>
+  
+  <%= f.check_box :fixed_flag %> 
+  <%= f.label :fixed_flag, "確定済み(確定後に自動チェックされます。解除のみ操作可能です。)", {style: 'color: blue', :tabindex=>"29"} %>
+  </br>
+  
+  <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>
+  <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_start_date_hide'}, as: :hidden  %>
+  <%= f.input :invoice_period_start_date_hide, input_html:{id:'invoice_period_end_date_hide'}, as: :hidden  %>
+  
+  <!--得意先M-->
+  <%= f.simple_fields_for :customer_master, :remote => true do |m| %>
+    <%= m.input :honorific_id , input_html:{ id:"honorific_id"}, as: :hidden %>
+	<%= m.input :responsible1 , input_html:{ id:"responsible1"}, as: :hidden %>
+	<%= m.input :responsible2 , input_html:{ id:"responsible2"}, as: :hidden %>
+	<!--add171014-->
+	<%= m.input :tel_main , input_html:{ id:"tel_main"}, as: :hidden %>
+	<%= m.input :fax_main , input_html:{ id:"fax_main"}, as: :hidden %>
+	<!--add end-->
+  <% end %>
+
+  
+  <!--<input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />-->
+  
+  <%= f.button_tag "登録する", :type => 'button', :class => "btn btn-primary", 
+               :onclick => "alertAfterValidation()" %>
+			   
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                quotation_headers_path, :class => 'btn btn-default' %>
+<% end %>
+
+<script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+<script type="text/javascript">
+
+   $(document).on('ready page:load', function(){
+   
+     //見積コード（参照）
+     //select2のタブインデックスはここで指定する
+	 $(".searchableQuotationOrigin").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',0)}).trigger('load');
+     //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableQuotationOrigin" ).on("select2:close", function (e) {
+	 //  $('[tabindex=1]').focus(); 
+	 });
+     
+     //検索可能なリストボックス(注文Noの場合)
+     $(".searchableConstructionCode").select2({ theme: "bootstrap" });
+
+     $( ".searchableConstructionCode" ).change(function(e) {
+	     setConstructionInfoDefault();
+	 });
+	 
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	 //工事コードの場合
+	 $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+	   $('[tabindex=5]').focus(); 
+	 });
+	 
+	 	 
+	 //検索可能なリストボックス(顧客名の場合)
+     $(".searchableCustomerName").select2({ theme: "bootstrap", allowClear: true , placeholder: "どれか一つを選択して下さい。" });
+	
+	 //$( ".searchableCustomerName" ).on("select2:open", function (e) {
+	 //  $('.searchableCustomerName').select2().trigger('change');
+     //});
+	 
+	 $( ".searchableCustomerName" ).change(function(e) {
+	  　  setCustomerInfoDefault();
+     });
+	 
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 //顧客名の場合
+	 $( ".searchableCustomerName" ).on("select2:close", function (e) {
+	  　 $('[tabindex=7]').focus(); 
+	 });
+	 //
+	 
+	 //見積コード参照用
+	 $(".searchableSelect2_1").select2({ theme: "classic", allowClear: true , placeholder: "" });
+	 
+   });
+  
+  
+ 
+  
+  //フォームロード時のイベント
+  window.onload = function(){
+    
+	//得意先名を最新の情報にする
+	var index = document.getElementById("customer_id").selectedIndex;
+	document.getElementById("customer_name").value = 
+	  document.getElementById("customer_id").options[index].innerText;
+    
+    //顧客情報の初期値もセットする(未入力の場合)
+    //add180206
+    setCustomerDefaultBySearch();
+    
+    //add190131
+    //担当者の更新
+    setResponsibleOnload();
+     
+  }
+  
+  //顧客情報のセット add180206
+  function setCustomerDefaultBySearch(){
+    index = parseInt(document.getElementById("customer_id").value);
+    
+    if (index > 0){
+      var blnExist = false;
+      if (document.getElementById("address").value != ""){
+        blnExist = true;
+      }
+      if (blnExist == false){
+        $(".searchableCustomerName").val(index).trigger("change");
+      }
+    }
+  }
+  
+   //工事情報のセット
+  function setConstructionInfoDefault()
+  {  
+    //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
+    obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     //$.get("<%= construction_costz_construction_name_select_path %>",
+	 //upd170218
+	 $.get("<%= construction_dataz_construction_and_customer_select_path %>",
+	   {id: construction_id },
+        function(data){
+          obj = document.getElementById("construction_name").textContent;
+          document.getElementById("construction_name").value = obj;
+		  
+		  obj = document.getElementById("construction_post").textContent;
+          document.getElementById("construction_post").value = obj;
+		  
+		  obj = document.getElementById("construction_place").textContent;
+          document.getElementById("construction_place").value = obj;
+		  
+		  //add171012
+		  obj = document.getElementById("construction_house_number").textContent;
+          document.getElementById("construction_house_number").value = obj;
+		  obj = document.getElementById("construction_place2").textContent;
+          document.getElementById("construction_place2").value = obj;
+		  //
+		  
+          //responsible1
+	      //add190131
+          obj = document.getElementById("responsible1").textContent;
+          document.getElementById("responsible1").value = obj;
+          
+		  //add170218
+		  //顧客情報も合わせてセットする
+		  obj = document.getElementById("customer_id_hide").textContent;
+		  if (obj != null){
+		    index = parseInt(obj);
+            $(".searchableCustomerName").val(index).trigger("change");
+			
+			}
+		  }
+	  );
+	  
+   };
+   
+  
+  //担当者の更新
+  //add190131
+  function setResponsibleOnload()
+  {  
+    //工事名のセット(ajax用のjsは、construction_costsのものを共用する)
+    obj = document.getElementById("construction_datum_id");
+     construction_id = parseInt(obj.value);
+     if (construction_id != "" && construction_id != "1")
+     {
+        $.get("<%= construction_dataz_construction_and_customer_select_path %>",
+	      {id: construction_id },
+          function(data){
+          
+            //responsible1
+	        //add190131
+            obj = document.getElementById("responsible1").textContent;
+            if (obj != "" && document.getElementById("responsible1").value != obj)
+            {
+                document.getElementById("responsible1").value = obj;
+            }
+          }
+	    );
+	 }
+   };
+   
+   
+   
+  //見積一覧データをコピーする
+  function CopyQuotationHeader(){
+   
+   var index = document.getElementById("quotation_header_origin_id").selectedIndex;
+   if (index > 0){
+     
+     var quotation_origin_code = 
+	  document.getElementById("quotation_header_origin_id").options[index].innerText;
+   
+   
+	 $.get("<%= quotation_headerz_duplicate_quotation_header_path %>",
+       {quotation_code: quotation_origin_code },
+        function(data){
+		  
+		  //工事情報をセット
+		  //setConstructionInfoDefault();
+		  
+		  //請求書有効期間開始日
+		  obj = document.getElementById("invoice_period_start_date_hide").textContent;
+		  if (obj != undefined){
+		    //年
+		    document.getElementsByName("quotation_header[invoice_period_start_date(1i)]")[0].value = obj.substr(0,4);
+		    //月
+		    document.getElementsByName("quotation_header[invoice_period_start_date(2i)]")[0].value = parseInt(obj.substr(5,2));
+		    //日
+		    document.getElementsByName("quotation_header[invoice_period_start_date(3i)]")[0].value = parseInt(obj.substr(8,2));
+		  }
+		  //請求書有効期間終了日
+		  obj = document.getElementById("invoice_period_end_date_hide").textContent;
+		  if (obj != undefined){
+		    //年
+		    document.getElementsByName("quotation_header[invoice_period_end_date(1i)]")[0].value = obj.substr(0,4);
+		    //月
+		    document.getElementsByName("quotation_header[invoice_period_end_date(2i)]")[0].value = parseInt(obj.substr(5,2));
+		    //日
+		    document.getElementsByName("quotation_header[invoice_period_end_date(3i)]")[0].value = parseInt(obj.substr(8,2));
+		  }
+		  
+		  
+		  //請求コード
+		  obj = document.getElementById("invoice_code").textContent;
+          document.getElementById("invoice_code").value = obj;
+		  //納品コード
+		  obj = document.getElementById("delivery_slip_code").textContent;
+          document.getElementById("delivery_slip_code").value = obj;
+		  
+		  //工事名
+		  obj = document.getElementById("construction_name").textContent;
+          document.getElementById("construction_name").value = obj;
+		  
+		  //顧客名
+		  obj = document.getElementById("customer_name").textContent;
+          document.getElementById("customer_name").value = obj;
+		  
+		  //担当者１
+		  obj = document.getElementById("responsible1").textContent;
+          document.getElementById("responsible1").value = obj;
+		  //担当者2
+		  obj = document.getElementById("responsible2").textContent;
+          document.getElementById("responsible2").value = obj;
+		  
+		  //郵便番号
+		  obj = document.getElementById("post").textContent;
+          document.getElementById("post").value = obj;
+		  
+		  //住所
+		  obj = document.getElementById("address").textContent;
+          document.getElementById("address").value = obj;
+		  obj = document.getElementById("house_number").textContent;
+          document.getElementById("house_number").value = obj;
+		  obj = document.getElementById("address2").textContent;
+          document.getElementById("address2").value = obj;
+		  
+		  //tel
+		  obj = document.getElementById("tel").textContent;
+          document.getElementById("tel").value = obj;
+		  //fax
+		  obj = document.getElementById("fax").textContent;
+          document.getElementById("fax").value = obj;
+		  //工事期間
+		  obj = document.getElementById("construction_period").textContent;
+          document.getElementById("construction_period").value = obj;
+		  //郵便番号(工事場所)  
+		  obj = document.getElementById("construction_post").textContent;
+          document.getElementById("construction_post").value = obj;
+		  //住所(工事場所)
+		  obj = document.getElementById("construction_place").textContent;
+          document.getElementById("construction_place").value = obj;
+		  //番地
+		  obj = document.getElementById("construction_house_number").textContent;
+          document.getElementById("construction_house_number").value = obj;
+		  //建物
+		  obj = document.getElementById("construction_place2").textContent;
+          document.getElementById("construction_place2").value = obj;
+		  //取引方法
+		  obj = document.getElementById("trading_method").textContent;
+          document.getElementById("trading_method").value = obj;
+		  //有効期間
+		  obj = document.getElementById("effective_period").textContent;
+          document.getElementById("effective_period").value = obj;
+		  //NET金額
+		  obj = document.getElementById("net_amount").textContent;
+          document.getElementById("net_amount").value = obj;
+		  //見積金額
+		  obj = document.getElementById("quote_price").textContent;
+          document.getElementById("quote_price").value = obj;
+		  //実行金額
+		  obj = document.getElementById("execution_amount").textContent;
+          document.getElementById("execution_amount").value = obj;
+		  
+		 }
+	  );
+    }
+  }
+   
+   //顧客情報のセット
+  function setCustomerInfoDefault()
+  {  
+    obj = document.getElementById("customer_id");
+	
+     customer_id = parseInt(obj.value);
+     $.get("<%= quotation_headerz_customer_info_select_path %>",
+       {id: customer_id },
+        function(data){
+          //顧客名
+		  obj = document.getElementById("customer_name").textContent;
+          document.getElementById("customer_name").value = obj;
+		  
+		  //郵便番号
+	      obj = document.getElementById("post").textContent;
+          document.getElementById("post").value = obj;
+		  //住所
+		  obj = document.getElementById("address").textContent;
+          document.getElementById("address").value = obj;
+		  //add171012
+		  obj = document.getElementById("house_number").textContent;
+          document.getElementById("house_number").value = obj;
+		  obj = document.getElementById("address2").textContent;
+          document.getElementById("address2").value = obj;
+		  //add end 
+		  
+		  //tel
+	      obj = document.getElementById("tel").textContent;
+          document.getElementById("tel").value = obj;
+          //fax
+	      obj = document.getElementById("fax").textContent;
+          document.getElementById("fax").value = obj;
+		  //responsible1
+	      //del190131
+          //obj = document.getElementById("responsible1").textContent;
+          //document.getElementById("responsible1").value = obj;
+		  //responsible2
+	      obj = document.getElementById("responsible2").textContent;
+          document.getElementById("responsible2").value = obj;
+		  
+          //担当名
+		  //add190131
+          //obj = document.getElementById("construction_name").textContent;
+          //document.getElementById("construction_name").value = obj;
+		  
+		 }
+	  );
+   };
+  
+ //登録時、見積参照コードが入力されていれば、メッセージを出す
+ function alertAfterValidation() {
+   
+   if (document.getElementById("quotation_header_origin_id").selectedIndex > 0){
+     alert('見積書データを参照元コードよりコピーします。');
+   }
+   
+   document.forms[0].submit();
+ }
+  
+ 
+ 
+</script>
