@@ -62,6 +62,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.collection_select :material_category_id, @material_categories.all, :id, :name, {:include_blank => true, :selected => f.object.material_category_id || nil} , 
       {class: "searchableSelect1_4 form-control" , id: "material_category_id" , style: 'width:200px;margin-left:-20px', :tabindex => "6" } %>
+  <% end %>
   
 </div>
 </div>

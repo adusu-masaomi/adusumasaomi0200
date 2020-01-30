@@ -26,7 +26,13 @@
   <dt><font color=blue><strong>請求金額(税込):</strong></font></dt>
   
   <% if @invoice_header.billing_amount.present? %>
-    <dd><%= number_to_currency(@invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></dd>
+    <% if @invoice_header.invoice_date >= Date.parse('2019-10-01')%>
+    <!--10%-->
+        <dd><%= number_to_currency(@invoice_header.billing_amount * $consumption_tax_include_per_ten,  precision: 0) %></dd>
+    <% else %>
+    <!--8%-->
+        <dd><%= number_to_currency(@invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></dd>
+    <% end %>
   <% else %>
     <dd></dd>
   <% end %>

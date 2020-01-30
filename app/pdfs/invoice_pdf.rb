@@ -103,10 +103,20 @@ class InvoicePDF
              
              #if @invoice_headers.invoice_date < date_per_ten_start
              #upd190919
-             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+             #if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+             if !(@invoice_headers.invoice_date.nil?) && @invoice_headers.invoice_date < date_per_ten_start
              #消費税8%の場合 
                @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include
-		     else
+		     elsif @invoice_headers.invoice_date.nil?
+             #日付ブランクなら現在日付で判定(add191031)
+               if Date.today < date_per_ten_start
+               #8%の場合
+                 @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include
+               else
+               #10%の場合。変更時はさらに分岐させる
+                 @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include_per_ten
+               end
+             else
              #消費税10%の場合 
                @billing_amount_tax_in = @invoice_headers.billing_amount * $consumption_tax_include_per_ten
              end
@@ -114,14 +124,22 @@ class InvoicePDF
              @report.page.item(:billing_amount_tax_in).value(@billing_amount_tax_in) 
 		   end
 		   
-		   #消費税
+		   #消費税のみ金額
 		   if @invoice_headers.billing_amount.present?
 		     
-             #if @invoice_headers.invoice_date < date_per_ten_start
-             #upd190919
-             if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+             #if @invoice_headers.invoice_date.nil? || @invoice_headers.invoice_date < date_per_ten_start
+             if !(@invoice_headers.invoice_date.nil?) && @invoice_headers.invoice_date < date_per_ten_start
                #消費税8%の場合
                @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only
+             elsif @invoice_headers.invoice_date.nil?
+             #日付ブランクなら現在日付で判定(add191031)
+               if Date.today < date_per_ten_start
+               #8%の場合
+                 @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only
+               else
+               #10%の場合。変更時はさらに分岐させる
+                 @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only_per_ten
+               end
              else
                #消費税10%の場合
                @billing_amount_tax_only = @invoice_headers.billing_amount * $consumption_tax_only_per_ten

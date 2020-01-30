@@ -400,6 +400,7 @@
 		 setNextControlOnSelect(e,control_name, 3);
 	   });
 	   
+     
 	   //担当者のリセット(未選択状態にする)
 	   resetResponsible();
 	   
@@ -436,18 +437,33 @@
 	   //全落札（3）のチェックを押した時の動作
 	   $('.all_bid_flag_3').on('change', function(){
          if ($(this).is(':checked')) {
-		    //全て落札させる(配列の１つ目は仕入先フラグ、２つ目はチェックの場合true、外す場合はfalse
-			setAllBidFlag(3,true);
+		       //全て落札させる(配列の１つ目は仕入先フラグ、２つ目はチェックの場合true、外す場合はfalse
+			     setAllBidFlag(3,true);
 			
-			//他の仕入先のチェックは外す
-			document.getElementById("all_bid_flag_1").checked = false;
-			document.getElementById("all_bid_flag_2").checked = false;
-		 }else{
-		    //全てチェック外す(配列の１つ目は仕入先フラグ、２つ目はチェックの場合true、外す場合はfalse
-		    setAllBidFlag(3,false);
-		 }
-       });
-	
+			     //他の仕入先のチェックは外す
+			     document.getElementById("all_bid_flag_1").checked = false;
+			     document.getElementById("all_bid_flag_2").checked = false;
+		     }else{
+		       //全てチェック外す(配列の１つ目は仕入先フラグ、２つ目はチェックの場合true、外す場合はfalse
+		       setAllBidFlag(3,false);
+		     }
+     });
+     
+     //add190226
+     //分類
+     $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+	   $( ".searchableSelect1_4" ).change(function(e) {
+       obj = $(this);
+		   //分類からアイテム抽出する
+		   setMaterialExtractByCategory(obj);
+     });
+     //明細-分類
+	   $( ".searchableSelect1_4" ).on("select2:close", function (e) {
+		   //次のコントロールへフォーカスを移す
+		   var control_name = $(this)[0].name;
+		   setNextControlOnSelect(e,control_name, 6);
+	   });
+     
   });  
 
 
@@ -546,7 +562,21 @@
 		 setNextControlOnSelect(e,control_name, 3);
 	   });
 	   
-	  
+     //分類
+     $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+     $( ".searchableSelect1_4" ).change(function(e) {
+       obj = $(this);
+		   //分類からアイテム抽出する
+		   setMaterialExtractByCategory(obj);
+     });
+     $( ".searchableSelect1_4" ).on("select2:close", function (e) {
+		   //次のコントロールへフォーカスを移す
+		   var control_name = $(this)[0].name;
+		   setNextControlOnSelect(e,control_name, 6);
+	   });
+     
+     
+	     
   });
 	
 
@@ -625,10 +655,23 @@
 	   //埋め込まれているIDを抜き出す
 	   var selectedIndex = control_name.slice(65);
 	   selectedIndex = selectedIndex.slice(0,-11);
-	  
+	   
 	   //フォーカス先のコントロール名をセット
 	   nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][list_price]";
 	   
+	   break;
+   case 6:
+   //分類
+     moveFlag = true;
+   
+     //埋め込まれているIDを抜き出す
+	   var selectedIndex = control_name.slice(65);
+	   selectedIndex = selectedIndex.slice(0,-23);
+	   
+     //debugger;
+     
+     //フォーカス先のコントロール名をセット
+	   nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]";
 	   break;
    }
    
@@ -974,7 +1017,45 @@ function reloadDiv(){
   //$("body").css("cursor", "default");
 }
 
-
+ //保留中
+ //分類別にアイテムを抽出する処理
+ function setMaterialExtractByCategory(obj){
+ //  //name属性に埋め込まれているIDを抜き出す
+ //  var controlName = obj[0].name;
+ //  var selectedIndex = 0;
+ //  selectedIndex = controlName.slice(42);
+ //  selectedIndex = selectedIndex.slice(0,-23);
+ //	 if (gTrigger == false){
+ //  	 var nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][material_id]";
+ //    var material_id = document.getElementsByName(nm)[0].value;
+ //    var nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][material_code]";
+ //    var material_category_id = obj[0].value;
+ //    material_code = document.getElementsByName(nm)[0].value;
+ //    //if (isNaN(material_category_id) == false){  //手入力(未選択)状態の場合のみ有効
+ //    if (material_id == "1" || material_id == "" )
+ //    {
+ //    //メーカーIDから該当する品番リストを取得する
+ //      $.get("<%= purchase_order_historiez_material_extract_by_category_path %>",
+ //       {material_category_id: material_category_id},
+ //       function(data){
+ //         if (document.getElementById("material_id_select_hide").innerHTML != "") {
+ //            var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+ //           document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	//         }
+  //         
+  //         if (material_code == "")
+  //         //商品コードが手入力されていたら、そのままにする
+  //         {
+  //           //商品コード
+  //           if (document.getElementById("material_code_select_hide").innerHTML != "") {
+  //             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+	//             document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_code_select_hide").innerHTML;
+  //           }
+  //         }
+	//     });
+  //   }
+  // }	 
+ }
 
 </script>
 

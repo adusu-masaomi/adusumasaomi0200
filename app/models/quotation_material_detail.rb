@@ -5,8 +5,15 @@ class QuotationMaterialDetail < ActiveRecord::Base
   belongs_to :maker_master, :foreign_key => "maker_id"
   belongs_to :unit_master
   
+  #add200129
+  belongs_to :material_master,  :foreign_key => "material_id"
+  
   #メーカーID用
   attr_accessor :maker_id_hide
+  
+  #add200129
+  #分類 
+  attr_accessor :material_category_id_hide
   
   #単位
   attr_accessor :unit_id_hide

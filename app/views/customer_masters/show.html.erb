@@ -29,6 +29,14 @@
   <dd><%= @customer_master.responsible1 %></dd>
   <dt><strong><%= model_class.human_attribute_name(:responsible2) %>:</strong></dt>
   <dd><%= @customer_master.responsible2 %></dd>
+  
+  <dt><strong>支払先銀行</strong></dt>
+  <% if @customer_master.payment_bank_id.present? %>
+  <dd><%= CustomerMaster.payment_bank[@customer_master.payment_bank_id][0] %></dd>
+  <% else %>
+  <dd>-</dd>
+  <% end %>
+  
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

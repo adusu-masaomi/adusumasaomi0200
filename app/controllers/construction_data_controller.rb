@@ -140,6 +140,10 @@ class ConstructionDataController < ApplicationController
   # POST /construction_data.json
   def create
   
+    #add200114
+    #viewで分解されたパラメータを、正常更新できるように復元させる。
+    adjust_billing_due_date_params
+  
     #住所のパラメータ変換
     params[:construction_datum][:address] = params[:addressX]
 
@@ -158,6 +162,10 @@ class ConstructionDataController < ApplicationController
 
 	
       if @construction_datum.save
+        
+        #add200114
+        #djangoの資金繰り用のデータ更新
+        set_cash_flow_detail
         
         #add180903
         #OneDrive用のディレクトリを作る
@@ -184,6 +192,9 @@ class ConstructionDataController < ApplicationController
   # PATCH/PUT /construction_data/1.json
   def update
    
+    #add200114
+    #viewで分解されたパラメータを、正常更新できるように復元させる。
+    adjust_billing_due_date_params
     
     #住所のパラメータ変換
     if params[:addressX].present?
@@ -233,6 +244,11 @@ class ConstructionDataController < ApplicationController
       
       
       if @update
+      
+        #add200114
+        #djangoの資金繰り用のデータ更新
+        set_cash_flow_detail
+      
 	  #if @construction_datum.update(construction_datum_params)
         
         #add180903
@@ -264,15 +280,26 @@ class ConstructionDataController < ApplicationController
           $construction_datum = @construction_datum 
 		  
 		  #作業日をグローバルへセット
-		  #$working_date = params[:construction_datum][:working_date]
-		  
-		  $working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
+		  #$working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
+          #                params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
+          working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
                           params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
-		  
-		  #add170601
+		  #upd191009
+          #曜日を追加
+          week = %w{日 月 火 水 木 金 土}[Date.parse(working_date).wday]
+          $working_date = working_date + "（" + week + "）"
+                    
 		  #発行日をグローバルへセット
+          #191009~現在未使用
           $issue_date = params[:construction_datum][:issue_date]
-		
+          
+          #復活した場合に残しておく
+          #曜日を追加
+          #issue_date = params[:construction_datum][:issue_date]
+		  #week = %w{日 月 火 水 木 金 土}[Date.parse(issue_date).wday]
+          #$issue_date = issue_date + "（" + week + "）"
+          #復活~end
+          
 		  #作業者をグローバルへセット
 		  staff_id = params[:construction_datum][:staff_id]
 		  @staff = Staff.find_by(id: staff_id)
@@ -315,8 +342,97 @@ class ConstructionDataController < ApplicationController
     
     return false
   end
- 
   
+  #add200114
+  #資金繰り表用のデータ作成する
+  #djangoのカラムのため、SQL操作
+  def set_cash_flow_detail 
+  
+    deposit_due_date = nil
+    
+    if params[:construction_datum][:deposit_due_date].present? 
+      deposit_due_date = params[:construction_datum][:deposit_due_date]
+    end
+    
+      args = ["select * from account_cash_flow_detail_expected where construction_id = ?", @construction_datum.id]
+      sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+      result_params = ActiveRecord::Base.connection.select_all(sql)
+
+      #予定金額<>決定金額なら決定金額を優先する
+      expected_income = 0
+      if params[:construction_datum][:final_amount].present? && 
+        params[:construction_datum][:final_amount].to_i > 0
+        
+        #決定金額をセット
+        expected_income = params[:construction_datum][:final_amount]
+      else
+        #予定金額をそのままセット
+        if params[:construction_datum][:estimated_amount].present?
+          expected_income = params[:construction_datum][:estimated_amount]
+        end
+      end
+      #
+      
+      #add200122
+      #登録時に消費税をかける
+      if expected_income.present? && expected_income.to_i > 0
+        tmp_amount = expected_income.to_i * $consumption_tax_include_per_ten
+        expected_income = tmp_amount.to_s
+      end
+      
+      #支払先の銀行ID取得
+      payment_bank_id = 1  #デフォルトは北越にする
+      customer = nil
+      
+      if params[:construction_datum][:customer_id].present?
+        customer = CustomerMaster.find(params[:construction_datum][:customer_id].to_i)
+      end
+      
+      #現金予定のパターン有り？？
+      if customer.present?
+        if customer.payment_bank_id.present? && customer.payment_bank_id > 0
+          payment_bank_id = customer.payment_bank_id
+        end
+      end
+      #
+
+      #新規・更新処理
+      if result_params.rows.blank?
+        #新規追加
+        
+        if deposit_due_date.present?  #入金予定日が入ってなければ登録しない
+            args = ["INSERT INTO account_cash_flow_detail_expected(expected_date, construction_id, expected_expense, 
+                                            expected_income, payment_bank_id, payment_bank_branch_id, account_title_id, billing_year_month) VALUES(? ,? , ? ,? ,? , ? ,? ,?)", 
+                                        deposit_due_date, @construction_datum.id, 0, expected_income, payment_bank_id, 1, 1, "2020-01-01"]
+             
+            #account_title_idとbilling_year_monthは未使用だが適当な初期値を入れておく
+            #args = ["INSERT INTO account_cash_flow_detail_expected(expected_date, construction_id, expected_expense, 
+             #                               expected_income, payment_bank_id, payment_bank_branch_id, account_title_id, billing_year_month) VALUES(? ,? , ? ,? ,? , ? ,?, ?)", 
+             #                           deposit_due_date, @construction_datum.id, 0, expected_income, payment_bank_id, 1, 1, "2020-01-01"]
+            sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+            result_params = ActiveRecord::Base.connection.execute(sql)
+        end
+      else
+        if deposit_due_date.present?
+            #更新
+            args = ["UPDATE account_cash_flow_detail_expected SET expected_date=?, expected_income=?, payment_bank_id=? where construction_id = ?" , 
+                                        deposit_due_date, expected_income, payment_bank_id, @construction_datum.id]
+            sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+            result_params = ActiveRecord::Base.connection.execute(sql)
+        else
+           #すでにデータ存在していて、予定日が入ってなければ削除とする
+           args = ["DELETE FROM account_cash_flow_detail_expected where construction_id = ?" , 
+                                        @construction_datum.id]
+           sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+           result_params = ActiveRecord::Base.connection.execute(sql)
+            
+        end
+      end
+      
+    #end
+  end
+  
+    
   #190124
   #現場マスターへの新規追加又は更新
   def create_or_update_site
@@ -456,7 +572,17 @@ class ConstructionDataController < ApplicationController
      @@construction_new_code = newNum.to_s
 	 
   end
-
+  
+  #viewで分解されたパラメータを、正常更新できるように復元させる。
+  def adjust_billing_due_date_params
+    
+    if params[:construction_datum][:billing_due_date].present? 
+      params[:construction_datum][:billing_due_date] = params[:construction_datum][:billing_due_date][0] + "/" + 
+                                                  params[:construction_datum][:billing_due_date][1] + "/" + 
+                                                  params[:construction_datum][:billing_due_date][2]
+    end
+  end
+    
   # ajax
   def working_safety_matter_name_select
      @working_safety_matter_name = WorkingSafetyMatter.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_safety_matter_name).flatten.join(" ")
@@ -495,9 +621,6 @@ class ConstructionDataController < ApplicationController
 	end
   end
     
-  
-  
-  
   # ajax
   
   #add180926
@@ -516,6 +639,15 @@ class ConstructionDataController < ApplicationController
     if construction_data.present?
         #更新する
         construction_data_params = { order_flag: params[:order_flag] }
+        construction_data.update(construction_data_params)
+    end
+  end
+  #集計フラグのON/OFF(add200130)
+  def set_calculated_flag
+    construction_data = ConstructionDatum.find(params[:id])
+    if construction_data.present?
+        #更新する
+        construction_data_params = { calculated_flag: params[:calculated_flag] }
         construction_data.update(construction_data_params)
     end
   end
@@ -543,6 +675,93 @@ class ConstructionDataController < ApplicationController
 	 if add2.present?
 	   @address2 = add2 
 	 end
+  end
+  
+  #add200111
+  #請求予定日から入金予定日を取得
+  def get_deposit_due_date
+    #binding.pry
+    @customer = nil
+    if params[:customer_id].present?
+      @customer = CustomerMaster.find(params[:customer_id])
+    end
+    
+    if @customer.present?
+        
+        @purchase_date = Date.parse(params[:billing_due_date])
+        
+        @closing_date = nil
+        @payment_due_date = nil
+        addMonth = 0
+    
+        #締め日算出
+        if @customer.closing_date_division == 1
+        #月末の場合
+          d = @purchase_date
+          @closing_date = Date.new(d.year, d.month, -1)
+        else
+        #日付指定の場合
+          d = @purchase_date
+          
+          if @customer.closing_date != 0
+          
+            #if d.day < @customer.closing_date
+            if d.day <= @customer.closing_date  #bugfix 200127
+              if Date.valid_date?(d.year, d.month, @customer.closing_date)
+                @closing_date = Date.new(d.year, d.month, @customer.closing_date)
+              end
+            else
+            #締め日を過ぎていた場合、月＋１
+              addMonth += 1
+            
+              d = d >> addMonth
+            
+              if Date.valid_date?(d.year, d.month, @customer.closing_date)
+                @closing_date = Date.new(d.year, d.month, @customer.closing_date) 
+              end
+            end
+          else
+          #日付指定有で指定日未入力なら、月末とみなす
+          #add200110
+            d = @purchase_date
+            @closing_date = Date.new(d.year, d.month, -1)
+          end
+          
+        end
+        
+        #支払日算出
+        d = @closing_date   
+        if @customer.due_date.present?  && @customer.due_date > 0
+          
+          #binding.pry
+          
+          if @customer.due_date >= 28   #月末とみなす
+            d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
+            
+            addMonth = @customer.due_date_division 
+            
+            d2 = d2 >> addMonth
+            d2 = Date.new(d2.year, d2.month, -1)
+            
+            @payment_due_date = d2
+          
+          else
+          ##月末の扱いでなければ、そのまま
+            if Date.valid_date?(d.year, d.month, @customer.due_date)
+              d2 = Date.new(d.year, d.month, @customer.due_date)
+            
+              addMonth = @customer.due_date_division
+              
+              @payment_due_date = d2 >> addMonth
+            
+            end
+          end
+        
+        end
+        
+        
+        
+      end
   end
   
   #見積書などで使用
@@ -622,7 +841,7 @@ class ConstructionDataController < ApplicationController
     def construction_datum_params
       params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :personnel, :site_id, :construction_start_date, 
       :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
-      :working_safety_matter_id, :working_safety_matter_name, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
+      :working_safety_matter_id, :working_safety_matter_name, :estimated_amount, :final_amount, :billing_due_date, :deposit_due_date, :deposit_date, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
     end
     def construction_datum_attachments_params
       params.require(:construction_datum).permit(construction_attachments_attributes: [:id, :attachment, :title, :_destroy])

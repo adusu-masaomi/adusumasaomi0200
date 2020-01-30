@@ -31,9 +31,31 @@ class ConstructionDailyReportsController < ApplicationController
 	   query = {"construction_datum_id_eq"=> construction_id }
 	 end
 	 
+     if query.present? && query["update_at_gteq"].present?
+        #add191010
+        #更新日検索をかける場合、日付を-1にする(時差の関係?でうまくできないため)
+        #dt = Date.parse(query["update_at_gteq"])
+        dt = Time.parse(query["update_at_gteq"])
+        dt = dt - (60 * 60 * 9)  #アメリカ時間で９時間進んでいるので、マイナスする
+        #dt -= 1  #NG
+        query["update_at_gteq"] = dt.to_s
+        #ransack保持用
+        @q = ConstructionDailyReport.ransack(query)
+        
+        #上記で日付をマイナスしたため、再検索用にまた戻す
+        #dt += 1
+        dt += (60 * 60 * 9)
+        query["update_at_gteq"] = dt.to_s
+     else
+        #ransack保持用
+        @q = ConstructionDailyReport.ransack(query)
+     end
+     #
+     
 	 #@q = ConstructionDailyReport.ransack(params[:q])  
      #ransack保持用--上記はこれに置き換える
 	 @q = ConstructionDailyReport.ransack(query)
+     
      
 	 #ransack保持用コード
      search_history = {

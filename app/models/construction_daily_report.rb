@@ -26,8 +26,6 @@ class ConstructionDailyReport < ActiveRecord::Base
   #validation
   validates :working_date, presence: true
   validates :staff_id, presence: true
-  
-  #upd170529
   validates :working_details, presence: true
   
   #validates :construction_datum_id, presence: true

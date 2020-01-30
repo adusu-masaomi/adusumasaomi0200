@@ -124,9 +124,39 @@ class DeliverySlipPDF
 		   end
 		   
            
-           #add 190723
            #工事期間
-		   @report.page.item(:construction_period).value(@delivery_slip_headers.construction_period) 
+		   #工事期間(開始〜終了日も追加)
+           construction_period = @delivery_slip_headers.construction_period 
+           
+           if @delivery_slip_headers.construction_period.present?  #文字が入っていたらスペースを開ける
+             construction_period += "　"
+           end
+           
+           #開始日
+           if @delivery_slip_headers.construction_period_date1.present?
+             
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@delivery_slip_headers.construction_period_date1)
+             
+             construction_period += japaneseCalendar
+           end
+           
+           if @delivery_slip_headers.construction_period_date1.present? &&
+              @delivery_slip_headers.construction_period_date2.present?
+             construction_period += " 〜 "
+           end
+           
+           #終了日
+           if @delivery_slip_headers.construction_period_date2.present?
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@delivery_slip_headers.construction_period_date2)
+             
+             construction_period += japaneseCalendar
+           end
+           #
+           
+           @report.page.item(:construction_period).value(construction_period) 
+           #@report.page.item(:construction_period).value(@delivery_slip_headers.construction_period) 
 		 
 		   #住所（工事場所）
 		   all_address = ""
@@ -149,21 +179,23 @@ class DeliverySlipPDF
            
            #納品日
 		   if @delivery_slip_headers.delivery_slip_date.present?
-		     @gengou = @delivery_slip_headers.delivery_slip_date
-		    
-             #元号変わったらここも要変更
-             if @gengou >= d_heisei_limit
-             #令和
-               if @gengou.year - $gengo_minus_ad_2 == 1
-               #１年の場合は元年と表記
-                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               else
-                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               end
-             else
-             #平成
-               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     end
+		     #@gengou = @delivery_slip_headers.delivery_slip_date
+		     #upd191204 サブルーチン化
+             @gengou = ApplicationController.new.WesternToJapaneseCalendar(@delivery_slip_headers.delivery_slip_date)
+            
+             ##元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             ##令和
+             #  if @gengou.year - $gengo_minus_ad_2 == 1
+             #  #１年の場合は元年と表記
+             #    @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  else
+             #    @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  end
+             #else
+             ##平成
+             #  @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     #end
              @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
             #空でも文字を出す 
@@ -196,7 +228,7 @@ class DeliverySlipPDF
                       
                       #add190903
                       if @quantity.present?
-                        @quantity = "%.2g" %  @quantity
+                        @quantity = "%.4g" %  @quantity
                       end
 					  if delivery_slip_detail_large_classification.WorkingUnit.present?
 					    @unit_name = delivery_slip_detail_large_classification.WorkingUnit.working_unit_name
@@ -329,21 +361,24 @@ class DeliverySlipPDF
 		   end
 		   
 		   if @delivery_slip_headers.delivery_slip_date.present?
-             @gengou = @delivery_slip_headers.delivery_slip_date
+             #@gengou = @delivery_slip_headers.delivery_slip_date
+             #upd191204 サブルーチン化
+             @gengou = ApplicationController.new.WesternToJapaneseCalendar(@delivery_slip_headers.delivery_slip_date)
+             
 		     
-             #元号変わったらここも要変更
-             if @gengou >= d_heisei_limit
-             #令和
-               if @gengou.year - $gengo_minus_ad_2 == 1
-               #１年の場合は元年と表記
-                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               else
-                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               end
-             else
-             #平成
-               @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     end
+             ##元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             ##令和
+             #  if @gengou.year - $gengo_minus_ad_2 == 1
+             #  #１年の場合は元年と表記
+             #    @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  else
+             #    @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  end
+             #else
+             ##平成
+             #  @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     #end
              
              @report.page.item(:delivery_slip_date).value(@gengou) 
 		   else
@@ -389,7 +424,7 @@ class DeliverySlipPDF
 				  #add190903
                   #小数点以下１位があれば表示、なければ非表示
                   if @quantity.present?
-                    @quantity = "%.2g" %  @quantity
+                    @quantity = "%.4g" %  @quantity
                   end
 				  if delivery_slip_detail_middle_classification.WorkingUnit.present?
                     @unit_name = delivery_slip_detail_middle_classification.WorkingUnit.working_unit_name

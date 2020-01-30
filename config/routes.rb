@@ -261,15 +261,17 @@ Rails.application.routes.draw do
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
 
   get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
-  #add170830
   get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
   get '/construction_dataz/delivery_slip_header_select' => 'construction_data#delivery_slip_header_select'
   get '/construction_dataz/customer_extract' => 'construction_data#customer_extract'
   get '/construction_dataz/set_order_flag' => 'construction_data#set_order_flag'
   get '/construction_dataz/set_billed_flag' => 'construction_data#set_billed_flag'
-  
-  #add190130
+  #add200130
+  get '/construction_dataz/set_calculated_flag' => 'construction_data#set_calculated_flag'
   get '/construction_dataz/get_site_address' => 'construction_data#get_site_address'
+  
+  #add200111
+  get '/construction_dataz/get_deposit_due_date' => 'construction_data#get_deposit_due_date'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'

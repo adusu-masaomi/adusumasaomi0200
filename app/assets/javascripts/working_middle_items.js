@@ -31,6 +31,7 @@ function calcWorkingMiddleItemMaterialUnitPrice()
 	//if (obj > 0) {
 	  //実行労務単価
 	  num = obj * 11000;
+      //num = obj * 12100;   //upd200108
       //upd180316
       num = Math.round(num);   //整数四捨五入とする
       document.getElementById("execution_labor_unit_price").value = num;

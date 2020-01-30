@@ -53,5 +53,6 @@ module Adusu
     #config.action_controller.relative_url_root = '/sub'
     # for backup
     #config.autoload_paths += %W(#{Rails.root}/lib)
-end
+    
+  end
 end

@@ -32,11 +32,12 @@
     <%= m.text_field :payment_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date'   %>
   <% end %>-->
   
+  <!--支払日検索。未払支払日も含める-->
   <%= f.label :purchase_date, '支払日' %>
-  <%= f.text_field :payment_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date_start'   %>
+  <%= f.text_field :payment_date_or_unpaid_payment_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date_start'   %>
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartPaymentDate()" %>
   <%= f.label :purchase_date, '～' %>
-  <%= f.text_field :payment_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'payment_date_end'  %>
+  <%= f.text_field :payment_date_or_unpaid_payment_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'payment_date_end'  %>
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndPaymentDate()" %>
   
   <%= f.label :purchase_due_date, '支払予定日' %>

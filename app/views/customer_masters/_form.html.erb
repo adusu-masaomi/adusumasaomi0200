@@ -52,6 +52,11 @@
   <%= f.select :due_date_division, CustomerMaster.due_division, {}, 
        {id:'searchableSelect2_2', :class => "my-custom-class", style: 'width:80px;height:30px;margin-left:-0px;margin-top:-30px;font-size:14px;', :tabindex=>"12" } %>
   </br></br></br></br></br>
+  <%= f.label :支払先銀行：, {:class => "my-custom-class-l" , style: 'width:90px;' }  %>
+  <!--支払先は、デフォルトは北越銀行にしておく(入力漏れ防ぐため)-->
+  <%= f.select :payment_bank_id, CustomerMaster.payment_bank, {:selected => @customer_master.payment_bank_id || 1}, 
+       {id:'searchableSelect2_3', :class => "my-custom-class", style: 'width:120px;height:30px;margin-left:-0px;margin-top:-30px;font-size:14px;', :tabindex=>"12" } %>
+  </br></br>
   <%= f.input :responsible1 , input_html:{:tabindex=>"13"} %>
   <%= f.input :responsible2 , input_html:{:tabindex=>"14"} %>
   

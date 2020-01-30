@@ -50,9 +50,15 @@ class OutsourcingInvoicePDF
         set_supplier_info(staff_id)
         
         #外注費データを取得
-        outsourcing_cost = OutsourcingCost.where(:construction_datum_id => $purchase_data_current.construction_datum_id).
+        
+        if $purchase_data_current.purchase_order_datum_id.present?
+        #upd190930 注番で優先
+            outsourcing_cost = OutsourcingCost.where(:purchase_order_datum_id => $purchase_data_current.purchase_order_datum_id).
                            where(:staff_id => staff_id).first
-                           
+        else
+            outsourcing_cost = OutsourcingCost.where(:construction_datum_id => $purchase_data_current.construction_datum_id).
+                           where(:staff_id => staff_id).first
+        end
         
         #請求書コード
         page_count = report.page_count.to_s + "頁"
@@ -334,6 +340,8 @@ end
 
   #得意先から締め日・支払日を算出
   def get_customer_date_info
+    
+    #未使用・・・
     
     require "date"
     

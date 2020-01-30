@@ -15,6 +15,8 @@ class PurchaseOrderDatum < ActiveRecord::Base
 	#has_many :orders, dependent: :destroy, inverse_of: :purchase_order_datum
 	has_many :purchase_order_history
 	
+	  #upd190930
+	  has_many :construction_costs, :foreign_key => "purchase_order_datum_id"
 	
     has_many :orders
     accepts_nested_attributes_for :orders, :allow_destroy => true

@@ -129,7 +129,7 @@ class PostMailer < ApplicationMailer
 
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "i_kyohim@yahoo.co.jp", 
 
     #以下は消さない事!
     #add180403
@@ -140,9 +140,8 @@ class PostMailer < ApplicationMailer
   #注文依頼メール(見積後)
   def send_order_after_quotation(user)
    
-    #@quotation_code = "見積No:" + user.quotation_code
-
     @purchase_order_code = "注文No:" + $purchase_order_code
+    
     if user.construction_datum.alias_name.present?
     #通称名をセット
       @construction_name = "工事名:" + user.construction_datum.alias_name
@@ -159,25 +158,19 @@ class PostMailer < ApplicationMailer
 	  @responsible_name = "ご担当者様"
 	end
     
-    #add181002
-    #備考(全体)をセット
+    #備考(全体)
     @notes = $notes
 	
 	#見積金額合計
 	
-	#upd171019
-	#tmp_header = "見積合計価格：￥"
 	tmp_header = "注文金額合計：￥"
 	case $supplier
       when 1
-        #@total_quotation_price = tmp_header + user.total_quotation_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-		@total_quotation_price = tmp_header + user.total_order_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+        @total_quotation_price = tmp_header + user.total_order_price_1.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
       when 2
-        #@total_quotation_price = tmp_header + user.total_quotation_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-		@total_quotation_price = tmp_header + user.total_order_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+        @total_quotation_price = tmp_header + user.total_order_price_2.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
       when 3
-        #@total_quotation_price = tmp_header + user.total_quotation_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
-		@total_quotation_price = tmp_header + user.total_order_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
+        @total_quotation_price = tmp_header + user.total_order_price_3.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')
 	end
 	
 	
@@ -193,7 +186,7 @@ class PostMailer < ApplicationMailer
 
     #メアドは画面より反映(ccは固定)
     mail to: "kamille1973@live.jp" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "i_kyohim@yahoo.co.jp", 
 
     #以下は消さない事!
     #add180403

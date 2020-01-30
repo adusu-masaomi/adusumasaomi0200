@@ -30,6 +30,31 @@ class ApplicationController < ActionController::Base
   end
   ### ここまで追加(ログイン) ###
   
+  #add191204
+  #西暦から和暦に変換するメソッド(in=Date , out=String)
+  def WesternToJapaneseCalendar(westernYear)
+  
+    japaneseCalendar = westernYear
+    japaneseCalendarChar = westernYear.to_s
+    
+    d_heisei_limit = Date.parse("2019/5/1");
+    
+    #元号変わったらここも要変更
+    if japaneseCalendar >= d_heisei_limit
+      #令和
+      if japaneseCalendar.year - $gengo_minus_ad_2 == 1
+      #１年の場合は元年と表記
+        japaneseCalendarChar = $gengo_name_2 + "元年#{japaneseCalendar.strftime('%-m')}月#{japaneseCalendar.strftime('%-d')}日"
+      else
+        japaneseCalendarChar = $gengo_name_2 + "#{japaneseCalendar.year - $gengo_minus_ad_2}年#{japaneseCalendar.strftime('%-m')}月#{japaneseCalendar.strftime('%-d')}日"
+      end
+    else
+      #平成
+      japaneseCalendarChar = $gengo_name + "#{japaneseCalendar.year - $gengo_minus_ad}年#{japaneseCalendar.strftime('%-m')}月#{japaneseCalendar.strftime('%-d')}日" 
+    end
+    
+    return japaneseCalendarChar
+  end
   
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"      #平成の場合
@@ -40,11 +65,11 @@ class ApplicationController < ActionController::Base
   $gengo_minus_ad = 1988   #平成の場合
   $gengo_minus_ad_2 = 2018
   
-  #消費税の設定(改定時はここを変更する)
+  #消費税の設定(改定時はここを変更する→xx)
   $consumption_tax_only = 0.08
   $consumption_tax_include = 1.08
   
-  #消費税１０％の対応
+  #消費税１０％の対応(切り替えのタイミングがあるので、こうやって定数追加した方がよい)
   $consumption_tax_only_per_ten = 0.10
   $consumption_tax_include_per_ten = 1.10
   
@@ -90,6 +115,7 @@ class ApplicationController < ActionController::Base
   
   #労務単価定数
   $LABOR_COST = 11000
+  #$LABOR_COST = 12100   #upd200108
   
   $INDEX_SUPPLIER_OKADA = 2     #仕入先ID(岡田電気)
   

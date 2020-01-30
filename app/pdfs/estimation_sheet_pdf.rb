@@ -44,6 +44,44 @@ class EstimationSheetPDF
 	   #end
 	   #
 	   
+       #add200127
+       @notSumFlag = false
+       @existsDetail = false
+       #事前に明細データの有無を確認
+       
+       #@quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+       #if @quotation_headers.not_sum_flag.present? && @quotation_headers.not_sum_flag == 1
+       #  @notSumFlag = true
+       #  quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_headers.id).
+       #                                          where("id is NOT NULL")
+           
+       #  quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
+       #    if quotation_detail_middle_classification.quote_price.present? && 
+       #      quotation_detail_middle_classification.quote_price.to_i > 0
+       #      @existsDetail = true
+       #    end
+       #  end #loop end     
+       #end
+       
+       
+         quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
+         @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
+           if @quotation_headers.not_sum_flag.present? && @quotation_headers.not_sum_flag == 1
+             @notSumFlag = true
+             if @quotation_headers.present?
+               quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_headers.id).
+                                                 where(:quotation_detail_large_classification_id => quotation_detail_large_classification.id).where("id is NOT NULL")
+               quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
+                 
+                 if quotation_detail_middle_classification.quote_price.present? && 
+                   quotation_detail_middle_classification.quote_price.to_i > 0
+                     @existsDetail = true
+                 end
+               end  #loop end
+             end
+           end  
+        end #loop end
+       
 	   
        #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
 	   #upd170626
@@ -120,37 +158,74 @@ class EstimationSheetPDF
 		 
            date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日  add190824
          
-           #税込見積合計金額	 
-		   if @quotation_headers.quote_price.present?
-             #if @quotation_headers.quotation_date < date_per_ten_start
-             #upd190919
-             if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
-             #消費税8%の場合 
-               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
-		     else
-             #消費税10%の場合 
-               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
-             end
-             @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
-		   end
+           if @notSumFlag == false   #add200127
+           
+             #税込見積合計金額	 
+		     if @quotation_headers.quote_price.present?
+               #if @quotation_headers.quotation_date < date_per_ten_start
+               #upd190919
+               if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               #消費税8%の場合 
+                 @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
+		       else
+               #消費税10%の場合 
+                 @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
+               end
+               @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
+		     end
 		   
-		   #消費税
-		   if @quotation_headers.quote_price.present?
-		     #if @quotation_headers.quotation_date < date_per_ten_start
-             #upd190919
-             if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
-             #消費税8%の場合  
-               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
-             else
-             #消費税10%の場合
-               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
-             end
-             @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
+		     #消費税
+		     if @quotation_headers.quote_price.present?
+		       #if @quotation_headers.quotation_date < date_per_ten_start
+               #upd190919
+               if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               #消費税8%の場合  
+                 @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
+               else
+               #消費税10%の場合
+                 @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
+               end
+               @report.page.item(:quote_price_tax_only).value(@quote_price_tax_only) 
+		     end
 		   end
-		 
 		   #工事期間
-		   @report.page.item(:construction_period).value(@quotation_headers.construction_period) 
+		   
+           #add191204
+           #工事期間(開始〜終了日も追加)
+           construction_period = @quotation_headers.construction_period 
+           
+           if @quotation_headers.construction_period.present?  #文字が入っていたらスペースを開ける
+             construction_period += "　"
+           end
+           
+           #開始日
+           if @quotation_headers.construction_period_date1.present?
+             
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.construction_period_date1)
+             
+             construction_period += japaneseCalendar
+           end
+           
+           if @quotation_headers.construction_period_date1.present? &&
+              @quotation_headers.construction_period_date2.present?
+             construction_period += " 〜 "
+           end
+           
+           #終了日
+           if @quotation_headers.construction_period_date2.present?
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.construction_period_date2)
+             
+             construction_period += japaneseCalendar
+           end
+           #
+           
+           @report.page.item(:construction_period).value(construction_period)
+           #@report.page.item(:construction_period).value(@quotation_headers.construction_period) 
 		 
+           
+         
 		   #住所（工事場所）
 		   #upd171012 分割された住所を一つにまとめる。
            
@@ -182,28 +257,28 @@ class EstimationSheetPDF
            #binding.pry
            
 		   if @quotation_headers.quotation_date.present?
-		     @gengou = @quotation_headers.quotation_date
+		     
+             #@gengou = @quotation_headers.quotation_date
              
-             #新元号対応 190401
-             #require "date"
-             d_heisei_limit = Date.parse("2019/5/1");
+             #upd191204 サブルーチン化
+             @gengou = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.quotation_date)
              
-		     #元号変わったらここも要変更
+             ##新元号対応 
+             #d_heisei_limit = Date.parse("2019/5/1");
+             ##元号変わったらここも要変更
              #if @gengou >= d_heisei_limit
-             #binding.pry
-             if @gengou >= d_heisei_limit
-             #if @gengou.blank? || @gengou >= d_heisei_limit
-                #令和
-                if @gengou.year - $gengo_minus_ad_2 == 1
-                #１年の場合は元年と表記
-                  @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                else
-                  @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                end
-             else
-                #平成
-		        @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     end
+             #   #令和
+             #   if @gengou.year - $gengo_minus_ad_2 == 1
+             #   #１年の場合は元年と表記
+             #     @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   else
+             #     @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   end
+             #else
+             #   #平成
+		     #   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     #end
+             
              
              @report.page.item(:quotation_date).value(@gengou) 
 		   else
@@ -225,10 +300,21 @@ class EstimationSheetPDF
 		   
 		   #小計(見積金額) 
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
-		   @report.page.item(:quote_price).value(@quotation_headers.quote_price)
-		   
+           if @notSumFlag == false  #add200127
+		     @report.page.item(:quote_price).value(@quotation_headers.quote_price)
+		   end
 		 end
 		 
+         #add200127
+         #見積だけの単価としたい場合は、合計を出さない
+         #binding.pry
+         #if @quotation_headers.not_sum_flag.present? && @quotation_headers.not_sum_flag == 1
+         #明細データの有無を事前に確認しておく
+             #quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_headers.id).
+             #                                    where(:quotation_detail_large_classification_id => quotation_detail_large_classification_id).where("id is NOT NULL")
+         #end
+         #
+         
 		   @report.list(:default).add_row do |row|
 		  
                       #仕様の場合に数値・単位をnullにする
@@ -239,7 +325,7 @@ class EstimationSheetPDF
                       #add190903
                       #小数点以下１位があれば表示、なければ非表示
                       if @quantity.present? 
-                      	@quantity = "%.2g" %  @quantity
+                      	@quantity = "%.4g" %  @quantity
                       end
 					  if quotation_detail_large_classification.WorkingUnit.present?
 					    @unit_name = quotation_detail_large_classification.WorkingUnit.working_unit_name
@@ -268,13 +354,19 @@ class EstimationSheetPDF
 					  end
 					  #
 					  
+                      #add200127
+                      quote_price = nil
+                      if @existsDetail == false #明細データがない場合
+                        quote_price = quotation_detail_large_classification.quote_price
+                      end
+                      
                       #明細欄出力
                       row.values working_large_item_name: item_name,
                        working_large_specification: quotation_detail_large_classification.working_large_specification,
                        quantity: @quantity,
 		               working_unit_name: @unit_name,
 					   working_unit_price: unit_price_or_notices,
-                       quote_price: quotation_detail_large_classification.quote_price
+                       quote_price: quote_price
 					   
             end 
 	end	
@@ -293,6 +385,9 @@ class EstimationSheetPDF
 		
     
   end
+  
+  
+  
   def self.set_detail_data
      
 	 #見積書(表紙)のページ番号をマイナスさせるためのカウンター。
@@ -302,6 +397,8 @@ class EstimationSheetPDF
 	 #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
 	 #$construction_data.order("construction_code desc").each do |construction_datum| 
 	 
+     #binding.pry
+     
 	 #upd170626
 	 @quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
 	   #upd170626
@@ -385,27 +482,26 @@ class EstimationSheetPDF
            #見積日
 		   if @quotation_headers.quotation_date.present?
              
-             @gengou = @quotation_headers.quotation_date
-		     
-             #新元号対応 190401
-             #require "date"
-             d_heisei_limit = Date.parse("2019/5/1");
-                         
-             #元号変わったらここも要変更
-             #if @gengou.blank? || @gengou >= d_heisei_limit
-             if @gengou >= d_heisei_limit
-                #令和
-                if @gengou.year - $gengo_minus_ad_2 == 1
-                #１年の場合は元年と表記
-                  @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                else
-                  @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                end
-             else
-                #平成
-                @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-             end
+             #@gengou = @quotation_headers.quotation_date
+             #upd191204 サブルーチン化
+		     @gengou = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.quotation_date)
              
+             ##新元号対応 
+             #d_heisei_limit = Date.parse("2019/5/1");
+             ##元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             #   #令和
+             #   if @gengou.year - $gengo_minus_ad_2 == 1
+             #   #１年の場合は元年と表記
+             #     @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   else
+             #     @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   end
+             #else
+             #   #平成
+             #   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #end
+                          
 		     @report.page.item(:quotation_date).value(@gengou) 
 		   else
            #空でも文字を出す add180515
@@ -439,9 +535,12 @@ class EstimationSheetPDF
 			  
 			  if @quote_price_save > 0
 			    @report.page.item(:message_sum_header).value("前頁より")
-			    @report.page.item(:blackets1_header).value("(")
-		        @report.page.item(:blackets2_header).value(")")
-			    @report.page.item(:subtotal_header).value(@quote_price_save)
+                
+                if @notSumFlag == false  #add200127
+			      @report.page.item(:blackets1_header).value("(")
+		          @report.page.item(:blackets2_header).value(")")
+			      @report.page.item(:subtotal_header).value(@quote_price_save)
+                end
 			  end 
 		   end 
 		   @page_number = @report.page_count - @estimation_sheet_pages
@@ -454,8 +553,9 @@ class EstimationSheetPDF
                   end  
                   #add190903
                   #小数点以下１位があれば表示、なければ非表示
-                  @quantity = "%.2g" %  @quantity
-                      
+                  if @quantity.present? 
+                    @quantity = "%.4g" %  @quantity
+                  end    
                   if quotation_detail_middle_classification.WorkingUnit.present?
                      @unit_name = quotation_detail_middle_classification.WorkingUnit.working_unit_name
                   end 
@@ -530,8 +630,10 @@ class EstimationSheetPDF
 		   @report.page.item(:message_sum).value("次頁へ")
 		   
 		   #本来ならフッターに設定するべきだが、いまいちわからないため・・
-		   @report.page.item(:subtotal).value(@@quote_price )
-		   
+           if @notSumFlag == false  #add200127
+		     @report.page.item(:subtotal).value(@@quote_price )
+		   end
+           
 		   @report.page.item(:blackets1).value("(")
 		   @report.page.item(:blackets2).value(")")
 		   

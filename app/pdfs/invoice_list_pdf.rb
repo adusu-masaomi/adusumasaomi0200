@@ -200,10 +200,34 @@ class InvoiceListPDF
 				@commission_total = 0
 				
 			  end
+              
+              date_per_ten_start = Date.parse("2019/10/01")
+              
 			  #
 			  if invoice_header.billing_amount.present?
-			    #請求金額は「税込」を使用する
-			    billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include
+			    
+                #請求金額は「税込」を使用する
+                #請求日によって税率を切り分ける
+                if !(invoice_header.invoice_date.nil?) && invoice_header.invoice_date < date_per_ten_start
+                  #8%の場合
+                  billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include
+                elsif invoice_header.invoice_date.nil?
+                  #日付ブランクなら現在日付で判定(add191031)
+                  if Date.today < date_per_ten_start
+                  #8%の場合
+                    billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include
+                  else
+                  #10%の場合。変更時はさらに分岐させる
+                    billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include_per_ten
+                  end
+                else
+                #10%の場合
+                  billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include_per_ten
+                end
+                
+                
+                #請求金額は「税込」を使用する
+			    #billing_amount_with_tax = invoice_header.billing_amount * $consumption_tax_include
 			    #四捨五入する
 			    billing_amount_with_tax = billing_amount_with_tax.round(0)
 			  else

@@ -512,7 +512,8 @@ class DeliverySlipHeadersController < ApplicationController
     def delivery_slip_header_params
       params.require(:delivery_slip_header).permit(:delivery_slip_code, :quotation_code, :invoice_code, :delivery_slip_date,
                      :construction_datum_id, :construction_name, :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, 
-                     :post, :address, :tel, :house_number, :address2, :fax, :construction_period, :construction_post, :construction_place, 
+                     :post, :address, :tel, :house_number, :address2, :fax, :construction_period, 
+                     :construction_period_date1, :construction_period_date2, :construction_post, :construction_place, 
                      :construction_house_number, :construction_place2, :delivery_amount, :execution_amount, :last_line_number, :fixed_flag)
       #Note: "delivery_slip_header_origin_id"は既存データ上書き防止のため、保存させない。
     end

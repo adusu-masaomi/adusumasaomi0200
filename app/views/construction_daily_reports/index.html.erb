@@ -26,12 +26,20 @@
   
   </br>
   
+  <%= f.label :update_at, '入力日' %>
+  
+  <!--<%= f.text_field :update_at_gteq, class:"input-append date datepicker", include_blank: true , size: "12", id: 'update_start'   %>-->
+  <!--value~の部分は本来いらないが、入力後に日付を消したいために、あえてするVer-->
+  <%= f.text_field :update_at_gteq, :value=> (f.object.update_at.strftime("%Y/%m/%d") if f.object.update_at), class:"input-append date datepicker", include_blank: true , size: "12", id: 'update_start'   %>
+  
+  
   <!--
   <%= f.label :working_date, '作業日' %>
-  <%= f.date_select :working_date_gteq, {include_blank: true} ,  {id: "working_date_start"}   %>
+  <%= f.text_field :working_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'working_date_start'   %>
   <%= f.label :working_date, '〜' %>
-  <%= f.date_select :working_date_lteq, {include_blank: true} ,  {id: "working_date_end"}   %>
+  <%= f.text_field :working_date_lteq, class:"input-append date datepicker", include_blank: true ,  id: 'working_date_end'   %>
   -->
+  
   	<div>
         <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
         <%= link_to "労務費集計表",
@@ -93,8 +101,11 @@
       <th><%= model_class.human_attribute_name(:man_month) %></th>
       <th><%= model_class.human_attribute_name(:labor_cost) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
+      
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
-	  <th><%= '<No.>' %></th>
+	  <!--<th><%= '<No.>' %></th>-->
+      <th><%= sort_link(@q, :construction_datum_construction_code, '<No.>') %></th>
+      
     </tr>
   </thead>
   <tbody>

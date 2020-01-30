@@ -56,16 +56,48 @@
   
   <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label_html:{style: 'margin-top : -30px;'},  input_html:{id:"address2", style: 'width:320px;', :tabindex=>"14"} %>
   
+  <!--add200111-->
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :estimated_amount, input_html:{ id:"estimated_amount", style: 'width:320px', :tabindex=>"15"}  %>
+  </div>
+  <%= f.input :final_amount, input_html:{ id:"final_amount", style: 'width:320px', :tabindex=>"16"}  %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :billing_due_date, :include_blank => true, start_year: Date.today.year - 1,
+                  end_year: Date.today.year + 3, hint: "", input_html:{ id:"billing_due_date", :tabindex=>"17", name: "construction_datum[billing_due_date][]", 
+                                                           :onchange => "getDepositDueDateAjax()"} %>
+  </div>
+  <div class="col-lg-4" , style="margin-left : 10px">
+  
+  <%= f.input :deposit_due_date ,label: "入金予定日", hint: "＊自動計算されます" , 
+          input_html:{ id:"deposit_due_date", :tabindex=>"18"} ,as: :date_picker %>
+  
+  <!--
+  <%= f.input :deposit_due_date, :include_blank => true, start_year: Date.today.year - 1,
+                  end_year: Date.today.year + 3, hint: "自動計算されます(入力不要)", input_html:{ id:"deposit_due_date",
+                                              name: "construction_datum[deposit_due_date][]"} %>
+  -->
+  
+  <%= f.input :deposit_due_date_hide ,  input_html:{ id:"deposit_due_date_hide", style: 'width:100px',
+                                             name: "construction_datum[deposit_due_date_hide][]"}, as: :hidden %>
+  
+  </div>
+  </br></br></br></br></br></br>
+  
+  <%= f.input :deposit_date, :include_blank => true, start_year: Date.today.year - 1,
+                  end_year: Date.today.year + 3, input_html:{:readonly=>true} %>
+  <!--add end-->
+  
   <%= f.check_box :order_flag %> 
-  <%= f.label :order_flag, "受注済", {style: 'color: purple', :tabindex=>"15"} %>
+  <%= f.label :order_flag, "受注済", {style: 'color: purple', :tabindex=>"18"} %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.check_box :billed_flag %> 
-  <%= f.label :billed_flag, "請求済", {style: 'color: blue', :tabindex=>"16"} %>
+  <%= f.label :billed_flag, "請求済", {style: 'color: blue', :tabindex=>"19"} %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.check_box :calculated_flag %> 
-  <%= f.label :calculated_flag, "集計済", {style: 'color: green', :tabindex=>"17"} %>
+  <%= f.label :calculated_flag, "集計済", {style: 'color: green', :tabindex=>"20"} %>
   
   </br></br>
   
@@ -81,7 +113,7 @@
 
   
   <!--<%= f.button :submit, :class => 'btn-primary' %>-->
-  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" tabindex = "18" />
+  <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" tabindex = "21" />
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 construction_data_path, :class => 'btn btn-white_rsd' %>
 <% end %>
@@ -218,6 +250,58 @@
     document.getElementById("address").value = obj;
     
   }
-  
+  //請求予定日→入金日のセット
+  function getDepositDueDateAjax()
+  {  
+    //obj = document.getElementById("delivery_slip_header_id");
+    //delivery_slip_header_id = parseInt(obj.value);
+	
+      //日付がまだ未選択の状態なら、抜ける
+     if (document.getElementsByName("construction_datum[billing_due_date][]")[0].value == "" ||
+       document.getElementsByName("construction_datum[billing_due_date][]")[1].value == "" ||
+       document.getElementsByName("construction_datum[billing_due_date][]")[2].value == "" )
+     {
+       return;
+     }
+    
+     var billing_due_date = document.getElementsByName("construction_datum[billing_due_date][]")[0].value + "/" 
+                                    + document.getElementsByName("construction_datum[billing_due_date][]")[1].value + "/" 
+                                    + document.getElementsByName("construction_datum[billing_due_date][]")[2].value; 
+    
+     obj = document.getElementById("customer_id");
+     customer_id = parseInt(obj.value);
+    
+     document.getElementById("deposit_due_date").value = "";  //一旦クリア
+    
+     $.get("<%= construction_dataz_get_deposit_due_date_path %>",
+       {billing_due_date: billing_due_date, customer_id: customer_id },
+        function(data){
+          
+          
+          obj = document.getElementById("deposit_due_date_hide").textContent;
+          
+          document.getElementById("deposit_due_date_hide").textContent = "";
+          
+          if (obj != "")
+          {
+            //document.getElementById("deposit_due_date").value = obj;
+            
+            var purchase_date_set = obj;
+            document.getElementById("deposit_due_date").value = purchase_date_set;
+            
+            //debugger;
+          
+            
+            //document.getElementsByName("construction_datum[deposit_due_date][]")[0].value = obj.substr(0, 4);
+            //document.getElementsByName("construction_datum[deposit_due_date][]")[1].value = obj.substr(5,2);
+            //document.getElementsByName("construction_datum[deposit_due_date][]")[2].value = obj.substr(8,2);
+          }
+          
+          
+		  //setConstructionDetail();
+		  
+		 }
+	  );
+   };
     
 </script>

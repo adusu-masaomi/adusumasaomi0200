@@ -293,20 +293,24 @@ class QuotationMaterialHeadersController < ApplicationController
   #商品名などを取得
   def material_select
   
-     @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
-	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
-	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
-     @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+    @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
+	  @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
+	  @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
+    @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
 	 
-	 @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+	  @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
-	 #add170914 該当なければひとまず”個”にする
-	 if @unit_id.blank?
-	   @unit_id = "3"
-	 end
+	  
+    #該当なければひとまず”個”にする
+	  if @unit_id.blank?
+	    @unit_id = "3"
+	  end
      
-     #add180509
-     @notes = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:notes).flatten.join(" ")
+    @notes = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:notes).flatten.join(" ")
+  
+    #add200129
+    @material_category_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_category_id).flatten.join(" ")
+    
   end
   
   #見積コードの最終番号(+1)を取得する
@@ -559,16 +563,20 @@ class QuotationMaterialHeadersController < ApplicationController
         if (item[:material_name] != @material_master.material_name) || 
                  (item[:maker_id] != @material_master.maker_id)  || 
                  (item[:list_price] != @material_master.list_price)  ||
-                 (item[:notes] != @material_master.notes)
+                 (item[:notes] != @material_master.notes) ||
+                 (item[:material_category_id] != @material_master.material_category_id)
 			    #↑フィールド追加時注意！
               #マスター情報変更した場合は、商品マスターへ反映させる。
                 
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  #品名・メーカーID・定価・備考を更新
+                  #add200129 分類追加
+                  #品名・メーカーID・定価・備考・分類を更新
                   materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
-                                               :list_price => item[:list_price], :notes => item[:notes])
-           end 
+                                               :list_price => item[:list_price], :notes => item[:notes], 
+                                               :material_category_id => item[:material_category_id])
+          end
+ 
 			  end
 			  
 			  
@@ -600,8 +608,11 @@ class QuotationMaterialHeadersController < ApplicationController
 				    @material_master = MaterialMaster.find_by(material_code: item[:material_code])
 			      #商品マスターへセット(商品コード存在しない場合)
 			      if @material_master.nil?
+            
+              #add200129 分類追加
 				      material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:maker_id], list_price: item[:list_price], :notes => item[:notes] }
+                                        maker_id: item[:maker_id], list_price: item[:list_price], :notes => item[:notes],
+                                        :material_category_id => item[:material_category_id] }
                                         
 			        @material_master = MaterialMaster.create(material_master_params)
 			      end

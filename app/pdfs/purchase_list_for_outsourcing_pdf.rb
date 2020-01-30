@@ -18,7 +18,8 @@ class PurchaseListForOutsourcingPDF
         @purchase_order_code  = ""
         @purchase_amount_subtotal = 0
         @purchase_amount_total = 0
-        #add190212
+        @purchase_amount_tax_in_total = 0  #add191101
+        
         @payment_amount_total = 0
         @unpaid_amount_total = 0
 
@@ -39,8 +40,9 @@ class PurchaseListForOutsourcingPDF
 		   @flag = "1"
 		   
 		   if $construction_flag == true
-		     report.page.item(:construction_code).value(purchase_datum.construction_datum.construction_code)
-		     report.page.item(:construction_name).value(purchase_datum.construction_datum.construction_name)
+              #del190930
+              # report.page.item(:construction_code).value(purchase_datum.construction_datum.construction_code)
+		      # report.page.item(:construction_name).value(purchase_datum.construction_datum.construction_name)
 		   end
 		   if $customer_flag == true
              #if purchase_datum.construction_datum.CustomerMaster.customer_name.present?
@@ -63,8 +65,24 @@ class PurchaseListForOutsourcingPDF
          unpaid_payment_date = nil
          
          staff_id = ::ApplicationController.helpers.getSupplierToStaff(purchase_datum.supplier_id)
-         outsourcing_cost = OutsourcingCost.where(:construction_datum_id => 
-            purchase_datum.construction_datum_id).where(:staff_id => staff_id).first
+         
+         #outsourcing_cost = OutsourcingCost.where(:construction_datum_id => 
+         #       purchase_datum.construction_datum_id).where(:staff_id => staff_id).first
+                
+         
+         if purchase_datum.purchase_order_datum_id.present?
+         #upd190930
+         #注番があればそっちを優先する
+             outsourcing_cost = OutsourcingCost.where(:purchase_order_datum_id => 
+                purchase_datum.purchase_order_datum_id).where(:staff_id => staff_id).first
+             
+             #注番のないデータなら、工事IDで引っ張る(将来的にはなくなる予定)
+             if outsourcing_cost.nil?
+                   outsourcing_cost = OutsourcingCost.where(:construction_datum_id => 
+                      purchase_datum.construction_datum_id).where(:staff_id => staff_id).first
+             end
+         end
+         
          if outsourcing_cost.present?
            payment_date = outsourcing_cost.payment_date
            unpaid_payment_date = outsourcing_cost.unpaid_payment_date
@@ -84,10 +102,29 @@ class PurchaseListForOutsourcingPDF
 		#end
 		
 	    @purchase_order_code  = purchase_datum.purchase_order_datum.purchase_order_code
+        purchse_amount_tax_in = 0   #add191101
+        
 		#金額小計・合計をセット
 		if purchase_datum.purchase_amount.present?
 		  @purchase_amount_subtotal = @purchase_amount_subtotal + purchase_datum.purchase_amount
 		  @purchase_amount_total = @purchase_amount_total + purchase_datum.purchase_amount
+          
+          #add191101
+          #異なる消費税が混在するケースがあるので、消費税は一括計算せずに明細を加算させる
+          #@purchase_amount_tax_in_total
+          date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日
+          #upd191101
+          #消費税率により分岐
+          if purchase_datum.purchase_date < date_per_ten_start
+          #8%の場合
+            purchase_amount_tax_in = purchase_datum.purchase_amount * $consumption_tax_include
+          else
+            #10%の場合(変更があれば更に分岐させる)
+            purchase_amount_tax_in = purchase_datum.purchase_amount * $consumption_tax_include_per_ten
+          end
+          
+          @purchase_amount_tax_in_total += purchase_amount_tax_in
+          #
 		end
         
         if outsourcing_cost.present?
@@ -141,13 +178,14 @@ class PurchaseListForOutsourcingPDF
 					   formatNum()
 					   purchase_amount = @num
 					   
-                       purchase_amount_tax_in = 0
+                       #purchase_amount_tax_in = 0  #del191101
                        if purchase_datum.purchase_amount > 0
                        #税込価格にする
-                         purchase_amount_tax_in = purchase_datum.purchase_amount * $consumption_tax_include
+                         
+                         #フォーマット変更させる
                          @num = purchase_amount_tax_in
                          formatNum()
-					     purchase_amount_tax_in = @num
+					     purchase_amount_tax_in_str = @num
                        end
                        
                        #支払金額
@@ -179,12 +217,12 @@ class PurchaseListForOutsourcingPDF
                        #
                        
 			           row.values purchase_date: purchase_datum.purchase_date,
+                                  purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
                                   construction_code: construction_code,
 								  construction_name: construction_name,
 								  customer_name: customer_name,
-					              purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              purchase_amount: purchase_amount,
-                                  purchase_amount_tax_in: purchase_amount_tax_in,
+                                  purchase_amount_tax_in: purchase_amount_tax_in_str,
                                   closing_date: @closing_date,
                                   payment_due_date: @payment_due_date,
                                   payment_date: payment_date,
@@ -256,7 +294,9 @@ class PurchaseListForOutsourcingPDF
 		@purchase_amount_total = @num
 		
         #税込
-        @num = tmp_purchase_amount_total * $consumption_tax_include
+        #@num = tmp_purchase_amount_total * $consumption_tax_include
+        @num = @purchase_amount_tax_in_total   #upd191101
+        
         formatNum()
 		@purchase_amount_total_tax_in = @num
         
@@ -319,24 +359,26 @@ end
             if Date.valid_date?(d.year, d.month, customer.closing_date)
               @closing_date = Date.new(d.year, d.month, customer.closing_date)
             end
+            
           else
           #締め日を過ぎていた場合、月＋１
             addMonth += 1
-            
             d = d >> addMonth
-            
             if Date.valid_date?(d.year, d.month, customer.closing_date)
               @closing_date = Date.new(d.year, d.month, customer.closing_date)
             end
           end
           
-          #if Date.valid_date?(d.year, d.month, customer.closing_date)
-          #  @closing_date = Date.new(d.year, d.month, customer.closing_date)
-          #end
         end
         
         #支払日算出
-        d = @purchase_date
+        #d = @purchase_date
+        d = @closing_date    #upd191112
+        
+        if d.nil?
+          d = @purchase_date  #add191120
+        end
+ 
         if customer.due_date.present?
           
           if customer.due_date >= 28   #月末とみなす
@@ -345,12 +387,12 @@ end
             d2 = d2 >> addMonth
             d2 = Date.new(d2.year, d2.month, -1)
             @payment_due_date = d2
-          
           else
           ##月末の扱いでなければ、そのまま
             if Date.valid_date?(d.year, d.month, customer.due_date)
                 d2 = Date.new(d.year, d.month, customer.due_date)
-                addMonth = customer.due_date_division + addMonth
+                #addMonth = customer.due_date_division + addMonth
+                addMonth = customer.due_date_division
                 @payment_due_date = d2 >> addMonth
             end
           end

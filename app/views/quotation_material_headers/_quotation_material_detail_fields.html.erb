@@ -50,7 +50,7 @@
   
   <%= f.label :数量, {style: 'width:28px'}  %>
   <!--<%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>-->
-  <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2" , :onkeydown => "checkBytesQuantity(event)"  %>
+  <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2" , :onkeydown => "checkBytesQuantity(event, this)"  %>
   <td>&nbsp;&nbsp;</td>
   <!--<%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
      { id: "unit_master_id", name:"unit_master_id[]", class: "searchableSelect1_2" , style: 'width:50px' } %>-->
@@ -126,17 +126,23 @@
   
   <%= f.input :notes,  input_html:{ id: "notes",  style: 'width:581px' , :tabindex=>"5", :value => @notes} %>
   
-  <!--メール送信フラグ-->
+  <!--add200129-->
+  <!--資材分類-->
+  <!--スペース-->
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <% if f.object.material_master.present? %>
+    <% @material_category_id = f.object.material_master.material_category_id %>
+  <% else %>
+    <% @material_category_id = nil %>
+  <% end %>
+  <%= f.collection_select :material_category_id, MaterialCategory.all, :id, :name,
+      {:include_blank => true, :selected => @material_category_id} , 
+      {class: "searchableSelect1_4 form-control" , id:"material_category_id", 
+             style: 'width:200px;margin-left:-20px'} %>
   
-  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
-  
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <!--メール送信フラグ  -->
+  <!-- (200129, -45)  -->
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   
   <%= f.label :mail_sent_flag, 'メール送信フラグ：', { style: 'font-size:8px'} %>
@@ -170,6 +176,7 @@
   <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %>
   <%= f.input :material_code,  input_html:{id:"material_code_hide", name:"material_code_hide" }, as: :hidden %>
   <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %>
+  <%= f.input :material_category_id_hide,  input_html:{id:"material_category_id_hide", }, as: :hidden %>
   
 </div>
 </div>
@@ -287,8 +294,7 @@
 	    
 	  	unit_price = document.querySelectorAll("#quotation_unit_price_1");
 		price = document.querySelectorAll("#quotation_price_1");
-		
-	 	
+			 	
 		break;
       case 2:
 	    num = 2;
@@ -303,10 +309,8 @@
     }
 	
 	for (var index = 0; index < unit_price.length  ; index ++)
- {
+    {
 	  
-	  //
-	   
 	  //add180120
 	  //全角入力→半角にする
 	  unit_price[index].value =  toHalfWidth(unit_price[index].value);
@@ -464,8 +468,15 @@
     //name属性に埋め込まれているIDを抜き出す
 	var controlName = t.name
     var child_index = controlName.slice(65);
-    var child_index = child_index.slice(0,-25);
-   
+    
+    if (child_index.indexOf("quantity") == -1)
+    {
+    //見積単価から来た場合
+      child_index = child_index.slice(0,-25);
+    }else{
+    //数量から来た場合 add200129
+      child_index = child_index.slice(0,-11);
+    }
     
     //落札フラグの判定
     //仕入先1~3でループし、落札フラグがあれば仕入先を注文先として自動セットする。
@@ -659,6 +670,18 @@
 				  $(".searchableSelect1_3").trigger("change"); 
 		        }
 				
+                //add200129
+                //分類をセット
+				obj = document.getElementById("material_category_id_hide").textContent;
+			    if (obj != null){
+		          var index = parseInt(obj);
+                  //$(".searchableSelect1_4")[selected_index].value = index; 
+				  var nm = "quotation_material_header[quotation_material_details_attributes][" + selected_index + "][material_category_id]";
+				  document.getElementsByName(nm)[0].value = obj;
+				  
+				  $(".searchableSelect1_4").trigger("change"); 
+		        }
+                
 				//定価をセット
 				obj = document.getElementById("list_price").textContent;
 				//document.getElementsByName("list_price[]")[selected_index].value = obj;
@@ -808,9 +831,7 @@
 	gControl_id = current.id;
 	controlName = current.name;
 	
-   
-	var selectedIndex = 0;
-	
+    var selectedIndex = 0;
 	var moveFlag = false;
 	var nm = "";
 	
@@ -851,13 +872,19 @@
 		//nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
         nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][notes]"
 	  }else if (controlName.substr(-7,7) == "[notes]") {
-      //備考→見積単価１へ
-      //add180509
+      //備考→分類へ
         
         moveFlag = true;
         selectedIndex = selectedIndex.slice(0,-8);
-        nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
+        nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][material_category_id]"
+        //nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
       
+      //}else if (controlName.substr(-22,22) == "[material_category_id]") {
+      //  //備考→見積単価
+      //  moveFlag = true;
+      //  selectedIndex = selectedIndex.slice(0,-23);
+      //  nm = "quotation_material_header[quotation_material_details_attributes][" + selectedIndex + "][quotation_unit_price_1]"
+        
       }else if (controlName.substr(-24,24) == "[quotation_unit_price_1]") {
 	  //見積単価１→金額１へ
 	    moveFlag = true;
@@ -907,14 +934,23 @@
   
   //数量が全角になっていたら半角に変換する
   //add180120
-  function checkBytesQuantity(e){
+  function checkBytesQuantity(e, t){
+     //debugger;
+     
      if (e.keyCode == 13 || e.keyCode == 9) {
 	 } else {
        return false;
 	 }
+     
 	 if (document.getElementById("quantity").value != ""){
 	   var str = document.getElementById("quantity").value;
 	   document.getElementById("quantity").value = toHalfWidth(str);
+       
+       //add 200129
+       //数量が変わったら単価(1~3)も変更させる
+       for (  var i = 1;  i <= 3;  i++  ) {
+         checkQuotationUnitPriceAll(t, i, e);
+       }
 	 }
   }
   //定価が全角になっていたら半角に変換する

@@ -89,9 +89,9 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 357.8,
+            "x": 350.2,
             "y": 401.5,
-            "width": 17.4,
+            "width": 25,
             "height": 10,
             "style": {
               "font-family": [

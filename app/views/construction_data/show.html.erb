@@ -23,10 +23,21 @@
   <dd><%= @construction_datum.house_number %></dd>
   <dt><strong><%= model_class.human_attribute_name(:address2) %>:</strong></dt>
   <dd><%= @construction_datum.address2 %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:estimated_amount) %>:</strong></dt>
+  <dd><%= @construction_datum.estimated_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:final_amount) %>:</strong></dt>
+  <dd><%= @construction_datum.final_amount %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:billing_due_date) %>:</strong></dt>
+  <dd><%= @construction_datum.billing_due_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:deposit_due_date) %>:</strong></dt>
+  <dd><%= @construction_datum.deposit_due_date %></dd>
+  
+  <!--
   <dt><strong><%= model_class.human_attribute_name(:latitude) %>:</strong></dt>
   <dd><%= @construction_datum.latitude %></dd>
   <dt><strong><%= model_class.human_attribute_name(:longitude) %>:</strong></dt>
   <dd><%= @construction_datum.longitude %></dd>
+  -->
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

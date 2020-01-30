@@ -1139,6 +1139,7 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
                                   construction_datum_id: @delivery_slip_header.construction_datum_id, construction_name: @delivery_slip_header.construction_name, 
                                   customer_id: @delivery_slip_header.customer_id, customer_name: @delivery_slip_header.customer_name, honorific_id: @delivery_slip_header.honorific_id,
                                   responsible1: @delivery_slip_header.responsible1, responsible2: @delivery_slip_header.responsible2, post: @delivery_slip_header.post, construction_period: @delivery_slip_header.construction_period,
+                                  construction_period_date1: @delivery_slip_header.construction_period_date1, construction_period_date2: @delivery_slip_header.construction_period_date2,
                                   address: @delivery_slip_header.address, house_number: @delivery_slip_header.house_number, address2: @delivery_slip_header.address2,
                                   tel: @delivery_slip_header.tel, fax: @delivery_slip_header.fax, 
                                   construction_post: @delivery_slip_header.construction_post,  construction_place: @delivery_slip_header.construction_place, 

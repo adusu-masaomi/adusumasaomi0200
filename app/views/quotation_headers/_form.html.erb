@@ -32,6 +32,12 @@
   </br></br></br></br></br>
   
   <%= f.input :quotation_date, :include_blank => true, input_html:{ id:"quotation_date", :tabindex=>"1",style: 'width:100px'} %>
+  
+  <!--add200127-->
+  <%= f.check_box :not_sum_flag %> 
+  <%= f.label :not_sum_flag, "※単価見積(合計表示しない)の場合にチェックしてください", {style: 'color: black', :tabindex=>"29"} %>
+  </br>
+  
   <div class="col-md-6" , style="margin-left : -15px">
    <%= f.input :invoice_period_start_date, :include_blank => true, input_html:{ id:"invoice_period_start_date", :tabindex=>"2",style: 'width:100px'} %>
   </div>
@@ -76,30 +82,48 @@
   
   <%= f.input :tel, input_html:{id:"tel", :tabindex=>"15"} %>
   <%= f.input :fax, input_html:{id:"fax", :tabindex=>"16"} %>
-  <%= f.input :construction_period, input_html:{id:"construction_period", :tabindex=>"17"}  %>
+  
+  <div class="col-md-3" , style="margin-left : -15px">
+    <%= f.input :construction_period, label:"工事期間（文字）" , input_html:{id:"construction_period", :tabindex=>"17", style: 'width:220px' ,}  %>
+  </div>
+  <div class="col-md-3" , style="margin-left : 90px">
+    <%= f.input :construction_period_date1 , as: :string, input_html:{id: "construction_period_date1" , class: "datepicker", 
+           style: 'width:120px' , :tabindex=>"18" }  %>
+  </div>
+ 
+  <div class="col-md-3" , style="margin-left : -30px ;margin-top : 35px">
+    <%= f.label :〜, {:class => "my-custom-class-l"}  %>
+  </div>
+  <div class="col-md-3" , style="margin-left : -130px">
+    <%= f.input :construction_period_date2 , as: :string, input_html:{id: "construction_period_date2" , class: "datepicker", 
+           style: 'width:120px' , :tabindex=>"19" }  %>
+  </div>
+  
+  </br></br></br>
+  
   <%= f.input :construction_post, label:"郵便番号（工事場所）", input_html:{ id:"construction_post", :onchange => "formatPost2(id)", 
-       :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');", :tabindex=>"18"}  %>
+       :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');", :tabindex=>"20"}  %>
   
   <div class="col-lg-6" , style="margin-left : -15px">
     <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{ id:"construction_place", style: 'width:320px;', 
-        name:"construction_place", :tabindex=>"19", :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
+        name:"construction_place", :tabindex=>"21", :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
   </div>
   
   <!--add171010-->
   <%= f.input :construction_house_number , hint: "＊番地のみ入力して下さい。", label:"番地（工事場所）", input_html:{id:"construction_house_number",
-              style: 'width:320px', :tabindex=>"20"} %>
+              style: 'width:320px', :tabindex=>"22"} %>
   <%= f.input :construction_place2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（工事場所）", label_html:{style: 'margin-top : -30px;'},  
-            input_html:{id:"construction_place2", style: 'width:320px;', :tabindex=>"21"} %>
+            input_html:{id:"construction_place2", style: 'width:320px;', :tabindex=>"23"} %>
   <!--add end-->
   
-  <%= f.input :trading_method, input_html:{ id:"trading_method", :tabindex=>"22"}  %>
-  <%= f.input :effective_period, input_html:{ id:"effective_period", :tabindex=>"23"}  %>
-  <%= f.input :net_amount, input_html:{ id:"net_amount", :tabindex=>"24"}  %>
-  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", :tabindex=>"25"} %>
-  <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"26"}  %>
+  <%= f.input :trading_method, input_html:{ id:"trading_method", :tabindex=>"24"}  %>
+  <%= f.input :effective_period, input_html:{ id:"effective_period", :tabindex=>"25"}  %>
+  <%= f.input :net_amount, input_html:{ id:"net_amount", :tabindex=>"26"}  %>
+  <%= f.input :quote_price, hint: "＊自動計算されます。手入力可。" , input_html:{ id:"quote_price", :tabindex=>"27"} %>
+  <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{ id:"execution_amount", :tabindex=>"28"}  %>
   
   <%= f.check_box :fixed_flag %> 
-  <%= f.label :fixed_flag, "確定済み(確定後に自動チェックされます。解除のみ操作可能です。)", {style: 'color: blue', :tabindex=>"27"} %>
+  <%= f.label :fixed_flag, "確定済み(確定後に自動チェックされます。解除のみ操作可能です。)", {style: 'color: blue', :tabindex=>"29"} %>
   </br>
   
   <%= f.input :customer_id_hide, input_html:{id:'customer_id_hide'}, as: :hidden  %>

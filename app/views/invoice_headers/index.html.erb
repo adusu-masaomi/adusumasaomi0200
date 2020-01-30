@@ -145,7 +145,16 @@
           <% if invoice_header.invoice_date.present? && invoice_header.invoice_date >= Date.new(2019,10,1) %>
             <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include_per_ten,  precision: 0) %></td>
 		  <% else %>
-            <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>
+            <% if invoice_header.invoice_date.present? %>
+              <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>
+            <% else %>
+              <!--upd191031日付未入力なら現在日付にて判定、変更時は分岐させる-->
+              <% if Date.today >= Date.new(2019,10,1) %>
+                <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include_per_ten,  precision: 0) %></td>
+              <% else %>
+                <td align="right"><%= number_to_currency(invoice_header.billing_amount * $consumption_tax_include,  precision: 0) %></td>
+              <% end %>
+            <% end %>
           <% end %>
         <% else %>
 		  <td align="right"><%= number_to_currency(invoice_header.billing_amount,  precision: 0) %></td>

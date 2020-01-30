@@ -8,7 +8,8 @@ class ConstructionDatum < ActiveRecord::Base
     belongs_to :site    #add190124
     has_many :purchase_order_datum
 	has_many :construction_daily_reports
-	has_many :construction_costs, :foreign_key => "construction_datum_id"
+	#Del190930
+    #has_many :construction_costs, :foreign_key => "construction_datum_id"
 	has_many :construction_attachments, dependent: :destroy
     accepts_nested_attributes_for :construction_attachments, allow_destroy: true
     #
@@ -21,6 +22,9 @@ class ConstructionDatum < ActiveRecord::Base
 	attr_accessor :working_date
 	attr_accessor :staff_id
 	
+    #add200114
+    attr_accessor :deposit_due_date_hide
+    
 	#バリデーション
 	validates :customer_id, presence: true
     validates :construction_code, presence: true, uniqueness: true

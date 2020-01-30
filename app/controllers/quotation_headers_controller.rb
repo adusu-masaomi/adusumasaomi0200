@@ -549,9 +549,9 @@ class QuotationHeadersController < ApplicationController
     def quotation_header_params
       params.require(:quotation_header).permit(:quotation_code, :invoice_code, :delivery_slip_code, :quotation_date, :construction_datum_id, :construction_name, 
                                                :honorific_id, :responsible1, :responsible2, :customer_id, :customer_name, :post, :address, :house_number, :address2, :tel, :fax, 
-                                               :construction_period, :construction_post, :construction_place, :construction_house_number, :construction_place2, 
+                                               :construction_period, :construction_period_date1, :construction_period_date2, :construction_post, :construction_place, :construction_house_number, :construction_place2, 
                                                :trading_method, :effective_period, :net_amount, :quote_price, :execution_amount, 
-                                               :invoice_period_start_date, :invoice_period_end_date, :fixed_flag )
+                                               :invoice_period_start_date, :invoice_period_end_date, :fixed_flag, :not_sum_flag )
 	  #upd171014 "quotation_header_origin_id"は誤って上書きの危険性があるので抹消。
     end
     

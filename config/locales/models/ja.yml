@@ -1,6 +1,9 @@
 ---
 ja:
   attributes:
+    billing_due_date: 請求予定日
+    deposit_due_date: 入金予定日
+    deposit_date: 入金日
     tel_main: 代表Tel
     fax_main: 代表fax
     email_main: 代表Email
@@ -10,6 +13,8 @@ ja:
     email1: 担当1Email
     email2: 担当2Email
     email3: 担当3Email
+    estimated_amount: 予定金額
+    final_amount: 決定金額
     supplier_name: 仕入先名
     supplier_material_code: 仕入先品番
     material_id: 品番
@@ -85,6 +90,8 @@ ja:
     quotation_date: 見積書日付
     construction_name: 工事名
     construction_period: 工事期間
+    construction_period_date1: 工事期間(開始日)
+    construction_period_date2: 工事期間(終了日)
     construction_place: 工事場所
     trading_method: 取引方法
     effective_period: 有効期間
@@ -196,6 +203,7 @@ ja:
        task_content: 工程表項目マスター
     attributes:
        construction_datum:
+         calculated_flag: 集計済
          order_flag: 受注済
          personnel: 担当者
        delivery_slip_header:

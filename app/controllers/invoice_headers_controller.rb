@@ -1,6 +1,9 @@
 class InvoiceHeadersController < ApplicationController
   before_action :set_invoice_header, only: [:show, :edit, :update, :destroy]
 
+  #add200123
+  #include SetCashFlow
+
   # GET /invoice_headers
   # GET /invoice_headers.json
   def index
@@ -144,8 +147,13 @@ class InvoiceHeadersController < ApplicationController
           update_params_customer
         end
         #工事担当者を更新
-        #add190131
         update_construction_personnel
+        
+        #add200127
+        #資金繰データ(会計)を更新
+        @set_cash_flow = SetCashFlow.new
+        @set_cash_flow.set_cash_flow_detail_actual_prepare(@invoice_header)
+        #
         
         format.html { redirect_to @invoice_header, notice: 'Invoice header was successfully updated.' }
         format.json { render :show, status: :ok, location: @invoice_header }
@@ -168,6 +176,13 @@ class InvoiceHeadersController < ApplicationController
       format.json { head :no_content }
     end
 	
+    #資金繰りのデータも削除 (add200127)
+    args = ["DELETE FROM account_cash_flow_detail_actual where invoice_header_id = ?" , 
+                                    invoice_header_id]
+    sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+    result_params = ActiveRecord::Base.connection.execute(sql)
+    #add end    
+    
 	#内訳も消す
 	InvoiceDetailLargeClassification.where(invoice_header_id: invoice_header_id).destroy_all
 		
@@ -316,6 +331,7 @@ class InvoiceHeadersController < ApplicationController
 	 end
      
   end
+  
   
   
   private

@@ -3,6 +3,8 @@ class QuotationMaterialHeader < ActiveRecord::Base
   belongs_to :construction_datum
   belongs_to :supplier_master
   
+  #belongs_to :MaterialMaster, :foreign_key => "material_id"  #add200129
+  
   has_many :quotation_material_details
   accepts_nested_attributes_for :quotation_material_details, :allow_destroy => true
   

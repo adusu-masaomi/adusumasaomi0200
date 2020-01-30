@@ -211,7 +211,14 @@ class WorkingMiddleItemsController < ApplicationController
     
 	
 	#労務単価の初期値をセットする
-    @working_middle_item.labor_unit_price_standard ||= $LABOR_COST
+    #@working_middle_item.labor_unit_price_standard ||= $LABOR_COST
+  
+    #upd200108 単価変更
+    #if @working_middle_item.labor_unit_price_standard.blank? || @working_middle_item.labor_unit_price_standard == 11000
+    if @working_middle_item.labor_unit_price_standard.blank? || @working_middle_item.labor_unit_price_standard == 12100
+      @working_middle_item.labor_unit_price_standard = $LABOR_COST
+    end
+  
   end
 
   # POST /working_middle_items

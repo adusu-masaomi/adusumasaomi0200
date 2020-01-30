@@ -9,8 +9,16 @@ class CustomerMaster < ActiveRecord::Base
     def self.due_division 
       [["当月", 0], ["翌月", 1], ["翌々月", 2]]
     end
-
-    has_many :construction_datum  # <== 関係を追記
+    
+    #支払銀行
+    def self.payment_bank 
+      #[["-", 0], ["北越", 1], ["三信(塚野目)", 2], ["三信(本店)", 3]]
+      #ex.2は会計の銀行マスターと連動させるため空き(第四)
+      [["-", 0], ["北越", 1], ["----", 2], ["三信(塚野目)", 3], ["三信(本店)", 4]]
+    end
+    
+    #has_many :construction_datum
+    has_many :construction_datum, :foreign_key => "customer_id"  # <== 関係を追記
     
     validates :closing_date, presence: true, numericality: :integer
     validates :due_date, presence: true, numericality: :integer

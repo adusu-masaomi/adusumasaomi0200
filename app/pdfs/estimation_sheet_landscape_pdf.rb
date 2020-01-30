@@ -96,24 +96,26 @@ class EstimationSheetLandscapePDF
 		   
 		   #元号変わったらここも要変更
 		   if @quotation_headers.quotation_date.present?
-		     @gengou = @quotation_headers.quotation_date
+		     #@gengou = @quotation_headers.quotation_date
+             #upd191204
+             @gengou = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.quotation_date)
              
-             #新元号対応 190401
-             #require "date"
-             d_heisei_limit = Date.parse("2019/5/1");
-             #元号変わったらここも要変更
-             if @gengou >= d_heisei_limit
-                #令和
-                if @gengou.year - $gengo_minus_ad_2 == 1
-                #１年の場合は元年と表記
-                  @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                else
-                  @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-                end
-             else
-                #平成
-		        @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     end
+             ##新元号対応 190401
+             #d_heisei_limit = Date.parse("2019/5/1");
+             ##元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             #   #令和
+             #   if @gengou.year - $gengo_minus_ad_2 == 1
+             #   #１年の場合は元年と表記
+             #     @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   else
+             #     @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #   end
+             #else
+             #   #平成
+		     #   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     #end
+             
            end
 		  
 		   #NET金額
@@ -177,8 +179,40 @@ class EstimationSheetLandscapePDF
 		 
 		   #件名
 		   @report.page.item(:construction_name2).value(@quotation_headers.construction_name) 
-		   #工事期間
-		   @report.page.item(:construction_period2).value(@quotation_headers.construction_period) 
+		   
+           #upd191204
+           #工事期間(開始〜終了日も追加)
+           construction_period = @quotation_headers.construction_period 
+           
+           if @quotation_headers.construction_period.present?  #文字が入っていたらスペースを開ける
+             construction_period += "　"
+           end
+           
+           #開始日
+           if @quotation_headers.construction_period_date1.present?
+             
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.construction_period_date1)
+             
+             construction_period += japaneseCalendar
+           end
+           
+           if @quotation_headers.construction_period_date1.present? &&
+              @quotation_headers.construction_period_date2.present?
+             construction_period += " 〜 "
+           end
+           
+           #終了日
+           if @quotation_headers.construction_period_date2.present?
+             #一旦和暦に変換
+             japaneseCalendar = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.construction_period_date2)
+             
+             construction_period += japaneseCalendar
+           end
+           #
+           
+           @report.page.item(:construction_period2).value(construction_period)
+           #@report.page.item(:construction_period2).value(@quotation_headers.construction_period) 
 		 
 		   #住所（工事場所）
 		   #分割された住所を一つにまとめる。
@@ -258,7 +292,7 @@ class EstimationSheetLandscapePDF
                       #add190903
                       #小数点以下１位があれば表示、なければ非表示
                       if @quantity.present?
-                        @quantity = "%.2g" %  @quantity
+                        @quantity = "%.4g" %  @quantity
                       end
                       @execution_quantity = quotation_detail_large_classification.execution_quantity
                       if @execution_quantity == 0 
@@ -267,7 +301,7 @@ class EstimationSheetLandscapePDF
                       #add190903
                       #小数点以下１位があれば表示、なければ非表示
                       if @execution_quantity.present?
-                        @execution_quantity = "%.2g" %  @execution_quantity
+                        @execution_quantity = "%.4g" %  @execution_quantity
                       end
                       
                       if quotation_detail_large_classification.WorkingUnit.present?
@@ -441,24 +475,25 @@ class EstimationSheetLandscapePDF
 		   @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
 		 
 		   if @quotation_headers.quotation_date.present?
-             @gengou = @quotation_headers.quotation_date
+             #@gengou = @quotation_headers.quotation_date
+             #upd191204
+             @gengou = ApplicationController.new.WesternToJapaneseCalendar(@quotation_headers.quotation_date)
              
-             #新元号対応 190401
-             #require "date"
-             d_heisei_limit = Date.parse("2019/5/1")
-             #元号変わったらここも要変更
-             if @gengou >= d_heisei_limit
-             #令和
-               if @gengou.year - $gengo_minus_ad_2 == 1
-               #１年の場合は元年と表記
-                 @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               else
-                 @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-               end
-             else
-		     #平成
-                @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
-		     end
+             #d_heisei_limit = Date.parse("2019/5/1")
+             ##元号変わったらここも要変更
+             #if @gengou >= d_heisei_limit
+             ##令和
+             #  if @gengou.year - $gengo_minus_ad_2 == 1
+             #  #１年の場合は元年と表記
+             #    @gengou = $gengo_name_2 + "元年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  else
+             #    @gengou = $gengo_name_2 + "#{@gengou.year - $gengo_minus_ad_2}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+             #  end
+             #else
+		     ##平成
+             #   @gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
+		     #end
+             
              @report.page.item(:quotation_date).value(@gengou) 
 		  end
 		 
@@ -515,7 +550,7 @@ class EstimationSheetLandscapePDF
                   #add190903
                   #小数点以下１位があれば表示、なければ非表示
                   if @quantity.present?
-                    @quantity = "%.2g" %  @quantity
+                    @quantity = "%.4g" %  @quantity
                   end
 
                   @execution_quantity = quotation_detail_middle_classification.execution_quantity
@@ -525,7 +560,7 @@ class EstimationSheetLandscapePDF
                   #add190903
                   #小数点以下１位があれば表示、なければ非表示
                   if @execution_quantity.present?
-                     @execution_quantity = "%.2g" %  @execution_quantity
+                     @execution_quantity = "%.4g" %  @execution_quantity
                   end
                   #@unit_name = quotation_detail_middle_classification.QuotationUnit.quotation_unit_name
 				  if quotation_detail_middle_classification.WorkingUnit.present?

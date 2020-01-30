@@ -4,8 +4,10 @@ class StaffsController < ApplicationController
   # GET /staffs
   # GET /staffs.json
   def index
-    @staffs = Staff.all
-	@affiliation = Affiliation.all
+    #binding.pry
+		
+		@staffs = Staff.all
+	  @affiliation = Affiliation.all
   end
 
   # GET /staffs/1

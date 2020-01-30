@@ -83,9 +83,20 @@ class OutsourcingCostsController < ApplicationController
     if params[:outsourcing_cost][:staff_id].present?
       supplier_id = getStaffToSupplier(params[:outsourcing_cost][:staff_id].to_i)
     end
+    
+    purchase_data = nil
+    
     if supplier_id.present?
-      purchase_data = PurchaseDatum.where(:construction_datum_id => params[:outsourcing_cost][:construction_datum_id]).
+      #upd190930
+      #将来的にはこの分岐は不要
+      
+      if params[:outsourcing_cost][:purchase_order_datum_id].present?
+        purchase_data = PurchaseDatum.where(:purchase_order_datum_id => params[:outsourcing_cost][:purchase_order_datum_id]).
                            where(:supplier_id => supplier_id).first
+      else
+        purchase_data = PurchaseDatum.where(:construction_datum_id => params[:outsourcing_cost][:construction_datum_id]).
+                           where(:supplier_id => supplier_id).first
+      end
     end
     #
     
@@ -99,22 +110,8 @@ class OutsourcingCostsController < ApplicationController
             params[:outsourcing_cost][:unpaid_amount] == 0 ||
             (params[:outsourcing_cost]["unpaid_payment_date(1i)"].present? && params[:outsourcing_cost]["unpaid_payment_date(2i)"].present? && 
              params[:outsourcing_cost]["unpaid_payment_date(3i)"].present?)
-            #params[:outsourcing_cost][:unpaid_amount] == 0
             
-            #社員IDから仕入先IDを取得
-            
-            #supplier_id = nil
-            #if params[:outsourcing_cost][:staff_id].present?
-            #  supplier_id = getStaffToSupplier(params[:outsourcing_cost][:staff_id].to_i)
-            #end
-            
-            #if supplier_id.present?
-              
-              
-            #  purchase_data = PurchaseDatum.where(:construction_datum_id => params[:outsourcing_cost][:construction_datum_id]).
-            #               where(:supplier_id => supplier_id).first
-            
-              if purchase_data.present?
+            if purchase_data.present?
                 
                 update_flag = true
                 
@@ -123,17 +120,32 @@ class OutsourcingCostsController < ApplicationController
                 payment_due_date = Date.strptime(payment_due_date_str, '%Y-%m-%d')  
                 
                 payment_date_str = params[:outsourcing_cost]["payment_date(1i)"] + "-" + params[:outsourcing_cost]["payment_date(2i)"] + "-" + params[:outsourcing_cost]["payment_date(3i)"]
-                payment_date = Date.strptime(payment_date_str, '%Y-%m-%d')  
-                                
-                #purchase_params = {outsourcing_payment_flag: 1}
-                purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date}
+                payment_date = Date.strptime(payment_date_str, '%Y-%m-%d')
+                
+                #add191101
+                if params[:outsourcing_cost]["unpaid_payment_date(1i)"].present? && params[:outsourcing_cost]["unpaid_payment_date(2i)"].present? && 
+                   params[:outsourcing_cost]["unpaid_payment_date(3i)"].present?
+                #未払金支払日を仕入データにセット
+                   #binding.pry
+                
+                   unpaid_payment_date_str = params[:outsourcing_cost]["unpaid_payment_date(1i)"] + "-" + 
+                                          params[:outsourcing_cost]["unpaid_payment_date(2i)"] + "-" + 
+                                          params[:outsourcing_cost]["unpaid_payment_date(3i)"]
+                   unpaid_payment_date = Date.strptime(unpaid_payment_date_str, '%Y-%m-%d')
+                   
+                  purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date, unpaid_payment_date: unpaid_payment_date}
+                else
+                #未払支払日がない場合
+                  purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date}
+                end             
+                
+                #purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date}
                 
                 #ヴァリデーションしない
                 purchase_data.assign_attributes(purchase_params)
                 purchase_data.save!(:validate => false)
                 
-              end
-            #end
+            end
             
             #purchase_data = PurchaseDatum.find
             
@@ -194,6 +206,11 @@ class OutsourcingCostsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def outsourcing_cost_params
-      params.require(:outsourcing_cost).permit(:construction_datum_id, :staff_id, :purchase_amount, :supplies_expense, :labor_cost, :misellaneous_expense, :execution_amount, :billing_amount, :purchase_order_amount, :closing_date, :payment_amount, :unpaid_amount, :payment_due_date, :payment_date, :unpaid_payment_date)
+      #udp190930 
+      #purchase_order_datum_id追加
+    
+      params.require(:outsourcing_cost).permit(:purchase_order_datum_id, :construction_datum_id, :staff_id, :purchase_amount, :supplies_expense, 
+                     :labor_cost, :misellaneous_expense, :execution_amount, :billing_amount, :purchase_order_amount, 
+                     :closing_date, :payment_amount, :unpaid_amount, :payment_due_date, :payment_date, :unpaid_payment_date)
     end
 end

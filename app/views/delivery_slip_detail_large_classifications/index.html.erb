@@ -37,8 +37,12 @@
 <%= link_to t('.new', :default => t("固有マスター")),
             new_working_specific_middle_item_path(move_flag: "3",  delivery_slip_header_id: params[:delivery_slip_header_id],  delivery_slip_header_name: params[:delivery_slip_header_name]),
             :class => 'btn btn-purple300_rsd keep-disp' %>
-<!---->
+<!--
 <%= link_to "納品書(提出用)PDF",
+            delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id], print_type: "1",  format: "pdf" ),
+            :class => 'btn btn-orange600_ftg keep-disp' , :target=>["_blank"] %>
+-->
+<%= link_to "納品書(プレビュー)PDF",
             delivery_slip_detail_large_classifications_path($delivery_slip_detail_large_classifications, delivery_slip_header_id: params[:delivery_slip_header_id], print_type: "1",  format: "pdf" ),
             :class => 'btn btn-orange600_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "納品書(提出／印付)PDF",

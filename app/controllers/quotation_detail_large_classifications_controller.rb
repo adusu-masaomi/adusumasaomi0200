@@ -1188,6 +1188,7 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                                   responsible1: @quotation_header.responsible1, responsible2: @quotation_header.responsible2, post: @quotation_header.post, 
                                   address: @quotation_header.address, house_number: @quotation_header.house_number, address2: @quotation_header.address2, 
                                   tel: @quotation_header.tel, fax: @quotation_header.fax, construction_period: @quotation_header.construction_period, 
+                                  construction_period_date1: @quotation_header.construction_period_date1, construction_period_date2: @quotation_header.construction_period_date2, 
                                   construction_post: @quotation_header.construction_post, construction_place: @quotation_header.construction_place, 
                                   construction_house_number: @quotation_header.construction_house_number, construction_place2: @quotation_header.construction_place2, 
                                   delivery_amount: @quotation_header.quote_price, 

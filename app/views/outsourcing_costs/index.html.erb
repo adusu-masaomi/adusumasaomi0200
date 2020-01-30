@@ -3,11 +3,15 @@
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   
   <%= search_form_for @q do |f| %>
-   
+  
+   <%= f.label :purchase_order_datum_id, '注文No：：' %>
+   <%= f.select :purchase_order_datum_id_eq, PurchaseOrderDatum.all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
+             {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
+ 
    <%= f.label :construction_code, '工事名　' %>
    <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, 
              {style: 'width:400px' , class: "searchableConstruction" } %>
-  
+   
    <%= f.label :staff_id, '社員' %>
    <%= f.select :staff_id_eq, Staff.all.map{|st| [st.staff_name, st.id]}, {include_blank: true}, { id: 'staff_id_eq', style: 'width:220px'} %>
    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStaff()" %>
@@ -65,21 +69,35 @@
           <td>-</td>
         <% end %>
         
-        <!--<td><%= outsourcing_cost.purchase_amount %></td>-->
-        <!--<td><%= outsourcing_cost.supplies_expense %></td>-->
-        <td><%= number_to_currency(outsourcing_cost.labor_cost * $consumption_tax_include, :precision => 0 ) %></td>
-        <!--<td><%= outsourcing_cost.misellaneous_expense %></td>-->
-        <!--<td><%= outsourcing_cost.execution_amount %></td>-->
+        <!--upd191206日付未入力なら現在日付にて判定、変更時は分岐させる-->
+        <% if outsourcing_cost.payment_due_date.present? %>
+          <% @due_date = outsourcing_cost.payment_due_date %>
+        <% else %>
+          <% @due_date = Date.today %>
+        <% end %>
+        
+        <% if @due_date >= Date.new(2019,10,1) %>
+          <td><%= number_to_currency(outsourcing_cost.labor_cost * $consumption_tax_include_per_ten, :precision => 0 ) %></td>
+        <% else %>
+          <td><%= number_to_currency(outsourcing_cost.labor_cost * $consumption_tax_include, :precision => 0 ) %></td>
+        <% end %>
         <td><%= number_to_currency(outsourcing_cost.billing_amount, :precision => 0 )  %></td>
-        <td><%= number_to_currency(outsourcing_cost.billing_amount * $consumption_tax_include, :precision => 0 ) %></td>
-        <!--<td><%= outsourcing_cost.purchase_order_amount %></td>-->
+        <% if @due_date >= Date.new(2019,10,1) %>
+          <td><%= number_to_currency(outsourcing_cost.billing_amount * $consumption_tax_include_per_ten, :precision => 0 ) %></td>
+        <% else %>
+          <td><%= number_to_currency(outsourcing_cost.billing_amount * $consumption_tax_include, :precision => 0 ) %></td>
+        <% end %>
         <td><%= outsourcing_cost.closing_date %></td>
         <td><%= number_to_currency(outsourcing_cost.payment_amount, :precision => 0 ) %></td>
         <td><%= number_to_currency(outsourcing_cost.unpaid_amount, :precision => 0 ) %></td>
-        <% if outsourcing_cost.unpaid_amount.present? %>
+        <% if outsourcing_cost.payment_amount.present? && outsourcing_cost.unpaid_amount.present?  %>
           <td><%= number_to_currency(outsourcing_cost.payment_amount + outsourcing_cost.unpaid_amount, :precision => 0 ) %></td>
         <% else %>
-          <td><%= number_to_currency(outsourcing_cost.payment_amount , :precision => 0 ) %></td>
+          <% if outsourcing_cost.payment_amount.present? %>		
+            <td><%= number_to_currency(outsourcing_cost.payment_amount , :precision => 0 ) %></td>
+          <% else %>
+            <td><%= number_to_currency(outsourcing_cost.unpaid_amount , :precision => 0 ) %></td>
+          <% end %>		
         <% end %>
         <td><%= outsourcing_cost.payment_due_date %></td>
         <td><%= outsourcing_cost.payment_date %></td>
@@ -109,7 +127,8 @@
   //検索可能なリストボックス
   $(document).ready(function(){
 	
-		$(".searchableConstruction").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+		$(".searchablePurchaseCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableConstruction").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
     
 		//見出し固定用設定追加
 		//var sz = window.parent.screen.width;

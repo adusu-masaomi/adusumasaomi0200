@@ -34,9 +34,12 @@
 <%= link_to t('.new', :default => t("固有マスター")),
             new_working_specific_middle_item_path(move_flag: "1",  quotation_header_id: params[:quotation_header_id],  quotation_header_name: params[:quotation_header_name]),
             :class => 'btn btn-purple300_rsd keep-disp' %>
-<%= link_to "見積書(提出用)PDF",
+<!--<%= link_to "見積書(提出用)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
-            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>
+            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] , :onclick => "submitAfterValidation()" %>-->
+<%= link_to "見積書(プレビュー)PDF",
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
+            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "見積書(提出／印付)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
             :class => 'btn btn btn-red500_ftg keep-disp' , :target=>["_blank"], id: 'quotation_print_2', :onclick => "submitAfterValidation()" %>
