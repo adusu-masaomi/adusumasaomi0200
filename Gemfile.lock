@@ -91,7 +91,7 @@ GEM
       railties (>= 3.2, < 5.2)
     font-awesome-sass (4.7.0)
       sass (>= 3.2)
-    geocoder (1.4.4)
+    geocoder (1.6.3)
     git-version-bump (0.15.1)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
