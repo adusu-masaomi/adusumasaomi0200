@@ -126,7 +126,7 @@
                                                         invoice_code: invoice_header.invoice_code,
                                                         quotation_code: invoice_header.quotation_code,
                                                         new_flag: "1"),
-            :class => 'btn btn-info' %>
+            :class => 'btn btn-info keep-disp' %>
         </td>
         <td><%= link_to invoice_header.id, invoice_header_path(invoice_header) %></td>
         <td><%= invoice_header.invoice_code %></td>

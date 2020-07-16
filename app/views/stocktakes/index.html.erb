@@ -1,4 +1,5 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
 <%- model_class = Stocktake -%>
 <div class="page-header", style="width:1920px">
   <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
@@ -102,12 +103,12 @@
         <td><%=l stocktake.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),
-                      edit_stocktake_path(stocktake), :class => 'btn btn-default btn-xs' %>
+                      edit_stocktake_path(stocktake), :class => 'btn btn-default btn-xs keep-disp' %>
           <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       stocktake_path(stocktake),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
-                      :class => 'btn btn-xs btn-danger' %>
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
         </td>
       </tr>
     <% end %>
@@ -119,7 +120,26 @@
  
   //検索可能なリストボックス
   $(document).ready(function(){
-   $(".searchableCategory").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableCategory").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+    
+    //見出し固定用設定追加
+	  var sz = window.parent.screen.width;
+	  var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	  var ht = 628;  //デフォルトの高さ(社長PC基準)old-586
+		
+	  if (sz < 1920) {
+	  //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        //fc = 3;  //固定列数
+        fc = 2;  //固定列数
+	    ht -= 50;
+        
+        sz = 1920; //for ipad pro!!
+    }
+	$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+       
+    
+    //画面位置保持用
+    $('form').keepPosition();
   });
  
  //入力チェック後の、更新処理

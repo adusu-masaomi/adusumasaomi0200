@@ -82,7 +82,11 @@ class EstimationSheetPDF
            end  
         end #loop end
        
-	   
+       
+       if $print_type == "4"
+         @notSumFlag = true
+       end
+       
        #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
 	   #upd170626
 	   quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
@@ -341,25 +345,32 @@ class EstimationSheetPDF
 					    end
                       end 
                       #  
+                      
+                      unit_price_or_notices = nil
+                      item_name = quotation_detail_large_classification.working_large_item_name
+                      
+                      if $print_type != "4"  #add200219
                       #小計、値引きの場合は項目を単価欄に表示させる為の分岐
-					  case quotation_detail_large_classification.construction_type.to_i
-					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
-                          item_name = ""
-						  unit_price_or_notices = quotation_detail_large_classification.working_large_item_name
-						  @quantity = ""
-						  @unit_name = ""
-						else
-                          item_name = quotation_detail_large_classification.working_large_item_name
-						  unit_price_or_notices = quotation_detail_large_classification.working_unit_price
-					  end
+					    case quotation_detail_large_classification.construction_type.to_i
+					        when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+                                item_name = ""
+						        unit_price_or_notices = quotation_detail_large_classification.working_large_item_name
+						        @quantity = ""
+						        @unit_name = ""
+						    else
+                                #item_name = quotation_detail_large_classification.working_large_item_name
+						        unit_price_or_notices = quotation_detail_large_classification.working_unit_price
+					    end
+                      end
 					  #
 					  
                       #add200127
                       quote_price = nil
-                      if @existsDetail == false #明細データがない場合
-                        quote_price = quotation_detail_large_classification.quote_price
+                      if $print_type != "4"  #add200219
+                       if @existsDetail == false #明細データがない場合
+                         quote_price = quotation_detail_large_classification.quote_price
+                       end
                       end
-                      
                       #明細欄出力
                       row.values working_large_item_name: item_name,
                        working_large_specification: quotation_detail_large_classification.working_large_specification,
@@ -567,18 +578,23 @@ class EstimationSheetPDF
 					end
                   end
                   #  
-                  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
-				  case quotation_detail_middle_classification.construction_type.to_i
-				  when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
+                  unit_price_or_notices = nil 
+                  item_name = quotation_detail_middle_classification.working_middle_item_name
+                  
+                  if $print_type != "4"   #upd200218
+                    #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+				    case quotation_detail_middle_classification.construction_type.to_i
+				    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
                     
-					item_name = ""
-					unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
-					@quantity = ""
-					@unit_name = ""
-				  else
-                    item_name = quotation_detail_middle_classification.working_middle_item_name
-					unit_price_or_notices = quotation_detail_middle_classification.working_unit_price
-				  end
+					    item_name = ""
+					    unit_price_or_notices = quotation_detail_middle_classification.working_middle_item_name
+					    @quantity = ""
+					    @unit_name = ""
+				    else
+                        #item_name = quotation_detail_middle_classification.working_middle_item_name
+					    unit_price_or_notices = quotation_detail_middle_classification.working_unit_price
+				    end
+                  end
 				  #
 					  
                   if quotation_detail_middle_classification.quote_price.present?
@@ -595,13 +611,19 @@ class EstimationSheetPDF
                     end
                   end
                   
+                  quote_price = nil
+                  if $print_type != "4"   #upd200218
+                    quote_price = quotation_detail_middle_classification.quote_price
+                  end
+                  
                    #明細欄出力
                   row.values working_middle_item_name: item_name,
                    working_middle_specification: quotation_detail_middle_classification.working_middle_specification, 
                    quantity: @quantity,
                    working_unit_name: @unit_name,
                    working_unit_price: unit_price_or_notices,
-                   quote_price: quotation_detail_middle_classification.quote_price
+                   #quote_price: quotation_detail_middle_classification.quote_price
+                   quote_price: quote_price
 				   
          		  
     	  end

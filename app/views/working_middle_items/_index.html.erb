@@ -1,4 +1,5 @@
-<% @working_middle_items.order("seq asc").each do |working_middle_item| %>
+<!-- upd200421 並びをseqから作成日時順に変更。 -->
+<% @working_middle_items.order("created_at desc").each do |working_middle_item| %>
      <tr id="<%= working_middle_item.id%>">
 	  
 	    <!--<td><%= link_to working_middle_item.id, working_middle_item_path(working_middle_item) %></td>-->

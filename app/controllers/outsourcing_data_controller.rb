@@ -1045,7 +1045,8 @@ class OutsourcingDataController < ApplicationController
     #add200124
     #資金繰のデータを削除
     set_cash_flow = SetCashFlow.new
-    set_cash_flow.destroy_outsourcing(@purchase_datum.purchase_order_datum_id)
+    set_cash_flow.destroy_outsourcing_expected(@purchase_datum.purchase_order_datum_id) #予定
+    set_cash_flow.destroy_outsourcing_actual(@purchase_datum.purchase_order_datum_id) #実際
     #
     
 	#
@@ -1098,11 +1099,11 @@ class OutsourcingDataController < ApplicationController
     end
     
     case supplier_id
-    when 37  #村山電気
+    when $SUPPLIER_MASER_ID_MURAYAMA_DENKI  #村山電気
       staff_id = 3
-    when 31  #須戸
+    when $SUPPLIER_MASER_ID_SUDO_DENKI  #須戸
       staff_id = 6
-    when 39  #小柳
+    when $SUPPLIER_MASER_ID_OYANAGI_DENKI  #小柳
       staff_id = 5
     else
     end

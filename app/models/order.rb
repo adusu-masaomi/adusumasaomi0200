@@ -9,6 +9,9 @@ class Order < ActiveRecord::Base
   belongs_to :unit_master
   belongs_to :purchase_order_history
   
+  #add200428
+  belongs_to :maker_master, :foreign_key => "maker_id"
+  
   #this is not work well.
   #validates :quantity, numericality: {
   #          only_integer: true, greater_than: 0

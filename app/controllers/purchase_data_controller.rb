@@ -1,7 +1,10 @@
 class PurchaseDataController < ApplicationController
   before_action :set_purchase_datum, only: [:show, :edit, :update, :destroy]
   
-  before_action :set_material, only: [:new, :edit]
+  #del200626
+  #before_action :set_material, only: [:new, :edit]
+  #add200626
+  #before_action :set_purchase_unit_price, only: [:new, :edit]
   
   #ransack保持用 
   #before_action only: [:index] do
@@ -21,7 +24,9 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_order_id = []
   @@purchase_datum_slip_code = []
   @@purchase_datum_construction_id = []
-  @@purchase_datum_supplier_id = []
+  #@@purchase_datum_supplier_id = []
+  @@purchase_datum_supplier_id = nil   #upd200626
+  
   @@purchase_datum_notes = ""
   @@purchase_datum_division_id = []
   
@@ -29,6 +34,8 @@ class PurchaseDataController < ApplicationController
   @@purchase_datum_unit_price_not_update_flag = ""
   
   @@new_flag = []
+  
+  #@@supplier_material = []    #add200626
   
   #見積用の定価
   @@list_price_quotation = 0
@@ -306,16 +313,24 @@ class PurchaseDataController < ApplicationController
 
        #初期値をセット(show画面からの遷移時のみ)
 	   if @@new_flag == "1"
+       #test del 200626
          @purchase_datum.purchase_date ||= @@purchase_datum_purchase_date
 	     @purchase_datum.purchase_order_datum_id ||= @@purchase_datum_order_id
 	     @purchase_datum.slip_code ||= @@purchase_datum_slip_code 
 	     @purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
-		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id
+		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id    #200626
+         
+         ##test
+         #@@supplier_material  = @@purchase_unit_prices.where(:supplier_id => @@purchase_datum_supplier_id).
+         #    where("supplier_id is NOT NULL").map{|x| [x.supplier_material_code, x.material_id]}
+         ##
          @purchase_datum.notes ||= @@purchase_datum_notes
          @purchase_datum.division_id ||= @@purchase_datum_division_id
          @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
-         #add171216
-		 @purchase_datum.unit_price_not_update_flag ||= @@purchase_datum_unit_price_not_update_flag
+         @purchase_datum.unit_price_not_update_flag ||= @@purchase_datum_unit_price_not_update_flag
+         
+         ####@purchase_unit_prices = PurchaseUnitPrice.all
+         
 	   end
 	   
        
@@ -336,10 +351,13 @@ class PurchaseDataController < ApplicationController
 
   # GET /purchase_data/1/edit
   def edit
-    	@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
+    #
+    #del200626
+    #@purchase_unit_prices = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", @purchase_datum.supplier_id, @purchase_datum.material_id])
     @material_masters = MaterialMaster.where(["id = ?", @purchase_datum.material_id]).pluck(:list_price)
 	@maker_masters = MakerMaster.where(["id = ?", @purchase_datum.material_id])
-	
+	#
+    
     #ここで資材マスターもセットしておく(動作軽減のため)
     #@@material_masters = MaterialMaster.all
     
@@ -672,9 +690,20 @@ class PurchaseDataController < ApplicationController
     if @purchase_unit_prices.present?
       #purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
       #                  unit_price: params[:purchase_datum][:purchase_unit_price]}
-      #upd180316
-      #単位も更新
+      
+      #仕入先用CDをセット
+	  if params[:purchase_datum][:supplier_material_code].present?
+        supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+	  else
+        #仕入先品番が未入力の場合は、登録済み品番をそのままセットする
+        #supplier_masterial_code = params[:purchase_datum][:material_code]
+        supplier_masterial_code = @purchase_unit_prices.supplier_material_code
+	  end
+      
+      #upd200714
+      #単位・品番も更新
       purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+                        supplier_material_code: supplier_masterial_code, 
                         unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
       
       @purchase_unit_prices.update(purchase_unit_prices_params)
@@ -725,9 +754,14 @@ class PurchaseDataController < ApplicationController
 	   #
 	   
 	 else
+       
        #工事コードのみの場合。
        if params[:construction_id].present?
-	     construction_id = params[:construction_id]
+         #add200716
+         #注番もデフォで１をセットしておく(主に出庫の場合で使用)
+	     @purchase_order_data = PurchaseOrderDatum.where("id >= ?", 1)
+         #
+         construction_id = params[:construction_id]
 	     @construction_data = ConstructionDatum.where("id >= ?", construction_id)
 	   end
 	 end
@@ -1103,6 +1137,7 @@ class PurchaseDataController < ApplicationController
   
   
   #得意先から締め日・支払日を算出
+  #未使用(200131)
   def get_customer_date_info
     
     require "date"
@@ -1239,16 +1274,33 @@ class PurchaseDataController < ApplicationController
      #end 
   end
 
+  
+  #得意先別の品番を絞り込むajax
+  #200626
+  #処理落ちがひどいので、アクセスしないようにする
   def supplier_item_select
-    @supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
+    
+    #if @@supplier_material.present?
+      #@supplier_material  = @@supplier_material
+    #@supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
+    #else
+    
+    if @@purchase_datum_supplier_id.nil?   #新規データで引き継いでる場合を除く(処理落ちする)
+      
+      @supplier_material  = PurchaseUnitPrice.where(:supplier_id => params[:supplier_id]).
+             where("supplier_id is NOT NULL").pluck("supplier_material_code, material_id")
+      
+      #binding.pry
+      #@supplier_material  = @@purchase_unit_prices.where(:supplier_id => params[:supplier_id]).
+      #       where("supplier_id is NOT NULL").map{|x| [x.supplier_material_code, x.material_id]}
+    end
     
     #add180514
     #資材マスターからも取得する
     if @supplier_material.present?
-      #@supplier_material += MaterialMaster.all.pluck("material_code", "id")
-      
-      #upd180627
-      @supplier_material += @@material_masters.pluck("material_code", "id")
+      #restore200626
+    #  @supplier_material += MaterialMaster.all.pluck("material_code", "id")
+       #@supplier_material += @@material_masters.all.map{|x| [x.material_code, x.id]}
     end
     
   end
@@ -1299,15 +1351,20 @@ class PurchaseDataController < ApplicationController
     end
 	
     #add180627
-    def set_material
+    #def set_material
+    ##  #ここで資材マスターもセットしておく(動作軽減のため)
+    #  @@material_masters = MaterialMaster.all
+    #end
+    #add200626
+    def set_purchase_unit_price
       #ここで資材マスターもセットしておく(動作軽減のため)
-      @@material_masters = MaterialMaster.all
+      @@purchase_unit_prices = PurchaseUnitPrice.all
     end
     
 	# Never trust parameters from the scary internet, only allow the white list through.
     def purchase_datum_params
       params.require(:purchase_datum).permit(:purchase_date, :slip_code, :purchase_order_datum_id, :construction_datum_id, 
-                     :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :unit_id, :purchase_unit_price, 
+                     :material_id, :material_code, :material_name, :maker_id, :maker_name, :quantity, :quantity2, :unit_id, :purchase_unit_price, :purchase_unit_price2,
                      :purchase_amount, :list_price, :division_id, :supplier_id, :inventory_division_id, :unit_price_not_update_flag, :outsourcing_invoice_flag, 
                      :notes, :purchase_header_id )
     end

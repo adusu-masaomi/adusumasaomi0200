@@ -42,7 +42,10 @@ class PurchaseDatum < ActiveRecord::Base
 	
 	attr_accessor :construction_datum_id_hide
 	attr_accessor :material_category_id_hide
-        
+    
+    #add200630
+    attr_accessor :price_disp_flag
+    
     #attr_accessor :parameters  #add180403
     #validation
     validates :material_id, presence: true
@@ -63,7 +66,9 @@ class PurchaseDatum < ActiveRecord::Base
     def purchase_order_code_check
 	#注文番号のチェック（既に集計済みなら除外する）
     #add171108  
-	  if construction_datum.calculated_flag == 1
+	  #if construction_datum.calculated_flag == 1
+      #upd200702
+      if construction_datum.present? && construction_datum.calculated_flag == 1
 	    errors.add(:purchase_order_datum_id, ": 工事集計済みのNoです。確認してください。" << 
         "　　　　　　　" << "（やむなく登録したい場合は、一旦集計フラグを解除して下さい。）")
       end 

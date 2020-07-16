@@ -1245,6 +1245,32 @@
             "y1": 140.7,
             "x2": 82,
             "y2": 156.7
+          },
+          {
+            "id": "lbl_unit_price_multi",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 586.9,
+            "y": 144.5,
+            "width": 9.1,
+            "height": 10.8,
+            "style": {
+              "font-family": [
+                "IPAGothic"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "*"
+            ]
           }
         ]
       },

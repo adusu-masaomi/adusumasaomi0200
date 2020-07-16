@@ -20,6 +20,10 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	attr_accessor :purchase_order_code
 	attr_accessor :construction_name
 	attr_accessor :supplier_name
+    
+    #fax
+    attr_accessor :format
+    #attr_accessor :fax_flag
 	
     #資材ID自動セット用
 	attr_accessor :material_id_hide

@@ -44,6 +44,9 @@ class PurchaseOrderHistoriesController < ApplicationController
     $purchase_order_date =  nil
     $supplier_master_id =  nil
     
+    #臨時FAX用
+    #binding.pry
+    
   end
   
   def index2
@@ -333,8 +336,11 @@ class PurchaseOrderHistoriesController < ApplicationController
     
     respond_to do |format|
 	  #if PurchaseOrderHistory.create(purchase_order_history_params)
-	  if @purchase_order_history.save!(:validate => false)   #upd170911
+	  if @purchase_order_history.save!(:validate => false)   
 	    
+        #臨時FAX用
+        set_order_data_fax(format)
+        
 		#メール送信する
 		send_email
 		
@@ -365,13 +371,16 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #メール送信済みフラグをセット
 	  #set_mail_sent_flag
 	  
-	  respond_to do |format|
+      respond_to do |format|
         
-		#binding.pry
+        #format.html
 		
 		if @purchase_order_history.update(purchase_order_history_params)
           
-		  
+		  #臨時FAX用
+          #save_only_flag = true
+          set_order_data_fax(format)
+          
 		  #メール送信する
 		  send_email
 		  
@@ -575,8 +584,12 @@ class PurchaseOrderHistoriesController < ApplicationController
 				  #supplier_material_code = params[:material_code][i]
 				  supplier_material_code = item[:material_code]
 				  
-				  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
-				  #岡田電気の場合のみ、品番のハイフンは抹消する
+                  #binding.pry
+                  
+				  #if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
+                  if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO  || 
+                                               supplier_id.to_i == $SUPPLIER_MASER_ID_OST)
+				  #岡田・オストの場合のみ、品番のハイフンは抹消する
 				      
 					  no_hyphen_code = supplier_material_code.delete('-')  
 					  
@@ -666,7 +679,41 @@ class PurchaseOrderHistoriesController < ApplicationController
     end
   end
   
-
+  def set_order_data_fax(format)
+    
+    
+    if params[:format] == "pdf"
+    #if params[:fax_flag] == "1"
+     
+      #params[:format] = "pdf"
+    
+     
+      #ｆａｘ用紙の発行
+	  save_only_flag = false
+       
+		  #global set
+      $purchase_order_history = @purchase_order_history 
+      
+      
+      #binding.pry
+    
+      
+      #pdf
+	    #@print_type = params[:print_type]
+      format.pdf do
+        report = OrderFaxPDF.create @order_fax 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "order_fax.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+    end
+    ##
+  end
+  
   # DELETE /purchase_order_histories/1
   # DELETE /purchase_order_histories/1.json
   def destroy

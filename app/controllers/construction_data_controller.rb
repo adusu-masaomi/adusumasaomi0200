@@ -165,7 +165,10 @@ class ConstructionDataController < ApplicationController
         
         #add200114
         #djangoの資金繰り用のデータ更新
-        set_cash_flow_detail
+        set_cash_flow = SetCashFlow.new
+        set_cash_flow.set_cash_flow_detail_expected_for_construction(params, @construction_datum)
+        
+        #set_cash_flow_detail
         
         #add180903
         #OneDrive用のディレクトリを作る
@@ -246,8 +249,10 @@ class ConstructionDataController < ApplicationController
       if @update
       
         #add200114
+        #set_cash_flow_detail
         #djangoの資金繰り用のデータ更新
-        set_cash_flow_detail
+        set_cash_flow = SetCashFlow.new
+        set_cash_flow.set_cash_flow_detail_expected_for_construction(params, @construction_datum)
       
 	  #if @construction_datum.update(construction_datum_params)
         
@@ -343,97 +348,89 @@ class ConstructionDataController < ApplicationController
     return false
   end
   
+  #delete later
   #add200114
   #資金繰り表用のデータ作成する
   #djangoのカラムのため、SQL操作
-  def set_cash_flow_detail 
-  
-    deposit_due_date = nil
-    
-    if params[:construction_datum][:deposit_due_date].present? 
-      deposit_due_date = params[:construction_datum][:deposit_due_date]
-    end
-    
-      args = ["select * from account_cash_flow_detail_expected where construction_id = ?", @construction_datum.id]
-      sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
-      result_params = ActiveRecord::Base.connection.select_all(sql)
-
-      #予定金額<>決定金額なら決定金額を優先する
-      expected_income = 0
-      if params[:construction_datum][:final_amount].present? && 
-        params[:construction_datum][:final_amount].to_i > 0
-        
-        #決定金額をセット
-        expected_income = params[:construction_datum][:final_amount]
-      else
-        #予定金額をそのままセット
-        if params[:construction_datum][:estimated_amount].present?
-          expected_income = params[:construction_datum][:estimated_amount]
-        end
-      end
-      #
-      
-      #add200122
-      #登録時に消費税をかける
-      if expected_income.present? && expected_income.to_i > 0
-        tmp_amount = expected_income.to_i * $consumption_tax_include_per_ten
-        expected_income = tmp_amount.to_s
-      end
-      
-      #支払先の銀行ID取得
-      payment_bank_id = 1  #デフォルトは北越にする
-      customer = nil
-      
-      if params[:construction_datum][:customer_id].present?
-        customer = CustomerMaster.find(params[:construction_datum][:customer_id].to_i)
-      end
-      
-      #現金予定のパターン有り？？
-      if customer.present?
-        if customer.payment_bank_id.present? && customer.payment_bank_id > 0
-          payment_bank_id = customer.payment_bank_id
-        end
-      end
-      #
-
-      #新規・更新処理
-      if result_params.rows.blank?
-        #新規追加
-        
-        if deposit_due_date.present?  #入金予定日が入ってなければ登録しない
-            args = ["INSERT INTO account_cash_flow_detail_expected(expected_date, construction_id, expected_expense, 
-                                            expected_income, payment_bank_id, payment_bank_branch_id, account_title_id, billing_year_month) VALUES(? ,? , ? ,? ,? , ? ,? ,?)", 
-                                        deposit_due_date, @construction_datum.id, 0, expected_income, payment_bank_id, 1, 1, "2020-01-01"]
-             
-            #account_title_idとbilling_year_monthは未使用だが適当な初期値を入れておく
-            #args = ["INSERT INTO account_cash_flow_detail_expected(expected_date, construction_id, expected_expense, 
-             #                               expected_income, payment_bank_id, payment_bank_branch_id, account_title_id, billing_year_month) VALUES(? ,? , ? ,? ,? , ? ,?, ?)", 
-             #                           deposit_due_date, @construction_datum.id, 0, expected_income, payment_bank_id, 1, 1, "2020-01-01"]
-            sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
-            result_params = ActiveRecord::Base.connection.execute(sql)
-        end
-      else
-        if deposit_due_date.present?
-            #更新
-            args = ["UPDATE account_cash_flow_detail_expected SET expected_date=?, expected_income=?, payment_bank_id=? where construction_id = ?" , 
-                                        deposit_due_date, expected_income, payment_bank_id, @construction_datum.id]
-            sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
-            result_params = ActiveRecord::Base.connection.execute(sql)
-        else
-           #すでにデータ存在していて、予定日が入ってなければ削除とする
-           args = ["DELETE FROM account_cash_flow_detail_expected where construction_id = ?" , 
-                                        @construction_datum.id]
-           sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
-           result_params = ActiveRecord::Base.connection.execute(sql)
-            
-        end
-      end
-      
-    #end
-  end
+  #def set_cash_flow_detail 
+  #  deposit_due_date = nil
+  #  if params[:construction_datum][:deposit_due_date].present? 
+  #    deposit_due_date = params[:construction_datum][:deposit_due_date]
+  #  end
+  #    args = ["select * from account_cash_flow_detail_expected where construction_id = ?", @construction_datum.id]
+  #    sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+  #    result_params = ActiveRecord::Base.connection.select_all(sql)
+  #    #予定金額<>決定金額なら決定金額を優先する
+  #    expected_income = 0
+  #    if params[:construction_datum][:final_amount].present? && 
+  #      params[:construction_datum][:final_amount].to_i > 0
+  #      #決定金額をセット
+  #      expected_income = params[:construction_datum][:final_amount]
+  #    else
+  #      #予定金額をそのままセット
+  #      if params[:construction_datum][:estimated_amount].present?
+  #        expected_income = params[:construction_datum][:estimated_amount]
+  #      end
+  #    end
+  #    #登録時に消費税をかける
+  #    if expected_income.present? && expected_income.to_i > 0
+  #      tmp_amount = expected_income.to_i * $consumption_tax_include_per_ten
+  #      expected_income = tmp_amount.to_s
+  #    end
+  #    #支払先の銀行ID取得
+  #    payment_bank_id = 1  #デフォルトは北越にする
+  #    payment_bank_branch_id = 1
+  #    customer = nil
+  #    if params[:construction_datum][:customer_id].present?
+  #      customer = CustomerMaster.find(params[:construction_datum][:customer_id].to_i)
+  #    end
+  #    #銀行によって支店を振り分ける(rails側では支店マスターがないため）
+  #    #現金予定のパターン有り？？
+  #    if customer.present?
+  #      if customer.payment_bank_id.present? && customer.payment_bank_id > 0
+  #        case payment_bank_id 
+  #        when $BANK_ID_SANSHIN_HOKUETSU
+  #          payment_bank_id = customer.payment_bank_id
+  #        when $BANK_ID_SANSHIN_TSUKANOME
+  #          payment_bank_id = customer.payment_bank_id
+  #          payment_bank_branch_id = $A_BANK_BRANSH_ID_SANSHIN_TSUKANOME
+  #        when $BANK_ID_SANSHIN_MAIN
+  #          payment_bank_id = $BANK_ID_SANSHIN_TSUKANOME  #会計sysでは塚野目と同じIDになっている
+  #          payment_bank_branch_id = $A_BANK_BRANSH_ID_SANSHIN_MAIN
+  #        end
+  #      end
+  #    end
+  #    #
+  #    #新規・更新処理
+  #    if result_params.rows.blank?
+  #      #新規追加
+  #      if deposit_due_date.present?  #入金予定日が入ってなければ登録しない
+  #          args = ["INSERT INTO account_cash_flow_detail_expected(expected_date, construction_id, expected_expense, 
+  #                                          expected_income, payment_bank_id, payment_bank_branch_id, account_title_id, billing_year_month) VALUES(? ,? , ? ,? ,? , ? ,? ,?)", 
+  #                                      deposit_due_date, @construction_datum.id, 0, expected_income, payment_bank_id, payment_bank_branch_id, 
+  #                                      1, "2020-01-01"]
+  #          sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+  #          result_params = ActiveRecord::Base.connection.execute(sql)
+  #      end
+  #    else
+  #      if deposit_due_date.present?
+  #          #更新
+  #          args = ["UPDATE account_cash_flow_detail_expected SET expected_date=?, expected_income=?, payment_bank_id=?, 
+  #                         payment_bank_branch_id=? where construction_id = ?" , 
+  #                                      deposit_due_date, expected_income, payment_bank_id, payment_bank_branch_id, @construction_datum.id]
+  #          sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+  #          result_params = ActiveRecord::Base.connection.execute(sql)
+  #      else
+  #         #すでにデータ存在していて、予定日が入ってなければ削除とする
+  #         args = ["DELETE FROM account_cash_flow_detail_expected where construction_id = ?" , 
+  #                                      @construction_datum.id]
+  #         sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
+  #         result_params = ActiveRecord::Base.connection.execute(sql)
+  #      end
+  #    end
+  #end
   
     
-  #190124
   #現場マスターへの新規追加又は更新
   def create_or_update_site
   

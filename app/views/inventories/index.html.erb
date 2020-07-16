@@ -8,10 +8,10 @@
   
   <%= search_form_for @q, :html => {:style=> 'width:1920px' } do |f| %>
     <%= f.label :material_code, '品番：：' %>
-    <!--<%= f.select :material_master_id_eq, MaterialMaster.all.map{|st| [st.material_code, st.id]}, {include_blank: true}, 
-	      {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
-	<%= f.select :material_master_id_eq, Inventory.all.map{|st| [st.material_master.material_code, st.material_master.id]}, {include_blank: true}, 
+  
+  <%= f.select :material_master_id_eq, Inventory.all.map{|st| [st.material_master.material_code, st.material_master.id]}, {include_blank: true}, 
 	      {style: 'width:220px' , class: "searchableMaterialCode" } %>
+
 	<%= f.label :material_name, '品名：' %>
     <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:330px', id: 'material_name'  %>
 	<%= f.label :inventory_category, 'カテゴリー：' %>
@@ -96,9 +96,16 @@
         <!--<td><%= inventory.warehouse_id %></td>-->
         <!--<td><%= inventory.location_id %></td>-->
         <!--<td><%= inventory.material_master_id %></td>-->
-        <td><%= inventory.material_master.material_code %></td>
-        <td><%= inventory.material_master.material_name %></td>
-        <td><%= inventory.inventory_quantity %></td>
+        <% if inventory.material_master.present? %>
+
+           <td><%= inventory.material_master.material_code %></td>
+           <td><%= inventory.material_master.material_name %></td>
+        <%else%>
+           <td>-</td>
+           <td>-</td>  
+        <%end%>
+
+         <td><%= inventory.inventory_quantity %></td>
 		<% if inventory.unit_master.present? %>
           <td><%= inventory.unit_master.unit_name %></td>
 		<% else %>
@@ -106,7 +113,11 @@
 		<% end %>
         <td><%= inventory.inventory_amount %></td>
         <td><%= inventory.current_unit_price %></td>
-        <td><%= inventory.material_master.list_price %></td>
+        <% if inventory.material_master.present? %>
+        	<td><%= inventory.material_master.list_price %></td>
+        <%else%>
+           <td>-</td>  
+        <%end%>
         <td><%=l inventory.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

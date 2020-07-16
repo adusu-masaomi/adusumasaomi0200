@@ -176,10 +176,88 @@ class StocktakesController < ApplicationController
 		  
 		  #在庫数量・在庫現在数量へ棚卸数量をそのまま上書き
 		  inventory_quantity = stocktake.physical_quantity
-		  current_quantity = stocktake.physical_quantity
-		  #上記同様に金額も上書き
-		  inventory_amount = stocktake.physical_amount
 		  
+          #del200629
+          #current_quantity = stocktake.physical_quantity
+		  #上記同様に金額も上書き
+		  #inventory_amount = stocktake.physical_amount
+		  
+          #add200629
+          #単価の違う在庫も考慮(但し、単価違いは２つまで考慮とする)
+          #差異数量=棚卸数-在庫数量
+          differ_quantity = stocktake.physical_quantity - inventory.inventory_quantity
+          
+          #現在単価も更新用に保持
+          current_quantity = inventory.current_quantity
+          current_unit_price = inventory.current_unit_price
+          
+          #次回単価も更新用に保持しておく
+          next_quantity_1 = inventory.next_quantity_1
+          next_unit_price_1 = inventory.next_unit_price_1
+          
+          #現在・次回履歴ID,入庫日も保持
+          current_history_id = inventory.current_history_id
+          current_warehousing_date = inventory.current_warehousing_date
+          next_history_id_1 = inventory.next_history_id_1
+          next_warehousing_date_1 = inventory.next_warehousing_date_1
+          #
+          
+          #差異を加減(現在数または次回ロット)
+          
+          if differ_quantity > 0 && inventory.next_quantity_1 > 0
+          #差異がプラスでロット２が存在する場合
+            #ロット２へ加算
+            next_quantity_1 = inventory.next_quantity_1 + differ_quantity
+          else
+          #差異プラスでロット２無、又は差異マイナスの場合
+            #ロット１へ加減算
+            current_quantity += differ_quantity
+            #current_quantity = inventory.current_quantity + differ_quantity
+            #unit_price_1 = inventory.current_unit_price
+            
+            #現在数(ロット１)がマイナスとなった場合、違う単価の在庫分ばあれば加減
+            #if current_quantity < 0
+            if current_quantity <= 0
+              if inventory.next_unit_price_1.present? && inventory.next_unit_price_1 > 0
+                differ_quantity_2 = current_quantity
+              
+                #現在数量単価(最初のストック)に上書きし、ストック２はクリアする
+                current_quantity = inventory.next_quantity_1 + differ_quantity_2
+                current_unit_price = inventory.next_unit_price_1
+                #履歴ID,入庫日をセット
+                current_history_id = next_history_id_1
+                current_warehousing_date = next_warehousing_date_1
+              
+                #次回数量単価(ストック２)をクリア
+                next_quantity_1 = nil
+                next_unit_price_1 = nil
+                next_history_id_1 = nil
+                next_warehousing_date_1 = nil
+                #
+              end
+            end
+            
+          end 
+          
+          #金額を計算
+          inventory_amount = current_quantity * current_unit_price
+          if next_quantity_1.present? && next_unit_price_1.present?
+            inventory_amount += next_quantity_1 * next_unit_price_1
+          end
+          
+          if inventory_amount.present?
+            inventory_amount = inventory_amount.to_i
+          end
+          
+          #next_quantity_1 = 0
+          #if current_quantity < 0
+          #  if inventory.next_unit_price_1.present? && inventory.next_unit_price_1 > 0
+          #    next_quantity_1 = current_quantity.abs
+          #    next_unit_price_1 = inventory.next_unit_price_1
+          #  end
+          #end
+          #
+          
 		  ##差異を加えるVer(元々の在庫が狂っている場合もあるので、これは使えないかも・・・)
 		  ##在庫Mへ差異数量を加える
 		  #inventory_quantity = inventory.inventory_quantity + differ_quantity
@@ -195,9 +273,17 @@ class StocktakesController < ApplicationController
 		  ###########
 		  
 		  #本来なら現在数量、現在単価にも影響する！！（今のところはそのままとする！！）
-	      inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
-                                     current_quantity: current_quantity }
-      
+	      #inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
+          #                           current_quantity: current_quantity }
+          inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
+                                     current_quantity: current_quantity, current_unit_price: current_unit_price,
+                                     current_history_id: current_history_id, current_warehousing_date: current_warehousing_date,
+                                     next_history_id_1: next_history_id_1, next_warehousing_date_1: next_warehousing_date_1,
+                                     next_quantity_1: next_quantity_1, next_unit_price_1: next_unit_price_1}
+          
+          #binding.pry
+         
+          
           inventory.update(inventory_update_params)
 	    end
 	    

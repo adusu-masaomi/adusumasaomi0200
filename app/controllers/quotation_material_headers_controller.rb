@@ -68,8 +68,8 @@ class QuotationMaterialHeadersController < ApplicationController
 	
   end
   
-  #pdf発行
-  def set_pdf(format)
+  #pdf(見積比較表)発行
+  def set_quotation_compare_pdf(format)
     #if params[:quotation_material_header][:sent_flag] == "3" then
       
   	  
@@ -93,6 +93,44 @@ class QuotationMaterialHeadersController < ApplicationController
         end
 	#end
   end
+
+  #pdf(見積ｆａｘ)発行
+  def set_quotation_fax_pdf(format)
+      
+	  $quotation_material_header = @quotation_material_header
+    
+        format.pdf do
+          report = QuotationFaxPDF.create @quotation_fax 
+        
+          # ブラウザでPDFを表示する
+          # disposition: "inline" によりダウンロードではなく表示させている
+          send_data report.generate,
+		      filename:    "見積ＦＡＸ.pdf",
+              type:        "application/pdf",
+              disposition: "inline"
+		  
+	      end
+	end
+
+  #pdf(注文ｆａｘ)発行
+  def set_quotation_order_fax_pdf(format)
+      
+	  $quotation_material_header = @quotation_material_header
+    $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
+    #仕入先（１〜３）の判定 "$supplier"にセットされる
+    setSupplier
+  
+    format.pdf do
+      report = QuotationOrderFaxPDF.create @quotation_order_fax 
+        
+      # ブラウザでPDFを表示する
+      # disposition: "inline" によりダウンロードではなく表示させている
+      send_data report.generate,
+		  filename:    "見積注文ＦＡＸ.pdf",
+        type:        "application/pdf",
+        disposition: "inline"
+		end
+	end
 
 
   # GET /quotation_material_headers/1
@@ -391,7 +429,8 @@ class QuotationMaterialHeadersController < ApplicationController
 		
 		    if params[:format] == "pdf"  
 		    #pdf発行
-          set_pdf(format)
+          
+            set_quotation_compare_pdf(format)
 		    else
 	  	  #通常の更新の場合
 		      format.html {redirect_to quotation_material_header_path( @quotation_material_header,
@@ -436,8 +475,22 @@ class QuotationMaterialHeadersController < ApplicationController
 		  
 		      if params[:format] == "pdf"  
 		      #pdf発行
-            set_pdf(format) 
-		
+          
+            #params[:quotation_material_header][:sent_flag] == "4"
+            
+            #upd200428
+            if params[:quotation_material_header][:sent_flag] == "4"
+            #見積比較ＦＡＸ
+              set_quotation_compare_pdf(format) 
+		        elsif params[:quotation_material_header][:sent_flag] == "5"
+            #見積ＦＡＸ
+              set_quotation_fax_pdf(format)
+            elsif params[:quotation_material_header][:sent_flag] == "6"
+            #注文ＦＡＸ
+              #binding.pry
+              
+              set_quotation_order_fax_pdf(format)
+            end
 		      else
 		      #通常の更新の場合
             format.html {redirect_to quotation_material_header_path( 
@@ -465,8 +518,8 @@ class QuotationMaterialHeadersController < ApplicationController
   
   def destroy_before_update
     #すでに登録していた注文データは一旦抹消する。
-	quotation_material_header_id = @quotation_material_header.id
-	QuotationMaterialDetail.where(quotation_material_header_id: quotation_material_header_id).destroy_all
+    quotation_material_header_id = @quotation_material_header.id
+    QuotationMaterialDetail.where(quotation_material_header_id: quotation_material_header_id).destroy_all
   end
   
   # DELETE /quotation_material_headers/1
@@ -628,8 +681,10 @@ class QuotationMaterialHeadersController < ApplicationController
 				  
 				      supplier_material_code = item[:material_code]
 				  
-				      if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
-				      #岡田電気の場合のみ、品番のハイフンは抹消する
+				      #if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO )
+              if supplier_id.present? && ( supplier_id.to_i == $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO  || 
+                                               supplier_id.to_i == $SUPPLIER_MASER_ID_OST)
+				      #岡田・オストの場合のみ、品番のハイフンは抹消する
 				        no_hyphen_code = supplier_material_code.delete('-')  
 					      if no_hyphen_code.present?
 				          supplier_material_code = no_hyphen_code

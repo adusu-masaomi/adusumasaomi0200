@@ -19,7 +19,7 @@
    <% end %>
    
 </div>
-<div style="width:1280px;">
+<div style="width:1580px;">
 <%= link_to t('.new', :default => t("新規作成")),
             new_quotation_detail_large_classification_path(quotation_header_id: params[:quotation_header_id], quotation_header_name: params[:quotation_header_name],
 			   new_flag: "1"), remote: true,
@@ -40,6 +40,9 @@
 <%= link_to "見積書(プレビュー)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "1", format: "pdf"),
             :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] %>
+<%= link_to "見積書(単抜/印付)PDF",
+            quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "4", format: "pdf"),
+            :class => 'btn btn-cyan500_ftg keep-disp' , :target=>["_blank"] %>
 <%= link_to "見積書(提出／印付)PDF",
             quotation_detail_large_classifications_path(quotation_header_id: params[:quotation_header_id], print_type: "3", format: "pdf"),
             :class => 'btn btn btn-red500_ftg keep-disp' , :target=>["_blank"], id: 'quotation_print_2', :onclick => "submitAfterValidation()" %>

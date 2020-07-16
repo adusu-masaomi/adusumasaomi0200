@@ -100,7 +100,10 @@ class WorkingMiddleItemsController < ApplicationController
 		   $sort = "reverse"
            #@working_middle_items  = @working_middle_items.order('seq ASC') #add180306
 		 end
-	     
+	  else
+      #add200528
+      #カテゴリー等のクエリーのみある場合
+         @working_middle_items  = @working_middle_items.order('seq ASC') 
       end
       
 	end

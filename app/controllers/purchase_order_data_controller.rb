@@ -18,9 +18,9 @@ class PurchaseOrderDataController < ApplicationController
   # Userクラスを作成していないので、擬似的なUser構造体を作る
   #MailUser = Struct.new(:name, :email)
 
-  # GET /purchase_order_data
-  # GET /purchase_order_data.json
-  def index
+# GET /purchase_order_data
+# GET /purchase_order_data.json
+def index
     
 	#ransack保持用コード
     query = params[:q]
@@ -40,22 +40,25 @@ class PurchaseOrderDataController < ApplicationController
 	
 	 #@q = PurchaseOrderDatum.ransack(params[:q])   
 	 #ransack保持用--上記はこれに置き換える
-     @q = PurchaseOrderDatum.ransack(query)   
-     #ransack保持用コード
-     search_history = {
-     value: params[:q],
-     #expires: 240.minutes.from_now
-	 expires: 24.hours.from_now
-     }
+     
+    @q = PurchaseOrderDatum.ransack(query)   
+    #ransack保持用コード
+    search_history = {
+    value: params[:q],
+    #expires: 240.minutes.from_now
+	  expires: 24.hours.from_now
+    }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
 		
     @purchase_order_data  = @q.result(distinct: true)
     @purchase_order_data  = @purchase_order_data.page(params[:page])
 
-
     @construction_data = ConstructionDatum.all
   
+    #臨時FAX用
+    #binding.pry
+    #set_order_data_fax(format)
 end
 
   # GET /purchase_order_data/1
@@ -133,10 +136,16 @@ end
 	
     respond_to do |format|
       if @purchase_order_datum.save
-        #format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully created.' }
-        #format.json { render :show, status: :created, location: @purchase_order_datum }
-		
-		format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+        
+        #臨時FAX用
+        save_only_flag = true
+        set_order_data_fax(format)
+        
+        if save_only_flag
+		      format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+        else
+          format.json { render :show, status: :ok, location: @purchase_order_datum }
+        end
       else
         format.html { render :new }
         format.json { render json: @purchase_order_datum.errors, status: :unprocessable_entity }
@@ -152,13 +161,13 @@ end
   # PATCH/PUT /purchase_order_data/1.json
   def update
    
-   #メール送信する(メール送信ボタン押した場合)
-	if params[:send].present?
+    ###
+    #メール送信する(メール送信ボタン押した場合)
+	  if params[:send].present?
       
       #画面のメアドをグローバルへセット
       $email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
       
-      #add180405
       #CC用に担当者２のアドレスもグローバルへセット
       $email_responsible2 = nil
       if params[:purchase_order_datum][:supplier_master_id].present?
@@ -173,23 +182,43 @@ end
       #インスタンスへパラメータを再セット
       reset_parameters
 	  
-	  #メール送信フラグをセット
+	    #メール送信フラグをセット
       params[:purchase_order_datum][:mail_sent_flag] = 1
-	  
-	  PostMailer.send_when_update(@purchase_order_datum).deliver
-	end
-	
+	    
+      #moved200519
+	    #PostMailer.send_when_update(@purchase_order_datum).deliver
+	  end
+    ###
    
-   #
    
    respond_to do |format|
    
+     
       if @purchase_order_datum.update(purchase_order_datum_params)
+        
+        #moved 200519
+        ###
+        #メール送信する(メール送信ボタン押した場合)
+	      if params[:send].present?
+          PostMailer.send_when_update(@purchase_order_datum).deliver
+	      end
+        ###
+        
+        save_only_flag = true
+     
+        #臨時FAX用
+        set_order_data_fax(format)
+     
+       
         #format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully updated.' }
-	    #format.json { render :show, status: :ok, location: @purchase_order_datum , construction_id: params[:construction_id], move_flag: params[:move_flag]}
-		
-        format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
-		
+	      #format.json { render :show, status: :ok, location: @purchase_order_datum , construction_id: params[:construction_id], move_flag: params[:move_flag]}
+		    if save_only_flag
+    
+          format.html {redirect_to purchase_order_datum_path(@purchase_order_datum, :construction_id => params[:construction_id], :move_flag => params[:move_flag])}
+		    else
+          format.json { render :show, status: :ok, location: @purchase_order_datum }
+        
+        end
       else
         format.html { render :edit }
         format.json { render json: @purchase_order_datum.errors, status: :unprocessable_entity }
@@ -198,6 +227,32 @@ end
 	
 	
   end
+  
+  def set_order_data_fax(format)
+    
+    if params[:format] == "pdf"
+     #ｆａｘ用紙の発行
+		  save_only_flag = false
+       
+		  #global set
+      $purchase_order_datum = @purchase_order_datum 
+        
+      #pdf
+	    #@print_type = params[:print_type]
+      format.pdf do
+        report = OrderNumberFaxPDF.create @order_number_fax 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "order_number_fax.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+    end
+    ##
+  end
+  
   
   def set_construction_default
   #工事一覧画面等から遷移した場合に、フォームに初期値をセットさせる    

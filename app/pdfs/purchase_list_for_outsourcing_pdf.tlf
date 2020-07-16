@@ -275,15 +275,15 @@
             "type": "text",
             "display": true,
             "description": "",
-            "x": 678,
+            "x": 671,
             "y": 102.7,
-            "width": 34.5,
+            "width": 53.3,
             "height": 11.1,
             "style": {
               "font-family": [
                 "IPAPGothic"
               ],
-              "font-size": 8,
+              "font-size": 7,
               "color": "#000000",
               "text-align": "left",
               "vertical-align": "top",
@@ -293,7 +293,7 @@
               "font-style": []
             },
             "texts": [
-              "支払金額"
+              "支払金額(税込)"
             ]
           },
           {
@@ -301,15 +301,15 @@
             "type": "text",
             "display": true,
             "description": "",
-            "x": 737,
+            "x": 730,
             "y": 102.7,
-            "width": 32,
+            "width": 53.3,
             "height": 11.1,
             "style": {
               "font-family": [
                 "IPAPGothic"
               ],
-              "font-size": 8,
+              "font-size": 7,
               "color": "#000000",
               "text-align": "left",
               "vertical-align": "top",
@@ -319,7 +319,7 @@
               "font-style": []
             },
             "texts": [
-              "未払金額"
+              "未払金額(税込)"
             ]
           },
           {
@@ -1221,6 +1221,38 @@
             "y1": 140.6,
             "x2": 782,
             "y2": 157.4
+          },
+          {
+            "id": "source_bank",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 840.3,
+            "y": 145.8,
+            "width": 10,
+            "height": 8.7,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
           }
         ]
       },

@@ -27,7 +27,6 @@
     <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", 
          class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
   <% end %>
-  
   <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
   <%= f.simple_fields_for :@purchase_order_datum do |m| %>
   <%= m.label :件名Ｎｏ参照用, {:class => "my-custom-class-lr"} %>
@@ -68,7 +67,9 @@
   
   <%= f.label :仕入先品番（検索用） , {:class => "my-custom-class-l"} %>
   <%= f.collection_select :supplier_material_code, PurchaseUnitPrice.all, :id, :supplier_material_code, {:include_blank => true} , 
-      {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px', :tabindex=>"6"} %>
+        {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px', :tabindex=>"6"} %>
+  
+  <!--               -->
   
   <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
   <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;width:100px'}  %></br>
@@ -82,10 +83,10 @@
   </div>
   <!--<%= f.hidden_field :material_masters, :value => @material_masters, id:"material_list_price" %>-->
   
-  <!--<%= f.label :品名 , {:class => "my-custom-class-l"} %></br>-->
-  <!--<%= f.collection_select :material_name, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {name: 'lstMaterialName' ,:class => "my-custom-class-r"}  %></br>-->
   <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , 
-  {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l", :hidden => true }  %></br></br></br></br></br></br>
+  {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l", :hidden => true }  %>
+  
+  </br></br></br></br></br></br>
   
   <%= f.input :material_name, label: "品名（手入力用）", hint: "品番が”＜手入力用＞”以外は全てマスターへ反映されるのでご注意下さい！！", label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"9"  }  %>
   <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
@@ -106,14 +107,29 @@
     <%= m.input :last_unit_price , input_html:{ id:"last_unit_price"}, as: :hidden %>
     <%= m.input :last_unit_price_update_at , input_html:{ id:"last_unit_price_update_at"} ,as: :date_picker, as: :hidden %>
   <% end %>
-
-  <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"12" , :onfocusout => "calcMoney(this.form)" } %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"12" , :onfocusout => "calcMoney(this.form)" } %>
+  </div>
+  <%= f.input :quantity2 , label: "数量(在庫時)" , input_html:{ id: "quantity2", :tabindex=>"20", style: 'width:100px;' } %>
+  
   <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
   <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
   <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"13" , style: 'width:110px;' , :class => "searchableUnit"} %>
-  <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
-  <%= f.check_box :unit_price_not_update_flag, {id:"unit_price_not_update_flag"}, '1', '0' %>
-  <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック' %> 
+  </br>
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
+  </div>
+  <%= f.input :purchase_unit_price2, label: "単価２(在庫時)", input_html:{id:"purchase_unit_price2", :tabindex=>"21", style: 'width:100px;' } %>
+  
+  <div class="col-lg-6" , style="margin-left : -15px">
+    <%= f.check_box :price_disp_flag, {id:"price_disp_flag", :class => "price_disp_flag"}, '1', '0' %>
+    <%= f.label_tag :price_disp_flag, '単価/金額を表示(在庫時)' %> 
+  </div>
+  
+  <%= f.check_box :unit_price_not_update_flag, {id:"unit_price_not_update_flag" }, '1', '0' %>
+  <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック', {id:"label_unit_price_not_update_flag"} %> 
+  
   <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"15"} %>
   <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
   
@@ -142,7 +158,10 @@
   -->
   
   </br>
-	   
+
+   <!--add200707-->
+   <%= f.input :id, input_html:{id:'id'}, as: :hidden  %>
+   
   <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
   <%= f.input :material_category_id_hide, input_html:{id:'material_category_id_hide'}, as: :hidden  %>
     
@@ -160,7 +179,9 @@
   <%= hidden_field_tag(:supplier_master_id, params[:supplier_master_id]) %>
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   <!-- -->
-  
+
+
+  <!--検証中-->
   <%= f.button :submit, :class => 'btn-primary', :tabindex=>"19" %>
   
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
@@ -218,7 +239,8 @@
        index = obj.selectedIndex;
        //品番・品名をセット
 	   setItem(index);
-	   //単価をセット
+	   
+        //単価をセット
 	    setUnitPrice();
         
         //資材分類をセット
@@ -256,17 +278,9 @@
          var supplier_material_code = $('.searchableSupplierItem').select2('data')[0].text;
 		 document.getElementById("supplier_material_code").value = supplier_material_code;
 		 
-		 
-		 //資材Mのインデックスも変更
-		 //document.getElementById("material_id").options[index].selected = true;
-		 
          $(".searchableItem").val(index).trigger("change");
 		 
-		//品番・品名をセット
-		//setItem(index);
-		//単価をセット
-		//setUnitPrice();
-	  });
+		});
 	  
 	 
       $(".searchableMaker").select2({ theme: "bootstrap" });
@@ -288,14 +302,11 @@
 	 //検索可能なリストボックス(仕入業者の場合)
      $(".searchableSupplier").select2({ theme: "bootstrap" });
      $( ".searchableSupplier" ).change(function(e) {
-       //setUnitPrice();
-	   setSupplierItem();
+       //del200626
+       //処理落ちひどいので行わない
+       //setSupplierItem();
      });
      
-	 //select2読み込んだ場合の処理
-	 //$( ".searchableSupplier" ).on("select2:loaded", function (e) {
-	 //  setSupplierItem();
-	 //});
 	 
 	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
 	 $( ".searchableSupplier" ).on("select2:close", function (e) {
@@ -371,37 +382,48 @@
       });
 	  
       
+      //add200702
+      //単価の表示非表示チェック
+	  $('.price_disp_flag').on('change', function(){
+         if ($(this).is(':checked')) {
+		 //チェックされた場合
+           //debugger;
+           visibleOffOnShipping(true);
+		 }else{
+		 //チェック外した場合
+		   visibleOffOnShipping(false);
+		 }
+      });
+      
       //外注請求書用のチェック
       //一旦保留・・・
-      var checkbox = document.getElementById('outsourcing_invoice_flag');
-      //var details_div = document.getElementById('card_details');
-      checkbox.onchange = function() {
-        if(this.checked) {
-          var construction_datum_id = $("#construction_datum_id").val();
-          var supplier_id = $("#supplier_id").val();
-		  
-          if (document.getElementById('purchase_unit_price').value == "" || 
-               parseInt(document.getElementById('purchase_unit_price').value) == 0)
-          {
-	        $.get("<%= purchase_datum_get_labor_cost_path %>",
-              { construction_datum_id: construction_datum_id, supplier_id: supplier_id },
-                function(data){ 
-                     if (document.getElementById('unit_price_hide').innerText != undefined)
-                     {
-                       //労務費を単価にセット
-                       document.getElementById('purchase_unit_price').value = document.getElementById('unit_price_hide').innerText;
-                       //金額へもそのままセット
-                       document.getElementById('purchase_amount').value = document.getElementById('purchase_unit_price').value;
-                     }
-                }
-            );
-          }
+      //var checkbox = document.getElementById('outsourcing_invoice_flag');
+      //checkbox.onchange = function() {
+      //  if(this.checked) {
+      //    var construction_datum_id = $("#construction_datum_id").val();
+      //    var supplier_id = $("#supplier_id").val();
+	 //     if (document.getElementById('purchase_unit_price').value == "" || 
+     //          parseInt(document.getElementById('purchase_unit_price').value) == 0)
+      //    {
+	  //     $.get("<%= purchase_datum_get_labor_cost_path %>",
+      //        { construction_datum_id: construction_datum_id, supplier_id: supplier_id },
+      //          function(data){ 
+      //               if (document.getElementById('unit_price_hide').innerText != undefined)
+      //               {
+      //                 //労務費を単価にセット
+      //                 document.getElementById('purchase_unit_price').value = document.getElementById('unit_price_hide').innerText;
+      //                 //金額へもそのままセット
+       //                document.getElementById('purchase_amount').value = document.getElementById('purchase_unit_price').value;
+       //              }
+       //         }
+       //     );
+       //   }
         
         //    details_div.style['display'] = 'block';
-        } else {
+        //} else {
           //debugger;
-        }
-      };
+        //}
+      //};
 	
    });
    
@@ -432,10 +454,11 @@
    //フォームロード時のイベント
    window.onload = function(){
   //    $(".searchableSupplier").val(index).trigger("change");
-     setSupplierItem();
-	 
-	 
      
+     //del200626 
+     //処理落ちひどいので行わない
+     //setSupplierItem();
+	      
 	 //品名をデフォルトでセット（フリー入力以外はマスターから取得)
 	 //$(".searchableItem").trigger("change");
 	 obj = document.getElementById("material_id");
@@ -447,6 +470,15 @@
 	 if (out == "1"){
 	   setDefaultOursourcing();
 	 }
+     
+     //add200702
+     division_id = document.getElementById("division_id").value;
+	 division_id = parseInt(division_id);
+     if (division_id == INDEX_DIVISION_SHIPPING) {
+       //単価・金額(非表示)
+       visibleOffOnShipping(false);
+     }
+     //
      
 	 //add180220
      //initialMurayama();
@@ -484,18 +516,58 @@
 	   //document.getElementById("inventory_division_id").selectedIndex = INDEX_INVENTORY_SHIPPING;
 	   document.getElementById("inventory_division_id").value = INDEX_INVENTORY_SHIPPING;
 	   
+       //upd200630
+       var index = INDEX_SUPPLIER_OWN_COMPANY;  //自社のコードにする
+       $(".searchableSupplier").val(index).trigger("change"); 
+       //単価・金額(非表示)
+       //add200701
+       visibleOffOnShipping(false);
+       //
+       
 	   //かつ、在庫マスターの単価を持ってくる！！
 	   getInventoryUnitPricesAndSupplier();
 	   
+       //add200701
+       //出庫時の単価(2)の計算
+       //calcMoneyOnInventoryShipping();
+       
 	 }else{
 	   
+       //add200701
+       //単価・金額(表示)
+       visibleOffOnShipping(true);
+       
 	   if (inventory_division_id == INDEX_INVENTORY_STOCK){
 	   //add171011入庫の場合もチェック入れる
 	     document.getElementById("unit_price_not_update_flag").checked = true;
 	   }else{
 	     document.getElementById("unit_price_not_update_flag").checked = false;
-	   }
+       }
+       //add200710
+       //金額を再計算させる(出庫以外)
+       calcMoneyNormal();
 	 }
+   }
+   
+   //出庫時に単価・金額を表示・非表示にする
+   function visibleOffOnShipping(visible){
+     
+     var cond;
+     if (visible == false){
+       cond = "none";    //非表示
+     }else{
+       cond = "block";   //表示
+     }
+          
+     document.getElementById("quantity2").style.display = cond;
+     document.getElementById("purchase_unit_price").style.display = cond;
+     document.getElementById("purchase_unit_price2").style.display = cond;
+     document.getElementById("purchase_amount").style.display = cond;
+     document.getElementById("list_price").style.display = cond;
+     //checkbox
+     //document.getElementById("label_unit_price_not_update_flag").style.display = cond;
+     //document.getElementById("unit_price_not_update_flag").style.display = cond;
+       
    }
    
    //入庫・出庫は「単価マスタを更新しない」フラグにチェックを入れる)--入出庫区分選択した場合。
@@ -505,12 +577,20 @@
 	 if (inventory_division_id == INDEX_INVENTORY_SHIPPING){
 	   document.getElementById("division_id").value = INDEX_DIVISION_SHIPPING;
 	   
-	   //かつ、在庫マスターの単価を持ってくる！！
+       visibleOffOnShipping(false);
+       
+       //かつ、在庫マスターの単価を持ってくる！！
 	   getInventoryUnitPricesAndSupplier();
-	   
+       
+       //add200701
+       //出庫時の単価の計算
+       calcMoneyOnInventoryShipping();
+    	   
 	 }
 	 //入庫の場合、仕入区分は”仕入”にする
 	 if (inventory_division_id == INDEX_INVENTORY_STOCK){
+       visibleOffOnShipping(true);
+     
 	   document.getElementById("division_id").value = INDEX_DIVISION_PURCHASE;
 	 }
 	 
@@ -532,13 +612,43 @@
    //在庫Mより現在単価・業者を取得する（出庫の場合に取得する）--ajax利用
    function getInventoryUnitPricesAndSupplier() {
      material_id = document.getElementById("material_id").value;
-	 $.get("<%= inventoriez_get_unit_price_path %>",
+     
+     if (material_id != "")
+     {
+	    $.get("<%= inventoriez_get_unit_price_path %>",
           {material_id: material_id },
           function(data){
 		    obj = document.getElementById("unit_price_hide").textContent;
 			//obj = document.getElementById("unit_price_hide").textContent;
 			document.getElementById("purchase_unit_price").value = obj;
-	 });
+            
+            //debugger;
+            
+            //add200630
+            //在庫登録されてない場合
+            if (obj == ""){
+              alert('在庫登録されてないか、在庫がありません。単価を確認後\n入力して下さい。');
+              visibleOffOnShipping(true);  //単価表示させる
+            }else{
+              visibleOffOnShipping(false);  //単価(非表示)
+              
+              //金額のあった場合は、金額計算させる
+              //add200707
+              if (document.getElementById("quantity").value != ""){
+                
+                amount = document.getElementById("quantity").value * obj;
+                document.getElementById("purchase_amount").value = amount;
+                
+                //add200701
+                //出庫時の単価(2)の計算
+                calcMoneyOnInventoryShipping();
+       
+              }
+            }
+            
+            //debugger;
+	    });
+      }
    }
    
    //外注の場合のパラメータ初期値
@@ -615,13 +725,17 @@
 	   }
 	   // 
 		  
-	     if (blnSame == false){
+	    if (blnSame == false){
 	       //品番は手入力用とみなし、１をセット。
-	       $(".searchableItem").val(1).trigger("change");
-	   
-           document.getElementById("material_code").value = 
-            document.getElementById("supplier_material_code").value;
+	       //del200714
+           //$(".searchableItem").val(1).trigger("change");
+           //upd200714 手入力の場合のみ、品番を客先品番のものに書き換える
+	       if (document.getElementById("material_id").value == "1"){
+             document.getElementById("material_code").value = 
+              document.getElementById("supplier_material_code").value;
+           }
 	    }
+      
       }
    }
    
@@ -676,6 +790,7 @@
      division_id = document.getElementById("division_id").value;
      if (division_id == INDEX_DIVISION_SHIPPING) {
        getInventoryUnitPricesAndSupplier();
+       
      }
    }
    
@@ -709,7 +824,14 @@
       var material_id = document.getElementById("material_id").value;
       var last_unit_price_update_at = document.getElementById("last_unit_price_update_at").value;
 	  
-	  if (material_id > 1) {
+      //add200629
+      division_id = document.getElementById("division_id").value;
+      //if (division_id == INDEX_DIVISION_SHIPPING) {
+      
+      
+	  //if (material_id > 1) {
+      //upd200629  出庫の場合は除く
+      if (material_id > 1 && division_id != INDEX_DIVISION_SHIPPING) {
 	  
         $.get("<%= purchase_datum_unit_price_select_path %>",
             { supplier_id: supplier_id, material_id: material_id },
@@ -719,6 +841,8 @@
 			  obj = document.getElementById("unit_price_hide").textContent;
 			  
               document.getElementById("purchase_unit_price").value = obj;
+              
+              //debugger;              
 			 
 			  //金額の計算も行う
 			  //add171216
@@ -751,7 +875,8 @@
           );
      }
    }
-
+   
+   //200626 処理落ちひどいので以下は保留とする
    //仕入先品番をセット(Ajax)
    function setSupplierItem(){
      var supplier_id = document.getElementById("supplier_id").value;
@@ -830,13 +955,89 @@
     var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
    
    
-   
     if (f.last_unit_price_update_at.value <= purchase_date_set){
      f.last_unit_price.value = f.purchase_unit_price.value;
      f.last_unit_price_update_at.value = purchase_date_set;
 	
     }
-  }
     
+    //add200701
+    //出庫時の単価の計算
+    calcMoneyOnInventoryShipping();
+  }
+  //金額計算(フォーム経由しないver)
+  //区分を出庫から仕入に切り替えた場合を想定
+  function calcMoneyNormal()
+  {
+    //debugger;
+    if (document.getElementById("quantity").value != "" && document.getElementById("purchase_unit_price").value != "")
+    {
+        var num = document.getElementById("quantity").value * document.getElementById("purchase_unit_price").value ;
+    
+        //小数点以下を切り捨て
+        document.getElementById("purchase_amount").value  = Math.floor(num);
+        
+        //数量２・単価２をクリア
+        document.getElementById("quantity2").value = "";
+        document.getElementById("purchase_unit_price2").value = "";
+    }
+    
+    // 仕入単価をセット
+    //単価Mの直近単価も更新
+    
+    //出庫時の単価の計算
+    //出庫区分の選択はないものとする
+    //calcMoneyOnInventoryShipping();
+  }
+  
+  //出庫時の単価の計算
+  function calcMoneyOnInventoryShipping()
+  {
+    //add200629
+    //出庫の場合は、次の単価になってないか見る必要がある
+    division_id = document.getElementById("division_id").value;
+    if (division_id == INDEX_DIVISION_SHIPPING) {
+      var material_id = document.getElementById("material_id").value;
+      var quantity = document.getElementById("quantity").value;
+      var id = document.getElementById("id").value;
+      var purchase_unit_price = document.getElementById("purchase_unit_price").value;
+      
+      if (material_id != "" && quantity != "" && quantity != "0")
+      {
+         //debugger;
+      
+         $.get("<%= inventoriez_get_unit_price_on_quantity_changed_path %>",
+            { id: id, material_id: material_id, quantity: quantity, purchase_unit_price: purchase_unit_price },
+            function(data){
+                
+                obj1 = document.getElementById("quantity2").textContent;
+                document.getElementById("quantity2").value = obj1;
+                
+                obj2 = document.getElementById("purchase_unit_price2").textContent;
+                document.getElementById("purchase_unit_price2").value = obj2;
+                
+                //単価２が存在した場合は、考慮して金額を出す
+                if (obj1 != "" && obj2 != "")
+                {
+                  unit_price = document.getElementById("purchase_unit_price").value;
+                  amount1 = (document.getElementById("quantity").value - obj1) * unit_price;
+                  amount2 = obj1 * obj2;
+                  
+                  //debugger;
+                  
+                  //金額へセット
+                  document.getElementById("purchase_amount").value = amount1 + amount2;
+                  
+                }
+                
+              }
+            );
+              
+      }
+      
+    }
+    //
+  }
+  
   
 </script>

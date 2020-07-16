@@ -106,14 +106,15 @@ class QuotationDetailLargeClassificationsController < ApplicationController
           
 		  $print_type = @print_type
 		  
-    	  case @print_type
+      case @print_type
 		  when "1"
 		  #見積書
 			report = EstimationSheetPDF.create @quotation_detail_large_classifications
           when "2"
 		  #見積書(横)
 			report = EstimationSheetLandscapePDF.create @quotation_detail_large_classifications
-          when "3"
+          #when "3"
+          when "3", "4"
 		  #見積書(印あり）
             report = EstimationSheetPDF.create @quotation_detail_large_classifications
 		  end 	

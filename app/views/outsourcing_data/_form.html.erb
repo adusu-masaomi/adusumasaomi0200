@@ -292,8 +292,8 @@
 	 //検索可能なリストボックス(仕入業者の場合)
      $(".searchableSupplier").select2({ theme: "bootstrap" });
      $( ".searchableSupplier" ).change(function(e) {
-       //setUnitPrice();
-	   setSupplierItem();
+       //del200626 処理落ちするので保留
+       //setSupplierItem();
      });
      
 	 //select2読み込んだ場合の処理
@@ -436,7 +436,10 @@
    //フォームロード時のイベント
    window.onload = function(){
   //    $(".searchableSupplier").val(index).trigger("change");
-     setSupplierItem();
+     
+     //del200626
+     //処理落ちするので保留
+     //setSupplierItem();
 	 
 	 
 	 //品名をデフォルトでセット（フリー入力以外はマスターから取得)
@@ -755,6 +758,8 @@
      }
    }
 
+   //200626
+   //処理落ちするので保留
    //仕入先品番をセット(Ajax)
    function setSupplierItem(){
      var supplier_id = document.getElementById("supplier_id").value;

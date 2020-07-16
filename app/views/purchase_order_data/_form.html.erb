@@ -51,6 +51,15 @@
     :onclick => "return confirm('メール送信&更新します。よろしいですか？ ' )"  %>
   
   <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
+  
+  <%= button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank" ) %>
+             
+  <!--<%= button_tag( 'ＦＡＸ', format: "pdf",  :value => 'pdf', :name => 'order_number_fax', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank" ) %>-->
+             
+  <!--<%= f.submit "ＦＡＸ", format: "pdf", name: "order_number_fax", class: "btn btn-pink300_ftg",  :tabindex => "6"  %>-->
+  
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                 :class => 'btn btn-white_rsd' %>

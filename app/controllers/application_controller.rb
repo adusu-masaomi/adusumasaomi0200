@@ -97,6 +97,16 @@ class ApplicationController < ActionController::Base
   
   #仕入先業者
   $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO = 2
+  $SUPPLIER_MASER_ID_OST = 4   #add200715
+  $SUPPLIER_MASER_ID_OWN_COMPANY = 10 
+  $SUPPLIER_MASER_ID_MURAYAMA_DENKI = 37
+  $SUPPLIER_MASER_ID_SUDO_DENKI = 31
+  $SUPPLIER_MASER_ID_OYANAGI_DENKI = 39
+  
+  #社員ID
+  $STAFF_ID_MURAYAMA = 3   #add200201
+  $STAFF_ID_SUDO = 6       #add200201
+  $STAFF_ID_OYANAGI = 5    #add200201
   
   #工事ID(170915~未使用？)
   $CUNSTRUCTION_ID_AIR_CONDITIONING_ELEMENT = 976 #エアコン部材
@@ -117,7 +127,26 @@ class ApplicationController < ActionController::Base
   $LABOR_COST = 11000
   #$LABOR_COST = 12100   #upd200108
   
-  $INDEX_SUPPLIER_OKADA = 2     #仕入先ID(岡田電気)
+  #$INDEX_SUPPLIER_OKADA = 2     #仕入先ID(岡田電気)   #del200715
   
   $STRING_COPY = "(コピー)"      #明細をコピーした場合にアイテム名につける文字  (add180912)
+  
+  #ADUSU側銀行マスターID
+  $BANK_ID_SANSHIN_HOKUETSU = 1
+  $BANK_ID_SANSHIN_TSUKANOME = 3
+  $BANK_ID_SANSHIN_MAIN = 4 #さんしん本店(*本来、支店IDで分けるべき?)
+  $BANK_ID_CASH = 9 #現金(*本来、支店IDで分けるべき?)  #add200201
+  
+  #会計システム用の定数
+  #勘定科目
+  $A_ACCOUNT_TITLE_ID_OUTSOURCING = 2
+  #支払方法
+  $A_PAYMENT_METHOD_ID_TRANSFER = 1    #add200201
+  $A_PAYMENT_METHOD_ID_CASH = 4        #add200201
+  #取引先
+  $A_PARTNER_ID_MURAYAMA_DENKI = 73
+  $A_PARTNER_ID_SUDO_DENKI = 50
+  #銀行支店
+  $A_BANK_BRANSH_ID_SANSHIN_MAIN = 19
+  $A_BANK_BRANSH_ID_SANSHIN_TSUKANOME = 21
 end

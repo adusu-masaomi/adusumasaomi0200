@@ -245,7 +245,11 @@
 	   
 		<%= f.button_tag "メール送信（見積）", :type => 'button', :class => "btn btn-indigo500_ftg", 
                id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmailorPdf(1)" %>
-		<%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+		
+    <%= f.button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lightBlue100_ftg" ,
+                 formtarget: "_blank", :onclick => "return submitAfterValidation(5)" ) %>
+        
+    <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation(2)" %>
 		
 		<!-- -->
@@ -256,24 +260,32 @@
 		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         
         <span id="filter" >
-		  <%= f.button_tag "メール送信（注文）", :type => 'button', :class => "btn btn-red400_ftg", 
+		    <%= f.button_tag "メール送信（注文）", :type => 'button', :class => "btn btn-red400_ftg", 
                id: "mail_sent_button2", name: "sendOrder", :onclick => "submitAfterValidationEmailorPdf(3)" %>
+        
+        <%= f.button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-pink100_ftg" ,
+                 formtarget: "_blank", :onclick => "return submitAfterValidation(6)" ) %>
         </span>
 	    
         <!--空ボタン-->
         <span id="empty_button" >
+          <!--<%= f.button_tag "　　　　　　　　　", :type => 'button', :class => "btn btn-grey50_ftg", 
+               id: "mail_sent_button2", name: "sendOrder" %>-->
           <%= f.button_tag "　　　　　　　　　", :type => 'button', :class => "btn btn-grey50_ftg", 
                id: "mail_sent_button2", name: "sendOrder" %>
-          
+          <!-- 200428 -->
+          <%= f.button_tag "　　　", :type => 'button', :class => "btn btn-grey50_ftg", 
+               id: "mail_sent_button2", name: "sendOrder" %>
         </span>
          
          <!--※２回目の登録以降は、Ｅｎｔｅｒ押下による移動はお勧めできません-->
 	    
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		 
+		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+		 <!--&nbsp;&nbsp;&nbsp;-->
+     
 		 <!--見積金額合計（１〜３）-->
 		 <%= f.input :total_quotation_price_1 , label:"見積金額計１", label_html: { style: 'color:black;' }, 
                      input_html:{ id:"total_quotation_price_1", style: 'width:100px;font-weight:bold;', readonly: true} %>
@@ -293,6 +305,7 @@
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		 <!---->
 		 
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -306,8 +319,10 @@
          
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		 
+     <!-- 200428del -->
+     <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
 		 
 		 <!--注文金額合計（１〜３）-->
 		 <%= f.input :total_order_price_1 , label:"注文金額計１", label_html: { style: 'color:black;' }, 
@@ -536,14 +551,14 @@
        //}));
 	   //商品ID-商品CD
 	   $( ".searchableSelect1_1" ).on("select2:close", function (e) {
-		 //次のコントロールへフォーカスを移す
-		 var control_name = $(this)[0].name;
-		 setNextControlOnSelect(e,control_name, 1);
+		   //次のコントロールへフォーカスを移す
+		   var control_name = $(this)[0].name;
+		   setNextControlOnSelect(e,control_name, 1);
 	   });
 	   
 	   
 	   //単位
-       $(".searchableSelect1_2").select2({ theme: "classic" });
+     $(".searchableSelect1_2").select2({ theme: "classic" });
        
 	   $( ".searchableSelect1_2" ).on("select2:close", function (e) {
 		 //次のコントロールへフォーカスを移す
@@ -556,10 +571,10 @@
        //upd180411
        $(".searchableSelect1_3").select2({ theme: "classic", tags: true });
        
-       $( ".searchableSelect1_3" ).on("select2:close", function (e) {
+     $( ".searchableSelect1_3" ).on("select2:close", function (e) {
 		 //次のコントロールへフォーカスを移す
 	     var control_name = $(this)[0].name;
-		 setNextControlOnSelect(e,control_name, 3);
+		   setNextControlOnSelect(e,control_name, 3);
 	   });
 	   
      //分類
@@ -698,27 +713,35 @@
  //入力チェック後の、更新処理
  function submitAfterValidation(flag) {
  	
-  	var ok_flag = true;
+   var ok_flag = true;
 	
-	var after_check = checkQuantity(ok_flag);
+	 var after_check = checkQuantity(ok_flag);
 	
-	if (after_check == true){
-	  var after_check = checkSupplier(flag);
-	}
+	 if (after_check == true){
+	   var after_check = checkSupplier(flag);
+	 }
 	
+	 //メッセージを可変にする
+	 var message = "";
+	 if (flag == 1){
+	   message = "見積依頼をメールしますか？"
+	 }else if (flag == 2){
+	   message = "登録のみ行いますか？"
+	 }else if (flag == 3){
+	   message = "注文依頼をメールしますか？"
+	 }else if (flag == 4){
+     document.getElementById("sent_flag").value = 4;  //add200428
+	   message = "見積比較表を発行しますか？"
+   }else if (flag == 5){
+     document.getElementById("sent_flag").value = 5;  //add200428
+	   message = "見積依頼をＦＡＸしますか？"
+   }else if (flag == 6){
+     document.getElementById("sent_flag").value = 6;  //add200428
+	   message = "注文依頼をＦＡＸしますか？"
+ 	 }
 	
-	//メッセージを可変にする
-	var message = "";
-	if (flag == 1){
-	  message = "見積依頼をメールしますか？"
-	}else if (flag == 2){
-	  message = "登録のみ行いますか？"
-	}else if (flag == 3){
-	  message = "注文依頼をメールしますか？"
-	}else if (flag == 4){
-	  message = "見積比較表を発行しますか？"
-	}
-	
+   //debugger;
+    
 	 if (after_check == true){
 	   if (flag != 4){
 	   //比較表のみメッセージは非表示とする（ややうざいので・・）
@@ -726,9 +749,12 @@
 	       reset_value();
            document.forms[0].submit();
 	     }else{
-	       return false;  //add170925
-         }
+	       return false; 
+       }
       }
+   }else
+   {
+     return false;  //add200501
 	 }
  }
 

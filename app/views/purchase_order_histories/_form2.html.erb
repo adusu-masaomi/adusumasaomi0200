@@ -110,6 +110,9 @@
    <!--<%= f.hidden_field :construction_id, {:value => params[:construction_id] } %>-->
    <!--<%= f.hidden_field :move_flag, {:value => params[:move_flag] } %>-->
    
+   <%= hidden_field_tag(:format) %>
+   
+   
    </br></br>
 	 <!--<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
                id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
@@ -124,11 +127,19 @@
 	   
 		<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
                id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
-                
-	    <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+        
+        <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
                :onclick => "submitAfterValidation()" %>
-			   
-	    
+        
+        <!--add200427-->
+        <!--<%= f.submit "ＦＡＸ", :type => 'button', :value => 'pdf', :name => 'format',  class: "btn btn-pink500_ftg", formtarget: "_blank", 
+            :onclick => "submit()", params: { format: :pdf}  %>-->
+        <!--<%= f.button_to :button, 'ＦＡＸ', type: 'button', :onclick => "submitFax()", method: :get, params: { format: :pdf}  %>-->
+        <!--<%= f.button_to :button, 'ＦＡＸ', type: 'button',  method: :get, :onclick => "submit()", params: { format: :pdf}, formtarget: "_blank"   %>-->
+        
+        <%= f.button_tag( 'ＦＡＸ', :type => 'button', :value => 'fax', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank" , :onclick => "submitFax()") %>
+        
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
          <!--※２回目の登録以降は、Ｅｎｔｅｒ押下による移動はお勧めできません（動作不安定により）-->
 		 
@@ -686,12 +697,35 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	 if (after_check == true){
        if (window.confirm('実行しますか？')) {
 	     reset_value();
+         
+         document.getElementById("format").value = "html";
+         
          document.forms[0].submit();
        }
 	 }
  }
+ 
+ 
+ function submitFax()
+ {
+ 
+      //debugger;
+      //var myparam = "abc";
 
+     // add hidden field to your form name="myparam" and value="abc"
+      //$('#receiptsForm').append('<input type="hidden" name="myparam " value="abc" />');
+      //$("#receiptsForm").submit();
+      
+      //ここでfaxフラグをセット
+      //document.getElementById("fax_flag").value = "1";
+      document.getElementById("format").value = "pdf";
+      
+      //document.forms[0].append('<input type="hidden" name="myparam " value="abc" />');
+      document.forms[0].submit();
+ 
+ }
 
+ 
 //仕入先別メアドのセット
 //ひとまず取得できるメアドは１つ(email1)とする。
 function setEmail()

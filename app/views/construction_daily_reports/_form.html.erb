@@ -180,6 +180,9 @@
      // 勤務時間を計算
      kinmu_time = 0;
      
+     
+     //debugger;
+     
      //開始時間1
      obj = document.getElementById("start_time_1");
      start_time = obj.value; 
@@ -628,7 +631,6 @@
 
   function calcWorkTime(tmp_kinmu_time){
    	   // 勤務時間の計算
-		  
 	  
       if (start_time >= 18000 & start_time <= 32400 & end_time >= 61200 & end_time <= 86400){
          // フルタイム勤務に近ければ、休憩時間を単純にマイナスする。
@@ -651,9 +653,10 @@
       } else if (start_time >= 34200 & start_time <= 37800 & end_time >= 55800 & end_time <= 86400){
 	  //add170328  9:30~10:30 ~ の勤務は、昼と、１５時休憩をマイナスする。
 	     tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 5400; 
-	  //} else if (start_time >= 39600 & start_time <= 43200 & end_time >= 55800 & end_time <= 86400){
+	  } else if (start_time >= 39600 & start_time <= 43200 & end_time >= 55800 & end_time <= 86400){
 	  //add170328  11:00 ~ の勤務は、昼休憩のみをマイナスする。→しない！！
-	  //   tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
+      //200608 restore 11:00~18:00のような勤務が１日扱いになるので
+	     tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 3600; 
       } else {
          tmp_kinmu_time = tmp_kinmu_time + end_time - start_time;   
   }

@@ -23,9 +23,20 @@ class PurchaseListForOutsourcingPDF
         @payment_amount_total = 0
         @unpaid_amount_total = 0
 
-        $purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum| 
-        #ソート順は仕入日、注文ナンバーの順とする。
-		
+        sort_key = ""
+        if !$no_color
+        #ADUSU用の場合、仕入日・注番でソート
+            sort_key = "purchase_date, purchase_order_code, id"
+        else
+        #会計士用の場合、支払日・仕入日・注番でソート
+            sort_key = "payment_date, purchase_date, purchase_order_code, id"
+        end
+
+        #$purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum|
+        #upd200215
+        $purchase_data.joins(:purchase_order_datum).order(sort_key).each do |purchase_datum|
+ 
+        
         #---見出し---
          #発行日
          dt = Time.now.strftime('%Y/%m/%d')
@@ -208,6 +219,20 @@ class PurchaseListForOutsourcingPDF
                        end
                        #
 					   
+                       #add20215
+                       #振込元銀行を表記
+                       #税理士向けレイアウトの場合のみ
+                       source_bank_str = ""
+                       if $no_color
+                         if outsourcing_cost.source_bank_id == 1
+                           source_bank_str = "北"
+                         else
+                           source_bank_str = "さ"
+                         end
+                       end
+                       ##
+                       
+                       
                        #締め日等を取得
                        @construction_datum_id = purchase_datum.construction_datum_id
 					   @purchase_date = purchase_datum.purchase_date.to_date
@@ -228,7 +253,8 @@ class PurchaseListForOutsourcingPDF
                                   payment_date: payment_date,
                                   payment_amount: payment_amount,
                                   unpaid_amount: unpaid_amount,
-                                  unpaid_payment_date: unpaid_payment_date
+                                  unpaid_payment_date: unpaid_payment_date,
+                                  source_bank: source_bank_str
                        
                        if purchase_datum.outsourcing_payment_flag == 1
                        #支払済みの場合の色
@@ -355,7 +381,8 @@ end
           #d = params[:purchase_datum][:purchase_date].to_date
           d = @purchase_date
           
-          if d.day < customer.closing_date
+          #if d.day < customer.closing_date
+          if d.day <= customer.closing_date  #bugfix 200127
             if Date.valid_date?(d.year, d.month, customer.closing_date)
               @closing_date = Date.new(d.year, d.month, customer.closing_date)
             end

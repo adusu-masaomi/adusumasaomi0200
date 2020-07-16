@@ -28,9 +28,9 @@ class OutsourcingInvoicePDF
         #@purchase_amount_subtotal = 0
         #@purchase_amount_total = 0
 
-        $purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum| 
         #ソート順は仕入日、注文ナンバーの順とする。
-		
+        $purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum| 
+                
         #---見出し---
         
         #あとで社員(仕入先？)マスターから拾えるようにする

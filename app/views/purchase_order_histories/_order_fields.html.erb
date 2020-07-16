@@ -62,7 +62,6 @@
   &nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.collection_select :material_category_id, @material_categories.all, :id, :name, {:include_blank => true, :selected => f.object.material_category_id || nil} , 
       {class: "searchableSelect1_4 form-control" , id: "material_category_id" , style: 'width:200px;margin-left:-20px', :tabindex => "6" } %>
-  <% end %>
   
 </div>
 </div>
@@ -448,6 +447,8 @@
              selectedIndex = controlName.slice(42);
 		     selectedIndex = selectedIndex.slice(0,-13);
              
+             //debugger;
+             
              var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][notes]"
 			 document.getElementsByName(nm)[0].focus();
 			 e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
@@ -545,3 +546,4 @@
   }
    
  </script>
+ 

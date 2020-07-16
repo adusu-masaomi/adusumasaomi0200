@@ -81,8 +81,13 @@ class PurchaseListPDF
 			@num = @purchase_amount_subtotal
 			formatNum()
 			@purchase_amount_subtotal = @num
-			report.list(:default).add_row purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
+			#report.list(:default).add_row purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
+            #                              purchase_amount: @purchase_amount_subtotal
+            report.list(:default).add_row do |row2|
+                              row2.values purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
                                           purchase_amount: @purchase_amount_subtotal
+                                          row2.item(:lbl_unit_price_multi).visible(false)  #add200716
+            end
 			@purchase_amount_subtotal = 0
 		  end
 		end
@@ -153,6 +158,14 @@ class PurchaseListPDF
 					   end
 					   #
 					   
+                       row.item(:lbl_unit_price_multi).visible(false)  #add200716
+                       
+                       #数量２が存在した場合は、注釈をつける(単価が２種あるため)
+                       if purchase_datum.quantity2.present? && purchase_datum.quantity2 > 0
+                         row.item(:lbl_unit_price_multi).visible(true)  
+                       end
+                       #
+                       
 			           row.values purchase_date: purchase_datum.purchase_date,
                                   purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					              material_code: material_code,
@@ -179,16 +192,29 @@ class PurchaseListPDF
 		@num = @purchase_amount_subtotal
 		formatNum()
 		@purchase_amount_subtotal = @num
-		report.list(:default).add_row purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
-                                          purchase_amount: @purchase_amount_subtotal
-		#@purchase_amount_subtotal = 0
+        #report.list(:default).add_row purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
+        #                                  purchase_amount: @purchase_amount_subtotal
+        
+        report.list(:default).add_row do |row2| 
+           row2.values purchase_order_code: @purchase_order_code, purchase_unit_price: "小計", 
+                       purchase_amount: @purchase_amount_subtotal
+           row2.item(:lbl_unit_price_multi).visible(false)  #add200716
+        end
+		
+        
+        #@purchase_amount_subtotal = 0
 		
 		#合計
 		@num = @purchase_amount_total
 		formatNum()
 		@purchase_amount_total = @num
-		report.list(:default).add_row  purchase_unit_price: "合計", 
-                                          purchase_amount: @purchase_amount_total
+		#report.list(:default).add_row  purchase_unit_price: "合計", 
+        #                                  purchase_amount: @purchase_amount_total
+        report.list(:default).add_row do |row2|
+                row2.values purchase_unit_price: "合計", 
+                            purchase_amount: @purchase_amount_total
+                row2.item(:lbl_unit_price_multi).visible(false)  #add200716
+        end
 		
         # ThinReports::Reportを返す
         return report

@@ -84,6 +84,7 @@ class OutsourcingCostsController < ApplicationController
       supplier_id = getStaffToSupplier(params[:outsourcing_cost][:staff_id].to_i)
     end
     
+    
     purchase_data = nil
     
     if supplier_id.present?
@@ -100,11 +101,14 @@ class OutsourcingCostsController < ApplicationController
     end
     #
     
+    
     #支払日入力有、支払金額有、未払金額無しor未払金支払日入力有の場合のみ、支払いフラグを更新。
     #解除は、ないものとする。(したい場合は外注のビュー画面から解除可能)
     if params[:outsourcing_cost]["payment_date(1i)"].present? && params[:outsourcing_cost]["payment_date(2i)"].present? && 
        params[:outsourcing_cost]["payment_date(3i)"].present? && 
        if params[:outsourcing_cost][:payment_amount].present? 
+         
+         
          
          if params[:outsourcing_cost][:unpaid_amount].blank? || 
             params[:outsourcing_cost][:unpaid_amount] == 0 ||
@@ -122,7 +126,13 @@ class OutsourcingCostsController < ApplicationController
                 payment_date_str = params[:outsourcing_cost]["payment_date(1i)"] + "-" + params[:outsourcing_cost]["payment_date(2i)"] + "-" + params[:outsourcing_cost]["payment_date(3i)"]
                 payment_date = Date.strptime(payment_date_str, '%Y-%m-%d')
                 
-                #add191101
+                #add200201
+                #資金繰データ(会計)を更新
+                outsourcing_amount = params[:outsourcing_cost][:payment_amount].to_i
+                @set_cash_flow = SetCashFlow.new
+                @set_cash_flow.set_cash_flow_detail_actual_for_outsourcing(params, payment_date, outsourcing_amount)
+                #
+                                
                 if params[:outsourcing_cost]["unpaid_payment_date(1i)"].present? && params[:outsourcing_cost]["unpaid_payment_date(2i)"].present? && 
                    params[:outsourcing_cost]["unpaid_payment_date(3i)"].present?
                 #未払金支払日を仕入データにセット
@@ -134,6 +144,14 @@ class OutsourcingCostsController < ApplicationController
                    unpaid_payment_date = Date.strptime(unpaid_payment_date_str, '%Y-%m-%d')
                    
                   purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date, unpaid_payment_date: unpaid_payment_date}
+                
+                  #add200201
+                  #資金繰データ(会計)を更新
+                  outsourcing_amount = params[:outsourcing_cost][:unpaid_amount].to_i
+                  @set_cash_flow = SetCashFlow.new
+                  @set_cash_flow.set_cash_flow_detail_actual_for_outsourcing(params, unpaid_payment_date, outsourcing_amount)
+                  #
+                
                 else
                 #未払支払日がない場合
                   purchase_params = {outsourcing_payment_flag: 1, payment_due_date: payment_due_date, payment_date: payment_date}
@@ -211,6 +229,7 @@ class OutsourcingCostsController < ApplicationController
     
       params.require(:outsourcing_cost).permit(:purchase_order_datum_id, :construction_datum_id, :staff_id, :purchase_amount, :supplies_expense, 
                      :labor_cost, :misellaneous_expense, :execution_amount, :billing_amount, :purchase_order_amount, 
-                     :closing_date, :payment_amount, :unpaid_amount, :payment_due_date, :payment_date, :unpaid_payment_date)
+                     :closing_date, :source_bank_id, :payment_amount, :unpaid_amount, :payment_due_date, :payment_date, 
+                     :unpaid_payment_date)
     end
 end

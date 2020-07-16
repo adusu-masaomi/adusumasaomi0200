@@ -559,6 +559,7 @@ Rails.application.routes.draw do
   #在庫単価取得用 1
   get '/inventoriez/get_unit_price' => 'inventories#get_unit_price'
   get '/inventoriez/get_quantity' => 'inventories#get_quantity'
+  get '/inventoriez/get_unit_price_on_quantity_changed' => 'inventories#get_unit_price_on_quantity_changed'  #add200701
   get '/working_middle_itemz/item_extract' => 'working_middle_items#item_extract'
   get '/working_specific_middle_itemz/working_material_info_select' => 'working_specific_middle_items#working_material_info_select'
   get '/working_middle_itemz/working_material_info_select' => 'working_middle_items#working_material_info_select'
