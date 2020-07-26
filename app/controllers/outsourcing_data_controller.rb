@@ -456,13 +456,15 @@ class OutsourcingDataController < ApplicationController
       #  save_check = @purchase_datum.save
       #else
       
-      if request.format.symbol != :pdf
+      
+      #if request.format.symbol != :pdf  #del200721 pdfでも保存する
       #ヴァリデーションを無効にする
       #確定申告などで編集する場合を考慮。
         save_check = @purchase_datum.save!(:validate => false)
-      else
-        save_check = true
-      end
+      
+      #else
+      #  save_check = true
+      #end
       #end
       #
       

@@ -577,6 +577,9 @@
 	 if (inventory_division_id == INDEX_INVENTORY_SHIPPING){
 	   document.getElementById("division_id").value = INDEX_DIVISION_SHIPPING;
 	   
+       var index = INDEX_SUPPLIER_OWN_COMPANY;  //自社のコードにする
+       $(".searchableSupplier").val(index).trigger("change"); 
+       
        visibleOffOnShipping(false);
        
        //かつ、在庫マスターの単価を持ってくる！！

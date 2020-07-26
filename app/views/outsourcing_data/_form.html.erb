@@ -163,19 +163,27 @@
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   <!-- -->
   
-  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"19" %>
   
-  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  
+  <% if params[:action] == "new" %>
+    <% @button_caption = "請求書発行(外注)・登録する" %>
+  <% else %>
+    <% @button_caption = "請求書発行(外注)・更新する" %>
+  <% end %>
+  
+  <%= button_tag( @button_caption, :value => 'pdf', :name => 'format', :class => "btn btn-purple500_ftg" , 
+             formtarget: "_blank", :onclick => "setOutSourcingFlag()" ) %>
+  <%= link_to t('.cancel', :default => t("helpers.links.back")),
                 outsourcing_data_path(construction_id: params[:construction_id], 
                 purchase_order_id: params[:purchase_order_id], 
                 supplier_master_id: params[:supplier_master_id],
                 move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
-  <!--<%= link_to "請求書(外注)",
-            outsourcing_data_path(@purchase_data, action:"index", format: "pdf", print_type: "4"),
-            :class => 'btn  btn-lime500_ftg', :target=>["_blank"] %>-->
-   
-  <%= button_tag( '請求書(外注)', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
-             formtarget: "_blank", :onclick => "setOutSourcingFlag()" ) %>
+  <!--style: 'width:100px;'-->
+  <!--スペース-->
+  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+  <!--<%= f.button :submit, '更新のみ', :class => 'btn btn-blue50_rsd' %>-->
 <% end %>
 
 <script type="text/javascript">

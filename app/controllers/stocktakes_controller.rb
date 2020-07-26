@@ -191,20 +191,31 @@ class StocktakesController < ApplicationController
           current_quantity = inventory.current_quantity
           current_unit_price = inventory.current_unit_price
           
-          #次回単価も更新用に保持しておく
+          #次回・次次回単価も更新用に保持しておく
           next_quantity_1 = inventory.next_quantity_1
           next_unit_price_1 = inventory.next_unit_price_1
+          next_quantity_2 = inventory.next_quantity_2
+          next_unit_price_2 = inventory.next_unit_price_2
           
           #現在・次回履歴ID,入庫日も保持
           current_history_id = inventory.current_history_id
           current_warehousing_date = inventory.current_warehousing_date
           next_history_id_1 = inventory.next_history_id_1
           next_warehousing_date_1 = inventory.next_warehousing_date_1
+          next_history_id_2 = inventory.next_history_id_2
+          next_warehousing_date_2 = inventory.next_warehousing_date_2
           #
+          
+          #binding.pry
           
           #差異を加減(現在数または次回ロット)
           
-          if differ_quantity > 0 && inventory.next_quantity_1 > 0
+          if differ_quantity > 0 && inventory.next_quantity_2.present? && inventory.next_quantity_2 > 0
+          #差異がプラスでロット３が存在する場合
+            #ロット３へ加算
+            next_quantity_2 = inventory.next_quantity_2 + differ_quantity
+          #if differ_quantity > 0 && inventory.next_quantity_1 > 0
+          elsif differ_quantity > 0 && inventory.next_quantity_1.present? && inventory.next_quantity_1 > 0
           #差異がプラスでロット２が存在する場合
             #ロット２へ加算
             next_quantity_1 = inventory.next_quantity_1 + differ_quantity
@@ -219,6 +230,7 @@ class StocktakesController < ApplicationController
             #if current_quantity < 0
             if current_quantity <= 0
               if inventory.next_unit_price_1.present? && inventory.next_unit_price_1 > 0
+              #ロット１が現在庫に繰り上がる場合
                 differ_quantity_2 = current_quantity
               
                 #現在数量単価(最初のストック)に上書きし、ストック２はクリアする
@@ -233,7 +245,53 @@ class StocktakesController < ApplicationController
                 next_unit_price_1 = nil
                 next_history_id_1 = nil
                 next_warehousing_date_1 = nil
+                
+                #ロット２が０になった場合、ロット３から繰り上げる
+                if current_quantity <= 0
+                  differ_quantity_3 = current_quantity
+                  #
+                  current_quantity = inventory.next_quantity_2 + differ_quantity_3
+                  current_unit_price = inventory.next_unit_price_2
+                  #履歴ID,入庫日をセット
+                  current_history_id = next_history_id_2
+                  current_warehousing_date = next_warehousing_date_2
+                  
+                  #次回数量単価(ストック２)をクリア
+                  next_quantity_2 = nil
+                  next_unit_price_2 = nil
+                  next_history_id_2 = nil
+                  next_warehousing_date_2 = nil
+                elsif inventory.next_quantity_2.present? && inventory.next_quantity_2 > 0
+                #ロット３がある場合は、ロット２へ繰り上げる
+                  next_quantity_1 = inventory.next_quantity_2 
+                  next_unit_price_1 = inventory.next_unit_price_2
+                  next_history_id_1 = next_history_id_2
+                  next_warehousing_date_1 = next_warehousing_date_2
+                  
+                  #次回数量単価(ストック２)をクリア
+                  next_quantity_2 = nil
+                  next_unit_price_2 = nil
+                  next_history_id_2 = nil
+                  next_warehousing_date_2 = nil
+                end
                 #
+              #elsif inventory.next_unit_price_2.present? && inventory.next_unit_price_2 > 0
+              #ロット２が現在庫に繰り上がる場合
+              #  differ_quantity_2 = current_quantity
+              
+              #  #現在数量単価(最初のストック)に上書きし、ストック２はクリアする
+              #  current_quantity = inventory.next_quantity_2 + differ_quantity_2
+              #  current_unit_price = inventory.next_unit_price_2
+              #  #履歴ID,入庫日をセット
+              #  current_history_id = next_history_id_2
+              #  current_warehousing_date = next_warehousing_date_2
+              
+              #  #次回数量単価(ストック３)をクリア
+              #  next_quantity_2 = nil
+              #  next_unit_price_2 = nil
+              #  next_history_id_2 = nil
+              #  next_warehousing_date_2 = nil
+              
               end
             end
             
@@ -243,6 +301,9 @@ class StocktakesController < ApplicationController
           inventory_amount = current_quantity * current_unit_price
           if next_quantity_1.present? && next_unit_price_1.present?
             inventory_amount += next_quantity_1 * next_unit_price_1
+          end
+          if next_quantity_2.present? && next_unit_price_2.present?
+            inventory_amount += next_quantity_2 * next_unit_price_2
           end
           
           if inventory_amount.present?
@@ -278,6 +339,8 @@ class StocktakesController < ApplicationController
           inventory_update_params = {inventory_quantity: inventory_quantity, inventory_amount: inventory_amount, 
                                      current_quantity: current_quantity, current_unit_price: current_unit_price,
                                      current_history_id: current_history_id, current_warehousing_date: current_warehousing_date,
+                                     next_history_id_2: next_history_id_2, next_warehousing_date_2: next_warehousing_date_2,
+                                     next_quantity_2: next_quantity_2, next_unit_price_2: next_unit_price_2,
                                      next_history_id_1: next_history_id_1, next_warehousing_date_1: next_warehousing_date_1,
                                      next_quantity_1: next_quantity_1, next_unit_price_1: next_unit_price_1}
           
