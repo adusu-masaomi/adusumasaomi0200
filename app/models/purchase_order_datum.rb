@@ -28,7 +28,8 @@ class PurchaseOrderDatum < ActiveRecord::Base
 	 #最終番号取得
      attr_accessor :last_header_number
   
-	
+	   attr_accessor :search_character
+     
     #validation
     validates :purchase_order_code, presence: true, uniqueness: true
 	#validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 

@@ -124,13 +124,18 @@ class InvoiceLandscapePDF
 		     end
            end
            
+           #見出に確定申告区分が入ってる場合(Zを除く)
+           isFinalDivisionHeader = false
            
-		   #NET金額
-		   #if @invoice_headers.net_amount.present?
-		   #  @net_amount = "(" + @invoice_headers.net_amount.to_s(:delimited, delimiter: ',') + ")" 
-		   #  @report.page.item(:message_net).value("NET")
-		   #  @report.page.item(:net_amount).value(@net_amount)
-		   #end
+           if @invoice_headers.final_return_division.present? &&
+              #@invoice_headers.final_return_division > 0 &&
+              @invoice_headers.final_return_division < $FINAL_RETURN_DIVISION_Z
+              
+              isFinalDivisionHeader = true
+              final_return_division_header = @invoice_headers.final_return_division
+              
+           end
+           #
 		   
 		   #小計(見積金額) 
 		   @report.page.item(:billing_amount).value(@invoice_headers.billing_amount)
@@ -244,10 +249,12 @@ class InvoiceLandscapePDF
 		 end
 		 
 		
-		 
+		  rowCount = 0
 		 #for i in 0..29   #29行分(for test)
 		   @report.list(:default).add_row do |row|
 		  
+              rowCount += 1
+          
                       #仕様の場合に数値・単位をnullにする
                       @quantity = invoice_detail_large_classification.quantity
                       if @quantity == 0 
@@ -282,7 +289,9 @@ class InvoiceLandscapePDF
 						end
 					  end 
                       #  
-                      #add170308
+                      
+                      final_return_division = ""
+                      
 					  #小計、値引きの場合は項目を単価欄に表示させる為の分岐
 					  case invoice_detail_large_classification.construction_type.to_i
 					    when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
@@ -294,17 +303,47 @@ class InvoiceLandscapePDF
 						  @unit_name = ""
 						else
                           item_name = invoice_detail_large_classification.working_large_item_name
+                          #add210208
+                          #納品書データから工事IDを引っ張る
+                          if invoice_detail_large_classification.delivery_slip_header_id.present?
+                            delivery_slip_header = DeliverySlipHeader.where(:id => invoice_detail_large_classification.delivery_slip_header_id).first
+                            if delivery_slip_header.present?
+                              #工事IDを引っ張る
+                              if delivery_slip_header.construction_datum_id.present?
+                                construction = ConstructionDatum.where(:id => delivery_slip_header.construction_datum_id).first
+                                if construction.present?
+                                  item_name += "(" + construction.construction_code + ")"
+                                end
+                              end
+                              #確定区分があれば取得
+                              if delivery_slip_header.final_return_division.present?
+                                final_return_division = ConstructionCost.final_division[delivery_slip_header.final_return_division][0]
+                              #else
+                              #  #確定区分がなければ、-を出力 -> 登録・未登録の区分けをする為、nullは出力しない
+                              #  final_return_division = ConstructionCost.final_division[0][0]
+                              end
+                            end
+                          end
+                          #add end
                           unit_price_or_notices = invoice_detail_large_classification.working_unit_price
                           execution_unit_price_or_notices = invoice_detail_large_classification.execution_unit_price
 					  end
+                      
+                      #見出に確定申告区分があれば、1行目に表示させる
+                      if rowCount == 1
+                        if isFinalDivisionHeader
+                          final_return_division = ConstructionCost.final_division[final_return_division_header][0]
+                        end
+                      end
 					  #
 					  row.values working_large_item_name: item_name,
                        working_large_specification: invoice_detail_large_classification.working_large_specification,
+                       final_return_division: final_return_division,
                        quantity: @quantity,
 		               working_unit_name: @unit_name,
                        working_unit_price: unit_price_or_notices,
 					   invoice_price: invoice_detail_large_classification.invoice_price
-					   
+                       
                       #row.values working_large_item_name: invoice_detail_large_classification.working_large_item_name,
                       # working_large_specification: invoice_detail_large_classification.working_large_specification,
                       # quantity: @quantity,

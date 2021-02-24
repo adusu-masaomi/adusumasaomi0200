@@ -233,7 +233,9 @@ class InvoicePDF
                       end  
 					  #add190903
                       #小数点以下１位があれば表示、なければ非表示
-                      @quantity = "%.2g" %  @quantity
+                      if @quantity.present? 
+                      	@quantity = "%.2g" %  @quantity
+                      end
                   
 					  if invoice_detail_large_classification.WorkingUnit.present?
                         @unit_name = invoice_detail_large_classification.WorkingUnit.working_unit_name

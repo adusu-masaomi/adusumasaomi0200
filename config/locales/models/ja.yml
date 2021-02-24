@@ -245,6 +245,9 @@ ja:
        customer_master:
          search_character: 検索文字
          card_not_flag: 年賀不要
+       order:
+         order_unit_price: 単価
+         order_price: 金額
        purchase_datum:
          purchase_amount: 金額
        purchase_header:

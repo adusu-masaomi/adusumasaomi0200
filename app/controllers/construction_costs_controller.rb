@@ -34,7 +34,8 @@ class ConstructionCostsController < ApplicationController
     
     @construction_costs = @q.result(distinct: true)
     
-	
+	$construction_costs = @construction_costs
+    
    respond_to do |format|
       format.html
       format.csv { send_data @construction_costs.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }
@@ -49,6 +50,18 @@ class ConstructionCostsController < ApplicationController
       else
         $construction_costs = @construction_costs
       end
+      
+      format.pdf do
+        report = ConstructionCostFinalListPDF.create @construction_costs 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "construction_cost_final_list.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+      
       
       #moved170925 
       #format.pdf do
@@ -89,7 +102,11 @@ class ConstructionCostsController < ApplicationController
     #仕入金額・実行金額をセットする
     #upd170209 入力時に反映することにした。
     ##set_amount
-      
+    
+    #add210208
+    #納品書・請求書データへ、確定申告区分をアップする
+    set_final_return_divsion
+    
     @construction_cost = ConstructionCost.new(construction_cost_params)
 
     respond_to do |format|
@@ -124,6 +141,10 @@ class ConstructionCostsController < ApplicationController
     #仕入金額・実行金額をセットする
     #upd170209 入力時に反映することにした。
     #set_amount
+    
+    #add210208
+    #納品書・請求書データへ、確定申告区分をアップする
+    set_final_return_divsion
    
     respond_to do |format|
 	
@@ -158,6 +179,56 @@ class ConstructionCostsController < ApplicationController
       format.html { redirect_to construction_costs_url, notice: 'Construction cost was successfully destroyed.' }
       format.json { head :no_content }
     end
+  end
+  
+  #納品書・請求書データへ、確定申告区分をアップする
+  def set_final_return_divsion
+    
+    final_return_division_s = params[:construction_cost][:final_return_division]
+        
+    #if final_return_division_s.present? && final_return_division_s.to_i > 0
+    if final_return_division_s.present?
+      construction_datum_id = params[:construction_cost][:construction_datum_id].to_i
+      final_return_division = final_return_division_s.to_i
+      
+      #請求書見出に工事番号が存在すれば区分更新
+      invoiceExist = false
+      
+      invoice_header = InvoiceHeader.where(:construction_datum_id => construction_datum_id).first
+      if invoice_header.present?
+        invoice_header.final_return_division = final_return_division
+        invoice_header.save!(:validate => false)
+        
+        invoiceExist = true
+      end
+      #
+      
+      #納品書見出に工事番号が存在すれば区分更新
+      delivery_slip_header = DeliverySlipHeader.where(:construction_datum_id => construction_datum_id).first
+      if delivery_slip_header.present?
+        delivery_slip_header.final_return_division = final_return_division
+        delivery_slip_header.save!(:validate => false)
+        
+        #請求書内訳も検索し、ヒットすればヘッダを更新
+        invoice_detail_large = InvoiceDetailLargeClassification.where(:delivery_slip_header_id => delivery_slip_header.id).first
+        if invoice_detail_large.present?
+          invoice_header = InvoiceHeader.where(:id => invoice_detail_large.invoice_header_id).first
+          if invoice_header.present? && invoiceExist == false  #請求書に工事番号があればそれを優先
+            invoice_header.final_return_division = $FINAL_RETURN_DIVISION_Z  #Zを入れる
+            #通常なら、Ｚは外す(訂正の場合を考慮)。但し2行以上あった場合は考慮しない(Zの再セット)
+            if final_return_division == 0
+              invoice_header.final_return_division = 0
+            end
+            
+            invoice_header.save!(:validate => false)
+          end
+        end
+        #
+      end
+      #
+    end
+    #
+    
   end
   
   #工事集計表の発行
@@ -317,6 +388,6 @@ class ConstructionCostsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_cost_params
       params.require(:construction_cost).permit(:construction_datum_id, :supplies_expense, :labor_cost, :misellaneous_expense, :constructing_amount, :purchase_order_amount, 
-                                                :purchase_amount, :execution_amount)
+                                                :purchase_amount, :execution_amount, :final_return_division)
     end
 end

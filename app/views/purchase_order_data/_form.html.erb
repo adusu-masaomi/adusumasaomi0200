@@ -10,16 +10,18 @@
     </ul>
    </div>
   <% end %>
-
-  <!--<%= f.select :last_header_number,PurchaseOrderDatum.header_numbers, {}, {class: "searchableHeader" , style: 'width:100px' } %>-->
-  <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } %>
-  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"1", :onfocusout => "checkAutoOutSourcing()" } %>
+  
+  <!--upd201229 hiddenにした-->
+  <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } ,as: :hidden %>
+  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"0", :onfocusout => "checkAutoOutSourcing()" } %>
   <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
   <% if @construction_data.present? %>
-    <%= f.collection_select :construction_datum_id, @construction_data ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+    <%= f.collection_select :construction_datum_id, @construction_data ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"1"} %></p></p>
   <% else %>
-    <%= f.collection_select :construction_datum_id, ConstructionDatum.all ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"2"} %></p></p>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.all ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"1"} %></p></p>
   <% end %>
+  
+  <%= f.input :search_character, label:"検索頭文字(半角アルファベット入力で検索／頭文字は仕入先マスターで設定可)", input_html:{ id:"search_character" , style: 'width:50px', :tabindex=>"2", :onkeyup => "getSupplier()" } %>
   
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
@@ -76,7 +78,7 @@
        });  
 	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
 	   $( ".searchableConstructionName" ).on("select2:close", function (e) {
-	     $('[tabindex=3]').focus(); 
+	     $('[tabindex=2]').focus(); 
 	   });
 	   
 	   $(".searchableSupplier").select2({ theme: "bootstrap" }); 
@@ -113,6 +115,9 @@
     if (obj.value == ""){
       setAliasName();
     }
+    //最終番号表示する
+    //20201229~
+    getLastCode();
   } 
 
   function checkAutoOutSourcing() {
@@ -160,23 +165,42 @@
         );
   };
 
+  //ajax
+  function getSupplier()
+  {
+       obj = document.getElementById("search_character");
+       search_character = obj.value;
+       $.get("<%= purchase_order_datum_get_supplier_by_character_path %>",
+         {header_code: search_character },
+          function(data){
+          
+             //obj = document.getElementById("email1").textContent;
+			//document.getElementById("email1").value = obj;
+          }
+        );
+  };
   
   //最終番号のセット
   function getLastCode()
-  {  
-    obj = document.getElementById("last_header_number");
-     //quotation_unit_id = parseInt(obj.value);
-	 header = obj.value;
-     $.get("<%= purchase_order_datum_get_last_number_select_path %>",
-       {header: header },
-        function(data){
+  { 
+  
+    if ( document.getElementById("purchase_order_code").value == "")
+    {
+      obj = document.getElementById("last_header_number");
+      //quotation_unit_id = parseInt(obj.value);
+	  header = obj.value;
+      $.get("<%= purchase_order_datum_get_last_number_select_path %>",
+         {header: header },
+         function(data){
 		  obj = document.getElementById("purchase_order_code").textContent;
 		  document.getElementById("purchase_order_code").value = obj;
 		  
-		  //村山電気対応 add170307
-		  checkAutoOutSourcing();
-		  }
-      );
+          //Mなら自動で村山にする処理 -201229抹消
+		  //村山電気対応 
+		  //checkAutoOutSourcing();
+		 }
+       );
+     }
    };  
 
 

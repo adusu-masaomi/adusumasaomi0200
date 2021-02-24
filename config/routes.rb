@@ -215,6 +215,9 @@ Rails.application.routes.draw do
   get '/purchase_datum/unit_select' => 'purchase_data#unit_select'
   get '/purchase_datum/supplier_item_select' => 'purchase_data#supplier_item_select'
   
+  #add201229
+  get '/purchase_order_datum/get_supplier_by_character' => 'purchase_order_data#get_supplier_by_character'
+  
   get '/purchase_datum/material_category_select' => 'purchase_data#material_category_select'
   
   get '/purchase_datum/supplier_select' => 'purchase_data#supplier_select'
@@ -292,6 +295,10 @@ Rails.application.routes.draw do
   get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
 
   get '/construction_costz/set_caluculated_flag' => 'construction_costs#set_caluculated_flag'
+
+  #add200917
+  #見積書コード自動採番
+  get "/quotation_headerz/set_quotation_code" => 'quotation_headers#set_quotation_code'
 
   #見積書履歴保存処理
   get "/quotation_header_historiez/set_history" => 'quotation_header_histories#set_history'
@@ -380,6 +387,10 @@ Rails.application.routes.draw do
   get '/quotation_breakdown_historiez/LPU_labor_cost_select' => 'quotation_breakdown_histories#LPU_labor_cost_select'
   get '/quotation_details_historiez/LPU_labor_cost_select' => 'quotation_details_histories#LPU_labor_cost_select'
   
+  #add200917
+  #請求書コード自動採番
+  get "/invoice_headerz/set_invoice_code" => 'invoice_headers#set_invoice_code'
+  
   ###
   #請求書見出D関連
   get '/invoice_headerz/customer_info_select' => 'invoice_headers#customer_info_select'
@@ -395,6 +406,11 @@ Rails.application.routes.draw do
   get '/invoice_detail_large_classificationz/labor_productivity_unit_select' => 'invoice_detail_large_classifications#labor_productivity_unit_select'
   #歩掛計
   get '/invoice_detail_large_classificationz/labor_productivity_unit_total_select' => 'invoice_detail_large_classifications#labor_productivity_unit_total_select'
+  
+  #add200917
+  #納品書コード自動採番
+  get "/delivery_slip_headerz/set_delivery_slip_code" => 'delivery_slip_headers#set_delivery_slip_code'
+  
   #add170203
   ###
   #納品書見出D関連

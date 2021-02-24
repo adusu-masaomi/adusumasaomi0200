@@ -1,0 +1,840 @@
+
+
+<%= simple_form_for @purchase_datum, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @purchase_datum.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @purchase_datum.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_datum.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+
+  <!--スマホ対応,datepicker使う場合のみ。 --> 
+  <!--</br></br></br></br>-->  
+
+  <%= f.input :purchase_date, label: "仕入日" ,  input_html:{ id:"purchase_date", name: "purchase_datum[purchase_date][]" , style: 'width:220px;', :tabindex=>"0"} %>
+  <%= f.input :slip_code, label: "伝票番号", input_html: { id:"slip_code", style: 'width:220px;', :tabindex=>"1", :onchange => "setHeaderId()" }  %>
+  <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
+  <% if @purchase_order_data.present? %>
+    <%= f.collection_select :purchase_order_datum_id, @purchase_order_data, :id, :p_num_cd, {} , {id:"purchase_datum", 
+         class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
+  <% else %>
+    <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", 
+         class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
+  <% end %>
+  
+  <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
+  <%= f.simple_fields_for :@purchase_order_datum do |m| %>
+  <%= m.label :件名Ｎｏ参照用, {:class => "my-custom-class-lr"} %>
+  <%= m.collection_select :lstConstruction_datumid, ConstructionDatum.all, :id, :construction_code, {:include_blank => true,:selected => @purchase_datum.construction_datum_id} , {id:'lstConstruction_datumid',name:'lstConstruction_datumid', style: 'font-size : 12px;' , :class => "my-custom-class-r2"} %></br>
+  <% end %>
+  <!-- -->
+  <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
+  
+  <div class="col-xs-5" , style="margin-left : -15px">
+  <% if @construction_data.present? %>
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , {id:'construction_datum_id', :tabindex=>"3", 
+       :class => "searchableConstructionCode",  style: 'width:260px;' } %>
+  <% else %>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :tabindex=>"3", 
+       :class => "searchableConstructionCode",  style: 'width:260px;' } %>
+  <% end %>
+  </div>
+  <div style="margin-left : -10px">
+  <%= f.input :notes, label_html:{style: 'margin-top : -30px;'}, input_html:{id:"notes",  style: 'width:330px;margin-top : -0px;'} %>
+  </div>
+  
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <% if @supplier_master.present? %>
+    <%= f.collection_select :supplier_id, @supplier_master, :id, :supplier_name, {},
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+  <% else %>
+    <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+  <% end %>
+  </br>
+  <div class="col-xs-5 " , style="margin-left : -15px;">
+  <%= f.label :'品番（ﾏｽﾀｰ追加は”＜手入力用＞”に）' , {:class => "my-custom-class-l" ,style: 'color:red;'} %></br>
+  <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , 
+               :tabindex=>"5",style: 'width:220px;'  ,:onchange => "setListPriceAndMakerAndUnit(this.form)"} %>
+  <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , 
+               :tabindex=>"5",style: 'width:220px;' } %>-->
+  </div>
+  
+  <%= f.label :仕入先品番（検索用） , {:class => "my-custom-class-l"} %>
+  <%= f.collection_select :supplier_material_code, PurchaseUnitPrice.all, :id, :supplier_material_code, {:include_blank => true} , 
+      {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px', :tabindex=>"6"} %>
+  
+  <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
+  <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;width:100px'}  %></br>
+  
+  <div class="col-lg-5" , style="margin-left : -15px">
+  <%= f.input :material_code, label: "品番（手入力用）", hint: "品名をﾌﾘｰ入力したい場合は”手入力”のまま" ,label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' , :tabindex=>"7" }  %>
+  </div>
+  <div class="col-lg-5" , style="margin-left : -15px">
+  <%= f.input :supplier_material_code, label: "仕入先品番（手入力用）", input_html: { :class => "my-custom-class-t", id:'supplier_material_code' , 
+                   style: 'width:220px;', :tabindex=>"8", :onchange => "copySupplierCodeToMaterial()" }  %>
+  </div>
+  <!--<%= f.hidden_field :material_masters, :value => @material_masters, id:"material_list_price" %>-->
+  
+  <!--<%= f.label :品名 , {:class => "my-custom-class-l"} %></br>-->
+  <!--<%= f.collection_select :material_name, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {name: 'lstMaterialName' ,:class => "my-custom-class-r"}  %></br>-->
+  <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , 
+  {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l", :hidden => true }  %></br></br></br></br></br></br>
+  
+  <%= f.input :material_name, label: "品名（手入力用）", hint: "品番が”＜手入力用＞”以外は全てマスターへ反映されるのでご注意下さい！！", label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"9"  }  %>
+  <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
+  <!--<%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>-->
+  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , :tabindex=>"10", style: 'width:220px'} %></br> 
+  <%= f.input :maker_name, label: "メーカー名（手入力用）", input_html: { id:'maker_name', :class => "my-custom-class-t", :tabindex=>"11" }  %>
+    
+  <!--仕入先単価-->
+  <%= f.input :unit_price_hide , input_html:{ id:"unit_price_hide"} , as: :hidden%>
+  <%= f.simple_fields_for :PurchaseUnitPrice, :remote => true do |k| %>
+    <%= k.input :material_id , input_html:{ } , as: :hidden%>
+	<%= k.input :supplier_id , input_html:{ } , as: :hidden%>
+	<%= k.input :unit_price , input_html:{ } , as: :hidden%>
+  <% end %>
+  
+  <!--資材M単価-->
+  <%= f.simple_fields_for :MaterialMaster, :remote => true do |m| %>
+    <%= m.input :last_unit_price , input_html:{ id:"last_unit_price"}, as: :hidden %>
+    <%= m.input :last_unit_price_update_at , input_html:{ id:"last_unit_price_update_at"} ,as: :date_picker, as: :hidden %>
+  <% end %>
+
+  <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"12" , :onfocusout => "calcMoney(this.form)" } %>
+  <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"13" , style: 'width:110px;' , :class => "searchableUnit"} %>
+  <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
+  <%= f.check_box :unit_price_not_update_flag, {id:"unit_price_not_update_flag"}, '1', '0' %>
+  <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック' %> 
+  <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"15"} %>
+  <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
+  
+  <!--資材分類-->
+  <%= f.simple_fields_for :MaterialMaster, :remote => true do |m| %>
+    <%= m.label :"資材分類" , {:class => "my-custom-class-l"} %></br>
+    <%= m.collection_select :material_category_id, MaterialCategory.all, :id, :name, {:include_blank => true} , {id:"material_category_id", class: "searchableCategory" , 
+               style: 'width:220px;', :selected => 0 } %>
+  <% end %>
+  </br></br>
+  
+  <%= f.label :仕入区分 , {:class => "my-custom-class-l", style: 'width:190px;'} %><%= f.label :入出庫区分 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , 
+     {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , 
+       {id: "division_id", :tabindex=>"18", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
+  <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {:include_blank => true}, 
+       {id:'inventory_division_id', :onchange => "uncheckUnitPriceInventory()", :class => "my-custom-class",
+          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"19" } %>
+  <!--190124とりあえずいらないので保留-->
+  <!--<%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>-->
+  <!--<%= f.label :complete_flag, "入力完了", {} %>-->
+  
+  <!--一旦保留
+  <%= f.check_box :outsourcing_invoice_flag , {id:'outsourcing_invoice_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>
+  <%= f.label :complete_flag, "労務費をセット(外注)", {} %>
+  -->
+  
+  </br>
+	   
+  <%= f.input :supplier_id_hide, input_html:{id:'supplier_id_hide'}, as: :hidden  %>
+  <%= f.input :material_category_id_hide, input_html:{id:'material_category_id_hide'}, as: :hidden  %>
+    
+  <!--外注工事判定用-->
+  <%= f.input :outsourcing, :value => "1", input_html:{id:'outsourcing', :value => @outsourcing_flag} , as: :hidden %>
+  <!--工事ID自動切り替え用-->
+  <%= f.input :construction_datum_id_hide, input_html:{id:'construction_datum_id_hide', :value => @outsourcing_flag} , as: :hidden %>
+  
+  <!--add180223-->
+  <%= f.input :complete_flag_hide, input_html:{id:'complete_flag_hide'}, as: :hidden  %>
+  
+  <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+  <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+  <%= hidden_field_tag(:purchase_order_id, params[:purchase_order_id]) %>
+  <%= hidden_field_tag(:supplier_master_id, params[:supplier_master_id]) %>
+  <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+  <!-- -->
+  
+  <%= f.button :submit, :class => 'btn-primary', :tabindex=>"19" %>
+  
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                purchase_data_path(construction_id: params[:construction_id], 
+                purchase_order_id: params[:purchase_order_id], 
+                supplier_master_id: params[:supplier_master_id],
+                move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
+   
+  <!--一旦保留
+  <%= button_tag( '請求書(外注)', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank", :onclick => "setOutSourcingFlag()" ) %>-->
+<% end %>
+
+<script type="text/javascript">
+
+   var item_index = 0;
+
+   //$(document).ready(function(){
+   $(document).on('ready page:load', function(){
+   //$(document).on('turbolinks:load', function(){
+     
+     //連動しなくなるので保留・・・
+     $(".searchableConstructionCode").select2({ theme: "bootstrap" });
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	   $( ".searchableConstructionCode" ).on("select2:close", function (e) {
+	     $('[tabindex=4]').focus(); 
+	   });
+		
+	 
+	 $(".searchableUnit").select2({ theme: "bootstrap" });
+     //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableUnit" ).on("select2:close", function (e) {
+	   $('[tabindex=14]').focus(); 
+	 });
+	 
+     //資材分類
+     //select2のタブインデックスはここで指定する
+	 $(".searchableCategory").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
+        $(this).prop('tabindex',17)}).trigger('load');
+     //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableCategory" ).on("select2:close", function (e) {
+	   $('[tabindex=18]').focus(); 
+	 });
+     
+     
+     //検索可能なリストボックス(品名の場合)
+	 //色がピンクにしたいが、Macだと変わらない？？
+     $(".searchableItem").select2({ theme: "bootstrap", allowClear: true , placeholder: "どれか一つを選択して下さい。", style: 'font-color:red;'
+                                   })
+								   .data("select2").$container.find(".select2-selection").css('background-color', '#F5A9A9');
+     
+	 
+     $( ".searchableItem" ).change(function(e) {
+       obj = document.getElementById("material_id");
+       index = obj.selectedIndex;
+       //品番・品名をセット
+	   setItem(index);
+	   //単価をセット
+	    setUnitPrice();
+        
+        //資材分類をセット
+        setMaterialCategory();
+		
+        //出庫の場合は別途単価・業者を取得
+        setInventoriesInfo();
+        
+		//入庫の場合に工事IDをセット(マイナス登録も有るので保留・・)
+		//setConstructionOnStocked();
+		
+		 //if (e.added) {
+          // You can add other filters here like
+          // if e.val == option_x_of_interest or
+          // if e.added.text == some_text_of_interest
+          // Then add a custom CSS class my-custom-css to the <li> added
+          $('.select2-search-choice:not(.my-custom-css)', this).addClass('my-custom-css');
+		  //$(".searchableItem").parent().addClass("my-css-class");
+         //}
+      });
+      
+	  //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	   $( ".searchableItem" ).on("select2:close", function (e) {
+	     $('[tabindex=7]').focus(); 
+	   });
+	  
+	  //検索可能なリストボックス(客先品番の場合)
+      $(".searchableSupplierItem").select2({ theme: "bootstrap" });
+	  $( ".searchableSupplierItem" ).change(function(e) {
+	     //normal_index = document.getElementById("supplier_material_id").value;
+	     material_id_position = document.getElementById("supplier_material_id").value.indexOf(",") + 1 ;
+		 index = document.getElementById("supplier_material_id").value.slice(material_id_position)
+		 
+		 //得意先品番（手入力）へセット
+         var supplier_material_code = $('.searchableSupplierItem').select2('data')[0].text;
+		 document.getElementById("supplier_material_code").value = supplier_material_code;
+		 
+		 
+		 //資材Mのインデックスも変更
+		 //document.getElementById("material_id").options[index].selected = true;
+		 
+         $(".searchableItem").val(index).trigger("change");
+		 
+		//品番・品名をセット
+		//setItem(index);
+		//単価をセット
+		//setUnitPrice();
+	  });
+	  
+	 
+      $(".searchableMaker").select2({ theme: "bootstrap" });
+
+      $( ".searchableMaker" ).change(function(e) {
+           //メーカー名のセット
+          obj = document.getElementById("maker_id");
+          index = obj.selectedIndex;
+          if (index !== 0){
+             obj2 = document.getElementById("maker_name");
+             obj2.value = obj.options[index].innerText;
+          }
+      });
+      //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	  $( ".searchableMaker" ).on("select2:close", function (e) {
+	    $('[tabindex=11]').focus(); 
+	  });
+	  
+	 //検索可能なリストボックス(仕入業者の場合)
+     $(".searchableSupplier").select2({ theme: "bootstrap" });
+     $( ".searchableSupplier" ).change(function(e) {
+       //setUnitPrice();
+	   setSupplierItem();
+     });
+     
+	 //select2読み込んだ場合の処理
+	 //$( ".searchableSupplier" ).on("select2:loaded", function (e) {
+	 //  setSupplierItem();
+	 //});
+	 
+	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+	 $( ".searchableSupplier" ).on("select2:close", function (e) {
+	   $('[tabindex=5]').focus(); 
+	 });
+	  
+	  //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+	  $( ".searchableSubject" ).on("select2:close", function (e) {
+	    $('[tabindex=3]').focus(); 
+	  });
+	   
+      //検索可能なリストボックス(注文Noの場合)
+      $(".searchableSubject").select2({ theme: "bootstrap" });
+
+       $( ".searchableSubject" ).change(function(e) {
+      
+        //obj = f.purchase_datum_purchase_order_datum_id;
+        obj = document.getElementById("purchase_datum");
+        index = obj.selectedIndex;
+    
+        var str = obj.options[index].innerText;
+        //var searchIndex = obj.options[index].innerText.search("/");
+        //指定文字を抜き出す。区切り文字はモデル内に記述
+        var searchIndex = obj.options[index].innerText.search("<");
+        //数字だけ抜き出す。引数の10は10進数の意。
+        var KenId = parseInt(str.substr(searchIndex + 1,8),10);
+        
+		//工事のセット
+        obj2 = document.getElementById("lstConstruction_datumid");
+        obj2.selectedIndex = KenId;
+        $(".searchableConstructionCode").val(KenId).change(); 
+        
+		purchase_order_code = str.substr(0, searchIndex) ;
+		
+        //add170306 注文Noの頭文字を抜き出す
+		purchase_order_code_header = str.substr(0, 1) ;
+		
+        $.get("<%= purchase_datum_supplier_select_path %>",
+          {purchase_order_code: purchase_order_code },
+          function(data){
+            //
+              
+              //debugger;
+              
+			  //外注・機材借入の場合の入力自動化
+              //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+              //upd180220
+              if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+			    setForOursourcing(purchase_order_code_header);
+			  }
+			  
+			  
+			  obj = document.getElementById("supplier_id_hide").textContent;
+			  if (obj != null){
+		      index = parseInt(obj);
+              $(".searchableSupplier").val(index).trigger("change"); 
+		      }
+			  
+              //index = obj.selectedIndex;
+              //f.list_price.value = obj.options[index].innerText;
+        });
+		
+     });
+     //
+     $('#supplier_id').change(function(){
+        var supplier_id = $("#supplier_id").val();
+        var material_id = $("#material_id").val();
+		
+	   $.get("<%= purchase_datum_unit_price_select_path %>",
+          { supplier_id: supplier_id, material_id: material_id },
+          function(data){ }
+        );
+      });
+	  
+      
+      //外注請求書用のチェック
+      //一旦保留・・・
+      //var checkbox = document.getElementById('outsourcing_invoice_flag');
+      //checkbox.onchange = function() {
+      //  if(this.checked) {
+      //    var construction_datum_id = $("#construction_datum_id").val();
+      //    var supplier_id = $("#supplier_id").val();
+	 //     if (document.getElementById('purchase_unit_price').value == "" || 
+     //          parseInt(document.getElementById('purchase_unit_price').value) == 0)
+      //    {
+	  //     $.get("<%= purchase_datum_get_labor_cost_path %>",
+      //        { construction_datum_id: construction_datum_id, supplier_id: supplier_id },
+      //          function(data){ 
+      //               if (document.getElementById('unit_price_hide').innerText != undefined)
+      //               {
+      //                 //労務費を単価にセット
+      //                 document.getElementById('purchase_unit_price').value = document.getElementById('unit_price_hide').innerText;
+      //                 //金額へもそのままセット
+       //                document.getElementById('purchase_amount').value = document.getElementById('purchase_unit_price').value;
+       //              }
+       //         }
+       //     );
+       //   }
+        
+        //    details_div.style['display'] = 'block';
+        //} else {
+          //debugger;
+        //}
+      //};
+	
+   });
+   
+   //外注フラグをチェックする
+   function setOutSourcingFlag(){
+     //一旦チェックを外してから、イベント発現させる
+     document.getElementById("outsourcing_invoice_flag").checked = false;
+     $('#outsourcing_invoice_flag').trigger('click');
+   }
+   
+   function initialMurayama(){
+     //upd180220
+     obj = document.getElementById("purchase_datum");
+     index = obj.selectedIndex;
+     var str = obj.options[index].innerText;
+     purchase_order_code = str.substr(0, searchIndex) ;
+     //指定文字を抜き出す。区切り文字はモデル内に記述
+     var searchIndex = obj.options[index].innerText.search("<");
+        
+     //add170306 注文Noの頭文字を抜き出す
+     purchase_order_code_header = str.substr(0, 1) ;
+     
+     if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
+	    setDefaultOursourcing();
+     }
+   }
+   
+   //フォームロード時のイベント
+   window.onload = function(){
+  //    $(".searchableSupplier").val(index).trigger("change");
+     setSupplierItem();
+	 
+	 
+     
+	 //品名をデフォルトでセット（フリー入力以外はマスターから取得)
+	 //$(".searchableItem").trigger("change");
+	 obj = document.getElementById("material_id");
+     index = obj.selectedIndex;
+     setItem(index);
+	 
+     //外注なら、各種パラメータを自動でセットする
+	 var out = document.getElementById("outsourcing").value;
+	 if (out == "1"){
+	   setDefaultOursourcing();
+	 }
+     
+	 //add180220
+     //initialMurayama();
+     
+	 //del171214  
+	 //フィールド化。
+	 //入庫・出庫などは単価更新をさせない
+	 //uncheckUnitPrice();
+   }
+   
+   //伝票番号が入力されたら、見出しIDをセットする（存在する場合）
+   function setHeaderId(){
+     slip_code = document.getElementById("slip_code").value;  
+     $.get("<%= purchase_datum_get_header_id_path %>",
+          {slip_code: slip_code },
+          function(data){
+//            obj = document.getElementById("purchase_header_id_hide").textContent;
+//			document.getElementById("purchase_header_id").value = obj;
+            obj = document.getElementById("complete_flag_hide").textContent;
+			document.getElementById("complete_flag").checked = obj;
+	 });
+   }
+   
+   //入庫・出庫は「単価マスタを更新しない」フラグにチェックを入れる)
+   function uncheckUnitPrice(){
+     division_id = document.getElementById("division_id").value;
+	 division_id = parseInt(division_id);
+	 
+	 inventory_division_id = document.getElementById("inventory_division_id").value;
+	 inventory_division_id = parseInt(inventory_division_id);
+	 
+	 if (division_id == INDEX_DIVISION_SHIPPING) {
+	   document.getElementById("unit_price_not_update_flag").checked = true;
+	   //在庫区分も”出庫”にする
+	   //document.getElementById("inventory_division_id").selectedIndex = INDEX_INVENTORY_SHIPPING;
+	   document.getElementById("inventory_division_id").value = INDEX_INVENTORY_SHIPPING;
+	   
+	   //かつ、在庫マスターの単価を持ってくる！！
+	   getInventoryUnitPricesAndSupplier();
+	   
+	 }else{
+	   
+	   if (inventory_division_id == INDEX_INVENTORY_STOCK){
+	   //add171011入庫の場合もチェック入れる
+	     document.getElementById("unit_price_not_update_flag").checked = true;
+	   }else{
+	     document.getElementById("unit_price_not_update_flag").checked = false;
+	   }
+	 }
+   }
+   
+   //入庫・出庫は「単価マスタを更新しない」フラグにチェックを入れる)--入出庫区分選択した場合。
+   function uncheckUnitPriceInventory(){
+     inventory_division_id = document.getElementById("inventory_division_id").value;
+     //出庫の場合、仕入区分も”出庫”にする
+	 if (inventory_division_id == INDEX_INVENTORY_SHIPPING){
+	   document.getElementById("division_id").value = INDEX_DIVISION_SHIPPING;
+	   
+	   //かつ、在庫マスターの単価を持ってくる！！
+	   getInventoryUnitPricesAndSupplier();
+	   
+	 }
+	 //入庫の場合、仕入区分は”仕入”にする
+	 if (inventory_division_id == INDEX_INVENTORY_STOCK){
+	   document.getElementById("division_id").value = INDEX_DIVISION_PURCHASE;
+	 }
+	 
+	 
+	 if (inventory_division_id != "" && inventory_division_id == INDEX_INVENTORY_STOCK || 
+	     inventory_division_id == INDEX_INVENTORY_SHIPPING) {
+	   document.getElementById("unit_price_not_update_flag").checked = true;
+	 }
+	 
+	 //del171214 入出庫以外でも単価更新しないケースもあるので、フィールド化した。
+	 //}else{
+	 //  document.getElementById("unit_price_not_update_flag").checked = false;
+	 //}
+	 
+	 //在庫品目なら件名を自動セットする(マイナス登録もあるので保留)
+	 //setConstructionOnStocked();
+   }
+   
+   //在庫Mより現在単価・業者を取得する（出庫の場合に取得する）--ajax利用
+   function getInventoryUnitPricesAndSupplier() {
+     material_id = document.getElementById("material_id").value;
+	 $.get("<%= inventoriez_get_unit_price_path %>",
+          {material_id: material_id },
+          function(data){
+		    obj = document.getElementById("unit_price_hide").textContent;
+			//obj = document.getElementById("unit_price_hide").textContent;
+			document.getElementById("purchase_unit_price").value = obj;
+	 });
+   }
+   
+   //外注の場合のパラメータ初期値
+   function setDefaultOursourcing(){
+     //品番
+	 index = 1;
+     $(".searchableItem").val(index).trigger("change");
+     //品名
+	 document.getElementById("material_name").value = "外注費";
+	 //メーカー
+	 index = 1;
+     $(".searchableMaker").val(index).trigger("change");
+     //数量
+     document.getElementById("quantity").value = 1;
+	 //単位(「式」にする。id変更になった場合注意！)
+	 index = 12;
+     $(".searchableUnit").val(index).trigger("change");
+	 //区分(外注)
+	 document.getElementById("division_id").value = INDEX_DIVISION_OUTSOURCING;
+	 
+   }
+   
+   //注文番号のパラメータがある場合の初期値
+   //function test(){
+   //}
+   
+   //村山電気等、外注用の入力自動化
+   function setForOursourcing(purchase_order_code_header){
+     //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" ) {
+     
+     //upd180220
+     if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" ) {
+       //品番を切り替え
+       $(".searchableItem").val(1).trigger("change");
+	   //品名を切り替え
+	   document.getElementById("lstMaterialName").value = 1;
+	   if (purchase_order_code_header == "M" || purchase_order_code_header == "N"){
+         document.getElementById("material_name").value = "外注費";
+	   }
+	 
+	   //メーカーを切り替え
+	   $(".searchableMaker").val(1).trigger("change");
+	 
+       //１式を自動化
+       document.getElementById("quantity").value = 1;
+       index_set = 12;
+	   $(".searchableUnit").val(index_set).trigger("change");
+       //区分を自動化(外注に)
+	   document.getElementById("division_id").value = INDEX_DIVISION_OUTSOURCING;
+	 }
+	 
+	 if (purchase_order_code_header == "R"){
+	   //区分を自動化(機材借入に)
+	 document.getElementById("division_id").value = INDEX_DIVISION_MACHINE_RENTAL;
+	 }
+   }
+   
+   function copySupplierCodeToMaterial(){
+   //手入力の仕入先品番→通常の仕入先品番へセット
+     if (document.getElementById("supplier_material_code").value != ""){
+	   
+	   //add170807 仕入先品番のみ新たに追加する場合を考慮
+	   var blnSame = false;
+	   if (document.getElementById("material_code").value == 
+	      document.getElementById("supplier_material_code").value) {
+		  blnSame = true;
+	   } else {
+	     
+		 var code = document.getElementById("material_code").value;
+		 var no_hyphen_code = code.replace( /-/g , "" ) ;
+		 if (no_hyphen_code == document.getElementById("supplier_material_code").value){
+		   blnSame = true;
+		 }
+	   }
+	   // 
+		  
+	     if (blnSame == false){
+	       //品番は手入力用とみなし、１をセット。
+	       $(".searchableItem").val(1).trigger("change");
+	   
+           document.getElementById("material_code").value = 
+            document.getElementById("supplier_material_code").value;
+	    }
+      }
+   }
+   
+   //入庫の場合に、工事名を自動取得する(ajax)
+   function setConstructionOnStocked(){
+     material_id = document.getElementById("material_id").value;
+     inventory_division_id = document.getElementById("inventory_division_id").value;
+	 
+	 if (inventory_division_id != "" && inventory_division_id == INDEX_INVENTORY_STOCK) {
+	   
+	   $.get("<%= purchase_datum_construction_select_on_stocked_path %>",
+            { material_id: material_id },
+            function(data){
+              obj = document.getElementById("construction_datum_id_hide").textContent;
+			  if (obj != "" && obj != "1"){
+			    index = parseInt(obj);
+				//注文番号はＩＤの１をセット
+				//$(".searchableSubject").val(1).attr('selected', true)
+				//$('.searchableSubject').select2("val", "1");
+				
+				//件名を自動でセット
+				$(".searchableConstructionCode").val(index).trigger("change");
+				
+			  }
+	          }
+        );
+	 }
+   }
+   
+   
+   //品番・品名のセット
+   function setItem(index){
+       //品番のセット
+       obj4 = document.getElementById("material_code");
+       obj = document.getElementById("material_id");
+       obj4.value = obj.options[index].innerText;
+	  
+		 
+	   //品名のセット（リスト）
+       obj2 = document.getElementById("lstMaterialName");
+       obj2.selectedIndex = index;
+       //品名のセット（テキスト）
+       if (index !== 0){
+          obj3 = document.getElementById("material_name");
+          obj3.value = obj2.options[index].innerText;
+        }
+   }
+   
+   //add180402
+   //出庫の場合のみ、在庫の単価・業者を取得
+   function setInventoriesInfo(){
+     division_id = document.getElementById("division_id").value;
+     if (division_id == INDEX_DIVISION_SHIPPING) {
+       getInventoryUnitPricesAndSupplier();
+     }
+   }
+   
+   //資材分類のセット
+   function setMaterialCategory()
+   {    
+      var material_id = document.getElementById("material_id").value;
+      if (material_id > 1) {
+        $.get("<%= purchase_datum_material_category_select_path %>",
+            { material_id: material_id },
+            function(data){
+              obj = document.getElementById("material_category_id_hide").textContent;
+              if (obj != null){
+		        index = parseInt(obj);
+                $(".searchableCategory").val(index).trigger("change"); 
+		      }
+            }
+        );
+      }
+   
+   }
+   
+  //仕入先単価のセット
+   function setUnitPrice()
+   {
+      //仕入単価のセット
+      //var supplier_id = f.supplier_id.value;
+      //var material_id = f.material_id.value;
+	  
+      var supplier_id = document.getElementById("supplier_id").value;
+      var material_id = document.getElementById("material_id").value;
+      var last_unit_price_update_at = document.getElementById("last_unit_price_update_at").value;
+	  
+	  if (material_id > 1) {
+	  
+        $.get("<%= purchase_datum_unit_price_select_path %>",
+            { supplier_id: supplier_id, material_id: material_id },
+            function(data){
+              //obj = document.getElementById("unit_price").textContent;
+	          //document.getElementById("unit_price").value = obj;
+			  obj = document.getElementById("unit_price_hide").textContent;
+			  
+              document.getElementById("purchase_unit_price").value = obj;
+			 
+			  //金額の計算も行う
+			  //add171216
+			  if (document.getElementById("quantity") != undefined && document.getElementById("purchase_unit_price") != undefined){
+   	             
+				var num = document.getElementById("quantity").value * document.getElementById("purchase_unit_price").value ;
+                //小数点以下を切り捨て
+                document.getElementById("purchase_amount").value = Math.floor(num);
+                //
+			  }
+			  //
+			  
+              //var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;
+                 var purchase_date_set = document.getElementsByName("purchase_datum[purchase_date][]")[0].value + "/" + document.getElementsByName("purchase_datum[purchase_date][]")[1].value + "/" 
+                                    + document.getElementsByName("purchase_datum[purchase_date][]")[2].value; 
+               
+                   if (last_unit_price_update_at <= purchase_date_set){
+                     document.getElementById("last_unit_price").value = obj; 
+                      document.getElementById("last_unit_price_update_at").value = purchase_date_set;  
+            }
+              }
+          );
+      
+        //単位のセット
+        // var material_id = document.getElementById("material_id").value;
+	    $.get("<%= purchase_datum_unit_select_path %>",
+            { supplier_id: supplier_id, material_id: material_id },
+            function(data){
+            }
+          );
+     }
+   }
+
+   //仕入先品番をセット(Ajax)
+   function setSupplierItem(){
+     var supplier_id = document.getElementById("supplier_id").value;
+     $.get("<%= purchase_datum_supplier_item_select_path %>",
+            { supplier_id: supplier_id },
+            function(data){
+            });
+     
+   }
+
+   //定価・メーカー・単位のセット
+   function setListPriceAndMakerAndUnit(f)
+   //function setListPriceAndMakerAndUnit()
+   {  
+    
+	 //obj = document.getElementById("material_id");
+     //material_id = obj.selectedIndex;
+	 //if (material_id > 1){
+	
+     //定価のセット
+     //初期値をセット
+     f.material_list_price.selectedIndex = 1;
+     //document.getElementById("material_list_price").selectedIndex = 1;
+
+	 var material_id = f.material_id.value;
+     $.get("<%= purchase_datum_list_price_select_path %>",
+          {material_id: material_id },
+          function(data){
+            //
+            obj = document.getElementById("material_list_price");
+            index = obj.selectedIndex;
+            
+            if (material_id != 1) {
+			  
+			  if (obj.options[index] != undefined){
+                f.list_price.value = obj.options[index].innerText;
+			  }
+            }
+     }
+        );
+     //メーカーのセット
+     $.get("<%= purchase_datum_maker_select_path %>",
+          {material_id: material_id },
+          function(data){
+          //メーカー名もセット
+   	      obj = f.maker_id;
+   	      index = obj.selectedIndex;
+            //上記でピンポイントしているので0とする
+            index = 0;
+  	         f.maker_name.value = obj.options[index].innerText;
+          }
+        );
+     
+       //単位も再セット
+       setUnitPrice(f);
+     
+	 //}
+   }
+  
+  //金額計算
+  function calcMoney(f)
+  {
+   
+    //var num = f.purchase_datum_quantity.value * f.purchase_unit_price.value ;
+	//upd170307
+	var num = document.getElementById("quantity").value * f.purchase_unit_price.value ;
+    //小数点以下を切り捨て
+    //f.purchase_datum_purchase_amount.value = Math.floor(num);
+	document.getElementById("purchase_amount").value  = Math.floor(num);
+
+    // 仕入単価をセット
+    if (f.unit_price != undefined) {
+      f.unit_price.value = f.purchase_unit_price.value;
+	}
+    //単価Mの直近単価も更新
+    var purchase_date_set = f.purchase_date[0].value + "/" + f.purchase_date[1].value + "/" + f.purchase_date[2].value;  
+   
+   
+   
+    if (f.last_unit_price_update_at.value <= purchase_date_set){
+     f.last_unit_price.value = f.purchase_unit_price.value;
+     f.last_unit_price_update_at.value = purchase_date_set;
+	
+    }
+  }
+    
+  
+</script>

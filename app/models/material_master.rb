@@ -4,6 +4,9 @@ class MaterialMaster < ActiveRecord::Base
 	#has_many :PurchaseDatum
 	belongs_to :PurchaseDatum
 	belongs_to :MakerMaster, :foreign_key => "maker_id"
+    
+    has_many :PurchaseUnitPrice, :foreign_key => "material_id"  #add201208
+    
     belongs_to :material_category
     
     has_many :UnitMaster
@@ -46,12 +49,24 @@ class MaterialMaster < ActiveRecord::Base
    #scope :with_inventory_item, -> { where.not(:inventory_category_id => nil).where("inventory_category_id > ?", 0) }
    scope :with_inventory_item, -> { where.not(:inventory_category_id => nil) }
    
-   #add180627
-   #scope :with_category, -> (id=1){joins(:material_category).where("material_categories.id = material_masters.material_category_id" )}
    scope :with_category, -> (id=1){joins(:material_category)}
    
+   
+   #add201208
+   #scope :with_supplier_material_code, -> (dummy, supplier_material_id) { 
+   #scope :with_supplier_material_code, -> (supplier_material_id=1) {
+   scope :with_supplier_material_code, -> (supplier_material_id) {
+      
+      if supplier_material_id.present?
+        strAry = supplier_material_id.split(",")  #仕入先id, 品番idで結合されたキーの為、分割させる
+        joins(:PurchaseUnitPrice).where("purchase_unit_prices.material_id = ?", strAry[1] )
+      end
+   }
+   
+   
    def self.ransackable_scopes(auth_object=nil)
-       [:with_maker, :with_category]
+       [:with_maker, :with_category, :with_supplier_material_code]
+       #[:with_maker, :with_category]
    end
    
    

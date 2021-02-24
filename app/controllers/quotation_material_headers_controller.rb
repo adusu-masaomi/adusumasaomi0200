@@ -564,7 +564,6 @@ class QuotationMaterialHeadersController < ApplicationController
 	    end
 	  end
 	
-	#binding.pry
 	
 	  i = 0
    
@@ -591,13 +590,30 @@ class QuotationMaterialHeadersController < ApplicationController
           item[:maker_id] = @maker_master.id
         end
       end
-      ####
+      ###
           
       #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
 		  if @maker_master.present?
         item[:maker_name] = @maker_master.maker_name
       end
 		  
+      #分類手入力の場合の新規登録
+      #add201212
+      @material_category = MaterialCategory.where(:id => item[:material_category_id]).first
+      
+      if @material_category.nil?
+        #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+        material_category_params = {name: item[:material_category_id] }
+        @material_category = MaterialCategory.new(material_category_params)
+        @material_category.save!(:validate => false)
+                     
+        if @material_category.present?
+          #メーカーIDを更新（パラメータ）
+          item[:material_category_id] = @material_category.id
+        end
+      end
+      ###
+      
 		  id = item[:material_id].to_i
            
 		  #手入力以外なら、商品CD・IDをセットする。
@@ -723,123 +739,198 @@ class QuotationMaterialHeadersController < ApplicationController
   def send_email
    #メール送信する(メール送信ボタン押した場合)
      
-	 if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
-	   $detail_parameters = params[:quotation_material_header][:quotation_material_details_attributes]
+    if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
+	    $detail_parameters = params[:quotation_material_header][:quotation_material_details_attributes]
 	   
-	   if $seq_exists > 0
-	     #昇順になっている場合は、本来の降順にしておく。
-	     $tmp_detail_parameters = Hash[$detail_parameters.sort.reverse]
-	   else
-	     $tmp_detail_parameters = $detail_parameters
-	   end
-	 end
+      if $seq_exists > 0
+        #昇順になっている場合は、本来の降順にしておく。
+	      $tmp_detail_parameters = Hash[$detail_parameters.sort.reverse]
+      else
+	      $tmp_detail_parameters = $detail_parameters
+	    end
+    end
 	   
-     #add181002
-     #備考(全体)をセット
-     $notes = nil
-     if params[:quotation_material_header][:notes].present?
-       $notes = "※" + params[:quotation_material_header][:notes]
-     end
+    #備考(全体)をセット
+    $notes = nil
+    if params[:quotation_material_header][:notes].present?
+      $notes = "※" + params[:quotation_material_header][:notes]
+    end
      
-     #画面のメアドをグローバルへセット
-     $email_responsible = params[:quotation_material_header][:email]
+    #画面のメアドをグローバルへセット
+    $email_responsible = params[:quotation_material_header][:email]
      
-     #add180405
-     #CC用に担当者２のアドレスもグローバルへセット
-     $email_responsible2 = nil
-     if params[:quotation_material_header][:supplier_master_id].present?
-       supplier = SupplierMaster.where(id: params[:quotation_material_header][:supplier_master_id]).first
+    #add180405
+    #CC用に担当者２のアドレスもグローバルへセット
+    $email_responsible2 = nil
+    if params[:quotation_material_header][:supplier_master_id].present?
+      supplier = SupplierMaster.where(id: params[:quotation_material_header][:supplier_master_id]).first
          
-       if supplier.present? && supplier.email2.present?
-         $email_responsible2 = supplier.email2
-       end
-     end
-     #add end
+      if supplier.present? && supplier.email2.present?
+        $email_responsible2 = supplier.email2
+      end
+    end
+    #add end
      
-     #仕入先（１〜３）の判定
-     setSupplier
+    #仕入先（１〜３）の判定
+    setSupplier
 
 	 
-	 if params[:quotation_material_header][:sent_flag] == "1" then
-	 #見積メールの場合
+    if params[:quotation_material_header][:sent_flag] == "1" then
+	  #見積メールの場合
 	   
-	   PostMailer.send_quotation_material(@quotation_material_header).deliver
-	 
+      PostMailer.send_quotation_material(@quotation_material_header).deliver
 	   
-	 elsif params[:quotation_material_header][:sent_flag] == "2" then
-	 #注文メールの場合
+    elsif params[:quotation_material_header][:sent_flag] == "2" then
+	  #注文メールの場合
 	   
-	   #画面の注文Noをグローバルへセット（メール用）
-	   $purchase_order_code = nil
-	   if params[:quotation_material_header][:purchase_order_code].present?
-	     $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
-	   end
+	    #画面の注文Noをグローバルへセット（メール用）
+	    $purchase_order_code = nil
+	    if params[:quotation_material_header][:purchase_order_code].present?
+	      $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
+	    end
 	   
-	   PostMailer.send_order_after_quotation(@quotation_material_header).deliver
-	   
-	   
-	end
-	 
-  #各種更新処理
-	
-	if params[:quotation_material_header][:sent_flag] == "1" 
-	#見積メールの場合
-	   #メールの各種送信フラグをセット（ヘッダ・見積比較用）
-	   set_quotation_mail_flag_for_comparison
-	elsif params[:quotation_material_header][:sent_flag] == "2" 
-	  #メールの各種送信フラグをセット（ヘッダ・注文用）
-       set_order_mail_flag_for_comparison
-	end
-   
-    if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
-	   if $seq_exists > 0
-	   #昇順(編集時)になっている場合は、明細パラメータを本来の降順にしておく。
-	     #if params[:quotation_material_header][:quotation_email_flag_1] == 0 && params[:quotation_material_header][:order_email_flag_1] == 0
-		   params[:quotation_material_header][:quotation_material_details_attributes] = 
-	        Hash[params[:quotation_material_header][:quotation_material_details_attributes].sort.reverse]
-		 #end
-	   end
-	   
-       #メール送信フラグ(明細用)をセット＆データ更新
-       set_mail_sent_flag
-	end
-	
-	if params[:quotation_material_header][:sent_flag] == "2" 
-	#注文番号が新規の場合に、更新させる
-      set_new_purchase_order_code
+	    PostMailer.send_order_after_quotation(@quotation_material_header).deliver
+      
     end
 	 
+    #各種更新処理
+	
+    if params[:quotation_material_header][:sent_flag] == "1" 
+    #見積メールの場合
+	   #メールの各種送信フラグをセット（ヘッダ・見積比較用）
+      set_quotation_mail_flag_for_comparison
+    elsif params[:quotation_material_header][:sent_flag] == "2" 
+	  #メールの各種送信フラグをセット（ヘッダ・注文用）
+      set_order_mail_flag_for_comparison
+	  end
+   
+    if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
+      if $seq_exists > 0
+      #昇順(編集時)になっている場合は、明細パラメータを本来の降順にしておく。
+	      #if params[:quotation_material_header][:quotation_email_flag_1] == 0 && params[:quotation_material_header][:order_email_flag_1] == 0
+		    params[:quotation_material_header][:quotation_material_details_attributes] = 
+	        Hash[params[:quotation_material_header][:quotation_material_details_attributes].sort.reverse]
+		  #end
+	    end
+	   
+      #メール送信フラグ(明細用)をセット＆データ更新
+      set_mail_sent_flag
+    end
+  
+    if params[:quotation_material_header][:sent_flag] == "2" 
+      #注文番号が新規の場合に、更新させる
+      set_new_purchase_order_code
+      
+      #add201002
+      #注文データにも保存させる
+      #binding.pry
+      
+      set_purchase_order_history
+      
+    end
+	 
+  end
+  
+  #add201002
+  #注文データに保存する
+  def set_purchase_order_history
+    purchase_order_date = params[:quotation_material_header][:requested_date]
+    
+    purchase_order_history = PurchaseOrderHistory.where(purchase_order_date: purchase_order_date, 
+                                                        purchase_order_datum_id: @purchase_order_datum_id).first
+    
+    #create or update
+    if purchase_order_history.blank?
+    #新規
+      
+      purchase_order_history_params = { purchase_order_date: purchase_order_date, 
+                                        supplier_master_id: params[:quotation_material_header][:supplier_master_id],
+                                        purchase_order_datum_id: @purchase_order_datum_id, mail_sent_flag: 1}
+      
+      @purchase_order_history = PurchaseOrderHistory.create(purchase_order_history_params)
+      
+    else
+    #更新(そのまま)
+      @purchase_order_history = purchase_order_history
+    end
+    
+    ###
+    #明細データもここで登録
+    
+    #すでに登録していた注文データは一旦抹消する。(見積注文のみ)
+    #あとから追加注文の場合もあるので、二重登録のリスクはあるが、消せない.
+    #Order.where(purchase_order_history_id: @purchase_order_history.id, quotation_flag: 1).destroy_all
+    
+    #$tmp_detail_parameters.values.each_with_index.reverse_each do |item, index|
+    $tmp_detail_parameters.values.each_with_index.each do |item, index|
+    
+      #仕入先１〜３の判定
+      case $supplier
+      when 1
+        @bid_flag = item[:bid_flag_1].to_i
+	    when 2
+        @bid_flag = item[:bid_flag_2].to_i
+	    when 3
+	      @bid_flag = item[:bid_flag_3].to_i
+	    end
+      
+      #if item[:_destroy] != "1" && @bid_flag == 1 && @mail_sent_flag != "1"
+      if item[:_destroy] != "1" && @bid_flag == 1
+      
+        purchase_order_history_id = @purchase_order_history.id
+        material_id = item[:material_id]
+        material_code = item[:material_code]
+        material_name = item[:material_name]
+        maker_id = item[:maker_id]
+        maker_name = item[:maker_name]
+        quantity = item[:quantity]
+        unit_master_id = item[:unit_master_id]
+        list_price = item[:list_price]
+        #material_category_id = xxx フィールド無し
+        #quotation_flag = 1  #見積フラグ
+        mail_sent_flag = 1  #送信済みにする
+        sequential_id = index + 1
+      
+        order_params = {purchase_order_history_id: purchase_order_history_id, material_id: material_id,
+                      material_code: material_code, material_name: material_name, maker_id: maker_id, 
+                      maker_name: maker_name, quantity: quantity, unit_master_id: unit_master_id,
+                      list_price: list_price, mail_sent_flag: mail_sent_flag, 
+                      sequential_id: sequential_id}
+      
+        @order = Order.create(order_params)
+      end
+    end  #loop end
   end
   
   #仕入先（１〜３）の判定
   def setSupplier
     $supplier = 0
 	   
-	#仕入先判定
-	if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1] 
-	#仕入先１？
-	  $supplier = 1
-	elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
-	#仕入先２？
-	  $supplier = 2
-	elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_3]
-	 #仕入先３？
-	  $supplier = 3
-	end
+    #仕入先判定
+    if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1] 
+      #仕入先１？
+      $supplier = 1
+    elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
+      #仕入先２？
+      $supplier = 2
+    elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_3]
+      #仕入先３？
+      $supplier = 3
+    end
 	   
-	#見積をせず、いきなり注文をする場合もあり得る？為、以下の判定も行う。
-	#--但し、依頼先が４社以上になった場合は考慮しない
-	if $supplier == 0
-	  if params[:quotation_material_header][:supplier_master_id].present?
-		if params[:quotation_material_header][:supplier_id_1].blank?
-	      $supplier = 1
-		elsif params[:quotation_material_header][:supplier_id_2].blank?
-		  $supplier = 2
-		elsif params[:quotation_material_header][:supplier_id_3].blank?
-		  $supplier = 3
-		end
+	  #見積をせず、いきなり注文をする場合もあり得る？為、以下の判定も行う。
+	  #--但し、依頼先が４社以上になった場合は考慮しない
+	  if $supplier == 0
+	    if params[:quotation_material_header][:supplier_master_id].present?
+		    if params[:quotation_material_header][:supplier_id_1].blank?
+	        $supplier = 1
+		    elsif params[:quotation_material_header][:supplier_id_2].blank?
+		      $supplier = 2
+		    elsif params[:quotation_material_header][:supplier_id_3].blank?
+		      $supplier = 3
+		    end
+	    end
 	  end
-	end
   
   end
   
@@ -914,95 +1005,117 @@ class QuotationMaterialHeadersController < ApplicationController
       if params[:quotation_material_header][:quotation_material_details_attributes].present?
         params[:quotation_material_header][:quotation_material_details_attributes].values.each do |item|
 		#ここは、仕入先別と見積・注文別のフラグをセット
-		  case $supplier
-		    when 1
-			#仕入先１の場合
-			  if params[:quotation_material_header][:sent_flag] == "1"
-			  #見積依頼時
-			    item[:quotation_email_flag_1] = 1
-			  elsif params[:quotation_material_header][:sent_flag] == "2"
-			  #注文依頼時
-			    if item[:bid_flag_1] == "1"  #落札されている？
-			      item[:order_email_flag_1] = 1
-				end
-			  end
-			when 2
-			#仕入先２の場合
-			  if params[:quotation_material_header][:sent_flag] == "1"
-			  #見積依頼時
-			    item[:quotation_email_flag_2] = 1
-			  elsif params[:quotation_material_header][:sent_flag] == "2"
-			  #注文依頼時
-			    if item[:bid_flag_2] == "1"  #落札されている？
-			      item[:order_email_flag_2] = 1
-				end
-			  end
-			when 3
-			#仕入先３の場合
-			  if params[:quotation_material_header][:sent_flag] == "1"
-			  #見積依頼時
-			    item[:quotation_email_flag_3] = 1
-			  elsif params[:quotation_material_header][:sent_flag] == "2"
-			  #注文依頼時
-			    if item[:bid_flag_3] == "1"  #落札されている？
-			      item[:order_email_flag_3] = 1
-				end
-			  end
 		  
-		  end
+        case $supplier
+		      when 1
+			    #仕入先１の場合
+			    if params[:quotation_material_header][:sent_flag] == "1"
+			      #見積依頼時
+			      item[:quotation_email_flag_1] = 1
+			    elsif params[:quotation_material_header][:sent_flag] == "2"
+			    #注文依頼時
+			      if item[:bid_flag_1] == "1"  #落札されている？
+			        item[:order_email_flag_1] = 1
+				    end
+			    end
+			    when 2
+			    #仕入先２の場合
+			    if params[:quotation_material_header][:sent_flag] == "1"
+			      #見積依頼時
+			      item[:quotation_email_flag_2] = 1
+			    elsif params[:quotation_material_header][:sent_flag] == "2"
+			    #注文依頼時
+			      if item[:bid_flag_2] == "1"  #落札されている？
+			        item[:order_email_flag_2] = 1
+				    end
+			    end
+			    when 3
+			      #仕入先３の場合
+			      if params[:quotation_material_header][:sent_flag] == "1"
+			      #見積依頼時
+			        item[:quotation_email_flag_3] = 1
+			      elsif params[:quotation_material_header][:sent_flag] == "2"
+			      #注文依頼時
+			        if item[:bid_flag_3] == "1"  #落札されている？
+			          item[:order_email_flag_3] = 1
+				      end
+			      end
+		  
+		      end
              
         # item[:mail_sent_flag] = 1
-        end
+        end  #do end
 		
-		#再度ここで更新をかける(削除後)
-		destroy_before_update
-		@quotation_material_header.update(quotation_material_header_params)
+		    #再度ここで更新をかける(削除後)
+		    destroy_before_update
+		    @quotation_material_header.update(quotation_material_header_params)
 		
       end
-	end
+	  end
   end
 
   #注文番号が新規の場合に、更新させる
   def set_new_purchase_order_code
     
-    #binding.pry
-	
-	purchase_order_code = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
+    
+    purchase_order_code = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
            where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
            where("id is NOT NULL").pluck(:purchase_order_code).flatten.join(" ")
 
+    #add201002 履歴保存用
+    tmp_purchase_order_data = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
+                                where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
+                                where("id is NOT NULL").first
+    @purchase_order_datum_id = nil
+    if tmp_purchase_order_data.present?
+      @purchase_order_datum_id = tmp_purchase_order_data.id
+    end
+    #
+    
     if purchase_order_code.blank?
       
-	  #定数ファイルへ頭文字のアルファベットも保存
-	  @constant = Constant.find(1)   #id=１に定数ファイルが保管されている
+	    #定数ファイルへ頭文字のアルファベットも保存
+	    @constant = Constant.find(1)   #id=１に定数ファイルが保管されている
 	  
-	  #binding.pry
-	  if @constant.present?
-	    tmp_code = params[:quotation_material_header][:purchase_order_code] 
+	    #binding.pry
+	    if @constant.present?
+	      tmp_code = params[:quotation_material_header][:purchase_order_code] 
 	    
-		if tmp_code.present?
-		  #header = tmp_code[0, 1]
+        if tmp_code.present?
+          #header = tmp_code[0, 1]
           
           #upd180411
           #新コードの年(Axx)が最終コード以上の場合のみ更新。(古い年でテストするケースもあるため）
           new_year = tmp_code[1,2].to_i
           current_year = @constant.purchase_order_last_header_code[1,2].to_i
           
-          #if new_year >= current_year
-          if new_year > current_year   #upd180919
+          update_flag = false
           
+          if new_year > current_year   
+            update_flag = true
+          else
+            #add210224
+            #注文コード下２桁でも比較
+            if tmp_code[3,2].to_i >=
+              @constant.purchase_order_last_header_code[3,2].to_i 
+              update_flag = true
+            end
+          end
+          
+          if update_flag
             constant_params = { purchase_order_last_header_code: tmp_code}
             @constant.update(constant_params)
           end
-		end
-	  end
-	  #
+          
+        end
+	    end
+	    #
 	  
-	  construction_name = ConstructionDatum.where(:id => params[:quotation_material_header][:construction_datum_id]).
+	    construction_name = ConstructionDatum.where(:id => params[:quotation_material_header][:construction_datum_id]).
            where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	  
 	  
-      purchase_order_data_params = { purchase_order_code:  params[:quotation_material_header][:purchase_order_code], 
+        purchase_order_data_params = { purchase_order_code:  params[:quotation_material_header][:purchase_order_code], 
 	                                 construction_datum_id:  params[:quotation_material_header][:construction_datum_id], 
                                      supplier_master_id: params[:quotation_material_header][:supplier_master_id], alias_name: construction_name, 
                                      purchase_order_date:  params[:quotation_material_header][:requested_date] }
@@ -1010,7 +1123,10 @@ class QuotationMaterialHeadersController < ApplicationController
 	  
       @purchase_order_data = PurchaseOrderDatum.create(purchase_order_data_params)
 		  
-	end
+      #add201002 履歴保存用
+      @purchase_order_datum_id = @purchase_order_data.id
+      
+    end
 	
   end
 

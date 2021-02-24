@@ -292,7 +292,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 
    #既存のデータを取得する(日付・仕入先指定後。)
   def get_data
-    
+     
      #
 	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
 	    purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
@@ -359,6 +359,7 @@ class PurchaseOrderHistoriesController < ApplicationController
   # PATCH/PUT /purchase_order_histories/1
   # PATCH/PUT /purchase_order_histories/1.json
   def update
+      
       
 	  #del170724 
 	  #すでに登録していた注文データは一旦抹消する。
@@ -479,9 +480,24 @@ class PurchaseOrderHistoriesController < ApplicationController
               item[:maker_id] = @maker_master.id
             end
           end
-          ####
-          
-          
+          ##
+          #分類手入力の場合の新規登録
+          #add201212
+          @material_category = MaterialCategory.where(:id => item[:material_category_id]).first
+      
+          if @material_category.nil?
+          #名称にID(カテゴリー名が入ってくる--やや強引？)をセット。
+            material_category_params = {name: item[:material_category_id] }
+            @material_category = MaterialCategory.new(material_category_params)
+            @material_category.save!(:validate => false)
+                     
+            if @material_category.present?
+            #メーカーIDを更新（パラメータ）
+                item[:material_category_id] = @material_category.id
+            end
+          end
+          ###
+                    
           
 		  #あくまでもメール送信用のパラメータとしてのみ、メーカー名をセットしている
 		  if @maker_master.present?
@@ -515,10 +531,6 @@ class PurchaseOrderHistoriesController < ApplicationController
 			  #品名・メーカーを登録or変更した場合は、商品マスターへ反映させる。
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  #品名・メーカーIDをそれぞれ更新
-                  #materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
-                  #                             :notes => item[:notes] )
-                  #upd190226
                   materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
                                                :notes => item[:notes], :material_category_id => item[:material_category_id] )
                 end 
@@ -750,7 +762,11 @@ class PurchaseOrderHistoriesController < ApplicationController
 	 if @unit_id.blank?
 	   @unit_id = "3"
 	 end
-	 
+     
+     #supplier_master_id
+     @order_unit_price = PurchaseUnitPrice.where(:material_id => params[:id], :supplier_id => params[:supplier_master_id]).
+                                 where("id is NOT NULL").pluck(:unit_price).flatten.join(" ")
+     
   end
   
   #メーカーから該当する商品を取得
@@ -849,7 +865,7 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #upd170616 メーカー名は抹消
 	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, :notes, 
 	                  orders_attributes: [:id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
-                     :maker_id, :list_price, :material_category_id, :mail_sent_flag, :_destroy])
+                     :maker_id, :list_price, :order_unit_price, :order_price, :material_category_id, :mail_sent_flag, :_destroy])
     end
 
 end

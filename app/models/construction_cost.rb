@@ -5,6 +5,14 @@ class ConstructionCost < ActiveRecord::Base
   has_one :construction_daily_reports
   #belongs_to :purchase_order_datum
   
+  def self.final_division 
+     [["−", 0], ["Ａ", 1], ["Ｂ", 2], ["Ｃ", 3], ["Ｄ", 4], ["-", 5], ["-", 6], ["-", 7], ["-", 8], ["Ｚ", 9]]
+  end
+  
+  def self.final_division_with_explain 
+     [["- 通常", 0], ["Ａ-手間のみの作業", 1], ["Ｂ-一般に売ったもの", 2], ["Ｃ-業者に売ったもの", 3], ["Ｄ-レンタル", 4]]
+  end
+  
   #労務費(日報)
   attr_accessor :labor_cost_origin
   #差額
@@ -24,8 +32,15 @@ class ConstructionCost < ActiveRecord::Base
   
   scope :with_construction, -> (construction_costs_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id = ?", construction_costs_construction_datum_id )}
   
+  #add210208
+  #開始ID コードで比較できればベターであるが..
+  scope :with_construction_from, -> (construction_costs_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id >= ?", construction_costs_construction_datum_id )}
+  
+  #終了ID コードで比較できればベターであるが..
+  scope :with_construction_to, -> (construction_costs_construction_datum_id=1) { joins(:construction_datum).where("construction_data.id <= ?", construction_costs_construction_datum_id )}
+  
   def self.ransackable_scopes(auth_object=nil)
-  		[:with_construction]
+  		[:with_construction, :with_construction_from, :with_construction_to]
   end
   
   #scope :with_purchase_order, -> PurchaseDatum.joins(:PurchaseOrdrDatum).where(:construction_datum_id => params[:construction_datum_id]).group(:purchase_order_code).sum(:purchase_amount).flatten.join(",")

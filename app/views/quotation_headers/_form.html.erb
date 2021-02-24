@@ -13,7 +13,7 @@
  <% end %>
   
   <div class="col-sm-3" , style="margin-left : -15px">
-  <%= f.input :quotation_code, input_html:{:tabindex=>"0", style: 'width:130px'} %>
+  <%= f.input :quotation_code, input_html:{id:"quotation_code", :tabindex=>"0", style: 'width:130px'} %>
   </div>
   <div class="col-sm-3", style="margin-left : -0px">
   <%= f.input :invoice_code, input_html:{ id:"invoice_code", :tabindex=>"0", style: 'width:130px'} %>
@@ -31,7 +31,7 @@
   </div>
   </br></br></br></br></br>
   
-  <%= f.input :quotation_date, :include_blank => true, input_html:{ id:"quotation_date", :tabindex=>"1",style: 'width:100px'} %>
+  <%= f.input :quotation_date, :include_blank => true, input_html:{ id:"quotation_date", :onchange => "setCode()", :tabindex=>"1",style: 'width:100px'} %>
   
   <!--add200127-->
   <%= f.check_box :not_sum_flag %> 
@@ -46,8 +46,8 @@
   </div></br>
   
   <%= f.label :"件名Ｎｏ(＊該当無→”-”)" , {:class => "my-custom-class-l"} %></br>
-  <!--<%= f.input :construction_datum_id %>-->
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:selected => @quotation_header.construction_datum_id || 1, :include_blank => true} , 
+  <!--:selected => @quotation_header.construction_datum_id || 1(初期値１を抹消200917)  -->
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :construction_code, {:include_blank => true} , 
       {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"4",  style: 'width:220px' } %></br>
   <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"5", style: 'ime-mode:active'} %>
   <%= f.label :"得意先(＊該当無→”＜手入力用＞”)", {:class => "my-custom-class-l"} %></br>
@@ -484,7 +484,27 @@
    
    document.forms[0].submit();
  }
-  
  
+ //add200917
+ //日付から見積コードを自動的にセットする
+ function setCode()
+ {
+   var q_year = document.getElementsByName('quotation_header[quotation_date(1i)]')[0].value;
+   var q_month = document.getElementsByName('quotation_header[quotation_date(2i)]')[0].value;
+   var q_day = document.getElementsByName('quotation_header[quotation_date(3i)]')[0].value;
+   
+   if (q_year != "" && q_month != "" && q_day != "")
+   {
+       //ajax
+       $.get("<%= quotation_headerz_set_quotation_code_path %>",
+       {year: q_year, month: q_month, day: q_day },
+       function(data)
+       {
+         obj = document.getElementById("quotation_code").textContent;
+         document.getElementById("quotation_code").value = obj;
+       })
+   }
+   
+ }
  
 </script>

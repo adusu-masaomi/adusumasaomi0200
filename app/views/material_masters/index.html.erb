@@ -14,7 +14,15 @@
            {include_blank: true},  {style: 'width:900px' , class: "searchableMaterialCode" , multiple: true}  %>-->
    <%= f.select :id_in, options_from_collection_for_select(MaterialMaster.all, "id", :p_material_code, params[:q].try(:[], :id_in)) ,
        {include_blank: true}, {style: 'width:900px' , class: "searchableMaterialCode", multiple: true }  %>
+   </br>
    
+   <!--add201208-->
+   <%= f.label :supplier_material_code, '客先品番：：' %>
+   <!--本来なら複数でやりたいが上手くいかないので、保留-->
+   <!--<%= f.select :with_supplier_material_code, options_from_collection_for_select(PurchaseUnitPrice.all, "id", :supplier_material_code, params[:q].try(:[], :with_supplier_material_code)) ,
+       {include_blank: true}, {style: 'width:900px' , class: "searchableSupplierMaterialCode", multiple: true }  %>-->
+   <%= f.select :with_supplier_material_code, options_from_collection_for_select(PurchaseUnitPrice.all, "id", :supplier_material_code, params[:q].try(:[], :with_supplier_material_code)) ,
+       {include_blank: true}, {style: 'width:200px' , class: "searchableSupplierMaterialCode" }  %>
    </br>
    
    <div style="margin-left:-13px;">
@@ -119,6 +127,7 @@
   //検索可能なリストボックス
   $(document).ready(function(){
         $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        $(".searchableSupplierMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
         $(".searchableCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
         $(".searchableMaker").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
         

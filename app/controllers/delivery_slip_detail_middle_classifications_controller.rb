@@ -1202,29 +1202,44 @@ class DeliverySlipDetailMiddleClassificationsController < ApplicationController
         @delivery_slip_detail_middle_classification.id]).maximum(:line_number)
     end 
 
-    #見積品目データへ合計保存用　
-    def save_price_to_large_classifications
-        #@delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.where(:delivery_slip_header_id => params[:delivery_slip_header_id]).where(:delivery_slip_detail_large_classification_id => params[:delivery_slip_detail_large_classification_id])
-        @delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ? and id = ?", @delivery_slip_detail_middle_classification.delivery_slip_header_id,@delivery_slip_detail_middle_classification.delivery_slip_detail_large_classification_id]).first
+  #納品品目データへ合計保存用　
+  def save_price_to_large_classifications
+    @delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ? and id = ?", @delivery_slip_detail_middle_classification.delivery_slip_header_id,@delivery_slip_detail_middle_classification.delivery_slip_detail_large_classification_id]).first
 
-     if @delivery_slip_detail_large_classification.present?
-
-        #見積金額
-        @delivery_slip_detail_large_classification.delivery_slip_price = delivery_slip_total_price
-        #実行金額
-        @delivery_slip_detail_large_classification.execution_price = execution_total_price
-        #歩掛り
-        @delivery_slip_detail_large_classification.labor_productivity_unit = labor_total
-		#歩掛計
-        @delivery_slip_detail_large_classification.labor_productivity_unit_total = labor_all_total
-
-        @delivery_slip_detail_large_classification.save
+    if @delivery_slip_detail_large_classification.present?
+      
+      #add200917
+      #数量が１より大きい場合の対応
+      tmp_delivery_slip_total_price = delivery_slip_total_price
+      tmp_execution_total_price = execution_total_price
+        
+      if @delivery_slip_detail_large_classification.quantity > 1
+        @delivery_slip_detail_large_classification.working_unit_price = delivery_slip_total_price
+        @delivery_slip_detail_large_classification.execution_unit_price = execution_total_price
+          
+        #金額は数量*単価でかける
+        tmp_delivery_slip_total_price = delivery_slip_total_price.to_i * @delivery_slip_detail_large_classification.quantity
+        tmp_execution_total_price = execution_total_price.to_i * @delivery_slip_detail_large_classification.quantity
+      end 
+      #
+      
+      #見積金額
+      #@delivery_slip_detail_large_classification.delivery_slip_price = delivery_slip_total_price
+      @delivery_slip_detail_large_classification.delivery_slip_price = tmp_delivery_slip_total_price
+      #実行金額
+      #@delivery_slip_detail_large_classification.execution_price = execution_total_price
+      @delivery_slip_detail_large_classification.execution_price = tmp_execution_total_price
+      #歩掛り
+      @delivery_slip_detail_large_classification.labor_productivity_unit = labor_total
+      #歩掛計
+      @delivery_slip_detail_large_classification.labor_productivity_unit_total = labor_all_total
+      @delivery_slip_detail_large_classification.save
     
-        #見出データへも合計保存
-        save_price_to_headers
-     end
-
+      #見出データへも合計保存
+      save_price_to_headers
     end
+
+  end
 
     #見出データへ合計保存用
     def save_price_to_headers

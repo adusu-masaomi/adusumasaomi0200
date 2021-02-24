@@ -79,9 +79,9 @@
 <%= link_to "請求一覧(元請-確認用)",
             invoice_headers_path(@invoice_headers, format: "pdf" , print_flag: 1 ),
             :class => 'btn  btn-lime500_ftg btn-xs keep-disp', :target=>["_blank"] %>
-<!--<%= link_to "請求一覧(元請-中越用)",
-            invoice_headers_path(@invoice_headers, format: "pdf"  ),
-            :class => 'btn  btn-amber500_ftg btn-xs', :target=>["_blank"] %>-->
+<%= link_to "請求一覧(確定申告用)",
+            invoice_headers_path(@invoice_headers, format: "pdf" , print_flag: 2 ),
+            :class => 'btn  btn-cyan500_ftg btn-xs keep-disp', :target=>["_blank"] %>
 
 			   
 <!--見出し固定用設定追加-->

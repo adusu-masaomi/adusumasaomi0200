@@ -70,6 +70,7 @@ end
 
   # GET /purchase_order_data/new
   def new
+    
     @purchase_order_datum = PurchaseOrderDatum.new
     
     #工事データをビルド
@@ -160,6 +161,10 @@ end
   # PATCH/PUT /purchase_order_data/1
   # PATCH/PUT /purchase_order_data/1.json
   def update
+   
+    #add201229
+    #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
+    update_constant
    
     ###
     #メール送信する(メール送信ボタン押した場合)
@@ -296,33 +301,76 @@ end
   #constantに注文Noを書き込む
   def update_constant
     constant = Constant.find(1)   #id=１に定数ファイルが保管されている
-    if constant.purchase_order_last_header_code[0,1] != @purchase_order_datum.purchase_order_code[0,1]
+    
+    
+    #del201229
+    #if constant.purchase_order_last_header_code[0,1] != @purchase_order_datum.purchase_order_code[0,1]
       #外注用のアルファベットを除く
-      if @purchase_order_datum.purchase_order_code[0,1] != "M" && 
-           @purchase_order_datum.purchase_order_code[0,1] != "O"
+      #if @purchase_order_datum.purchase_order_code[0,1] != "M" && 
+      #     @purchase_order_datum.purchase_order_code[0,1] != "O"
+        
+        #(header.ord + 1).chr
+        current_header = @purchase_order_datum.purchase_order_code[0,1]
+        constant_header = constant.purchase_order_last_header_code[0,1]
+        
+        current_year = @purchase_order_datum.purchase_order_code[1,2].to_i
+        constant_year = constant.purchase_order_last_header_code[1,2].to_i
+        
+        update_flag = false
+    
+        if current_header.ord == constant_header.ord
+        #コンスタントとアルファベットが同じ場合
+          #年が切り替わった場合
+          if current_year > constant_year
+            update_flag = true
+          else  
+            #下２桁で比較
+            if @purchase_order_datum.purchase_order_code[3,2].to_i >=
+              constant.purchase_order_last_header_code[3,2].to_i 
+              update_flag = true
+            end
+          end
+        else
+        #アルファベットが大きい場合、更新
+          if current_header.ord > constant_header.ord
+            update_flag = true
+          else 
+            #年が切り替わった場合
+            if current_year > constant_year
+              update_flag = true
+            end
+          end
+        end
         
         #アルファベット以下の数値２桁が(AorB..+"xx")constant以上？
-        if @purchase_order_datum.purchase_order_code[1,2].to_i >=
-           constant.purchase_order_last_header_code[1,2].to_i 
-          
+        #if @purchase_order_datum.purchase_order_code[1,2].to_i >=
+        #   constant.purchase_order_last_header_code[1,2].to_i 
+        
+        if update_flag == true
           #更新する
           constant_params = { purchase_order_last_header_code: @purchase_order_datum.purchase_order_code}
           constant.update(constant_params)
         
         end
-      end
-    end
+      #end
+    #end
   end
   
   #add180926
   def reset_last_number
     #Constantの最終番号に該当するものを削除した場合は、直近での最大値を再セットする
     last_number = @purchase_order_datum.purchase_order_code
+    remove_id = @purchase_order_datum.id
     constant = Constant.find(1)   #id=１に定数ファイルが保管されている
     
     if constant.present? && constant.purchase_order_last_header_code == last_number
       #注文コードの直近最大値を取得
-      last_new_number = PurchaseOrderDatum.where('purchase_order_code < ?', last_number).maximum(:purchase_order_code)
+      #last_new_number = PurchaseOrderDatum.where('purchase_order_code < ?', last_number).maximum(:purchase_order_code)
+      last_id = PurchaseOrderDatum.where('id < ?', remove_id).maximum(:id)
+      last_new_number = PurchaseOrderDatum.find(last_id).purchase_order_code
+      
+      #binding.pry
+      
       #更新する
       constant_params = { purchase_order_last_header_code: last_new_number}
       constant.update(constant_params)
@@ -333,60 +381,77 @@ end
   
   #ajax
   def get_last_number_select
-     crescent = "%" + params[:header] + "%"
-     @purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
-	 
-	 #最終番号に１を足す。
-	 newStr = @purchase_order_datum_new_code[1, 4]
-	 header = @purchase_order_datum_new_code[0, 1]
-   
-   #upd180926 
-   #lastNum = @purchase_order_datum_new_code[-2, 2]  #末尾から２文字
-   #年号の２文字
-   #yearNum = @purchase_order_datum_new_code[-4, 2]
-   
-#   if lastNum.to_i != 99
-#   #通常は１だけプラスする
-#     newNum = newStr.to_i + 1
-#	 else
-#   #99まで行ったら次のアルファベットになる
-#     exist = false
-#     while exist == false
-#       header = header.succ      #アルファベットを繰り上げる
-#       #次のアルファベットでの最大値を取得
-#       crescent = "%" + header + yearNum + "%"
-#       purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
-#       #
-#       if purchase_order_datum_new_code.present?
-#         lastNum = purchase_order_datum_new_code[-2, 2]  #末尾から２文字
-#       else
-#         lastNum = 0  #次のアルファベットで同年の数値がなければ、ゼロに戻す
-#       end
-#       if lastNum.to_i != 99  #最終２桁が９９までなければ、このアルファベットで決定
-#         exist = true
-#       end
-#     end
+    
      
-#     #次のアルファベットでのナンバー判定
-#     if purchase_order_datum_new_code.present?
-#     #最終番号に１を足す。
-#	     newStr = purchase_order_datum_new_code[1, 4]
-#       newNum = newStr.to_i + 1
-#	     header = purchase_order_datum_new_code[0, 1]
-#     else
-#     #新しいアルファベットにしてゼロから開始
-#       newNum = newStr.to_i + 1  #ゼロにする
-#       newNum -= 100             #年の２桁を繰り上げないようにする
-#       #header = header.succ      #アルファベットを繰り上げる
-#     end
-#   end
-#   #
+      #crescent = "%" + params[:header] + "%"
+     #@purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
+	  #upd201229
+    #自動で番号を繰り上げる
+    constant = Constant.find(1)   #id=１に定数ファイルが保管されている
+    @purchase_order_datum_new_code = constant.purchase_order_last_header_code
    
-   newNum = newStr.to_i + 1
+    #年の判定
+    year = @purchase_order_datum_new_code[1, 2]
+    d = Date.today
+    
+    #binding.pry
+    #d.strftime("%y")
+    current_year = d.strftime("%y")
+    
+    #年が違った場合
+    if current_year != year
+    #新年とみなす
+      header = "A"
+      
+      newNum = current_year + "00"
+    else
+      #最終番号に１を足す。
+	    newStr = @purchase_order_datum_new_code[1, 4]
+	    header = @purchase_order_datum_new_code[0, 1]
+      
+      digit2 = @purchase_order_datum_new_code[3, 2]
+      
+      if digit2 == "99"
+      #99番の場合、アルファベット繰り上げる
+        newStr = ((year.to_i) -1) * 100 + 99 #年はそのまま、０がらスタート
+        header = (header.ord + 1).chr
+      end
+      
+      newNum = newStr.to_i + 1
+      
+    end
    
-	 @purchase_order_datum_new_code = header + newNum.to_s
+	  #最終番号に１を足す。
+	  #newStr = @purchase_order_datum_new_code[1, 4]
+	  #header = @purchase_order_datum_new_code[0, 1]
+   
+	  @purchase_order_datum_new_code = header + newNum.to_s
 	 
   end
+  
+  #頭文字で検索するajax
+  def get_supplier_by_character
+    
+    @suppliers = ""
+    
+    #params[:header_code]
+    if params[:header_code].present?
+      sc = params[:header_code].tr('０-９ａ-ｚＡ-Ｚ','0-9a-zA-Z')  #半角にする
+      sc = sc.downcase  #小文字にする
+      
+      @suppliers = SupplierMaster.where(:search_character => sc).pluck("supplier_masters.supplier_name, supplier_masters.id")
+      
+      if  @suppliers.blank?
+        @suppliers = SupplierMaster.all.pluck("supplier_masters.supplier_name, supplier_masters.id")
+      end
+      
+    else 
+      @suppliers = SupplierMaster.all.pluck("supplier_masters.supplier_name, supplier_masters.id")
+    end
+    
+    
+  end
+  
   def get_alias_name
      @alias_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:alias_name).flatten.join(" ")
   end

@@ -25,7 +25,7 @@
 
 <!--本番環境の場合-->
 <!--<img src="/rails/images/gif-load.gif" id="loading-indicator" style="display:none" />-->
-	
+
 	
    <div class = "form-inputs">
     <%= f.label :注文ＮＯ：, {style: 'color:blue'} %>
@@ -122,7 +122,7 @@
 	  
 	  
 	  <!-- moved170701 -->
-	   <div id="filter" > 
+	  <div id="filter" > 
 	    <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %> 
 	   
 		<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
@@ -315,7 +315,7 @@
        });
        //add190226
        //分類
-       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
        $( ".searchableSelect1_4" ).change(function(e) {
          
 		 obj = $(this);
@@ -482,7 +482,7 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
        //
        //add190226
        //分類
-       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
        $( ".searchableSelect1_4" ).change(function(e) {
          obj = $(this);
 		 //分類からアイテム抽出する
@@ -758,13 +758,20 @@ function dispDiv() {
   //event.preventDefault();
   //debugger;
   
+  //add200915
+  //ボタンが復活しない問題発生するため
+  //$('#filter').removeClass('hide');
+  
   //ajax
   //controllerのイベントを呼び出すため。
   purchase_order_datum_id = document.getElementById("purchase_order_datum_id").value;
   purchase_order_date = document.getElementById("purchase_order_date").value;
   supplier_master_id = document.getElementById("supplier_master_id").value;
   
-  
+   //セッション用のパラメータへセットする
+       sessionStorage.removeItem('onvisible');       //add200915 一旦消さないと壊れるケースあり？  
+  sessionStorage.setItem('onvisible', 'true');
+
   $.get("<%= purchase_order_historiez_get_data_path %>",
     {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, supplier_master_id: supplier_master_id},
      function(data){
@@ -774,6 +781,10 @@ function dispDiv() {
 	   // Loadingイメージ表示
        $('#loading-indicator').show();
 	   
+       //add200915
+      
+       //sessionStorage.setItem('onvisible', 'true');
+       
        //5秒待つ（描写されないことがあるため）
 	   //centOS上では必須なようである！
 	   setTimeout("reloadDiv()", 5000);
@@ -785,8 +796,9 @@ function dispDiv() {
 	   //隠れていたボタンをここで表示させる
        //$('#filter').removeClass('hide');
        
+       //movev200915
        //セッション用のパラメータへセットする
-       sessionStorage.setItem('onvisible', 'true');
+       //sessionStorage.setItem('onvisible', 'true');
        
        // Loadingイメージを消す
        // $('#loading-indicator').hide();
@@ -795,13 +807,9 @@ function dispDiv() {
    );
 };
 
-
-
-
 function reloadDiv(){
   //画面再ロードする
   // debugger;
-
   
   window.location.reload();
   event.preventDefault();

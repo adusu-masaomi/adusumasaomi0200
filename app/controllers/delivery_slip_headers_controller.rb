@@ -71,6 +71,9 @@ class DeliverySlipHeadersController < ApplicationController
     #見出しデータ（コピー元）の補完
     complementCopyHeader
     
+    #工事集計の確定区分があればセット
+    set_final_return_division_params
+    
     respond_to do |format|
       if @delivery_slip_header.save
         
@@ -105,7 +108,10 @@ class DeliverySlipHeadersController < ApplicationController
   
     #手入力時の顧客マスターの新規登録
   	create_manual_input_customer
-  
+    
+    #工事集計の確定区分があればセット
+    set_final_return_division_params
+    
     #見出しデータ（コピー元）の補完
     #アプデは既存データを書き換えてしまう可能性があるため、保留!
     #complementCopyHeader
@@ -321,6 +327,45 @@ class DeliverySlipHeadersController < ApplicationController
      
   end
   
+  #工事集計の確定区分があればセット
+  def set_final_return_division_params
+    
+    if params[:delivery_slip_header][:construction_datum_id].present?
+      construction_datum_id = params[:delivery_slip_header][:construction_datum_id].to_i
+       
+      construction_cost = ConstructionCost.where(:construction_datum_id => construction_datum_id).first
+      #工事集計データあり？
+      if construction_cost.present?
+        if construction_cost.final_return_division.present? && construction_cost.final_return_division > 0
+          params[:delivery_slip_header][:final_return_division] = construction_cost.final_return_division
+        end
+      end
+    end
+  end
+    
+  #コード自動採番
+  def set_delivery_slip_code
+    
+    #パラメーターからコードを作る
+    dateStr = format("%04d%02d%02d", params[:year], params[:month], params[:day] ) 
+    
+    codeMin = dateStr + "00"
+    codeMax = dateStr + "98"  #１日99件以上は考慮しない
+    
+    tmp_delivery_slip_header_code = DeliverySlipHeader.where(delivery_slip_code: codeMin..codeMax).maximum(:delivery_slip_code)
+    
+    @new_code = nil
+    
+    if tmp_delivery_slip_header_code.present?
+      under = tmp_delivery_slip_header_code[-2, 2].to_i + 1  #下２桁コードに１足す
+      @new_code = dateStr + format("%02d", under)
+    else
+    #指定日のコードが存在しなかった場合  
+      @new_code = dateStr + "01"
+    end
+    
+  end
+  
   #納品書データを複製する(一覧データのみ。内訳・明細はcreate時に作成)
   def duplicate_delivery_slip_header
     
@@ -514,7 +559,8 @@ class DeliverySlipHeadersController < ApplicationController
                      :construction_datum_id, :construction_name, :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, 
                      :post, :address, :tel, :house_number, :address2, :fax, :construction_period, 
                      :construction_period_date1, :construction_period_date2, :construction_post, :construction_place, 
-                     :construction_house_number, :construction_place2, :delivery_amount, :execution_amount, :last_line_number, :fixed_flag)
+                     :construction_house_number, :construction_place2, :delivery_amount, :execution_amount, :last_line_number,
+                     :fixed_flag, :final_return_division)
       #Note: "delivery_slip_header_origin_id"は既存データ上書き防止のため、保存させない。
     end
 	

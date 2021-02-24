@@ -25,6 +25,10 @@
   <%= f.input :email2,  input_html:{:tabindex=>"7"} %>
   <%= f.input :responsible3 , input_html:{:tabindex=>"8"} %>
   <%= f.input :email3 , input_html:{:tabindex=>"9"} %>
+  <%= f.input :search_character , label: "検索文字アルファベット(半角1文字だけ入力して下さい。／外注の場合のみ使用)", input_html:{style: 'width:40px;', :tabindex=>"10"} %>
+  <%= f.check_box :outsourcing_flag %> 
+  <%= f.label :outsourcing_flag, "外注の場合チェックを入れる", {style: 'color: blue', :tabindex=>"11"} %>
+  </br></br>
   
   <!--<%= f.button :submit, :class => 'btn-primary' %>-->
   <input type="button" onclick="submit();" class = 'btn btn-primary' value="登録する" />

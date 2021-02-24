@@ -43,6 +43,8 @@ class PurchaseDatum < ActiveRecord::Base
 	attr_accessor :construction_datum_id_hide
 	attr_accessor :material_category_id_hide
     
+    attr_accessor :outsourcing_flag_hide #add201229
+    
     #add200630
     attr_accessor :price_disp_flag
     

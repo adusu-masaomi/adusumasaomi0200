@@ -27,10 +27,7 @@ class OrdersController < ApplicationController
   # POST /orders.json
   def create
     @order = Order.new(order_params)
-    
-	#binding.pry
-    
-	
+    	
     respond_to do |format|
       if @order.save
         format.html { redirect_to @order, notice: 'Order was successfully created.' }
@@ -75,7 +72,8 @@ class OrdersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def order_params
-      params.require(:order).permit(:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity)
+      params.require(:order).permit(:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity,
+                                    :order_unit_price, :order_price)
     end
 	def purchase_order_datum_params
       params.require(:purchase_order_datum).permit(orders_attributes: [:purchase_order_history_id, :material_id, :material_code, :material_name, :quantity, :material_category_id])

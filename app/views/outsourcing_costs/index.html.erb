@@ -20,9 +20,10 @@
   
   	<div>
     	<%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
-        <%= link_to t('.new', :default => t("helpers.links.new")),
+      <%= link_to t('.new', :default => t("helpers.links.new")),
             new_outsourcing_cost_path,
             :class => 'btn btn-primary' %>
+      <%= link_to t('.back', :default => t("外注一覧へ")), outsourcing_data_path, :class => 'btn btn-green600_rsd'  %>
     </div>
   <% end %>
   

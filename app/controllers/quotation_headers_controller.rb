@@ -332,6 +332,31 @@ class QuotationHeadersController < ApplicationController
      
   end
   
+  #add00917
+  #コード自動採番
+  def set_quotation_code
+    
+    #パラメーターからコードを作る
+    dateStr = format("%04d%02d%02d", params[:year], params[:month], params[:day] ) 
+    
+    codeMin = dateStr + "00"
+    codeMax = dateStr + "98"  #１日99件以上は考慮しない
+    
+    tmp_quotation_header_code = QuotationHeader.where(quotation_code: codeMin..codeMax).maximum(:quotation_code)
+    
+    @new_code = nil
+    
+    if tmp_quotation_header_code.present?
+      under = tmp_quotation_header_code[-2, 2].to_i + 1  #下２桁コードに１足す
+      @new_code = dateStr + format("%02d", under)
+    else
+    #指定日のコードが存在しなかった場合  
+      @new_code = dateStr + "01"
+    end
+    
+  end
+  
+  
   #見積書データを複製する(一覧データのみ)
   def duplicate_quotation_header
     #quotation_header = QuotationHeader.where(:quotation_code => params[:quotation_code]).first
@@ -516,24 +541,22 @@ class QuotationHeadersController < ApplicationController
 	QuotationDetailMiddleClassification.where(quotation_header_id: new_header_id, 
 	    quotation_detail_large_classification_id: new_large_classification_id).destroy_all
 	
-	@qdmc = QuotationDetailMiddleClassification.where(quotation_header_id: params[:quotation_header][:quotation_header_origin_id],
+	  @qdmc = QuotationDetailMiddleClassification.where(quotation_header_id: params[:quotation_header][:quotation_header_origin_id],
 	                               quotation_detail_large_classification_id: old_large_classification_id)
 	
-	if @qdmc.present?
+	  if @qdmc.present?
       @qdmc.each do |qdmc|
-	    
-		#明細データのコピー元をコピー先オブジェクトへセット
-		new_qdmc = qdmc.dup
+	      #明細データのコピー元をコピー先オブジェクトへセット
+		    new_qdmc = qdmc.dup
 		
-		#ヘッダIDを新しいものに置き換える
+		    #ヘッダIDを新しいものに置き換える
         new_qdmc.quotation_header_id = new_header_id
-		#内訳IDを新しいものに置き換える
-		new_qdmc.quotation_detail_large_classification_id = new_large_classification_id
+		    #内訳IDを新しいものに置き換える
+		    new_qdmc.quotation_detail_large_classification_id = new_large_classification_id
 		
-		#更新する
-		new_qdmc.save!(:validate => false)
-	    
-      end
+		    #更新する
+		    new_qdmc.save!(:validate => false)
+	    end
     end  
 	
   end

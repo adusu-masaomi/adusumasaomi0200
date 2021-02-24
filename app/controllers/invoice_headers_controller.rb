@@ -101,10 +101,12 @@ class InvoiceHeadersController < ApplicationController
     #住所のパラメータを正常化
     adjust_address_params
     
-	#add170809
-    #手入力時の顧客マスターの新規登録
+	#手入力時の顧客マスターの新規登録
   	create_manual_input_customer
-	  
+	
+    #工事集計の確定区分があればセット
+    set_final_return_division_params
+    
     @invoice_header = InvoiceHeader.new(invoice_header_params)
 
     respond_to do |format|
@@ -135,10 +137,12 @@ class InvoiceHeadersController < ApplicationController
     #住所のパラメータを正常化
     adjust_address_params
 	
-	#add170809
-    #手入力時の顧客マスターの新規登録
+	#手入力時の顧客マスターの新規登録
   	create_manual_input_customer
-	
+      
+    #工事集計の確定区分があればセット
+    set_final_return_division_params
+    
     respond_to do |format|
       if @invoice_header.update(invoice_header_params)
 
@@ -332,7 +336,45 @@ class InvoiceHeadersController < ApplicationController
      
   end
   
+  #工事集計の確定区分があればセット
+  def set_final_return_division_params
+    
+    if params[:invoice_header][:construction_datum_id].present?
+      construction_datum_id = params[:invoice_header][:construction_datum_id].to_i
+       
+      construction_cost = ConstructionCost.where(:construction_datum_id => construction_datum_id).first
+      #工事集計データあり？
+      if construction_cost.present?
+        if construction_cost.final_return_division.present? && construction_cost.final_return_division > 0
+          params[:invoice_header][:final_return_division] = construction_cost.final_return_division
+        end
+      end
+    end
+  end
   
+  #add00917
+  #コード自動採番
+  def set_invoice_code
+    
+    #パラメーターからコードを作る
+    dateStr = format("%04d%02d%02d", params[:year], params[:month], params[:day] ) 
+    
+    codeMin = dateStr + "00"
+    codeMax = dateStr + "98"  #１日99件以上は考慮しない
+    
+    tmp_invoice_header_code = InvoiceHeader.where(invoice_code: codeMin..codeMax).maximum(:invoice_code)
+    
+    @new_code = nil
+    
+    if tmp_invoice_header_code.present?
+      under = tmp_invoice_header_code[-2, 2].to_i + 1  #下２桁コードに１足す
+      @new_code = dateStr + format("%02d", under)
+    else
+    #指定日のコードが存在しなかった場合  
+      @new_code = dateStr + "01"
+    end
+    
+  end
   
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -346,7 +388,7 @@ class InvoiceHeadersController < ApplicationController
             :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, :post, :address, :house_number, :address2,  
             :tel, :fax, :construction_period, :construction_place,
             :payment_period, :invoice_period_start_date, :invoice_period_end_date, :billing_amount, :execution_amount, 
-            :deposit_amount, :payment_method_id, :commission, :payment_date, :labor_insurance_not_flag, :last_line_number, :remarks)
+            :deposit_amount, :payment_method_id, :commission, :payment_date, :labor_insurance_not_flag, :last_line_number, :remarks, :final_return_division)
     end
     
     # 

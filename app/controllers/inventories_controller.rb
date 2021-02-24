@@ -292,6 +292,7 @@ class InventoriesController < ApplicationController
     #200703 moved
     #warehouse_id = 1
     #location_id = 1
+    
     #@inventory = Inventory.where(material_master_id: @inventory_history.material_master_id, warehouse_id: warehouse_id, 
     #                          location_id: location_id ).first
      
@@ -865,7 +866,18 @@ class InventoriesController < ApplicationController
 	  supplier_master_id = @inventory.supplier_master_id
   end
 	
-	inventory_params = {warehouse_id: @inventory.warehouse_id, location_id: @inventory.location_id, material_master_id: @inventory_history.material_master_id, 
+  #
+  if @inventory.blank?
+    warehouse_id = 1
+    location_id = 1
+  else
+    warehouse_id = @inventory.warehouse_id
+    location_id = @inventory.location_id
+  end
+  
+  #
+  #moved201017 inventory_params 
+	inventory_params = {warehouse_id: warehouse_id, location_id: location_id, material_master_id: @inventory_history.material_master_id, 
                         inventory_quantity: inventory_quantity, unit_master_id: @inventory_history.unit_master_id, inventory_amount: inventory_amount, 
                         supplier_master_id: supplier_master_id,
                         current_unit_price: current_unit_price, current_history_id: current_history_id, current_warehousing_date: current_warehousing_date, 
@@ -874,7 +886,8 @@ class InventoriesController < ApplicationController
                         next_quantity_1: @next_quantity_1, next_history_id_2: @next_history_id_2, next_warehousing_date_2: @next_warehousing_date_2, 
                         next_unit_price_2: @next_unit_price_2, 
                         next_quantity_2: @next_quantity_2}
-	
+	 #binding.pry
+  
     if @inventory.blank?
     #新規
       @inventory = Inventory.new(inventory_params)
@@ -887,6 +900,10 @@ class InventoriesController < ApplicationController
       
     else
     #更新
+      
+      
+      #@inventory.update(inventory_params)
+      #upd201017
       @inventory.update(inventory_params)
     end
     
@@ -1346,8 +1363,8 @@ class InventoriesController < ApplicationController
 
     #新規か編集かの判定フラグ
     def set_edit_flag
-	  @action_flag = params[:action]
-	end
+	    @action_flag = params[:action]
+	  end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def inventory_params
@@ -1355,4 +1372,4 @@ class InventoriesController < ApplicationController
       :current_history_id, :current_warehousing_date, :current_quantity, :current_unit_price, :last_unit_price, :last_warehousing_date, :next_history_id_1, :next_warehousing_date_1, :next_quantity_1, 
       :next_unit_price_1, :next_history_id_2, :next_warehousing_date_2, :next_quantity_2, :next_unit_price_2 , :image)
     end
-end
+  end

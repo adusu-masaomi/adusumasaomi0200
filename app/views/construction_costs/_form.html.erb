@@ -45,8 +45,17 @@
   <div class="col-xs-3">
     <%= f.input :constructing_amount , input_html:{ id:"constructing_amount", :tabindex=>"4", style: 'width:130px', :onchange => "calcExecutionAmount()" }%>
   </div>
+  <div class="col-xs-3">
+    <%= f.input :differense, input_html:{id:"differense", style: 'width:130px', :readonly => true } %>
+  </div>
   
-  <%= f.input :differense, input_html:{id:"differense", style: 'width:130px', :readonly => true } %>
+  <!--本来入力不可にしたいがパラメータが渡らないため、色付けだけする-->
+  <div class="col-xs-3">
+    <%= f.label :確定申告区分, {:class => "my-custom-class-l" , style: 'width:120px;' }  %>
+    <%= f.select :final_return_division, ConstructionCost.final_division_with_explain, {}, 
+       {id:'searchableSelect2_1', :class => "my-custom-class", style: 'width:170px;height:30px;margin-left:-0px;margin-top:5px;font-size:14px;', :tabindex=>"5" } %>
+  </div>
+  </br></br></br></br></br>
   <%= f.input :purchase_order_amount,
  input_html:{id:"purchase_order_amount", :readonly => true } %>
  

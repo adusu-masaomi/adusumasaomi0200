@@ -709,18 +709,32 @@ class PurchaseDataController < ApplicationController
       @purchase_unit_prices.update(purchase_unit_prices_params)
     else
     #該当なしの場合は新規追加  add180120
-	   #仕入先用CDをセット
-	   if params[:purchase_datum][:supplier_material_code].present?
-		  supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
-	   else
-		  #仕入先品番が未入力の場合は、品番をそのままセットする
-		  supplier_masterial_code = params[:purchase_datum][:material_code]
-	   end
+       
+       #add201221
+       #手入力のものは、別途(add_manual_input_except_unit_price)で登録されるので除く 
+       isExcept = false
+       if params[:purchase_datum][:material_id] == "1" && 
+         params[:purchase_datum][:material_code] != "" && 
+         params[:purchase_datum][:material_code] != "＜手入力用＞" &&
+         params[:purchase_datum][:material_code] != "-"
+         
+         isExcept = true
+       end
+       
+      if !isExcept
+	     #仕入先用CDをセット
+	     if params[:purchase_datum][:supplier_material_code].present?
+		    supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+	     else
+		    #仕入先品番が未入力の場合は、品番をそのままセットする
+		    supplier_masterial_code = params[:purchase_datum][:material_code]
+	     end
 	
-      purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
+         purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
                         supplier_material_code: supplier_masterial_code, 
                         unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
-      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_prices_params)
+         @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_prices_params)
+      end
     end
   end
   
@@ -743,13 +757,15 @@ class PurchaseDataController < ApplicationController
 	   @supplier_master = SupplierMaster.where("id >= ?", supplier_master_id)
 	   
 	   #外注の注文Noの判定
-	   
-	   str = purchase_order_code
-	   #if str[0,1] == "M" || str[0,1] == "O"
-       #upd180220
-       if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
-	     #binding.pry
-		 @outsourcing_flag = "1"
+       #add201229 仕入マスターの外注フラグで判定
+       sm = SupplierMaster.find(params[:supplier_master_id])
+	   outsourcing_flag = sm.outsourcing_flag
+       
+	   #str = purchase_order_code
+	   #if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
+       #upd201229
+       if outsourcing_flag == 1
+         @outsourcing_flag = "1"
 	   end
 	   #
 	   

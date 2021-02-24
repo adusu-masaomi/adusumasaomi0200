@@ -85,6 +85,8 @@ class ApplicationController < ActionController::Base
   #add170310
   #見積書などの、見出しコードの仮番
   $HEADER_CODE_MAX = "9999999999"
+  #確定申告区分のZ(明細有)のコード
+  $FINAL_RETURN_DIVISION_Z = 9
   
   #仕入区分
   $INDEX_DIVISION_PURCHASE = 1    #仕入 add180324

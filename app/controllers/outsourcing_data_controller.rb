@@ -124,10 +124,29 @@ class OutsourcingDataController < ApplicationController
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
 		end
 		
+        contain_no_payment_date = false
+        
+        #with_construction
+        
+        #if query.present? && query["payment_due_date_gteq"].present? && query["with_construction"].blank?
+        if query.present? && query["payment_due_date_lteq"].present? && query["with_construction"].blank?
+        #支払予定日で検索した場合、支払予定日未入力のものも加える(or条件)
+          
+          contain_no_payment_date = true
+        
+          custom_q_0 = query
+          custom_q_1 = {:supplier_id_eq => query["supplier_id_eq"] , :outsourcing_payment_flag_eq => "0", 
+                        :outsourcing_invoice_flag_eq => "1", :payment_due_date_null => true }
+          @q = PurchaseDatum.ransack(combinator: 'or', g: { '0': custom_q_0, '1': custom_q_1 })
+          
+        else
+        #通常の検索の場合
+          @q = PurchaseDatum.ransack(query)
+        end
         
         #@q = PurchaseDatum.ransack(params[:q]) 
         #ransack保持用--上記はこれに置き換える
-		@q = PurchaseDatum.ransack(query)
+		#@q = PurchaseDatum.ransack(query)
 		
         #ransack保持用コード
         search_history = {
@@ -145,11 +164,10 @@ class OutsourcingDataController < ApplicationController
         end
         #
        
+       
 
 	@purchase_data = @q.result(distinct: true)
 	
-    
-    
     
     #add180324
     ###
@@ -160,7 +178,11 @@ class OutsourcingDataController < ApplicationController
     end
     ###
     
-         
+    #支払予定日で検索した場合→検索状態(フォーム用)をもとに戻しておく
+    if contain_no_payment_date
+       @q = PurchaseDatum.ransack(query)
+    end
+    
     
     #add190211
     #支払日で絞る(保留)
@@ -201,15 +223,11 @@ class OutsourcingDataController < ApplicationController
 	@unit_masters = UnitMaster.all
 	@purchase_unit_prices = PurchaseUnitPrice.none  
     
-    
-    
-    
+    #binding.pry
     
 	#global set
 	$purchase_data = @purchase_data
 	
-    
-    
     #####
     #検索用のパラメータがセットされていたら、グローバルにもセットする
     #if params[:q].present?
@@ -444,8 +462,13 @@ class OutsourcingDataController < ApplicationController
     set_default_outsourcing_data  #外注費データの初期値をセット
     #支払予定日を仕入データへもセットする
     @purchase_datum.payment_due_date = @payment_due_date
-      
-    #end
+    
+    #add200925
+    #仕入日=作業完了日とする
+    if @purchase_date.present?
+      @purchase_datum.purchase_date = @purchase_date
+    end
+    
     
     respond_to do |format|
       
@@ -456,11 +479,10 @@ class OutsourcingDataController < ApplicationController
       #  save_check = @purchase_datum.save
       #else
       
-      
       #if request.format.symbol != :pdf  #del200721 pdfでも保存する
       #ヴァリデーションを無効にする
       #確定申告などで編集する場合を考慮。
-        save_check = @purchase_datum.save!(:validate => false)
+      save_check = @purchase_datum.save!(:validate => false)
       
       #else
       #  save_check = true
@@ -801,10 +823,15 @@ class OutsourcingDataController < ApplicationController
 	   
 	   #外注の注文Noの判定
 	   
+       #add201229 仕入マスターの外注フラグで判定
+       sm = SupplierMaster.find(params[:supplier_master_id])
+	   outsourcing_flag = sm.outsourcing_flag
+       
 	   str = purchase_order_code
 	   #if str[0,1] == "M" || str[0,1] == "O"
-       #upd180220
-       if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
+       #if str[0,1] == "M" || str[0,1] == "N" || str[0,1] == "O"
+       #upd201229
+       if outsourcing_flag == 1
 	     @outsourcing_flag = "1"
 	   end
 	   #
@@ -1222,18 +1249,53 @@ class OutsourcingDataController < ApplicationController
   
   #外注費支払いフラグセット(ajax)
   def set_payment_flag
+    
     outsourcing_payment_flag = params[:flag]
-    purchase_params = {outsourcing_payment_flag: outsourcing_payment_flag.to_i}
     
     #支払フラグをアップデートしておく
     purchase_data = PurchaseDatum.find(params[:id])
     
+    #日付が入力されていたら、外注費データも更新させる
+    #add200916
+    payment_date = nil
     
-    if purchase_data.present?
-      #ヴァリデーションしない
-      purchase_data.assign_attributes(purchase_params)
-      purchase_data.save!(:validate => false)
+    #binding.pry
+    
+    if purchase_data.present? && params[:payment_date].present?
+      
+      outsourcing_cost = OutsourcingCost.where(purchase_order_datum_id: purchase_data.purchase_order_datum_id).first
+      if outsourcing_cost.present?
+        if outsourcing_payment_flag.to_i ==  1   #支払チェック有?
+          #支払金額・支払日未入力の場合、セットする
+          if outsourcing_cost.payment_amount.nil? && outsourcing_cost.payment_date.nil?
+              
+            #支払額=請求額に消費税かけた金額をセット
+            payment_amount = outsourcing_cost.billing_amount * $consumption_tax_include_per_ten
+            #支払日をセット
+            payment_date = Date.parse(params[:payment_date])
+            
+            outsourcing_cost_params = {payment_amount: payment_amount, payment_date: payment_date}
+            outsourcing_cost.update(outsourcing_cost_params)
+              
+          
+            purchase_params = {outsourcing_payment_flag: outsourcing_payment_flag.to_i, payment_date: payment_date}
+        
+            if purchase_data.present?
+                #ヴァリデーションしない
+                purchase_data.assign_attributes(purchase_params)
+                purchase_data.save!(:validate => false)
+            end
+          end
+        end
+      end
+    
+      
+    
     end
+    #add end
+    
+    #purchase_params = {outsourcing_payment_flag: outsourcing_payment_flag.to_i}
+    
   end
   
   #外注用の請求ナンバーを作成
@@ -1330,9 +1392,7 @@ class OutsourcingDataController < ApplicationController
         @payment_due_date = nil
     
         addMonth = 0
-    
-        #binding.pry 
-
+        
         #締め日算出
         if customer.closing_date_division == 1
         #月末の場合
@@ -1367,7 +1427,13 @@ class OutsourcingDataController < ApplicationController
         #d = params[:purchase_datum][:purchase_date].to_date
         #d = @purchase_date
         d = @closing_date   #upd191001
-        #upd 191120
+        
+        #add200829
+        if d.nil?
+          d = @purchase_date  
+        end
+        #
+        
         if customer.due_date.present?  && customer.due_date > 0
           
           if customer.due_date >= 28   #月末とみなす
@@ -1583,7 +1649,9 @@ class OutsourcingDataController < ApplicationController
   
   #add170226
   def supplier_select
-   @supplier_id  = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("supplier_master_id")
+    @supplier_id  = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("supplier_master_id")
+    #add201229
+    @outsourcing_flag = PurchaseOrderDatum.where(:purchase_order_code => params[:purchase_order_code]).where("id is NOT NULL").pluck("outsourcing_flag")
   end
   
   #見出しデータを取得(伝票番号確認用）

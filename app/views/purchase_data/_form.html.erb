@@ -172,6 +172,7 @@
   
   <!--add180223-->
   <%= f.input :complete_flag_hide, input_html:{id:'complete_flag_hide'}, as: :hidden  %>
+  <%= f.input :outsourcing_flag_hide, input_html:{id:'outsourcing_flag_hide'}, as: :hidden  %>
   
   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
@@ -344,12 +345,18 @@
         //add170306 注文Noの頭文字を抜き出す
 		purchase_order_code_header = str.substr(0, 1) ;
 		
+        //debugger;
+              
+        
         $.get("<%= purchase_datum_supplier_select_path %>",
           {purchase_order_code: purchase_order_code },
           function(data){
             //
               
-              //debugger;
+              obj = document.getElementById("outsourcing_flag_hide").textContent;
+              if (obj.value == 1){
+                
+              }
               
 			  //外注・機材借入の場合の入力自動化
               //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
@@ -445,6 +452,8 @@
         
      //add170306 注文Noの頭文字を抜き出す
      purchase_order_code_header = str.substr(0, 1) ;
+     
+     //debugger;
      
      if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" || purchase_order_code_header == "R") {
 	    setDefaultOursourcing();
@@ -640,6 +649,12 @@
               if (document.getElementById("quantity").value != ""){
                 
                 amount = document.getElementById("quantity").value * obj;
+                
+                //add201126
+                //小数点以下を切り捨て
+                amount  = Math.floor(amount);
+                //
+                
                 document.getElementById("purchase_amount").value = amount;
                 
                 //add200701
@@ -682,8 +697,8 @@
    function setForOursourcing(purchase_order_code_header){
      //if (purchase_order_code_header == "M" || purchase_order_code_header == "O" ) {
      
-     //upd180220
-     if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" ) {
+     //del201229
+     //if (purchase_order_code_header == "M" || purchase_order_code_header == "N" || purchase_order_code_header == "O" ) {
        //品番を切り替え
        $(".searchableItem").val(1).trigger("change");
 	   //品名を切り替え
@@ -701,7 +716,7 @@
 	   $(".searchableUnit").val(index_set).trigger("change");
        //区分を自動化(外注に)
 	   document.getElementById("division_id").value = INDEX_DIVISION_OUTSOURCING;
-	 }
+	 //}
 	 
 	 if (purchase_order_code_header == "R"){
 	   //区分を自動化(機材借入に)
@@ -774,8 +789,13 @@
        //品番のセット
        obj4 = document.getElementById("material_code");
        obj = document.getElementById("material_id");
-       obj4.value = obj.options[index].innerText;
-	  
+       
+       if (obj.options[index] != undefined){
+          obj4.value = obj.options[index].innerText;
+       }else{
+       //add200917
+          alert('指定した仕入先品番は未登録です。品番から選択してください。');
+	   }
 		 
 	   //品名のセット（リスト）
        obj2 = document.getElementById("lstMaterialName");
@@ -783,7 +803,9 @@
        //品名のセット（テキスト）
        if (index !== 0){
           obj3 = document.getElementById("material_name");
-          obj3.value = obj2.options[index].innerText;
+          if (obj2.options[index] != undefined){
+            obj3.value = obj2.options[index].innerText;
+          }
         }
    }
    
@@ -1024,9 +1046,18 @@
                 {
                   unit_price = document.getElementById("purchase_unit_price").value;
                   amount1 = (document.getElementById("quantity").value - obj1) * unit_price;
+                  
+                  //add201126
+                  //小数点以下を切り捨て
+                  amount1  = Math.floor(amount1);
+                  //
+                  
                   amount2 = obj1 * obj2;
                   
-                  //debugger;
+                  //add201126
+                  //小数点以下を切り捨て
+                  amount2  = Math.floor(amount2);
+                  //
                   
                   //金額へセット
                   document.getElementById("purchase_amount").value = amount1 + amount2;

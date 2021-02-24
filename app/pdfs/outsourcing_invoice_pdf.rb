@@ -300,7 +300,7 @@ end
       @supplier_responsible = "村山　敏弘"
       @supplier_tel = "0256-32-5550"
       #
-      @supplier_bank_name = "第四銀行"
+      @supplier_bank_name = "第四北越銀行"
       @supplier_bank_branch_name = "三条南支店"
       @supplier_account_type_name = "普通"
       @supplier_account_number = "1108748"
@@ -328,7 +328,7 @@ end
       @supplier_responsible = "小柳　哲英"
       @supplier_tel = "0256-64-3548"
       #
-      @supplier_bank_name = "第四銀行"
+      @supplier_bank_name = "第四北越銀行"
       @supplier_bank_branch_name = "燕支店"
       @supplier_account_type_name = "普通"
       @supplier_account_number = "1294461"

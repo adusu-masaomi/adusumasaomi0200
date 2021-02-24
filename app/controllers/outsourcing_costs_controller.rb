@@ -11,6 +11,15 @@ class OutsourcingCostsController < ApplicationController
     query = params[:q]
     query ||= eval(cookies[:recent_search_history_outsourcing].to_s) 
   
+    #外注一覧から遷移した場合はデフォルトでクエリーをセット
+    if params[:move_flag] == "1"
+      purchase_order_datum_id = params[:purchase_order_datum_id]
+      query = {"purchase_order_datum_id_eq"=> purchase_order_datum_id}
+      #検索用クッキーへも保存
+      params[:q] = query
+    end
+    ##
+  
     #@outsourcing_costs = OutsourcingCost.all
     @q = OutsourcingCost.ransack(query)   
     

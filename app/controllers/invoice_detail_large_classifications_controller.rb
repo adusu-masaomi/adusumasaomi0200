@@ -258,7 +258,11 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
     
     #行番号の最終を書き込む
     invoice_headers_set_last_line_number
-
+    
+    #工事集計の確定区分があれば見出しへZセット
+    set_final_return_division_params
+  
+    
     #手入力用IDの場合は、単位マスタへも登録する。
     if @invoice_detail_large_classification.working_unit_id == 1
        #既に登録してないかチェック
@@ -326,7 +330,6 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 	
     @invoice_detail_large_classification.update(invoice_detail_large_classification_params)
       
-	#add170223
 	#歩掛りの集計を最新のもので書き換える。
 	update_labor_productivity_unit_summary
     #add170308
@@ -342,8 +345,10 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
       
     #行番号の最終を書き込む
     invoice_headers_set_last_line_number
-  
-    #####
+    
+    #工事集計の確定区分があれば見出しへZセット
+    set_final_return_division_params
+    
     #手入力用IDの場合は、単位マスタへも登録する。
     if @invoice_detail_large_classification.working_unit_id == 1
        #既に登録してないかチェック
@@ -740,6 +745,39 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
   
   end
   #add end
+  
+  #工事集計の確定区分があれば見出しへZセット
+  def set_final_return_division_params
+    #納品書コード有り？
+    if params[:invoice_detail_large_classification][:delivery_slip_header_id].present?
+      delivery_slip_header_id = params[:invoice_detail_large_classification][:delivery_slip_header_id].to_i
+      delivery_slip_header = DeliverySlipHeader.where(:id => delivery_slip_header_id).first
+      #納品書データに工事IDあり？
+      if delivery_slip_header.present?
+        if delivery_slip_header.construction_datum_id.present?
+          construction_datum_id = delivery_slip_header.construction_datum_id
+          construction_cost = ConstructionCost.where(:construction_datum_id => construction_datum_id).first
+          #工事集計データあり？
+          if construction_cost.present?
+            #確定申告区分あり？
+            if construction_cost.final_return_division.present? && construction_cost.final_return_division > 0
+              invoice_header_id = params[:invoice_detail_large_classification][:invoice_header_id]
+              invoice_header = InvoiceHeader.where(:id => invoice_header_id).first
+              
+              #請求書見出しの確定申告区分へZをセット(未入力またはゼロの場合)
+              if invoice_header.present?
+                if invoice_header.final_return_division.nil? || invoice_header.final_return_division == 0
+                  invoice_header.final_return_division = $FINAL_RETURN_DIVISION_Z
+                  invoice_header.save!(:validate => false)
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  
   
   private
     # Use callbacks to share common setup or constraints between actions.

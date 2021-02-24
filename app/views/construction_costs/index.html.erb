@@ -8,18 +8,30 @@
      <%= f.select :with_construction, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCode" } %>
      <%= f.label :construction_name, '工事名：' %>
      <%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_name") ,  {include_blank: true}, {style: 'width:220px',  class: "searchableConstructionName" } %>  
-     <%= f.label :construction_name, '*いずれかで検索可' %>  
+     <!--<%= f.label :construction_name, '*いずれかで検索可' %> -->
      <br>
-	<div>
+	
+     <%= f.label :construction_code, '工事コード(開始)：' %>
+     <%= f.select :with_construction_from, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCodeFrom" } %>
+     <%= f.label :construction_code, '工事コード(終了)：' %>
+     <%= f.select :with_construction_to, options_from_collection_for_select(ConstructionDatum.all, "id", "construction_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionCodeTo" } %>
+     
+    <div>
     	<%= f.submit '検索する' %>
   	</div>
    <% end %>
 
 </div>
+            
 <%= link_to t('.new', :default => t("helpers.links.new")),
             new_construction_cost_path,
             :class => 'btn btn-primary' %>
 <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+
+<%= link_to "一覧表(確定申告時)",
+            construction_costs_path(@construction_cost, action:"index", format: "pdf"),
+            :class => 'btn  btn-orange200_ftg', :target=>["_blank"] %>
+
 
 <!--いつか使うことがあるかもしれないので、残しておく-->
 <!--<%= link_to "CSV", construction_costs_path(params.merge(format: 'csv')),:class => 'btn btn-default btn-xs'%>-->
@@ -101,6 +113,9 @@
 	//検索可能なリストボックス(工事CDの場合)
 	$(".searchableConstructionCode").select2({ theme: "classic" });
 	
+    $(".searchableConstructionCodeFrom").select2({ theme: "classic" });
+    $(".searchableConstructionCodeTo").select2({ theme: "classic" });
+    
 	//検索可能なリストボックス(工事名の場合)
 	$(".searchableConstructionName").select2({ theme: "classic" });
 	

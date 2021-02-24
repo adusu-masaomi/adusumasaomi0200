@@ -18,6 +18,12 @@
   <dd><%= number_to_currency(@construction_cost.misellaneous_expense,  precision: 0) %></dd>
   <dt><strong><%= model_class.human_attribute_name(:constructing_amount) %>:</strong></dt>
   <dd><%= number_to_currency(@construction_cost.constructing_amount,  precision: 0) %></dd>
+  <dt><strong>確定申告区分</strong></dt>
+  <% if @construction_cost.final_return_division.present? %>
+  <dd><%= ConstructionCost.final_division[@construction_cost.final_return_division][0] %></dd>
+  <% else %>
+  <dd>-</dd>
+  <% end %>
 </dl>
 
 <!--<%= link_to t('.back', :default => t("helpers.links.back")),

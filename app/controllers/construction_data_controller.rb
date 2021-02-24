@@ -154,14 +154,34 @@ class ConstructionDataController < ApplicationController
     
     @construction_datum = ConstructionDatum.new(construction_datum_params)
     
-        #工事開始日・終了日（実績）の初期値をセットする
+    #工事開始日・終了日（実績）の初期値をセットする
     @construction_datum.construction_start_date = '3000-01-01'
     @construction_datum.construction_end_date = '2000-01-01'
-	
-    respond_to do |format|
 
-	
+    #binding.pry
+
+        respond_to do |format|
+
       if @construction_datum.save
+        
+        #del直前変更があったので様子見...
+        #add200727
+        #在庫資材のコードを自動生成する
+        #if @construction_datum.construction_code[-4,4] >= "0000" &&  
+        #  @construction_datum.construction_code[-4,4] <= "0004"
+          
+        #  #新規登録したコードは末尾４へ繰り上げる
+        #  @construction_datum.construction_code[-1] = "4"
+        #  new_code = @construction_datum.construction_code
+          
+        #  construction_params = {construction_code: new_code}
+        #  @construction_datum.update(construction_params)
+        #  #
+       
+          #自社のコードを自動生成(在庫資材・消耗品・工具)
+        #  auto_create_own_code
+        #end
+        #
         
         #add200114
         #djangoの資金繰り用のデータ更新
@@ -823,6 +843,99 @@ class ConstructionDataController < ApplicationController
 	 #住所（*工事場所）
 	 @address = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
  
+  end
+  
+  #自社のコードを自動生成(在庫資材・消耗品・工具)
+  #但し新年度のコードが0000もしくは0001から作られるものとする。
+  def auto_create_own_code
+    
+    year_code = @construction_datum.construction_code[0,4]
+    customer_own = 2
+
+    c_code = nil
+    c_name = nil
+    construction_code = nil
+    
+    start_num = 0 
+    
+    #工事コード0001〜0003は
+    #在庫資材・消耗品資材・工具で登録する
+    for i in 0..2 do
+      
+      case i
+      when 0
+        c_code = "0001"
+        c_name = "在庫資材"
+      when 1
+        c_code = "0002"
+        c_name = "消耗品"
+      when 2
+        c_code = "0003"
+        c_name = "工具類"
+      end
+  
+      construction_code = year_code + c_code
+  
+      construction_data_params = {construction_code: construction_code, 
+                              construction_name: c_name, alias_name: c_name,
+                              reception_date: Date.current, 
+                              customer_id: customer_own, post: "", address: "", house_number: "", 
+                              address2: "", order_flag: 1}
+                              
+      @construction = ConstructionDatum.new(construction_data_params)
+      @construction.save!(:validate => false)
+      
+      #注文番号も３つの工事で作る
+      #注番は０からスタート.
+      year_code_two = @construction_datum.construction_code[2,2]
+      header_code = "A" + year_code_two
+      
+      #初回のみ開始番号を検索(既に番号が埋まっている場合もあり得るため)
+      if i == 0
+        for x in 0..5 do
+          y = 5 - x
+          under_code = format("%02d", y)
+          purchase_order_code = header_code + under_code
+          purchase_order_data = PurchaseOrderDatum.where(["purchase_order_code = ?" , purchase_order_code]).first
+          if purchase_order_data.present?
+            start_num = y + 1
+            break
+          end
+        end
+      end
+      #
+
+      
+      #岡田・オストで生成
+      for j in 0..1 do
+        tmp_under_code = (i*2) + j + start_num
+        under_code = format("%02d", tmp_under_code)
+        
+        #注文コード
+        purchase_order_code = header_code + under_code
+        
+        construction_datum_id = @construction.id
+        alias_name = @construction.alias_name
+        
+        #仕入先
+        case j
+        when 0
+          supplier_master_id = $SUPPLIER_MASER_ID_OKADA_DENKI_SANGYO
+        when 1
+          supplier_master_id = $SUPPLIER_MASER_ID_OST
+        end
+        
+        #
+        purchase_order_data_params = {purchase_order_code: purchase_order_code, 
+                              construction_datum_id: construction_datum_id, 
+                              supplier_master_id: supplier_master_id, alias_name: alias_name
+                              }
+                              
+        @purchase_order_data = PurchaseOrderDatum.create(purchase_order_data_params)
+      end
+      
+      #
+    end
   end
   
   

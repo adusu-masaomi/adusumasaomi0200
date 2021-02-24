@@ -12,7 +12,7 @@
  <% end %>
   
   <div class="col-md-3" , style="margin-left : -15px">
-  <%= f.input :delivery_slip_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
+  <%= f.input :delivery_slip_code, input_html:{id:'delivery_slip_code', :tabindex=>"0", style: 'width:150px'} %>
   </div>
   <div class="col-md-3", style="margin-left : -0px">
   <%= f.input :quotation_code, input_html:{:tabindex=>"0", style: 'width:150px'} %>
@@ -31,10 +31,11 @@
   <!-- -->
   
   
-  <%= f.input :delivery_slip_date, :include_blank => true, label_html:{style: 'margin-top: -30px;'}, input_html:{:tabindex=>"1",style: 'width:100px;margin-top:-0px;'} %>
+  <%= f.input :delivery_slip_date, :include_blank => true, label_html:{style: 'margin-top: -30px;'}, input_html:{id:"delivery_slip_date", :tabindex=>"1", :onchange => "setCode()", 
+                                                                                                            style: 'width:100px;margin-top:-0px;'} %>
   <%= f.label :"件名Ｎｏ(＊該当無は”-”のままにする)" , {:class => "my-custom-class-l"} %></br>
-  <!--<%= f.input :construction_datum_id %>-->
-  <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_code, {:selected => @delivery_slip_header.construction_datum_id || 1, :include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"2",  style: 'width:220px' } %></br>
+  <!--:selected => @delivery_slip_header.construction_datum_id || 1(初期値１を抹消200917)-->
+  <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :construction_code, {:include_blank => true} , {id:'construction_datum_id', :class => "searchableConstructionCode", :tabindex=>"2",  style: 'width:220px' } %></br>
   <%= f.input :construction_name , input_html:{id:"construction_name", :tabindex=>"3"} %>
   <%= f.label :"得意先(＊該当無→”＜手入力用＞”)", {:class => "my-custom-class-l"} %></br>
   <!--<%= f.input :customer_id %>-->
@@ -92,20 +93,28 @@
        :onKeyUp => "AjaxZip3.zip2addr(this,'','construction_place','construction_place');",
       :tabindex=>"19"}  %>
 
-  <div class="col-lg-6" , style="margin-left : -15px">
+  <div class="col-md-6" , style="margin-left : -15px">
     <%= f.input :construction_place, label:"住所（工事場所）", hint: "＊都道府県市区町村のみ入力して下さい。", 
 	    input_html:{id:"construction_place", style: 'width:320px;', name:"construction_place", :tabindex=>"20", 
 		   :onkeydown => "setPostAuto($(this).val(), 'construction_post', event)"}  %>
   </div>
   
-  <!--add171010-->
   <%= f.input :construction_house_number , hint: "＊番地のみ入力して下さい。", label:"番地（工事場所）", input_html:{id:"construction_house_number",
               style: 'width:320px', :tabindex=>"21"} %>
-  <%= f.input :construction_place2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（工事場所）", label_html:{style: 'margin-top : -30px;'},  
-            input_html:{id:"construction_place2", style: 'width:320px;', :tabindex=>"22"} %>
-  <!--add end-->
   
-	
+  <div class="col-lg-7">
+  
+  <%= f.input :construction_place2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（工事場所）", label_html:{style: 'margin-top : -30px;'},  
+            input_html:{id:"construction_place2", style: 'width:320px;margin-left:-15px;', :tabindex=>"22"} %>
+  </div>
+  
+  
+  <%= f.label :確定申告区分, {:class => "my-custom-class-l" , style: 'width:120px;' }  %>
+  <%= f.select :final_return_division, ConstructionCost.final_division, {}, 
+       {id:'searchableSelect2_1', :class => "my-custom-class", style: 'width:60px;height:30px;margin-left:-20px;margin-top:5px;font-size:14px;background: #f1f1f1;', 
+            :tabindex=>"5" } %>
+  </br></br></br></br>
+  	
   <%= f.input :delivery_amount, hint: "＊自動計算されます。手入力可。" , input_html:{id:"delivery_amount", :tabindex=>"23"} %>
   <%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。", input_html:{id:"execution_amount", :tabindex=>"24"}  %>
 
@@ -439,6 +448,26 @@
      document.forms[0].submit();
    }
   
- 
+ //add200917
+ //日付から納品コードを自動的にセットする
+ function setCode()
+ {
+   var q_year = document.getElementsByName('delivery_slip_header[delivery_slip_date(1i)]')[0].value;
+   var q_month = document.getElementsByName('delivery_slip_header[delivery_slip_date(2i)]')[0].value;
+   var q_day = document.getElementsByName('delivery_slip_header[delivery_slip_date(3i)]')[0].value;
+   
+   if (q_year != "" && q_month != "" && q_day != "")
+   {
+       //ajax
+       $.get("<%= delivery_slip_headerz_set_delivery_slip_code_path %>",
+       {year: q_year, month: q_month, day: q_day },
+       function(data)
+       {
+         obj = document.getElementById("delivery_slip_code").textContent;
+         document.getElementById("delivery_slip_code").value = obj;
+       })
+   }
+   
+ }
  
 </script>

@@ -466,8 +466,9 @@
      
      //add190226
      //分類
-     $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
-	   $( ".searchableSelect1_4" ).change(function(e) {
+     //$(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+	   $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+     $( ".searchableSelect1_4" ).change(function(e) {
        obj = $(this);
 		   //分類からアイテム抽出する
 		   setMaterialExtractByCategory(obj);
@@ -578,7 +579,9 @@
 	   });
 	   
      //分類
-     $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+     //$(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-"});
+     //add201212
+     $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
      $( ".searchableSelect1_4" ).change(function(e) {
        obj = $(this);
 		   //分類からアイテム抽出する

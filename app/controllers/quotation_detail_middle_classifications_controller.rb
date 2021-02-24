@@ -1144,11 +1144,29 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 
      if @quotation_detail_large_classification.present?
 
+        #
+        #数量が１より大きい場合の対応
+        tmp_quote_total_price = quote_total_price
+        tmp_execution_total_price = execution_total_price
+        
+        if @quotation_detail_large_classification.quantity > 1
+          @quotation_detail_large_classification.working_unit_price = quote_total_price
+          @quotation_detail_large_classification.execution_unit_price = execution_total_price
+          
+          
+          #金額は数量*単価でかける
+          tmp_quote_total_price = quote_total_price.to_i * @quotation_detail_large_classification.quantity
+          tmp_execution_total_price = execution_total_price.to_i * @quotation_detail_large_classification.quantity
+        end 
+        #
+
         #見積金額
-        @quotation_detail_large_classification.quote_price = quote_total_price
+        #@quotation_detail_large_classification.quote_price = quote_total_price
+        @quotation_detail_large_classification.quote_price = tmp_quote_total_price
         
         #実行金額
-        @quotation_detail_large_classification.execution_price = execution_total_price
+        #@quotation_detail_large_classification.execution_price = execution_total_price
+        @quotation_detail_large_classification.execution_price = tmp_execution_total_price
         
         #歩掛り
         @quotation_detail_large_classification.labor_productivity_unit = labor_total

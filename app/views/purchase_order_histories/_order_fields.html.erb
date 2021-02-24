@@ -16,7 +16,7 @@
       {class: "searchableSelect1_1 form-control" , id: "material_id" , style: 'width:650px' } %>
   
   <%= f.label :数量, {style: 'width:28px'}  %>
-  <%= f.text_field :quantity, size:10, id: "quantity" , :tabindex=>"2"  %>
+  <%= f.text_field :quantity, size:10, id: "quantity" , :tabindex=>"2" , :onkeyup => "changePrice(event, this)" %>
   
   <td>&nbsp;&nbsp;</td>
     <%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
@@ -62,6 +62,9 @@
   &nbsp;&nbsp;&nbsp;&nbsp;
   <%= f.collection_select :material_category_id, @material_categories.all, :id, :name, {:include_blank => true, :selected => f.object.material_category_id || nil} , 
       {class: "searchableSelect1_4 form-control" , id: "material_category_id" , style: 'width:200px;margin-left:-20px', :tabindex => "6" } %>
+  
+  <%= f.input :order_unit_price,  input_html:{ id: "order_unit_price", style: 'width:100px;' , :tabindex=>"7" } %>
+  <%= f.input :order_price,  input_html:{ id: "order_price", style: 'width:100px;' , :tabindex=>"8" } %>
   
 </div>
 </div>
@@ -286,6 +289,14 @@
 				  $(".searchableSelect1_4").trigger("change.select2"); 
 		        }
                 
+                //add201212
+                //注文単価をセット
+                obj = document.getElementById("order_unit_price").textContent;
+				nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_unit_price]"
+			    document.getElementsByName(nm)[0].value = obj;
+                changePriceDirect(selectedIndex);  //金額計算する
+                
+                
                 gTrigger = false;
 			
 			  }
@@ -321,6 +332,10 @@
     //定価
     nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][list_price]"
     document.getElementsByName(nm)[0].value = ""; 
+    
+    //仕入単価
+    nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_unit_price]"
+    document.getElementsByName(nm)[0].value = ""; 
   
   }
   
@@ -328,6 +343,65 @@
   {
      document.getElementsByName("quantity[]")[selected_index].focus();
   }
+  
+  //数量訂正したら金額も訂正する
+  function changePrice(e, t){
+     
+     //if (e.keyCode == 13 || e.keyCode == 9) {
+	 //} else {
+     //  return false;
+	 //}
+     
+     var controlName = t.name;
+     var selectedIndex = 0;
+     
+     if (controlName != undefined){
+	    
+        //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+	    selectedIndex = controlName.slice(42);
+	    selectedIndex = selectedIndex.slice(0,-11);
+     }
+     
+     
+     nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_unit_price]";
+     if (document.getElementsByName(nm)[0].value != "")
+     {
+        qt = "purchase_order_history[orders_attributes][" + selectedIndex + "][quantity]";
+        quantity = document.getElementsByName(qt)[0].value;
+        
+        if (quantity != "")
+        {
+              unit_price = document.getElementsByName(nm)[0].value;
+              price = unit_price * quantity;
+              nm_pr = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_price]";
+              document.getElementsByName(nm_pr)[0].value = price;
+        }
+     } 
+      
+  }
+  //数量訂正したら金額も訂正する(インデックスあるVer)
+  function changePriceDirect(selectedIndex){
+     nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_unit_price]";
+     
+     //一旦金額をリセット
+     pr = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_price]";
+     document.getElementsByName(pr)[0].value = "";
+     
+     if (document.getElementsByName(nm)[0].value != "")
+     {
+        qt = "purchase_order_history[orders_attributes][" + selectedIndex + "][quantity]";
+        quantity = document.getElementsByName(qt)[0].value;
+        
+        if (quantity != "")
+        {
+              unit_price = document.getElementsByName(nm)[0].value;
+              price = unit_price * quantity;
+              nm_pr = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_price]";
+              document.getElementsByName(nm_pr)[0].value = price;
+        }
+     } 
+  }
+  
   
   //ENTER→TABキーに変換する処理。
   //レンダリングの場合は、共通化ができない（なぜか）

@@ -34,7 +34,7 @@
       "description": "",
       "x": 28,
       "y": 85,
-      "width": 799,
+      "width": 810,
       "height": 490,
       "header": {
         "enabled": true,
@@ -1067,6 +1067,38 @@
             "y1": 182,
             "x2": 814.4,
             "y2": 182.4
+          },
+          {
+            "id": "final_return_division",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 816.3,
+            "y": 176.8,
+            "width": 8.5,
+            "height": 8.9,
+            "style": {
+              "font-family": [
+                "IPAGothic"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
           }
         ]
       },

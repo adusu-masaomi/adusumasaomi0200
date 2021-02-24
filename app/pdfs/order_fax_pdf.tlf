@@ -1,0 +1,742 @@
+{
+  "version": "0.9.1",
+  "items": [
+    {
+      "id": "default",
+      "type": "list",
+      "display": true,
+      "description": "",
+      "x": 31.1,
+      "y": 33,
+      "width": 526,
+      "height": 788.8,
+      "header": {
+        "enabled": true,
+        "height": 178,
+        "translate": {
+          "x": -18,
+          "y": -309
+        },
+        "items": [
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101.1,
+            "y": 496,
+            "width": 59.2,
+            "height": 18.6,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "工事名："
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 468,
+            "width": 64.1,
+            "height": 23,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文Ｎｏ："
+            ]
+          },
+          {
+            "id": "construction_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 164,
+            "y": 496,
+            "width": 354,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "order_no",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 163,
+            "y": 468,
+            "width": 64,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "supplier_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 379,
+            "width": 123,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "supplier_responsible_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 257.1,
+            "y": 379,
+            "width": 39,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 303,
+            "y": 379,
+            "width": 24,
+            "height": 20,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "様"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 407,
+            "width": 196,
+            "height": 21,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "いつもお世話になっております。"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 432,
+            "width": 392,
+            "height": 23,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "下記の商品につきまして、ご注文の程よろしくお願い申し上げます。"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 102.5,
+            "y": 352.3,
+            "width": 102.3,
+            "height": 18.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文依頼"
+            ]
+          }
+        ]
+      },
+      "detail": {
+        "height": 99.6,
+        "translate": {
+          "x": -18,
+          "y": -184.6
+        },
+        "items": [
+          {
+            "id": "no",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 100,
+            "y": 401.6,
+            "width": 20,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 120.8,
+            "y": 401.6,
+            "width": 40,
+            "height": 21,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "品番："
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 120.8,
+            "y": 424.6,
+            "width": 47,
+            "height": 26,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "品名："
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 118.9,
+            "y": 445.6,
+            "width": 72,
+            "height": 21,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "メーカー："
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 120.8,
+            "y": 468.6,
+            "width": 42,
+            "height": 17,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "数量："
+            ]
+          },
+          {
+            "id": "material_code",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 164,
+            "y": 401.6,
+            "width": 162,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "material_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 164,
+            "y": 422.6,
+            "width": 383,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "maker_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 177,
+            "y": 445.6,
+            "width": 136,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "quantity",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 164,
+            "y": 468.6,
+            "width": 18.9,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "unit_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 185.8,
+            "y": 468.6,
+            "width": 25,
+            "height": 13.4,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 2,
+              "border-style": "dotted"
+            },
+            "x1": 56.1,
+            "y1": 487.6,
+            "x2": 558.1,
+            "y2": 487.6
+          }
+        ]
+      },
+      "page-footer": {
+        "enabled": false,
+        "height": 0,
+        "translate": {
+          "x": -18,
+          "y": -138.6
+        },
+        "items": []
+      },
+      "footer": {
+        "enabled": true,
+        "height": 96,
+        "translate": {
+          "x": -18,
+          "y": -178.8
+        },
+        "items": [
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 529.4,
+            "width": 398,
+            "height": 25,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "※ｅメールの調子が悪いため、臨時でＦＡＸさせていただきます。"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 455,
+            "y": 569.4,
+            "width": 104.1,
+            "height": 15,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "アデュース電気"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 101,
+            "y": 499,
+            "width": 206,
+            "height": 25,
+            "style": {
+              "font-family": [
+                "IPAPGothic"
+              ],
+              "font-size": 12,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "以上、宜しくお願い致します。"
+            ]
+          }
+        ]
+      },
+      "content-height": 610.8,
+      "auto-page-break": true
+    }
+  ],
+  "state": {
+    "layout-guides": []
+  },
+  "title": "",
+  "report": {
+    "paper-type": "A4",
+    "orientation": "portrait",
+    "margin": [
+      20,
+      20,
+      20,
+      20
+    ]
+  }
+}

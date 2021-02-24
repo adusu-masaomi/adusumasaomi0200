@@ -149,7 +149,12 @@
        <td><font size="2">合計数量(在庫確認用):<%= number_with_delimiter(@purchase_data.sumQuantity + @purchase_data.sumShipQuantity) %></font></td>
        
        
+       <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+       
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -158,12 +163,15 @@
        <!--<%= link_to "チェック反映",
             outsourcing_data_path,
             :class => 'btn btn-lime500_rsd keep-disp', :onclick => "bulkCheck()" %>-->
+       <!--add200916-->
+       <%= f.text_field :payment_date, class:"input-append date datepicker", include_blank: true ,  id: 'payment_date_input' , style: 'width:100px'  %>
        
        <%= f.button_tag "チェック反映", :type => 'link', name: "setCheck",  
                :onclick => "bulkCheck()" , :class => 'btn btn-lime500_rsd keep-disp' %>
        
-        
-       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp; <font color = red >※日付を先に入れる</font>
+       
+       <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
        
        <!--<%= link_to "(緊急用)",
             outsourcing_data_path,
@@ -233,8 +241,15 @@
         <% if purchase_datum.purchase_order_datum.nil? %>
            <td>-</td>
         <% else %>
-		   <td style="font-size : 12px;"><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>
-		<% end %>
+        
+           <!--<td style="font-size : 12px;"><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>-->
+
+           <td style="font-size : 12px;"><%= link_to purchase_datum.purchase_order_datum.purchase_order_code, 
+                outsourcing_costs_path(purchase_order_datum_id: purchase_datum.purchase_order_datum.id, move_flag: "1"), 
+                :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
+                
+        
+        <% end %>
         <% if purchase_datum.construction_datum_id.nil? || purchase_datum.construction_datum.nil? %>
            <td>-</td>
         <% else %>
@@ -407,10 +422,16 @@
        var $elem = $(e.target);
        var id = $elem.context.id
        var bool = $elem.is(':checked') ? 1 : 0;
+       
+       //add200916
+       var payment_date = document.getElementById("payment_date_input").value;
+       
+       //debugger;
+       
        //砂時計にする
        //$("body").css("cursor", "progress");
        $.get("<%= outsourcing_datum_set_payment_flag_path %>",
-            {id: id , flag: bool},
+            {id: id , flag: bool, payment_date: payment_date},
              function(data){
                 //画面再描画のためリロードする
 		        //window.location.reload();

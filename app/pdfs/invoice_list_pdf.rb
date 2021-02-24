@@ -264,6 +264,8 @@ class InvoiceListPDF
                 row.item(:fmeSituation).visible(true)
               end
               
+              final_return_division = ""
+              
               #add180719
               #元請業者の色つけ（印刷フラグがある場合のみ）
               if $print_flag_invoice == "1"
@@ -277,7 +279,21 @@ class InvoiceListPDF
                   if invoice_header.labor_insurance_not_flag == 1
                     row.item(:lineDelete).visible(true)
                   end
+              elsif $print_flag_invoice == "2"
+                #確定申告用
+                if invoice_header.final_return_division.present? && invoice_header.final_return_division > 0
+                  final_return_division = ConstructionCost.final_division[invoice_header.final_return_division][0]
+                end
               end
+              
+              #sample .....
+              # 入庫の場合は入庫と表示
+		      #if purchase_datum.inventory_division_id.present? && InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][1] == 0
+			  #  division_name = InventoryHistory.inventory_division[purchase_datum.inventory_division_id.to_i][0]
+			  #else
+		      #  division_name = purchase_datum.PurchaseDivision.purchase_division_name
+			  #end
+			  #
               
               
 			  #明細行出力
@@ -290,7 +306,8 @@ class InvoiceListPDF
 						 payment_method: payment_method,
 						 commission: commission,
                          payment_date: payment_date_formatted,
-						 remarks: invoice_header.remarks
+						 remarks: invoice_header.remarks,
+                         final_return_division: final_return_division
 			   
 			  #小計判定用
 			  if invoice_date.present?
