@@ -215,10 +215,32 @@ class ConstructionCostsController < ApplicationController
           invoice_header = InvoiceHeader.where(:id => invoice_detail_large.invoice_header_id).first
           if invoice_header.present? && invoiceExist == false  #請求書に工事番号があればそれを優先
             invoice_header.final_return_division = $FINAL_RETURN_DIVISION_Z  #Zを入れる
-            #通常なら、Ｚは外す(訂正の場合を考慮)。但し2行以上あった場合は考慮しない(Zの再セット)
+            
+            #区分が0-通常の場合->請求書明細データ->納品書見出を見回し、Aが一つも入ってなければ抹消
             if final_return_division == 0
-              invoice_header.final_return_division = 0
+              final_check = false
+              
+              invoice_detail_larges = InvoiceDetailLargeClassification.where(:invoice_header_id => invoice_header.id)
+              invoice_detail_larges.each do |invoice_large|
+                 dh = DeliverySlipHeader.where(:id => invoice_large.delivery_slip_header_id).first
+                 if dh.present?
+                   if dh.final_return_division.present? && dh.final_return_division > 0
+                     final_check = true
+                   end
+                 end
+              end  #loop end
+              
+              if !final_check
+                invoice_header.final_return_division = 0
+              end
             end
+            #
+            
+            #↓NG--２行以上の場合に０で上塗りされてしまうため、Falseにする。逆に、工事画面でAから抹消した場合は、直接見出しで直す事とする。
+            #通常なら、Ｚは外す(訂正の場合を考慮)。但し2行以上あった場合は考慮しない(Zの再セット)
+            #if final_return_division == 0
+            #  invoice_header.final_return_division = 0
+            #end
             
             invoice_header.save!(:validate => false)
           end

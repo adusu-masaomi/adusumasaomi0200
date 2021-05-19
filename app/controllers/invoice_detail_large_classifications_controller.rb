@@ -125,7 +125,10 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 		  when "3"
 		  #請求書（印鑑有）
             report = InvoicePDF.create @invoice_detail_large_classifications
-		  
+		  when "4"
+          #請求書（印鑑有-旧様式）
+            report = InvoicePDF.create @invoice_detail_large_classifications
+            
 		  #when "4"
 		  ##納品書(横)
 		  #  report = DeliverySlipLandscapePDF.create @delivery_slip_landscape

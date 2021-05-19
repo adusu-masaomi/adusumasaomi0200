@@ -63,7 +63,9 @@
   <%= f.collection_select :material_category_id, @material_categories.all, :id, :name, {:include_blank => true, :selected => f.object.material_category_id || nil} , 
       {class: "searchableSelect1_4 form-control" , id: "material_category_id" , style: 'width:200px;margin-left:-20px', :tabindex => "6" } %>
   
-  <%= f.input :order_unit_price,  input_html:{ id: "order_unit_price", style: 'width:100px;' , :tabindex=>"7" } %>
+  <%= f.input :order_unit_price,  input_html:{ id: "order_unit_price", style: 'width:100px;' , :tabindex=>"7" ,
+                                               :onkeyup => "changePriceByUnit(event, this)" } %>
+                                               
   <%= f.input :order_price,  input_html:{ id: "order_price", style: 'width:100px;' , :tabindex=>"8" } %>
   
 </div>
@@ -342,6 +344,42 @@
   function focusQuantity(selected_index)
   {
      document.getElementsByName("quantity[]")[selected_index].focus();
+  }
+  
+  //単価訂正したら金額も訂正する
+  function changePriceByUnit(e, t)
+  {
+     var controlName = t.name;
+     var selectedIndex = 0;
+     
+     if (controlName != undefined){
+	    
+        //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+        //debugger;
+        
+	    selectedIndex = controlName.slice(42);
+	    selectedIndex = selectedIndex.slice(0,-19);
+     }
+     
+     nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_unit_price]";
+     nm_pr = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_price]";
+     
+     if (document.getElementsByName(nm)[0].value != "")
+     {
+        qt = "purchase_order_history[orders_attributes][" + selectedIndex + "][quantity]";
+        quantity = document.getElementsByName(qt)[0].value;
+        
+        if (quantity != "")
+        {
+              unit_price = document.getElementsByName(nm)[0].value;
+              price = unit_price * quantity;
+              //nm_pr = "purchase_order_history[orders_attributes][" + selectedIndex + "][order_price]";
+              document.getElementsByName(nm_pr)[0].value = price;
+        }
+     }else{
+     //単価が空白の場合
+       document.getElementsByName(nm_pr)[0].value = "";
+     } 
   }
   
   //数量訂正したら金額も訂正する

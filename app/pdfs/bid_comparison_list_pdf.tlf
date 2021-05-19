@@ -575,7 +575,7 @@
             }
           },
           {
-            "id": "unit_price_bid",
+            "id": "unit_price_3",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -611,7 +611,7 @@
             }
           },
           {
-            "id": "price_bid",
+            "id": "price_3",
             "type": "text-block",
             "display": true,
             "description": "",
@@ -1116,9 +1116,9 @@
       "type": "rect",
       "display": true,
       "description": "",
-      "x": 737.7,
+      "x": 754.4,
       "y": 43,
-      "width": 104.1,
+      "width": 87.4,
       "height": 18.7,
       "style": {
         "border-color": "#000000",
@@ -1133,9 +1133,9 @@
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 747.7,
+      "x": 759.4,
       "y": 46.5,
-      "width": 89.3,
+      "width": 77.6,
       "height": 10.6,
       "style": {
         "font-family": [
@@ -1143,13 +1143,13 @@
         ],
         "font-size": 10,
         "color": "#000000",
-        "text-align": "left",
+        "text-align": "center",
         "vertical-align": "top",
         "line-height": "",
         "line-height-ratio": "",
         "letter-spacing": "",
         "font-style": [],
-        "overflow": "truncate",
+        "overflow": "fit",
         "word-wrap": "none"
       },
       "reference-id": "",
@@ -1767,32 +1767,6 @@
     },
     {
       "id": "",
-      "type": "text",
-      "display": true,
-      "description": "",
-      "x": 775,
-      "y": 148.5,
-      "width": 37.1,
-      "height": 15.7,
-      "style": {
-        "font-family": [
-          "IPAPGothic"
-        ],
-        "font-size": 9,
-        "color": "#000000",
-        "text-align": "left",
-        "vertical-align": "top",
-        "line-height": "",
-        "line-height-ratio": "",
-        "letter-spacing": "",
-        "font-style": []
-      },
-      "texts": [
-        "＊差額"
-      ]
-    },
-    {
-      "id": "",
       "type": "rect",
       "display": true,
       "description": "",
@@ -1835,7 +1809,7 @@
       ]
     },
     {
-      "id": "total_price_bid",
+      "id": "total_price_3",
       "type": "text-block",
       "display": true,
       "description": "",
@@ -1923,32 +1897,6 @@
       ]
     },
     {
-      "id": "",
-      "type": "text",
-      "display": true,
-      "description": "",
-      "x": 395.4,
-      "y": 566,
-      "width": 35.9,
-      "height": 16,
-      "style": {
-        "font-family": [
-          "IPAPGothic"
-        ],
-        "font-size": 10,
-        "color": "#000000",
-        "text-align": "left",
-        "vertical-align": "top",
-        "line-height": "",
-        "line-height-ratio": "",
-        "letter-spacing": "",
-        "font-style": []
-      },
-      "texts": [
-        "差額："
-      ]
-    },
-    {
       "id": "total_high_price",
       "type": "text-block",
       "display": true,
@@ -2021,13 +1969,13 @@
       }
     },
     {
-      "id": "total_balance",
+      "id": "supplier_name_3",
       "type": "text-block",
       "display": true,
       "description": "",
-      "x": 423,
-      "y": 566,
-      "width": 46.4,
+      "x": 744,
+      "y": 148.5,
+      "width": 92.7,
       "height": 9.9,
       "style": {
         "font-family": [
@@ -2035,7 +1983,7 @@
         ],
         "font-size": 9,
         "color": "#000000",
-        "text-align": "right",
+        "text-align": "center",
         "vertical-align": "top",
         "line-height": "",
         "line-height-ratio": "",
@@ -2049,11 +1997,7 @@
       "multiple-line": false,
       "format": {
         "base": "",
-        "type": "number",
-        "number": {
-          "delimiter": ",",
-          "precision": 0
-        }
+        "type": ""
       }
     }
   ],

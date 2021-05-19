@@ -74,22 +74,27 @@
   <%= f.input :fax, input_html:{id:"fax", :tabindex=>"17", :class => 'sbc_field'} %>
   <!--<%= f.input :construction_period, input_html:{:tabindex=>"15"}  %></br>-->
   <!--<%= f.input :construction_place, input_html:{:tabindex=>"16"}  %></br>-->
-  <div class="col-md-4" ,  style="margin-left : -15px;margin-top : -10px">
-  <%= f.input :billing_amount, label: "請求金額（税抜）", hint: "＊自動計算されます。手入力可。", input_html:{id:"billing_amount", :tabindex=>"18", style: 'width:200px;' } %>
+  <!--<div class="col-md-4" ,  style="margin-left : -15px;margin-top : -10px">-->
+  <div class="col-md-3" ,  style="margin-left : -15px;margin-top : -10px">
+    <%= f.input :billing_amount, label: "請求金額（税抜）", hint: "＊自動計算です(手入力可)", input_html:{id:"billing_amount", :tabindex=>"18", 
+                   style: 'width:200px;', :onkeyup => "setBillingAmountWithTax()"  } %>
   </div>
-  <div class="col-md-4" ,  style="margin-left : -0px;margin-top : -10px">
+  <div class="col-md-3" ,  style="margin-left : 50px;margin-top : -10px">
   <!--<%= f.input :execution_amount, hint: "＊自動計算されます。手入力可。",  input_html:{ style: 'width:200px;' }  %>-->
+     <%= f.input :billing_amount_with_tax, hint: "＊自動計算されます。", label: "請求金額（税込）", input_html:{ id:"billing_amount_with_tax", style: 'width:200px;', readonly: true,
+           value: number_with_precision((f.object.billing_amount || 0) * $consumption_tax_include_per_ten, precision:0) }  %>
   </div>
   
-  <div class="col-md-5" ,  style="margin-left : 50px;margin-top : 20px">
-  <%= f.check_box :labor_insurance_not_flag %> 
-  <%= f.label :labor_insurance_not_flag, "労働保険適用外(中越用)", {style: 'color: black', :tabindex=>"19"} %>
+  <div class="col-md-4" ,  style="margin-left : 50px;margin-top : 20px">
+    <%= f.check_box :labor_insurance_not_flag %> 
+    <%= f.label :labor_insurance_not_flag, "労働保険適用外(税理士用)", {style: 'margin-left :20px;margin-top : -15px;width:200px;color: black', :tabindex=>"19"} %>
   </div>
   
-  </br></br></br></br></br></br>
+  </br></br></br></br></br></br></br>
   
   <div class="col-md-4" ,  style="margin-left : -15px;margin-top : -10px">
-  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"20", style: 'width:200px;', :onchange => "setCommission(this.form)" } %>
+  <%= f.input :deposit_amount, label: "入金金額（税込）", input_html:{id:"deposit_amount", :tabindex=>"20", 
+            style: 'width:200px;', :onkeyup => "setCommission(this.form)" } %>
   </div>
   
   <div class="col-md-4" ,  style="margin-left : 0px;margin-top : -5px">
@@ -99,9 +104,15 @@
   :tabindex=>"21", :onchange => "setCommission(this.form)" } %>
   </div>
   
-  <div class="col-md-3" ,  style="margin-left : 0px;margin-top : -10px">
-  <%= f.input :commission, input_html:{id:"commission", :tabindex=>"22", style: 'width:200px;'} %>
+  <div class="col-md-3" ,  style="margin-left : -50px;margin-top : -10px">
+    <%= f.input :commission, input_html:{id:"commission", :tabindex=>"22", style: 'width:100px;'} %>
   </div>
+  
+  <div class="col-xl-3" , style="margin-left : -40px; margin-top : 20px">
+    <%= f.check_box :deposit_complete_flag, {id:"deposit_complete_flag"}%>
+    <%= f.label_tag :deposit_complete_flag, '入金完了' %> 
+  </div>
+  
   </br></br></br></br>
   <div class="col-md-6" ,  style="margin-left : -15px;margin-top : -0px">
   <%= f.input :payment_date, :include_blank => true, label_html:{style: 'margin-top: -15px;'},
@@ -277,8 +288,31 @@
       //現金の場合は、０をセット（必要ないかも）
       document.getElementById("commission").value = 0;
 	}
+    
+    //add210419
+    //さらに、入金完了フラグもセット
+    //※入力忘れが危険なため、１円でもあれば入金完了とする(未完了のケースが滅多に無いため）
+    var deposit_amount = document.getElementById("deposit_amount").value; deposit_amount
+    
+    if (deposit_amount != undefined && deposit_amount > 0)
+    {
+      document.getElementById("deposit_complete_flag").checked = true;
+    }else{
+      document.getElementById("deposit_complete_flag").checked = false;
+    }
+    //
   }
   
+  //税込請求額の計算
+  function setBillingAmountWithTax()
+  {
+    var billing_amount = document.getElementById("billing_amount").value;
+    
+    if (billing_amount != undefined){
+      var afterValue = Math.round(billing_amount * CONSUMPTION_TAX_INCLUDE_PER_TEN);
+      document.getElementById("billing_amount_with_tax").value = afterValue;
+    }
+  }
   //add190824
   //請求日から判断し、消費税込金額を算出する
   function setTaxIn(f, amount)

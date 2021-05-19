@@ -388,7 +388,8 @@ class InvoiceHeadersController < ApplicationController
             :customer_id, :customer_name, :honorific_id, :responsible1, :responsible2, :post, :address, :house_number, :address2,  
             :tel, :fax, :construction_period, :construction_place,
             :payment_period, :invoice_period_start_date, :invoice_period_end_date, :billing_amount, :execution_amount, 
-            :deposit_amount, :payment_method_id, :commission, :payment_date, :labor_insurance_not_flag, :last_line_number, :remarks, :final_return_division)
+            :deposit_amount, :payment_method_id, :commission, :payment_date, :labor_insurance_not_flag, :last_line_number, :remarks, :final_return_division,
+            :deposit_complete_flag)
     end
     
     # 

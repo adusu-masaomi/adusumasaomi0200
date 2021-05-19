@@ -272,8 +272,7 @@ class InventoriesController < ApplicationController
               #ここで更新する
 		          @inventory_history.update(inventory_history_params)
 		        end
-        
-		
+            
             #在庫データの更新
             #self.set_inventory
             self.set_inventory(params)
@@ -420,6 +419,8 @@ class InventoriesController < ApplicationController
     elsif @inventory_division_id == $INDEX_INVENTORY_SHIPPING
     #出庫
       
+      #binding.pry
+      
       #inventory_quantity = @inventory.inventory_quantity - @differ_inventory_quantit
       inventory_quantity = @inventory.inventory_quantity - (@differ_inventory_quantity + @differ_inventory_quantity2)
       inventory_amount = @inventory.inventory_amount - @differ_inventory_price
@@ -436,8 +437,8 @@ class InventoriesController < ApplicationController
       end
       
       #現ロット数より出庫が多い場合
-      #if @inventory.current_quantity < tmp_quantity
-      if @inventory.current_quantity <= tmp_quantity
+      if (@inventory.current_quantity.nil? && tmp_quantity > 0) ||
+         (@inventory.current_quantity <= tmp_quantity)
         if @inventory.next_quantity_1.present? && @inventory.next_quantity_1 > 0 && 
           @inventory.next_unit_price_1.present?
           
@@ -537,9 +538,12 @@ class InventoriesController < ApplicationController
         #
         move_flag = 0
         if (@inventory.current_warehousing_date.present? && @inventory.current_warehousing_date < @inventory_history.inventory_date && 
-              @inventory.inventory_quantity > 0 && @inventory_division_id == $INDEX_INVENTORY_STOCK ) || (@inventory_division_id == $INDEX_INVENTORY_SHIPPING && 
+              @inventory.inventory_quantity > 0 && @inventory_division_id == $INDEX_INVENTORY_STOCK ) ||
+              @inventory.current_warehousing_date.blank? || (@inventory_division_id == $INDEX_INVENTORY_SHIPPING && 
                               @inventory.current_warehousing_date <= @inventory_history.current_warehousing_date)
           #現在ストックのある入庫日より後に入庫or出庫
+          #@inventory.current_warehousing_date.blank?の条件追加 210408
+          
           move_flag = 1
         elsif @inventory_division_id == $INDEX_INVENTORY_SHIPPING && 
               @inventory.current_warehousing_date > @inventory_history.current_warehousing_date
@@ -903,8 +907,12 @@ class InventoriesController < ApplicationController
       
       
       #@inventory.update(inventory_params)
-      #upd201017
-      @inventory.update(inventory_params)
+      
+      #upd210330
+      #バリデーション無効にする
+      @inventory.assign_attributes(inventory_params)
+      update_check = @inventory.save!(:validate => false)
+      
     end
     
 	  #在庫履歴へも、入出庫直後の在庫数量を記録する。

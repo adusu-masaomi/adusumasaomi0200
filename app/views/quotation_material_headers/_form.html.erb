@@ -97,18 +97,22 @@
    <%= f.input :responsible , label:"担当者", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
    <%= f.input :email , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email", style: 'width:350px'} %>
    
+   <%= f.label :納品場所　, {style: 'color:blue'} %>
+   <%= f.select :delivery_place_flag, PurchaseOrderHistory.delivery_place, {:include_blank => true}, 
+       {id:'delivery_place_flag',  style: 'width:90px;height:30px;font-size:16px;margin-top:0px;' } %>
    
    <!--スペース用-->
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   
    
    <%= link_to t('.cancel', :default => t("前の画面に戻る")),
         quotation_material_headers_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                   :onclick => "reset_value()", :class => 'btn btn-teal500_rsd' %>
    <!--スペース用-->
    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-   
+   <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+   <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
    
    <!--メール送信フラグ-->
    <%= f.check_box :quotation_email_flag_1, :id => "quotation_email_flag_1", :class => "quotation_email_flag_1" %>

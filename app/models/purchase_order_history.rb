@@ -6,6 +6,12 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	has_many :orders
     accepts_nested_attributes_for :orders, allow_destroy: true
     
+    #add210518
+    #納品場所
+    def self.delivery_place 
+      [["現場", 0], ["事務所", 1]] 
+    end
+    
 	#eメール取得用
     attr_accessor :email_responsible
 	

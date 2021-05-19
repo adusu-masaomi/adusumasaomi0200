@@ -863,7 +863,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #                orders_attributes: [:id, :purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
       #               :maker_id, :maker_name, :list_price, :mail_sent_flag, :_destroy])
 	  #upd170616 メーカー名は抹消
-	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, :notes, 
+	  params.require(:purchase_order_history).permit(:purchase_order_datum_id, :supplier_master_id, :purchase_order_date, :mail_sent_flag, 
+                     :delivery_place_flag, :notes, 
 	                  orders_attributes: [:id, :material_id, :material_code, :material_name, :quantity, :unit_master_id, 
                      :maker_id, :list_price, :order_unit_price, :order_price, :material_category_id, :mail_sent_flag, :_destroy])
     end

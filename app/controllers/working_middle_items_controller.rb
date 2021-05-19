@@ -207,6 +207,9 @@ class WorkingMiddleItemsController < ApplicationController
 	#労務単価の初期値をセットする
 	@working_middle_item.labor_unit_price_standard ||= $LABOR_COST
 	
+    #binding.pry
+    
+    
   end
 
   # GET /working_middle_items/1/edit
@@ -234,7 +237,10 @@ class WorkingMiddleItemsController < ApplicationController
     #カテゴリーがなければ新たに作る
     #add180318
     create_category
-  
+    
+    #表示用の連番を割り振る(新規の場合のみ)
+    set_seq
+      
     if params[:move_flag].blank?
 	#upd171128
 	  #マスター画面からの遷移の場合、モーダルのため、別ルーチンにて処理する。
@@ -331,6 +337,9 @@ class WorkingMiddleItemsController < ApplicationController
     #add180318
     create_category
     
+    #表示用の連番を割り振る
+    #set_seq
+    
 	if params[:move_flag].blank?
 	#upd171128
 	  #マスター画面からの遷移の場合、モーダルのため、別ルーチンにて処理する。
@@ -426,6 +435,24 @@ class WorkingMiddleItemsController < ApplicationController
 	
 	end
 	
+  end
+  
+  #add210417
+  #表示用の連番を割り振る
+  def set_seq
+  
+    sub_category = params[:working_middle_item][:working_middle_item_category_id]
+  
+    if sub_category.present?
+      
+      min_seq = WorkingMiddleItem.where(:working_middle_item_category_id => sub_category).minimum(:seq)
+      
+      if min_seq.present?
+        params[:working_middle_item][:seq] = min_seq -1
+      else
+        params[:working_middle_item][:seq] = 0  #何もない場合、0をセット
+      end
+    end 
   end
   
   

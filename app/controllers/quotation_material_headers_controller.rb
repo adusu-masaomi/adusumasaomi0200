@@ -223,30 +223,31 @@ class QuotationMaterialHeadersController < ApplicationController
   
   def reset_mail_sent_flag
     
-	exist_flag = false
+	  exist_flag = false
 	
-	#binding.pry
-	
-	if params[:quotation_material_header].present?
+	  if params[:quotation_material_header].present?
       if params[:quotation_material_header][:supplier_id_1].present?
    	  #仕入先１で送信済？
-	    if params[:quotation_material_header][:supplier_master_id] ==  params[:quotation_material_header][:supplier_id_1]
-	      exist_flag = true
-	    end
+	      if params[:quotation_material_header][:supplier_master_id] ==  params[:quotation_material_header][:supplier_id_1]
+	        exist_flag = true
+	      end
       elsif params[:quotation_material_header][:supplier_id_2].present?
-	  #仕入先２で送信済？
-	    if params[:quotation_material_header][:supplier_master_id] ==  params[:quotation_material_header][:supplier_id_2]
-	      exist_flag = true
-	    end
-	  #仕入先３で送信済？→未検証、未設定。
+	    #仕入先２で送信済？
+	      if params[:quotation_material_header][:supplier_master_id] ==  params[:quotation_material_header][:supplier_id_2]
+	        exist_flag = true
+	      end
+	    elsif params[:quotation_material_header][:supplier_id_3].present?
+	    #仕入先３で送信済？→未検証
+        if params[:quotation_material_header][:supplier_master_id] ==  params[:quotation_material_header][:supplier_id_3]
+	        exist_flag = true
+	      end
       end
-	end
+	  end
 	
-	#binding.pry
-	
-	if exist_flag == true
-	  $new_flag = 1
-	end
+    #フォーム側で使用、現在未使用の模様..	
+	  if exist_flag == true
+	    $new_flag = 1
+	  end
   end
   
   def get_max_seq
@@ -785,8 +786,18 @@ class QuotationMaterialHeadersController < ApplicationController
 	   
 	    #画面の注文Noをグローバルへセット（メール用）
 	    $purchase_order_code = nil
+      $new_code_flag = false
+      
 	    if params[:quotation_material_header][:purchase_order_code].present?
 	      $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
+        
+        #新規の注番ならフラグをつける
+        purchase_order_code = PurchaseOrderDatum.where(:purchase_order_code => $purchase_order_code).first
+        if purchase_order_code.nil?
+          $new_code_flag = true
+        end
+        #binding.pry
+        #
 	    end
 	   
 	    PostMailer.send_order_after_quotation(@quotation_material_header).deliver
@@ -897,7 +908,16 @@ class QuotationMaterialHeadersController < ApplicationController
                       list_price: list_price, mail_sent_flag: mail_sent_flag, 
                       sequential_id: sequential_id}
       
-        @order = Order.create(order_params)
+        #@order = Order.create(order_params)
+                
+        @order = Order.where(["purchase_order_history_id = ? and sequential_id = ?", 
+           purchase_order_history_id, sequential_id]).first
+        if @order.present?  #上書き(メール異常等で再送信の場合もあり得るため)
+          @order.update(order_params)
+        else
+          @order = Order.create(order_params)
+        end
+        
       end
     end  #loop end
   end
@@ -1374,7 +1394,7 @@ class QuotationMaterialHeadersController < ApplicationController
 					 
 					 
 	  params.require(:quotation_material_header).permit(:quotation_code, :quotation_header_origin_id, :requested_date, :construction_datum_id, 
-	                 :supplier_master_id, :responsible, :email, :notes_1, :notes_2, :notes_3,
+	                 :supplier_master_id, :responsible, :email, :delivery_place_flag, :notes_1, :notes_2, :notes_3,
                      :total_quotation_price_1, :total_quotation_price_2, :total_quotation_price_3,
                      :total_order_price_1, :total_order_price_2, :total_order_price_3,
                      :supplier_id_1, :supplier_id_2, :supplier_id_3, :quotation_email_flag_1, 

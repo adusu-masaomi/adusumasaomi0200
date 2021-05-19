@@ -74,7 +74,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <%= link_to_remove_association 'アイテム削除', f , :class => 'btn btn-xs btn-danger'%>
   <!--以下スペースあり-->
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   
   <!-- -->
   <%= f.input :quotation_price_1,  label: "見積金額１", input_html:{ id: "quotation_price_1", :tabindex=>"11", style: 'width:100px' , class: "quotation_price_1" , :onchange => "checkQuotationPriceAll(this,1)" } %>
@@ -478,24 +478,24 @@
       child_index = child_index.slice(0,-11);
     }
     
+    //del 210412
+    //複数落札の場合にうまくいかないので削除
     //落札フラグの判定
     //仕入先1~3でループし、落札フラグがあれば仕入先を注文先として自動セットする。
-    for (var i=1; i<3; i++){
-      strNum = String(i);
-      var nm = "quotation_material_header[quotation_material_details_attributes][" + child_index + "][bid_flag_" + strNum + "]"
-    
-      if (nm != undefined){
-         if (document.getElementsByName(nm)[1] != undefined){
-           if (document.getElementsByName(nm)[1].checked == true){
-             //仕入先をセットする
-             var nm_id = "supplier_id_" + strNum;
-             var supplier_master_index = parseInt(document.getElementById(nm_id).value);
-             $(".searchableSupplier").val(supplier_master_index).trigger("change");
-           }
-         }
-	   }
-    
-    }
+    //for (var i=1; i<3; i++){
+    //  strNum = String(i);
+    //  var nm = "quotation_material_header[quotation_material_details_attributes][" + child_index + "][bid_flag_" + strNum + "]"
+    //  if (nm != undefined){
+    //     if (document.getElementsByName(nm)[1] != undefined){
+    //       if (document.getElementsByName(nm)[1].checked == true){
+    //         //仕入先をセットする
+    //         var nm_id = "supplier_id_" + strNum;
+    //         var supplier_master_index = parseInt(document.getElementById(nm_id).value);
+    //         $(".searchableSupplier").val(supplier_master_index).trigger("change");
+    //       }
+    //     }
+	  // }
+    //}
   
   
   }

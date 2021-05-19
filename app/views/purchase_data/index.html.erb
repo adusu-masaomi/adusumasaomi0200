@@ -27,8 +27,13 @@
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSlipCode()" %>
   
   <%= f.label :supplier_id, '仕入先：：' %>
-  <!--<%= f.select :supplier_id_eq, options_from_collection_for_select(SupplierMaster.all, "id","supplier_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %> -->
-  <%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+  
+  <!---<%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, 
+  {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>-->
+  
+  <%= f.select :supplier_id_eq, @supplier_master_extract.map{|st| [st.supplier_name, st.id]}, 
+  {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+  
   
   <!--モバイル用対応  add180830-->
   <% if browser.platform.ios? || browser.platform.android? %>

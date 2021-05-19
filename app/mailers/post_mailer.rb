@@ -16,8 +16,19 @@ class PostMailer < ApplicationMailer
       @construction = "工事名:" + user.construction_datum.construction_name
     end
     
-	#add170317
-    @supplier_name = user.supplier_master.supplier_name
+    #add210518
+    #現場住所
+    @construction_place = "現場住所:"
+    if user.construction_datum.address.present?
+      @construction_place += user.construction_datum.post + "　" +
+      user.construction_datum.address + user.construction_datum.house_number + 
+      user.construction_datum.address2
+    else
+      @construction_place += "※ご確認下さい"
+    end
+    #add end
+    
+	@supplier_name = user.supplier_master.supplier_name
     @responsible_name = user.supplier_master.responsible1 + "様"
     
         #件名に日時を入れる（メール重なるのを防ぐため）
@@ -63,7 +74,14 @@ class PostMailer < ApplicationMailer
       @construction_name = "工事名:" + user.purchase_order_datum.construction_datum.construction_name
     end
     
-    #add181002
+    #add210518
+    #納品先
+    @delivery_place = nil
+    if user.delivery_place_flag.present?
+      @delivery_place = "納品先:" + PurchaseOrderHistory.delivery_place[user.delivery_place_flag][0]
+    end
+    #add end
+    
     #備考
     @notes = nil
     if user.notes.present?
@@ -158,6 +176,27 @@ class PostMailer < ApplicationMailer
     #工事名をセット
       @construction_name = "工事名:" + user.construction_datum.construction_name
     end
+    
+    #add210518
+    #納品先
+    @delivery_place = nil
+    if user.delivery_place_flag.present?
+      @delivery_place = "納品先:" + PurchaseOrderHistory.delivery_place[user.delivery_place_flag][0]
+    end
+    #現場住所(新規の注文コードで現場のみ)
+    @construction_place = nil
+    if $new_code_flag && user.delivery_place_flag == 0
+      @construction_place = "現場住所:"
+      if user.construction_datum.address.present?
+        @construction_place += user.construction_datum.post + "　" +
+        user.construction_datum.address + user.construction_datum.house_number + 
+        user.construction_datum.address2
+      else
+        @construction_place += "※ご確認下さい"
+      end
+    end
+    #add end
+    
     @supplier_name = user.supplier_master.supplier_name + " 御中"
 	
 	#担当者

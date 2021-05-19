@@ -239,6 +239,8 @@ class PurchaseListForOutsourcingPDF
 					   @closing_date = nil
                        @payment_due_date = nil
                        get_customer_date_info
+                       
+                       get_date_manual(purchase_datum)  #add210301
                        #
                        
 			           row.values purchase_date: purchase_datum.purchase_date,
@@ -351,7 +353,16 @@ class PurchaseListForOutsourcingPDF
    
 end
    
-
+  #締日・支払日が手入力の場合の処理
+  def get_date_manual(purchase_datum)
+    if purchase_datum.closing_date.present?
+      @closing_date = purchase_datum.closing_date
+    end
+    if purchase_datum.payment_due_date.present?
+      @payment_due_date = purchase_datum.payment_due_date
+    end
+  end
+  
   #得意先から締め日・支払日を算出
   #本来、コントローラと共通化させなければならない・・・・
   def get_customer_date_info

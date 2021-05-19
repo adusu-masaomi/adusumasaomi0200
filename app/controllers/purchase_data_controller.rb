@@ -77,6 +77,11 @@ class PurchaseDataController < ApplicationController
         #注文番号の絞り込み（登録済みのものだけにする） 
         if query.present? && query[:with_construction].present?
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: query[:with_construction])
+          
+          #add210319
+          #仕入業者の絞り込み
+          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+                          where('purchase_data.construction_datum_id = ?', query[:with_construction]).distinct
         end
         
         #件名の絞り込み addd180830
@@ -90,6 +95,7 @@ class PurchaseDataController < ApplicationController
         case params[:move_flag]
 		when "1"
           #工事一覧画面から遷移した場合
+          
           construction_id = params[:construction_id]
 		  query = {"with_construction"=> construction_id }
 		  
@@ -111,6 +117,13 @@ class PurchaseDataController < ApplicationController
           
           #注文番号の絞り込み（登録済みのものだけにする） upd180403
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
+        
+          #add210319
+          #仕入業者の絞り込み
+          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+                          where('purchase_data.construction_datum_id = ?', params[:construction_id]).distinct
+          
+          
         when "2"
           
 		  #注文一覧画面から遷移した場合
@@ -139,6 +152,11 @@ class PurchaseDataController < ApplicationController
           
           #注文番号の絞り込み（登録済みのものだけにする） upd180403
           @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
+          
+          #add210319
+          #仕入業者の絞り込み
+          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+                          where('purchase_data.construction_datum_id = ?', params[:construction_id]).distinct
 		end
 		
         #@q = PurchaseDatum.ransack(params[:q]) 
@@ -160,7 +178,7 @@ class PurchaseDataController < ApplicationController
           
         end
         #
-       
+        
 
 	@purchase_data = @q.result(distinct: true)
 	
@@ -173,6 +191,10 @@ class PurchaseDataController < ApplicationController
     end
     ###
     
+    #add210319
+    if @supplier_master_extract.blank?
+      @supplier_master_extract = SupplierMaster.all
+    end
     
 	#kaminari用設定。
 	@purchase_data = @purchase_data.page(params[:page])

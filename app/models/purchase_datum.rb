@@ -17,6 +17,8 @@ class PurchaseDatum < ActiveRecord::Base
 	belongs_to :PurchaseDivision,  :foreign_key => "division_id"
     belongs_to :purchase_header  
     
+    #has_many :SupplierMaster,  :foreign_key => "supplier_id"
+    
     #belongs_to :outsourcing_cost    #add190213
     
     #belongs_to :material_category #add180626
@@ -43,10 +45,11 @@ class PurchaseDatum < ActiveRecord::Base
 	attr_accessor :construction_datum_id_hide
 	attr_accessor :material_category_id_hide
     
-    attr_accessor :outsourcing_flag_hide #add201229
-    
-    #add200630
+    attr_accessor :outsourcing_flag_hide 
     attr_accessor :price_disp_flag
+    
+    attr_accessor :closing_date_hide      #add210302
+    attr_accessor :payment_due_date_hide  #add210302
     
     #attr_accessor :parameters  #add180403
     #validation

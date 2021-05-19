@@ -18,31 +18,35 @@
   <!--</br></br></br></br>-->  
 
   <%= f.input :purchase_date, label: "作成日" ,  input_html:{ id:"purchase_date", name: "purchase_datum[purchase_date][]" , style: 'width:220px;', :tabindex=>"0"} %>
-  <%= f.input :slip_code, label: "伝票番号", input_html: { id:"slip_code", style: 'width:220px;', :tabindex=>"1", :onchange => "setHeaderId()" }  %>
+  <%= f.input :working_end_date, :include_blank => true, label: "完了日(変更の場合のみ入力)" ,  input_html:{ id:"working_end_date", name: "purchase_datum[working_end_date][]" , 
+           :onchange => "setAutoDate()", style: 'width:220px;', :tabindex=>"1"} %>
+  
+  <%= f.input :slip_code, label: "伝票番号", input_html: { id:"slip_code", style: 'width:220px;', :tabindex=>"2", :onchange => "setHeaderId()" }  %>
   <%= f.label :注文Ｎｏ , {:class => "my-custom-class-l"}  %></br>
   
   <% if @purchase_order_data.present? %>
     <%= f.collection_select :purchase_order_datum_id, @purchase_order_data, :id, :p_num_cd, {} , {id:"purchase_datum", 
-         class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
+         class: "searchableSubject" , :tabindex=>"3", style: 'width:220px !important; margin-left: -15px;'} %>
   <% else %>
     <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :p_num_cd, {:prompt => "どれか一つを選択して下さい"} , {id:"purchase_datum", 
-         class: "searchableSubject" , :tabindex=>"2", style: 'width:220px !important; margin-left: -15px;'} %>
+         class: "searchableSubject" , :tabindex=>"3", style: 'width:220px !important; margin-left: -15px;'} %>
   <% end %>
   
   <% @purchase_order_datum = PurchaseOrderDatum.new unless @purchase_order_datum %>
   <%= f.simple_fields_for :@purchase_order_datum do |m| %>
   <%= m.label :件名Ｎｏ参照用, {:class => "my-custom-class-lr"} %>
-  <%= m.collection_select :lstConstruction_datumid, ConstructionDatum.all, :id, :construction_code, {:include_blank => true,:selected => @purchase_datum.construction_datum_id} , {id:'lstConstruction_datumid',name:'lstConstruction_datumid', style: 'font-size : 12px;' , :class => "my-custom-class-r2"} %></br>
+  <%= m.collection_select :lstConstruction_datumid, ConstructionDatum.all, :id, :construction_code, 
+       {:include_blank => true,:selected => @purchase_datum.construction_datum_id} , {id:'lstConstruction_datumid',name:'lstConstruction_datumid', style: 'font-size : 12px;' , :class => "my-custom-class-r2"} %></br>
   <% end %>
   <!-- -->
   <%= f.label :件名Ｎｏ , {:class => "my-custom-class-l"} %></br>
   
   <div class="col-xs-5" , style="margin-left : -15px">
   <% if @construction_data.present? %>
-    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , {id:'construction_datum_id', :tabindex=>"3", 
+    <%= f.collection_select :construction_datum_id, @construction_data, :id, :p_cd_name, {} , {id:'construction_datum_id', :tabindex=>"4", 
        :class => "searchableConstructionCode",  style: 'width:260px;' } %>
   <% else %>
-    <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :tabindex=>"3", 
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.all, :id, :p_cd_name, {:include_blank => true} , {id:'construction_datum_id', :tabindex=>"4", 
        :class => "searchableConstructionCode",  style: 'width:260px;' } %>
   <% end %>
   </div>
@@ -53,33 +57,33 @@
   <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
   <% if @supplier_master.present? %>
     <%= f.collection_select :supplier_id, @supplier_master, :id, :supplier_name, {},
-      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"5", :onchange => "setUnitPrice(this.form)"}  %>
   <% else %>
     <%= f.collection_select :supplier_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
-      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"4", :onchange => "setUnitPrice(this.form)"}  %>
+      {id:"supplier_id", :class => "searchableSupplier", style: 'width:220px', :tabindex=>"5", :onchange => "setUnitPrice(this.form)"}  %>
   <% end %>
   </br>
   <div class="col-xs-5 " , style="margin-left : -15px;">
   <%= f.label :'品番（ﾏｽﾀｰ追加は”＜手入力用＞”に）' , {:class => "my-custom-class-l" ,style: 'color:red;'} %></br>
   <%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , 
-               :tabindex=>"5",style: 'width:220px;'  ,:onchange => "setListPriceAndMakerAndUnit(this.form)"} %>
-  <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:prompt => "どれか一つを選択して下さい"} , {id:"material_id", class: "searchableItem" , 
-               :tabindex=>"5",style: 'width:220px;' } %>-->
+               :tabindex=>"6",style: 'width:220px;'  ,:onchange => "setListPriceAndMakerAndUnit(this.form)"} %>
   </div>
   
   <%= f.label :仕入先品番（検索用） , {:class => "my-custom-class-l"} %>
   <%= f.collection_select :supplier_material_code, PurchaseUnitPrice.all, :id, :supplier_material_code, {:include_blank => true} , 
-      {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px', :tabindex=>"6"} %>
+      {id:"supplier_material_id", class: "searchableSupplierItem" , style: 'width:220px', :tabindex=>"7"} %>
   
   <%= f.label :定価参照, {:class => "my-custom-class-lr2"} %>
-  <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;width:100px'}  %></br>
+  <%= f.collection_select :lstListPrice, MaterialMaster.all,  :id, :list_price,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , 
+          {id:'material_list_price', :class => "my-custom-class-r2", style: 'font-size : 12px;width:100px'}  %></br>
   
   <div class="col-lg-5" , style="margin-left : -15px">
-  <%= f.input :material_code, label: "品番（手入力用）", hint: "品名をﾌﾘｰ入力したい場合は”手入力”のまま" ,label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' , :tabindex=>"7" }  %>
+  <%= f.input :material_code, label: "品番（手入力用）", hint: "品名をﾌﾘｰ入力したい場合は”手入力”のまま" , 
+        label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_code' , style: 'width:220px' , :tabindex=>"8" }  %>
   </div>
   <div class="col-lg-5" , style="margin-left : -15px">
   <%= f.input :supplier_material_code, label: "仕入先品番（手入力用）", input_html: { :class => "my-custom-class-t", id:'supplier_material_code' , 
-                   style: 'width:220px;', :tabindex=>"8", :onchange => "copySupplierCodeToMaterial()" }  %>
+                   style: 'width:220px;', :tabindex=>"9", :onchange => "copySupplierCodeToMaterial()" }  %>
   </div>
   <!--<%= f.hidden_field :material_masters, :value => @material_masters, id:"material_list_price" %>-->
   
@@ -88,11 +92,12 @@
   <%= f.collection_select :lstMaterialName, MaterialMaster.all,  :id, :material_name,  {:prompt => "どれか一つを選択して下さい",:selected => @purchase_datum.material_id} , 
   {id:'lstMaterialName',name: 'lstMaterialName' ,:class => "my-custom-class-l", :hidden => true }  %></br></br></br></br></br></br>
   
-  <%= f.input :material_name, label: "品名（手入力用）", hint: "品番が”＜手入力用＞”以外は全てマスターへ反映されるのでご注意下さい！！", label_html: { style: 'color:blue' }, input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"9"  }  %>
+  <%= f.input :material_name, label: "品名（手入力用）", hint: "品番が”＜手入力用＞”以外は全てマスターへ反映されるのでご注意下さい！！", label_html: { style: 'color:blue' }, 
+          input_html: { :class => "my-custom-class-t", id:'material_name', :tabindex=>"10"  }  %>
   <%= f.label :メーカー, {:class => "my-custom-class-l"} %></br>
-  <!--<%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', :class => "my-custom-class" ,:onchange => "setMakerName(this.form)" } %></br>-->
-  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,  { id:'maker_id', class: "searchableMaker" , :tabindex=>"10", style: 'width:220px'} %></br> 
-  <%= f.input :maker_name, label: "メーカー名（手入力用）", input_html: { id:'maker_name', :class => "my-custom-class-t", :tabindex=>"11" }  %>
+  <%= f.collection_select :maker_id, MakerMaster.all, :id, :maker_name,  {:prompt => "どれか一つを選択して下さい"} ,
+       { id:'maker_id', class: "searchableMaker" , :tabindex=>"11", style: 'width:220px'} %></br> 
+  <%= f.input :maker_name, label: "メーカー名（手入力用）", input_html: { id:'maker_name', :class => "my-custom-class-t", :tabindex=>"12" }  %>
     
   <!--仕入先単価-->
   <%= f.input :unit_price_hide , input_html:{ id:"unit_price_hide"} , as: :hidden%>
@@ -107,16 +112,24 @@
     <%= m.input :last_unit_price , input_html:{ id:"last_unit_price"}, as: :hidden %>
     <%= m.input :last_unit_price_update_at , input_html:{ id:"last_unit_price_update_at"} ,as: :date_picker, as: :hidden %>
   <% end %>
-
-  <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"12" , :onfocusout => "calcMoney(this.form)" } %>
-  <!--<%= link_to (button_tag "ボタン", type: 'button'), {:onclick => "calcMoney(this.form)"} %></br>-->
+  
+  <div class="col-xs-5 " , style="margin-left : -15px;">
+  <%= f.input :quantity , label: "数量" , input_html:{ id: "quantity", style: 'width:220px;' , :tabindex=>"13" , :onfocusout => "calcMoney(this.form)" } %>
+  </div>
+  
+  <%= f.input :closing_date, :include_blank => true, label: "締日(必要に応じて変更して下さい)" ,  input_html:{ id:"closing_date", name: "purchase_datum[closing_date][]" , style: 'width:120px;', :tabindex=>"0"} %>
+  
+  <div class="col-xs-5 " , style="margin-left : -15px;">
   <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"13" , style: 'width:110px;' , :class => "searchableUnit"} %>
-  <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"14" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
+  <%= f.collection_select :unit_id, UnitMaster.all,:id, :unit_name, {:selected => @purchase_datum.unit_id || 3 } , {id:"unit_id", :tabindex=>"14" , style: 'width:110px;' , :class => "searchableUnit"} %>
+  </div>
+  <%= f.input :payment_due_date, :include_blank => true, label: "支払予定日(必要に応じて変更して下さい)" ,  input_html:{ id:"payment_due_date", name: "purchase_datum[payment_due_date][]" , style: 'width:120px;', :tabindex=>"0"} %>
+  
+  <%= f.input :purchase_unit_price, label: "仕入単価", input_html:{id:"purchase_unit_price", :tabindex=>"15" ,  style: 'width:220px;' , :onfocusout => "calcMoney(this.form)" } %>
   <%= f.check_box :unit_price_not_update_flag, {id:"unit_price_not_update_flag"}, '1', '0' %>
   <%= f.label_tag :unit_price_not_update_flag, '単価マスタを更新しない場合はチェック' %> 
-  <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"15"} %>
-  <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"16"} %>
+  <%= f.input :purchase_amount ,label: "金額" , input_html:{id:"purchase_amount", :tabindex=>"16"} %>
+  <%= f.input :list_price,label: "定価", input_html:{id:"list_price", :tabindex=>"17"} %>
   
   <!--資材分類-->
   <%= f.simple_fields_for :MaterialMaster, :remote => true do |m| %>
@@ -129,15 +142,15 @@
   <%= f.label :仕入区分 , {:class => "my-custom-class-l", style: 'width:190px;'} %><%= f.label :入出庫区分 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :division_id, PurchaseDivision.all, :id, :purchase_division_name , 
      {:selected => @purchase_datum.division_id || 1, :prompt => "どれか一つを選択して下さい"} , 
-       {id: "division_id", :tabindex=>"18", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
+       {id: "division_id", :tabindex=>"19", style: 'width:120px;', :onchange => "uncheckUnitPrice()", :class => "my-custom-class"} %>
   <%= f.select :inventory_division_id, InventoryHistory.inventory_division, {:include_blank => true}, 
        {id:'inventory_division_id', :onchange => "uncheckUnitPriceInventory()", :class => "my-custom-class",
-          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"19" } %>
+          style: 'width:120px;margin-left:50px;font-size:18px;', :tabindex=>"20" } %>
   <!--190124とりあえずいらないので保留-->
   <!--<%= f.check_box :complete_flag , {id:'complete_flag', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>-->
   <!--<%= f.label :complete_flag, "入力完了", {} %>-->
   
-  <%= f.check_box :labor_cost_set , {id:'labor_cost_set', style: 'margin-top:-50px;', :tabindex=>"20", :readonly=> true} %>
+  <%= f.check_box :labor_cost_set , {id:'labor_cost_set', style: 'margin-top:-50px;', :tabindex=>"21", :readonly=> true} %>
   <%= f.label :complete_flag, "労務費をセット(外注)", {} %>
   
   <%= f.check_box :outsourcing_invoice_flag , {id:'outsourcing_invoice_flag', style: 'margin-top:-50px;visibility: hidden'} %>
@@ -153,8 +166,10 @@
   <!--工事ID自動切り替え用-->
   <%= f.input :construction_datum_id_hide, input_html:{id:'construction_datum_id_hide', :value => @outsourcing_flag} , as: :hidden %>
   
-  <!--add180223-->
   <%= f.input :complete_flag_hide, input_html:{id:'complete_flag_hide'}, as: :hidden  %>
+  <!--add210302-->
+  <%= f.input :closing_date_hide, input_html:{id:'closing_date_hide'}, as: :hidden  %>
+  <%= f.input :payment_due_date_hide, input_html:{id:'payment_due_date_hide'}, as: :hidden  %>
   
   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
@@ -198,23 +213,23 @@
      $(".searchableConstructionCode").select2({ theme: "bootstrap" });
 	 //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
 	   $( ".searchableConstructionCode" ).on("select2:close", function (e) {
-	     $('[tabindex=4]').focus(); 
+	     $('[tabindex=5]').focus(); 
 	   });
 		
 	 
 	 $(".searchableUnit").select2({ theme: "bootstrap" });
      //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
 	 $( ".searchableUnit" ).on("select2:close", function (e) {
-	   $('[tabindex=14]').focus(); 
+	   $('[tabindex=15]').focus(); 
 	 });
 	 
      //資材分類
      //select2のタブインデックスはここで指定する
 	 $(".searchableCategory").select2({ theme: "classic", allowClear: true, placeholder: "" }).on("load", function(e) { 
-        $(this).prop('tabindex',17)}).trigger('load');
+        $(this).prop('tabindex',18)}).trigger('load');
      //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
 	 $( ".searchableCategory" ).on("select2:close", function (e) {
-	   $('[tabindex=18]').focus(); 
+	   $('[tabindex=19]').focus(); 
 	 });
      
      
@@ -853,6 +868,54 @@
 	
     }
   }
-    
+  
+  //締日・支払予定日を自動取得するajax
+  function setAutoDate()
+  {
+     var check = false;
+     if (document.getElementsByName("purchase_datum[working_end_date][]")[0].value != "" &&
+         document.getElementsByName("purchase_datum[working_end_date][]")[1].value != "" &&
+         document.getElementsByName("purchase_datum[working_end_date][]")[2].value != "")
+     {
+        check = true;
+     }
+     
+     if (check)
+     {
+        construction_datum_id = document.getElementById("construction_datum_id").value;
+        working_end_date = document.getElementsByName("purchase_datum[working_end_date][]")[0].value +
+                           document.getElementsByName("purchase_datum[working_end_date][]")[1].value.padStart(2, '0') +
+                           document.getElementsByName("purchase_datum[working_end_date][]")[2].value.padStart(2, '0');
+        
+        //
+        $.get("<%= outsourcing_datum_get_customer_date_ajax_path %>",
+           {construction_datum_id: construction_datum_id, working_end_date: working_end_date },
+        function(data)
+        {
+            obj1 = document.getElementById("closing_date_hide").textContent;
+            obj2 = document.getElementById("payment_due_date_hide").textContent;
+            
+            
+            //締日
+            if (obj1 != null)
+            {
+              document.getElementsByName("purchase_datum[closing_date][]")[0].value = parseInt(obj1.substr(0,4));
+              document.getElementsByName("purchase_datum[closing_date][]")[1].value = parseInt(obj1.substr(5,2));
+              document.getElementsByName("purchase_datum[closing_date][]")[2].value = parseInt(obj1.substr(8,2));
+            }
+            //支払予定日
+            if (obj2 != null)
+            {
+              document.getElementsByName("purchase_datum[payment_due_date][]")[0].value = parseInt(obj2.substr(0,4));
+              document.getElementsByName("purchase_datum[payment_due_date][]")[1].value = parseInt(obj2.substr(5,2));
+              document.getElementsByName("purchase_datum[payment_due_date][]")[2].value = parseInt(obj2.substr(8,2));
+            }
+            
+            
+        }
+        );
+        
+     }
+  }
   
 </script>

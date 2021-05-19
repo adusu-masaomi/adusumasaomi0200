@@ -213,6 +213,30 @@ class OutsourcingCostsController < ApplicationController
       end
     end
     
+    #add210302
+    #仕入データの締日を更新(異なる場合)
+    closing_date_str = params[:outsourcing_cost]["closing_date(1i)"] + "-" + params[:outsourcing_cost]["closing_date(2i)"] + 
+                                          "-" + params[:outsourcing_cost]["closing_date(3i)"]
+    closing_date = Date.strptime(closing_date_str, '%Y-%m-%d')  
+    
+    if purchase_data.closing_date != closing_date
+      purchase_params = {closing_date: closing_date}
+      #ヴァリデーションしない
+      purchase_data.assign_attributes(purchase_params)
+      purchase_data.save!(:validate => false)
+    end
+    #仕入データの支払予定日を更新(異なる場合)
+    payment_due_date_str = params[:outsourcing_cost]["payment_due_date(1i)"] + "-" + params[:outsourcing_cost]["payment_due_date(2i)"] + 
+                                          "-" + params[:outsourcing_cost]["payment_due_date(3i)"]
+    payment_due_date = Date.strptime(payment_due_date_str, '%Y-%m-%d')  
+    
+    if purchase_data.payment_due_date != payment_due_date
+      purchase_params = {payment_due_date: payment_due_date}
+      #ヴァリデーションしない
+      purchase_data.assign_attributes(purchase_params)
+      purchase_data.save!(:validate => false)
+    end
+    #
   end
 
   # DELETE /outsourcing_costs/1

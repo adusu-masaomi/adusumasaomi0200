@@ -65,14 +65,14 @@ class DeliverySlipHeadersController < ApplicationController
 	 #add170809
     #手入力時の顧客マスターの新規登録
   	create_manual_input_customer
-	
+	 
+    #工事集計の確定区分があればセット
+    set_final_return_division_params
+  
     @delivery_slip_header = DeliverySlipHeader.new(delivery_slip_header_params)
     
     #見出しデータ（コピー元）の補完
     complementCopyHeader
-    
-    #工事集計の確定区分があればセット
-    set_final_return_division_params
     
     respond_to do |format|
       if @delivery_slip_header.save
@@ -336,8 +336,11 @@ class DeliverySlipHeadersController < ApplicationController
       construction_cost = ConstructionCost.where(:construction_datum_id => construction_datum_id).first
       #工事集計データあり？
       if construction_cost.present?
-        if construction_cost.final_return_division.present? && construction_cost.final_return_division > 0
+        #if construction_cost.final_return_division.present? && construction_cost.final_return_division > 0
+        #upd210402
+        if construction_cost.final_return_division.present?
           params[:delivery_slip_header][:final_return_division] = construction_cost.final_return_division
+          #@delivery_slip_header.final_return_division = construction_cost.final_return_division
         end
       end
     end

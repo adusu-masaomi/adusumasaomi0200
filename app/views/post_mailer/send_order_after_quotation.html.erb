@@ -14,6 +14,12 @@
   <p><%= @purchase_order_code %></p>
   <p><%= @construction_name %></p>
   <p><%= @total_quotation_price %></p>
+  <% if @delivery_place.present? %>
+    <p><%= @delivery_place %></p>
+  <% end %>
+  <% if @construction_place.present? %>
+    <p><%= @construction_place %></p>
+  <% end %>
   </p>
   </p>
   <% cnt = 0 %>
