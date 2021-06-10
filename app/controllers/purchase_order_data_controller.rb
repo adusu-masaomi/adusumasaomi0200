@@ -26,6 +26,10 @@ def index
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  
     
+    #add210521
+    #注文画面でのパラメータを消す
+    $delivery_place_flag = nil
+    
     case params[:move_flag] 
     when "1"
 	   #工事一覧画面から遷移した場合
@@ -110,6 +114,9 @@ end
     #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
     update_constant
     
+    #工事データの住所を更新
+    update_address_to_construction
+    
 	#メール送信する(メール送信ボタン押した場合)
 	if params[:send].present?
       
@@ -165,6 +172,9 @@ end
     #add201229
     #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
     update_constant
+   
+    #工事データの住所を更新
+    update_address_to_construction
    
     ###
     #メール送信する(メール送信ボタン押した場合)
@@ -356,6 +366,27 @@ end
     #end
   end
   
+  #工事データの住所をアプデする
+  def update_address_to_construction
+    
+    
+    if params[:purchase_order_datum][:post].present? ||
+       params[:purchase_order_datum][:addressX].present?
+      
+      construction_datum_id = params[:purchase_order_datum][:construction_datum_id].to_i
+      construction = ConstructionDatum.find(construction_datum_id)
+      if construction.present?
+        construction_params = { post: params[:purchase_order_datum][:post],
+                                address: params[:addressX],
+                                house_number: params[:purchase_order_datum][:house_number],
+                                address2: params[:purchase_order_datum][:address2]}
+        construction.update(construction_params)
+      end
+     
+    end
+    
+  end
+    
   #add180926
   def reset_last_number
     #Constantの最終番号に該当するものを削除した場合は、直近での最大値を再セットする
@@ -457,6 +488,19 @@ end
   end
   def get_email1
      @email1 = SupplierMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
+  end
+  
+  #add210610
+  #住所取得
+  def get_address
+    @post = ConstructionDatum.where(:id => params[:construction_datum_id]).
+                              where("id is NOT NULL").pluck(:post).flatten.join(" ")
+    @address = ConstructionDatum.where(:id => params[:construction_datum_id]).
+                              where("id is NOT NULL").pluck(:address).flatten.join(" ")
+    @house_number = ConstructionDatum.where(:id => params[:construction_datum_id]).
+                              where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+    @address2 = ConstructionDatum.where(:id => params[:construction_datum_id]).
+                              where("id is NOT NULL").pluck(:address2).flatten.join(" ")
   end
 
   private

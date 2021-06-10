@@ -1,7 +1,6 @@
 class PurchaseOrderDatum < ActiveRecord::Base
     paginates_per 200  # 1ページあたり項目表示
 
-    #has_many :construction_data , :foreign_key => "construction_datum_id"
     belongs_to :construction_datum 
     accepts_nested_attributes_for :construction_datum, update_only: true
     
@@ -10,31 +9,29 @@ class PurchaseOrderDatum < ActiveRecord::Base
 
     belongs_to :purchase_datum
     
-	#has_many :entries
-    #has_many :orders, through: :entries
-	#has_many :orders, dependent: :destroy, inverse_of: :purchase_order_datum
-	has_many :purchase_order_history
-	
-	  #upd190930
+    has_many :purchase_order_history
 	  has_many :construction_costs, :foreign_key => "purchase_order_datum_id"
-	
     has_many :orders
     accepts_nested_attributes_for :orders, :allow_destroy => true
-	
+
     #def self.header_numbers 
     #  [["B", 1], ["M", 2]] 
     #end
 	
-	 #最終番号取得
-     attr_accessor :last_header_number
-  
-	   attr_accessor :search_character
-     
+    #最終番号取得
+    attr_accessor :last_header_number
+    attr_accessor :search_character
+    
+    #現場住所
+    attr_accessor :post
+    attr_accessor :address
+    attr_accessor :house_number
+    attr_accessor :address2
+    #
+    
     #validation
     validates :purchase_order_code, presence: true, uniqueness: true
-	#validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
- 
-    
+    #validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
     #scope
     scope :with_id,  -> { joins(:construction_datum) }
 	

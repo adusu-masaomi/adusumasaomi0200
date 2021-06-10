@@ -1,4 +1,4 @@
-<%= simple_form_for @purchase_order_datum, :html => { :id => 'form_id', :class => 'well form-horizontal' } do |f| %>
+<%= simple_form_for @purchase_order_datum, :html => { :id => 'form_id', :class => 'well form-horizontal', :style=> 'width:1280px' } do |f| %>
   <% if @purchase_order_datum.errors.any? %>
    <div id="error_explanation">
     <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
@@ -13,32 +13,57 @@
   
   <!--upd201229 hiddenにした-->
   <%= f.input :last_header_number, label:"注No頭文字", input_html:{ id:"last_header_number" , style: 'width:50px', :tabindex=>"0", :onfocusout => "getLastCode()" } ,as: :hidden %>
-  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" , 　style: 'width:220px', :tabindex=>"0", :onfocusout => "checkAutoOutSourcing()" } %>
+  <%= f.input :purchase_order_code, input_html:{ id:"purchase_order_code", name: "purchase_order_datum[purchase_order_code]" ,  style: 'width:110px', :tabindex=>"0", :onfocusout => "checkAutoOutSourcing()" } %>
   <%= f.label :工事名 , {:class => "my-custom-class-l"} %></br>
   <% if @construction_data.present? %>
-    <%= f.collection_select :construction_datum_id, @construction_data ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"1"} %></p></p>
+    <%= f.collection_select :construction_datum_id, @construction_data ,:id, :p_cd_name, {}, 
+    {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" ,
+     class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()", 
+     :tabindex=>"1"} %></p></p>
   <% else %>
-    <%= f.collection_select :construction_datum_id, ConstructionDatum.all ,:id, :p_cd_name, {}, {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" , class: "searchableConstructionName" , style: 'width:430px', :tabindex=>"1"} %></p></p>
+    <%= f.collection_select :construction_datum_id, ConstructionDatum.all ,:id, :p_cd_name, {}, 
+    {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" ,
+      class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()",
+      :tabindex=>"1"} %></p></p>
   <% end %>
   
-  <%= f.input :search_character, label:"検索頭文字(半角アルファベット入力で検索／頭文字は仕入先マスターで設定可)", input_html:{ id:"search_character" , style: 'width:50px', :tabindex=>"2", :onkeyup => "getSupplier()" } %>
+  <!-- 現場住所追加 -->
+  <div class="col-xs-3" , style="margin-left : -15px">
+    <%= f.input :post , input_html:{id:"post", :onchange => "formatPost()",
+                 :onKeyUp => "AjaxZip3.zip2addr(this,'','addressX','addressX');", 
+                 :tabindex=>"2", style: 'width:130px' } %>
+  </div>
+  <div class="col-xs-8", style="margin-left : -170px">
+      <%= f.input :address, input_html:{id:"address", name:"addressX", :tabindex=>"3" , style: 'width:320px',
+                                        :onkeydown => "setPostAuto($(this).val(), 'post', event)" } %>
+  </div>
+  <div class="col-lg-3", style="margin-left : -495px">
+      <%= f.input :house_number, input_html:{id:"house_number", :tabindex=>"4" , style: 'width:320px' } %>
+  </div>
+  <div class="col-lg-3", style="margin-left : -165px">
+      <%= f.input :address2, input_html:{id:"address2", :tabindex=>"5" , style: 'width:350px' } %>
+  </div>
+  </br></br></br></br>
+  <!-- -->
+  
+  <%= f.input :search_character, label:"検索頭文字(半角アルファベット入力で検索／頭文字は仕入先マスターで設定可)", input_html:{ id:"search_character" , style: 'width:50px', :tabindex=>"6", :onkeyup => "getSupplier()" } %>
   
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"3"} %></br></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"7"} %></br></br>
   
   <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
-     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"4"}  %>
+     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"8"}  %>
   <% end %>
   
   <%= f.simple_fields_for :construction_datum, :remote => true do |m| %>
-  <!--   <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>-->
+  <!--   <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"9"}  %>-->
     <%= m.input :alias_name, label:"通称" , as: :hidden  %>
   <% end %>
-  <%= f.input :alias_name, label:"通称／備考（メール送信しない場合は”備考”としても登録ができます。）" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"5"}  %>
+  <%= f.input :alias_name, label:"通称／備考（メール送信しない場合は”備考”としても登録ができます。）" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"9"}  %>
   
   
   <%= f.check_box :mail_sent_flag,  { :id => "mail_sent_flag",  :class => "mail_sent_flag"} , '1', '0' %> 
-  <%= f.label :mail_sent_label, "メール送信済フラグ（障害発生等で再送信したい場合は、チェックを外してください）", {style: 'color: green;font-size:12px;', :tabindex=>"6"} %>
+  <%= f.label :mail_sent_label, "メール送信済フラグ（障害発生等で再送信したい場合は、チェックを外してください）", {style: 'color: green;font-size:12px;', :tabindex=>"10"} %>
   
   <!--<%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>-->
   
@@ -50,7 +75,7 @@
   <!--これを使いたいがsubmitでは現状sweetalertが使えないので、保留中・・・-->
   <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？"} %>-->
   <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", 
-    :onclick => "return confirm('メール送信&更新します。よろしいですか？ ' )"  %>
+    :onclick => "return confirm('メール送信&更新します。よろしいですか？ ')",  :tabindex => "11"  %>
   
   <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
   
@@ -67,9 +92,11 @@
                 :class => 'btn btn-white_rsd' %>
    </div>
 <% end %>
-<script type="text/javascript">
 
-　　$(document).ready(function(){
+<script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
+<script type="text/javascript">
+    
+    $(document).ready(function(){
 	   //検索可能なリストボックス(注文Noの場合)
        $(".searchableConstructionName").select2({ theme: "bootstrap" });
 	   
@@ -86,7 +113,7 @@
          setEmail();
        });  
 	   $( ".searchableSupplier" ).on("select2:close", function (e) {
-	     $('[tabindex=5]').focus(); 
+	     $('[tabindex=8]').focus(); 
 	   });
 	   
        //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
@@ -116,8 +143,10 @@
       setAliasName();
     }
     //最終番号表示する
-    //20201229~
     getLastCode();
+    
+    //住所を表示させる
+    getAddress();
   } 
 
   function checkAutoOutSourcing() {
@@ -168,17 +197,42 @@
   //ajax
   function getSupplier()
   {
-       obj = document.getElementById("search_character");
-       search_character = obj.value;
-       $.get("<%= purchase_order_datum_get_supplier_by_character_path %>",
-         {header_code: search_character },
-          function(data){
+     obj = document.getElementById("search_character");
+     search_character = obj.value;
+     $.get("<%= purchase_order_datum_get_supplier_by_character_path %>",
+       {header_code: search_character },
+        function(data){
           
-             //obj = document.getElementById("email1").textContent;
-			//document.getElementById("email1").value = obj;
-          }
-        );
+           //obj = document.getElementById("email1").textContent;
+	       //document.getElementById("email1").value = obj;
+        }
+     );
   };
+  
+  //住所取得
+  function getAddress()
+  {
+    if ( document.getElementById("construction_datum_id").value != "")
+    {
+      construction_datum_id = document.getElementById("construction_datum_id").value;
+      $.get("<%= purchase_order_datum_get_address_path %>",
+      {construction_datum_id: construction_datum_id }, function(data)
+      {
+        obj = document.getElementById("post").textContent;
+        document.getElementById("post").value = obj;
+        //
+        obj = document.getElementById("address").textContent;
+        document.getElementById("address").value = obj;
+        //
+        obj = document.getElementById("house_number").textContent;
+        document.getElementById("house_number").value = obj;
+        //
+        obj = document.getElementById("address2").textContent;
+        document.getElementById("address2").value = obj;
+        
+      });
+    }
+  }
   
   //最終番号のセット
   function getLastCode()
@@ -205,22 +259,21 @@
 
 
   $('a[data-sweet-confirm]').on('click', function(e) {
-  e.preventDefault();
-  e.stopPropagation();
-
+    e.preventDefault();
+    e.stopPropagation();
   
-  var $link = $(this);
+    var $link = $(this);
 
-  swal({
-    title: $link.data('sweet-confirm'),
-    text: "You won't be able to revert this!",
-    type: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!'
-  }).then(function() {
-    $link.trigger('click.rails');
-  }, function(dismiss) {})
-});
+    swal({
+      title: $link.data('sweet-confirm'),
+      text: "You won't be able to revert this!",
+      type: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then(function() {
+      $link.trigger('click.rails');
+    }, function(dismiss) {})
+  });
 </script>

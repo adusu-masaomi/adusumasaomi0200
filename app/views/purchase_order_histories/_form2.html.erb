@@ -773,13 +773,16 @@ function dispDiv() {
   purchase_order_datum_id = document.getElementById("purchase_order_datum_id").value;
   purchase_order_date = document.getElementById("purchase_order_date").value;
   supplier_master_id = document.getElementById("supplier_master_id").value;
+  //add210521
+  delivery_place_flag = document.getElementById("delivery_place_flag").value;
   
-   //セッション用のパラメータへセットする
-       sessionStorage.removeItem('onvisible');       //add200915 一旦消さないと壊れるケースあり？  
+  //セッション用のパラメータへセットする
+  sessionStorage.removeItem('onvisible');       //add200915 一旦消さないと壊れるケースあり？  
   sessionStorage.setItem('onvisible', 'true');
 
   $.get("<%= purchase_order_historiez_get_data_path %>",
-    {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, supplier_master_id: supplier_master_id},
+    {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, 
+     supplier_master_id: supplier_master_id, delivery_place_flag: delivery_place_flag},
      function(data){
 	   // マウスカーソルの形を変える
        $("body").css("cursor", "progress");
@@ -788,14 +791,12 @@ function dispDiv() {
        $('#loading-indicator').show();
 	   
        //add200915
-      
        //sessionStorage.setItem('onvisible', 'true');
        
        //5秒待つ（描写されないことがあるため）
 	   //centOS上では必須なようである！
 	   setTimeout("reloadDiv()", 5000);
-        
-	
+       
 	   //setTimeout(reloadDiv(), 30000);  
        //reloadDiv();   	   
 
@@ -815,7 +816,7 @@ function dispDiv() {
 
 function reloadDiv(){
   //画面再ロードする
-  // debugger;
+  //debugger;
   
   window.location.reload();
   event.preventDefault();

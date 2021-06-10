@@ -261,10 +261,11 @@ Rails.application.routes.draw do
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
   get '/purchase_order_datum/get_last_number_select' => 'purchase_order_data#get_last_number_select'
-  #add161207
   get '/purchase_order_datum/get_alias_name' => 'purchase_order_data#get_alias_name'
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
-
+  #add210610
+  get '/purchase_order_datum/get_address' => 'purchase_order_data#get_address'
+  
   get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
   get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
   get '/construction_dataz/delivery_slip_header_select' => 'construction_data#delivery_slip_header_select'

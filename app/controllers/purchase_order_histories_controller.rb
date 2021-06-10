@@ -103,11 +103,23 @@ class PurchaseOrderHistoriesController < ApplicationController
     $quantity_nothing = false
   
     @purchase_order_history = PurchaseOrderHistory.new
+    
     if $purchase_order_history.present?
       @purchase_order_history = $purchase_order_history 
       @purchase_order_data  = PurchaseOrderDatum.find($purchase_order_history.purchase_order_datum_id)
     end
 	
+    #add210521
+    #新しいデータの場合は、納品場所を初期値としてセット  
+    #-->  ここ(new)は通らない????
+    #納品場所が画面で指定されていたらセット(未登録の場合)
+    if $delivery_place_flag.present?
+      if @purchase_order_history.delivery_place_flag.nil?
+        @purchase_order_history.delivery_place_flag = $delivery_place_flag
+      end
+    end
+    #
+    
 	#連番の最大値を取る(フォーム用)
     get_max_seq
   
@@ -123,7 +135,16 @@ class PurchaseOrderHistoriesController < ApplicationController
 	
 	set_edit_params
 	
-	
+    #binding.pry
+    
+	#納品場所が画面で指定されていたらセット(未登録の場合)
+    if $delivery_place_flag.present?
+      if @purchase_order_history.delivery_place_flag.nil?
+        @purchase_order_history.delivery_place_flag = $delivery_place_flag
+      end
+    end
+    #
+    
 	#連番の最大値を取る(フォーム用)
 	get_max_seq
 	
@@ -292,27 +313,26 @@ class PurchaseOrderHistoriesController < ApplicationController
 
    #既存のデータを取得する(日付・仕入先指定後。)
   def get_data
-     
-     #
-	 $purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
+    
+    #
+	$purchase_order_history = PurchaseOrderHistory.find_by(purchase_order_datum_id: params[:purchase_order_datum_id], 
 	    purchase_order_date: params[:purchase_order_date] , supplier_master_id: params[:supplier_master_id])
 	
-	 if $purchase_order_history.nil?
-	    $purchase_order_date = params[:purchase_order_date]
-		$supplier_master_id = params[:supplier_master_id]
-     else 
-        $purchase_order_date = nil
-        $supplier_master_id = nil
-
+    $delivery_place_flag = nil
     
-	    #add170719 呼び出さない不具合対応
-	    #@purchase_order_history_saved.orders.build
-		
-       #obj.assign_attributes(params[:model])
-		
-     end
+    #binding.pry
     
-	
+	if $purchase_order_history.nil?
+	  $purchase_order_date = params[:purchase_order_date]
+      $supplier_master_id = params[:supplier_master_id]
+      #add210521
+      #binding.pry
+      $delivery_place_flag = params[:delivery_place_flag]
+    else 
+      $purchase_order_date = nil
+      $supplier_master_id = nil
+    end
+    
   end
 
   # POST /purchase_order_histories
@@ -545,11 +565,23 @@ class PurchaseOrderHistoriesController < ApplicationController
                  params[:purchase_order_history][:supplier_master_id], item[:material_id] ]).first 
 			  
 			  if item[:unit_master_id].present?
-			    #purchase_unit_price_params = {material_id: params[:material_id][i], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+			    
+                #unit_price = purchase_unit_price.unit_price
+                unit_price = 0
+                
+                if purchase_unit_price.present? && purchase_unit_price.unit_price.present?
+                  unit_price = purchase_unit_price.unit_price
+                end
+                
+                if item[:order_unit_price].present?
+                  unit_price = item[:order_unit_price].to_f
+                end
+                #purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
 				#                               unit_id: item[:unit_master_id]}
-			    purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
-				                               unit_id: item[:unit_master_id]}
-			 
+                #upd210527 単価も更新
+                purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
+				                               unit_id: item[:unit_master_id], unit_price: unit_price}
+                
 				if purchase_unit_price.present?
 				  purchase_unit_price.update(purchase_unit_price_params)
 				else
@@ -611,9 +643,19 @@ class PurchaseOrderHistoriesController < ApplicationController
 					  
 				  end
 				  
+                  #add210527 単価も更新
+                  unit_price = 0
+                  if item[:order_unit_price].present?
+                    unit_price = item[:order_unit_price].to_f
+                  end
+                  #
+                  
+                  #purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
+                  #                      supplier_material_code: supplier_material_code, unit_price: 0 ,
+                  #                      unit_id: item[:unit_master_id]}
                   purchase_unit_price_params = {material_id: material_id, supplier_id: supplier_id, 
                                         supplier_material_code: supplier_material_code, unit_price: 0 ,
-                                        unit_id: item[:unit_master_id]}
+                                        unit_id: item[:unit_master_id], unit_price: unit_price}
 			      @purchase_unit_prices = PurchaseUnitPrice.create(purchase_unit_price_params)
                 
 		  	    end
@@ -705,10 +747,6 @@ class PurchaseOrderHistoriesController < ApplicationController
        
 		  #global set
       $purchase_order_history = @purchase_order_history 
-      
-      
-      #binding.pry
-    
       
       #pdf
 	    #@print_type = params[:print_type]

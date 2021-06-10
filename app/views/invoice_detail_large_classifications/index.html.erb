@@ -46,7 +46,7 @@
             invoice_code: params[:invoice_code], delivery_slip_code: params[:delivery_slip_code], quotation_code: params[:quotation_code],
             data_type: "2" ),
             :class => 'btn btn-success keep-disp' , :data => {:confirm => '見積書データを作成しますか？'} %>
-<%= link_to "請求書(旧様式)PDF",
+<%= link_to "請求書(新様式)PDF",
             invoice_detail_large_classifications_path($invoice_detail_large_classifications, invoice_header_id: params[:invoice_header_id], print_type: "4", format: "pdf"),
             :class => 'btn btn-bluegrey100_ftg' , :target=>["_blank"] %>
 </br>
