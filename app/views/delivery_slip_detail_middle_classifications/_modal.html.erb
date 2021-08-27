@@ -92,9 +92,9 @@
   </br></br></br>
   <!--upd end-->
   
-  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"9" }  %>
+  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"9", autocomplete: 'off' }  %>
   
-  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px', :tabindex=>"10" }  %>
+  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px', :tabindex=>"10", autocomplete: 'off' }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
   <%= f.input :quantity, label: "納品数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"11", :onchange => "calcMoneyforQuantity(0)"}  %>
@@ -121,11 +121,11 @@
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :delivery_slip_price, input_html:{id:"delivery_slip_price", style: 'width:120px', :tabindex=>"17"} %>
+  <%= f.input :delivery_slip_price, input_html:{id:"delivery_slip_price", style: 'width:120px', :tabindex=>"17", autocomplete: 'off'} %>
   </div>
   <!--<div style="margin-left : -50px;margin-top : -20px">-->
   <div class="col-xs-2",  style="margin-left : -0px;margin-top : -20px">
-  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"18"} %>
+  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"18", autocomplete: 'off'} %>
   </div>
   
    <div style="margin-top : 25px">

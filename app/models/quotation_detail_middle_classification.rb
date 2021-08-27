@@ -1,5 +1,9 @@
 class QuotationDetailMiddleClassification < ActiveRecord::Base
 
+  #kaminari用設定
+  paginates_per 200  # 1ページあたり項目表示
+   
+
   belongs_to :QuotationHeader, :foreign_key => "quotation_header_id"
   belongs_to :QuotationDetailLargeClassification, :foreign_key => "quotation_detail_large_classification_id"
   belongs_to :QuotationLargeItem, :foreign_key => "quotation_detail_large_classification_id"

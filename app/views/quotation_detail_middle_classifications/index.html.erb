@@ -5,6 +5,10 @@
 <div class="page-header", style="width:1920px" >
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
   
+  <!-- kaminari追加箇所開始 -->
+  <%= page_entries_info @quotation_detail_middle_classifications %>
+  <!-- kaminari追加箇所終了 -->
+  
   <%= search_form_for @q do |f| %>
   <%= f.label :construction_code, '見積Ｎｏ　' %>
   <%= f.select :quotation_header_id_eq, options_from_collection_for_select(QuotationHeader.all, "id", "quotation_code") , {include_blank: true}, {style: 'width:220px' , class: "searchableQuotationCode" } %>
@@ -88,6 +92,12 @@
   </font>
 <% end %>
 <!-- -->
+</div>
+
+<div>
+   <!-- kaminari用追加箇所開始 -->
+   <%= paginate @quotation_detail_middle_classifications %>
+   <!-- kaminari用追加箇所終了 --> 
 </div>
 
 <div id="quotation_detail_middle_classification-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true"></div>

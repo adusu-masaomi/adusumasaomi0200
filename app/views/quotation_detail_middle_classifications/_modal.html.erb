@@ -1,3 +1,4 @@
+
 <div class="modal-dialog modal-lg" id='myModal'>
   <div class="modal-content">
   <div style="padding-left : 15px">
@@ -26,7 +27,9 @@
   
   <div class="col-xs-3" , style="margin-left : -15px">
   <%= f.label :working_middle_item_short_name , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :working_middle_item_short_name, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name,
+  <!--WorkingMiddleItem to @working_middle_item-->
+  <!--@working_middle_item.order('seq').all-->
+  <%= f.collection_select :working_middle_item_short_name, @working_middle_item, :id, :working_middle_item_short_name,
      {:selected => @quotation_detail_middle_classification.working_middle_item_id || 1} , 
     {id:'working_middle_item_short_name', :tabindex=>"1", :class => "searchableSelect2_2",  style: 'width:190px' } %>
   
@@ -38,12 +41,14 @@
   <!--add171104-->
   <div class="col-xs-3" , style="margin-left : -15px">
   <%= f.label :"(呼出用)カテゴリー" , {:class => "my-custom-class-l"} %></br>
-  <%= f.select :working_middle_item_category_id_call, WorkingCategory.order('seq').all.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
+  <!--WorkingCategory to @working_category-->
+  <!--WorkingCategory.order('seq').all to -->
+  <%= f.select :working_middle_item_category_id_call, @working_category.order('seq').to_a.map{|t| [t.category_name, t.id]}, {:include_blank => true}, 
     {id:'working_middle_item_category_id_call', :class => "my-custom-class", style: 'width:190px;font-size:14px;', :onchange => "setItemExtractByCategory(1)" ,:tabindex=>"3" } %>
   </div>
   <div class="col-xs-3" , style="margin-left : 10px">
   <%= f.label :"(登録用)カテゴリー" , {:class => "my-custom-class-l"} %></br>
-  <%= f.select :working_middle_item_category_id, WorkingCategory.order('seq').all.map{|t| [t.category_name, t.id]}, {:selected => @quotation_detail_middle_classification.working_middle_item_category_id || 1}, 
+  <%= f.select :working_middle_item_category_id, @working_category.order('seq').to_a.map{|t| [t.category_name, t.id]}, {:selected => @quotation_detail_middle_classification.working_middle_item_category_id || 1}, 
     {id:'working_middle_item_category_id', :class => "my-custom-class", style: 'width:190px;font-size:14px;' , 
       :tabindex=>"4", :onchange => "setSubacategoryExtractByParent(2)" } %>
   </div>
@@ -77,7 +82,9 @@
   <!--upd171106-->
   <div class="col-xs-3" , style="margin-left : -15px">
   <%= f.label :"品名" , {:class => "my-custom-class-l"} %></br>
-  <%= f.collection_select :working_middle_item_id, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name, 
+  <!--WorkingMiddleItem to @working_middle_item-->
+  <!--remove order('seq').to_a-->
+  <%= f.collection_select :working_middle_item_id, @working_middle_item, :id, :working_middle_item_name, 
     {:selected => @quotation_detail_middle_classification.working_middle_item_id || 1} , 
     {id:'working_middle_item_id', :class => "searchableSelect2_3",  style: 'width:210px' } %>
   
@@ -91,8 +98,8 @@
   </br></br></br>
   <!--upd end-->
   
-  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"9" }  %>
-  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"10" }  %>
+  <%= f.input :working_middle_item_name, label: "品名(手入力可)", input_html:{id:"working_middle_item_name", style: 'width:420px', :tabindex=>"9", autocomplete: 'off' }  %>
+  <%= f.input :working_middle_specification, label: "仕様(手入力可)", input_html:{id:"working_middle_specification", style: 'width:420px',:tabindex=>"10", autocomplete: 'off' }  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
   <%= f.input :quantity, label: "見積数量", input_html:{id:"quantity", style: 'width:120px', :tabindex=>"11", :onchange => "calcMoneyforQuantity(0)"}  %>
@@ -120,11 +127,10 @@
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"17"} %>
+  <%= f.input :quote_price, input_html:{id:"quote_price", style: 'width:120px', :tabindex=>"17", autocomplete: 'off'} %>
   </div>
-  <!--<div class="col-xs-2",  style="margin-left : -50px;margin-top : -20px">-->
   <div class="col-xs-2",  style="margin-left : -0px;margin-top : -20px">
-  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"18"} %>
+  <%= f.input :execution_price, input_html:{id:"execution_price", style: 'width:120px', :tabindex=>"18", autocomplete: 'off'} %>
   </div>
   
   <div style="margin-top : 25px">
@@ -158,17 +164,7 @@
   <%= f.check_box :check_update_all, {id:"check_update_all"}, "true", "false" %>
   <%= f.label_tag :check_update_all, '全てマスター反映' %></br>
  
-  <!--<%= f.label :"使用材料(選択)", {:class => "my-custom-class-l"} %></br>-->
-  <!--<%= f.collection_select :material_id, MaterialMaster.all, :id, :material_code, {:selected => @quotation_detail_middle_classification.material_id || 1 } , {id:"material_id", :tabindex=>"16", class: "searchableItem" , style: 'width:330px'} %>-->
-  <!--<%= f.input :quotation_material_name, input_html:{id:"quotation_material_name", :tabindex=>"17"} %>-->
-  <!--<%= f.input :material_unit_price, input_html:{id:"material_unit_price", :tabindex=>"18", :onchange => "calcAccessory()"} %>-->
-  <!--<%= f.input :labor_unit_price, input_html:{id:"labor_unit_price", :tabindex=>"19", :onchange => "calcLaborCost()"}  %>-->
-  <!--<%= f.input :material_quantity, input_html:{id:"material_quantity", :tabindex=>"21", :onchange => "calcAccessory()"} %>-->
-  <!--<%= f.input :accessory_cost, input_html:{id:"accessory_cost" , :tabindex=>"22"} %>-->
-  <!--<%= f.input :material_cost_total, input_html:{id:"material_cost_total", :tabindex=>"23"} %>-->
-  <!--<%= f.input :labor_cost_total, input_html:{id:"labor_cost_total", :tabindex=>"24"} %>-->
-  <!--<%= f.input :other_cost, input_html:{id:"other_cost", :tabindex=>"25"} %>-->
-
+  
   <%= f.collection_select :working_subcategory_select_hide, WorkingSubcategory.order('seq').all, :id, :name,  {} , 
          {id:"working_subcategory_select_hide",  hidden: true  } %>
   
@@ -189,9 +185,12 @@
 							   
   <!--add171104-->
   <%= f.input :master_insert_flag , input_html:{ id:"master_insert_flag"}, as: :hidden %>
-  <%= f.collection_select :working_middle_item_id_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_name,  {} , 
+  <!--WorkingMiddleItem to @working_middle_item-->
+  <!--@working_middle_item.order('seq').all-->
+  <%= f.collection_select :working_middle_item_id_select_hide, @working_middle_item, :id, :working_middle_item_name,  {} , 
     {id:"working_middle_item_id_select_hide",  hidden: true  } %>
-  <%= f.collection_select :working_middle_item_short_name_select_hide, WorkingMiddleItem.order('seq').all, :id, :working_middle_item_short_name,  {} , 
+  <!--remove order('seq')-->
+  <%= f.collection_select :working_middle_item_short_name_select_hide, @working_middle_item, :id, :working_middle_item_short_name,  {} , 
     {id:"working_middle_item_short_name_select_hide",  hidden: true   } %>
   
 <% end %>
@@ -213,6 +212,8 @@
   
   //$(document).on('ready page:load', function(){
   $(document).ready(function(){
+  //test
+  //$(document).on('turbolinks:load', function(){
      //ドラッグできるようにする add171107
 	 $("#myModal").draggable({
        handle: ".modal-dialog"
@@ -301,8 +302,9 @@
 	//  document.getElementById("working_middle_item_short_name").options[index].innerText;
     
     //add180210
+    //del210708
     //呼出用カテゴリーの初期設定
-    setItemExtractByCategoryInitial();
+    //setItemExtractByCategoryInitial();
     
   });
   

@@ -41,17 +41,13 @@ class PurchaseDatum < ActiveRecord::Base
     
     #外注判定用
     attr_accessor :outsourcing
-	
 	attr_accessor :construction_datum_id_hide
 	attr_accessor :material_category_id_hide
-    
     attr_accessor :outsourcing_flag_hide 
     attr_accessor :price_disp_flag
+    attr_accessor :closing_date_hide      
+    attr_accessor :payment_due_date_hide  
     
-    attr_accessor :closing_date_hide      #add210302
-    attr_accessor :payment_due_date_hide  #add210302
-    
-    #attr_accessor :parameters  #add180403
     #validation
     validates :material_id, presence: true
     validates :material_code, presence: true
@@ -60,13 +56,14 @@ class PurchaseDatum < ActiveRecord::Base
     validates :unit_id, presence: true
     validates :check_unit, acceptance: true 
     validates :purchase_order_datum_id, presence:true
+    validates_numericality_of :purchase_amount, :only_integer => true, :allow_nil => false
+    validate :purchase_order_code_check   
+	validate :check_complete    
     
-	validates_numericality_of :purchase_amount, :only_integer => true, :allow_nil => false
-    #validates: purchase_amount, numericality: { only_integer: true }
-	
-	validate :purchase_order_code_check   
-	
-    validate :check_complete    #add180223
+    #add210628
+    VALID_HALF_REGEX = /\A[a-z0-9]+\z/i
+    validates :slip_code, format: { with: VALID_HALF_REGEX }, allow_blank: true
+    #
     
     def purchase_order_code_check
 	#注文番号のチェック（既に集計済みなら除外する）

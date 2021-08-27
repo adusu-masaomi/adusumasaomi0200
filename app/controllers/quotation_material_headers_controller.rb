@@ -758,7 +758,16 @@ class QuotationMaterialHeadersController < ApplicationController
     end
      
     #画面のメアドをグローバルへセット
-    $email_responsible = params[:quotation_material_header][:email]
+    #$email_responsible = params[:quotation_material_header][:email]
+     
+    #upd210712
+    #担当者・Emailコンボ化による変更
+    @supplier_update_flag = 0  # 1:new  2:upd
+      
+    #app.contollerで処理
+    #担当者/Emailをメール送信用のグローバルへセット・更新フラグをセット
+    app_set_responsible(params[:quotation_material_header][:responsible],
+                                        params[:quotation_material_header][:email])
      
     #add180405
     #CC用に担当者２のアドレスもグローバルへセット
@@ -766,15 +775,17 @@ class QuotationMaterialHeadersController < ApplicationController
     if params[:quotation_material_header][:supplier_master_id].present?
       supplier = SupplierMaster.where(id: params[:quotation_material_header][:supplier_master_id]).first
          
-      if supplier.present? && supplier.email2.present?
-        $email_responsible2 = supplier.email2
+      #if supplier.present? && supplier.email2.present?
+      #  $email_responsible2 = supplier.email2
+      #upd210628
+      if supplier.present? && supplier.email_cc.present?
+        $email_responsible2 = supplier.email_cc
       end
     end
     #add end
      
     #仕入先（１〜３）の判定
     setSupplier
-
 	 
     if params[:quotation_material_header][:sent_flag] == "1" then
 	  #見積メールの場合
@@ -805,7 +816,8 @@ class QuotationMaterialHeadersController < ApplicationController
     end
 	 
     #各種更新処理
-	
+    @update_supplier_flag = 0	#add210720  
+
     if params[:quotation_material_header][:sent_flag] == "1" 
     #見積メールの場合
 	   #メールの各種送信フラグをセット（ヘッダ・見積比較用）
@@ -815,6 +827,8 @@ class QuotationMaterialHeadersController < ApplicationController
       set_order_mail_flag_for_comparison
 	  end
    
+    #binding.pry
+
     if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
       if $seq_exists > 0
       #昇順(編集時)になっている場合は、明細パラメータを本来の降順にしておく。
@@ -828,18 +842,35 @@ class QuotationMaterialHeadersController < ApplicationController
       set_mail_sent_flag
     end
   
+    #add210712
+    #仕入担当者の追加・更新
+    app_update_responsible(params[:quotation_material_header][:supplier_master_id],
+                           params[:quotation_material_header][:responsible], 0, 1)
+                             
+  
     if params[:quotation_material_header][:sent_flag] == "2" 
       #注文番号が新規の場合に、更新させる
       set_new_purchase_order_code
-      
-      #add201002
-      #注文データにも保存させる
-      #binding.pry
-      
       set_purchase_order_history
+    
+    else 
+      #見積の場合でも、担当者変更あり＆注文データがあれば担当者を更新
+      purchase_order_data = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
+                                where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
+                                where("id is NOT NULL").first
       
+      if purchase_order_data.present?
+        if @supplier_update_flag > 0
+          purchase_order_data_params = { supplier_responsible_id: @supplier_responsible_id }
+          purchase_order_data.update(purchase_order_data_params)
+        end
+      end
     end
-	 
+	  
+    #add210716
+    #仕入先担当者(1~3)のパラメータも更新
+    set_quotation_responsible_for_comparison
+   
   end
   
   #add201002
@@ -854,6 +885,7 @@ class QuotationMaterialHeadersController < ApplicationController
     if purchase_order_history.blank?
     #新規
       
+      #ex. mail_sent_flagは現在使用してないので、1のセットは不要かもしれない...
       purchase_order_history_params = { purchase_order_date: purchase_order_date, 
                                         supplier_master_id: params[:quotation_material_header][:supplier_master_id],
                                         purchase_order_datum_id: @purchase_order_datum_id, mail_sent_flag: 1}
@@ -954,35 +986,71 @@ class QuotationMaterialHeadersController < ApplicationController
   
   end
   
+  #add210716
+  #担当者を見積担当として埋め込む
+  def set_quotation_responsible_for_comparison
+    #binding.pry
+    
+    supplier_responsible_id_1 = @quotation_material_header.supplier_responsible_id_1
+    supplier_responsible_id_2 = @quotation_material_header.supplier_responsible_id_2
+    supplier_responsible_id_3 = @quotation_material_header.supplier_responsible_id_3
+    
+    if @update_supplier_flag == 1
+      #仕入先１へセット
+      #仕入先１がブランク又は、手入力や注文先行（？）などですでに仕入先１に入力がある場合。
+      supplier_responsible_id_1 = @supplier_responsible_id
+  	elsif @update_supplier_flag == 2
+	    #仕入先２へセット
+      supplier_responsible_id_2 = @supplier_responsible_id
+		elsif @update_supplier_flag == 3
+		  #仕入先３へセット(仕入先１・２とも非該当の場合)
+		  supplier_responsible_id_3 = @supplier_responsible_id
+		end
+    
+    
+    if @update_supplier_flag > 0
+      tmp_quotation_material_header_params = { supplier_responsible_id_1: supplier_responsible_id_1, 
+                                               supplier_responsible_id_2: supplier_responsible_id_2, 
+                                               supplier_responsible_id_3: supplier_responsible_id_3 }
+      #binding.pry
+                                         
+      @quotation_material_header.update(tmp_quotation_material_header_params)
+    end
+  end
+  
   #メールの各種送信フラグをセット（見積比較用として）
   def set_quotation_mail_flag_for_comparison
     
-	
-	  if params[:quotation_material_header][:supplier_id_1].blank?  ||
-	   params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1]
+	  @update_supplier_flag = 0
+    
+    if params[:quotation_material_header][:supplier_id_1].blank?  ||
+      params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1]
       #if params[:quotation_material_header][:supplier_id_1].blank?
-	  #仕入先１へセット
-	  #仕入先１がブランク又は、手入力や注文先行（？）などですでに仕入先１に入力がある場合。
-	    params[:quotation_material_header][:supplier_id_1] = params[:quotation_material_header][:supplier_master_id]
-		params[:quotation_material_header][:quotation_email_flag_1] = 1
-	  else
+      #仕入先１へセット
+      #仕入先１がブランク又は、手入力や注文先行（？）などですでに仕入先１に入力がある場合。
+      @update_supplier_flag = 1
+      params[:quotation_material_header][:supplier_id_1] = params[:quotation_material_header][:supplier_master_id]
+  	  params[:quotation_material_header][:quotation_email_flag_1] = 1
+    else
 	    
-		#if params[:quotation_material_header][:supplier_id_2].blank?
-	    if params[:quotation_material_header][:supplier_id_2].blank?  || 
+		  if params[:quotation_material_header][:supplier_id_2].blank?  || 
 	       params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
           #仕入先２へセット
           if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_1] 
-		    params[:quotation_material_header][:supplier_id_2] = params[:quotation_material_header][:supplier_master_id]
-		    params[:quotation_material_header][:quotation_email_flag_2] = 1
+		        @update_supplier_flag = 2
+            params[:quotation_material_header][:supplier_id_2] = params[:quotation_material_header][:supplier_master_id]
+		        params[:quotation_material_header][:quotation_email_flag_2] = 1
+		      end
+		  else
+		    #仕入先３へセット(仕入先１・２とも非該当の場合)
+		    if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_1] && 
+		       params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_2]
+          
+          @update_supplier_flag = 3
+          params[:quotation_material_header][:supplier_id_3] = params[:quotation_material_header][:supplier_master_id]
+		      params[:quotation_material_header][:quotation_email_flag_3] = 1
+		    end
 		  end
-		else
-		  #仕入先３へセット(仕入先１・２とも非該当の場合)
-		  if params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_1] && 
-		     params[:quotation_material_header][:supplier_master_id] != params[:quotation_material_header][:supplier_id_2]
-            params[:quotation_material_header][:supplier_id_3] = params[:quotation_material_header][:supplier_master_id]
-		    params[:quotation_material_header][:quotation_email_flag_3] = 1
-		  end
-		end
 	  end
 	  
 	  #params[:quotation_material_header][:quotation_email_flag_1]
@@ -990,31 +1058,40 @@ class QuotationMaterialHeadersController < ApplicationController
   end
   #メールの各種送信フラグをセット（注文用）
   def set_order_mail_flag_for_comparison
+    
+    @update_supplier_flag = 0
+  
     if params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_1]
       #仕入先１へセット
-	  params[:quotation_material_header][:order_email_flag_1] = 1
-	elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
-	  #仕入先２へセット
-	  params[:quotation_material_header][:order_email_flag_2] = 1
+      @update_supplier_flag = 1
+	    params[:quotation_material_header][:order_email_flag_1] = 1
+	  elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_2]
+	    #仕入先２へセット
+      @update_supplier_flag = 2
+	    params[:quotation_material_header][:order_email_flag_2] = 1
     elsif params[:quotation_material_header][:supplier_master_id] == params[:quotation_material_header][:supplier_id_3]
-	  #仕入先３へセット
+	    #仕入先３へセット
+      @update_supplier_flag = 3
       params[:quotation_material_header][:order_email_flag_3] = 1
-	else
+	  else
 	
-	#見積をせず、いきなり注文をする場合もあり得る？為、以下の判定も行う。
-	  if params[:quotation_material_header][:supplier_master_id].present?
-	    if params[:quotation_material_header][:supplier_id_1].blank?
-		  params[:quotation_material_header][:supplier_id_1] = params[:quotation_material_header][:supplier_master_id]
-		  params[:quotation_material_header][:order_email_flag_1] = 1
-		elsif params[:quotation_material_header][:supplier_id_2].blank?
-		  params[:quotation_material_header][:supplier_id_2] = params[:quotation_material_header][:supplier_master_id]
-		  params[:quotation_material_header][:order_email_flag_2] = 1
-		elsif params[:quotation_material_header][:supplier_id_3].blank?
-		  params[:quotation_material_header][:supplier_id_3] = params[:quotation_material_header][:supplier_master_id]
-		  params[:quotation_material_header][:order_email_flag_3] = 1
-		end
+      #見積をせず、いきなり注文をする場合もあり得る？為、以下の判定も行う。
+      if params[:quotation_material_header][:supplier_master_id].present?
+	      if params[:quotation_material_header][:supplier_id_1].blank?
+          @update_supplier_flag = 1
+		      params[:quotation_material_header][:supplier_id_1] = params[:quotation_material_header][:supplier_master_id]
+		      params[:quotation_material_header][:order_email_flag_1] = 1
+		    elsif params[:quotation_material_header][:supplier_id_2].blank?
+		      @update_supplier_flag = 2
+          params[:quotation_material_header][:supplier_id_2] = params[:quotation_material_header][:supplier_master_id]
+		      params[:quotation_material_header][:order_email_flag_2] = 1
+		    elsif params[:quotation_material_header][:supplier_id_3].blank?
+		      @update_supplier_flag = 3
+          params[:quotation_material_header][:supplier_id_3] = params[:quotation_material_header][:supplier_master_id]
+		      params[:quotation_material_header][:order_email_flag_3] = 1
+		    end
+	    end
 	  end
-	end
 	##
 	
   end
@@ -1073,6 +1150,12 @@ class QuotationMaterialHeadersController < ApplicationController
       end
 	  end
   end
+  
+  #担当者を更新(新規の場合)
+  #def set_responsible
+  #  if @purchase_order_data.present?
+  #  end
+  #end
 
   #注文番号が新規の場合に、更新させる
   def set_new_purchase_order_code
@@ -1082,7 +1165,7 @@ class QuotationMaterialHeadersController < ApplicationController
            where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
            where("id is NOT NULL").pluck(:purchase_order_code).flatten.join(" ")
 
-    #add201002 履歴保存用
+    #履歴保存用
     tmp_purchase_order_data = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
                                 where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
                                 where("id is NOT NULL").first
@@ -1092,12 +1175,21 @@ class QuotationMaterialHeadersController < ApplicationController
     end
     #
     
+    #add210716
+    #担当者IDを取得
+    #responsible  #email  "9"
+    #if params[:quotation_material_header][:responsible].to_i > 0
+    #  #
+    #else
+    #  #文字の場合
+    #end
+    #
+    
     if purchase_order_code.blank?
       
 	    #定数ファイルへ頭文字のアルファベットも保存
 	    @constant = Constant.find(1)   #id=１に定数ファイルが保管されている
 	  
-	    #binding.pry
 	    if @constant.present?
 	      tmp_code = params[:quotation_material_header][:purchase_order_code] 
 	    
@@ -1134,18 +1226,27 @@ class QuotationMaterialHeadersController < ApplicationController
 	    construction_name = ConstructionDatum.where(:id => params[:quotation_material_header][:construction_datum_id]).
            where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
 	  
-	  
-        purchase_order_data_params = { purchase_order_code:  params[:quotation_material_header][:purchase_order_code], 
+	    #upd210716 @supplier_responsible_id追加
+      purchase_order_data_params = { purchase_order_code:  params[:quotation_material_header][:purchase_order_code], 
 	                                 construction_datum_id:  params[:quotation_material_header][:construction_datum_id], 
-                                     supplier_master_id: params[:quotation_material_header][:supplier_master_id], alias_name: construction_name, 
-                                     purchase_order_date:  params[:quotation_material_header][:requested_date] }
+                                   supplier_master_id: params[:quotation_material_header][:supplier_master_id], 
+                                   supplier_responsible_id: @supplier_responsible_id,
+                                   alias_name: construction_name, 
+                                   purchase_order_date:  params[:quotation_material_header][:requested_date] }
 									 
 	  
       @purchase_order_data = PurchaseOrderDatum.create(purchase_order_data_params)
 		  
       #add201002 履歴保存用
       @purchase_order_datum_id = @purchase_order_data.id
+    else
       
+      #新規・更新フラグ(担当者変更)があれば更新する
+      #if @supplier_update_flag == 2
+      if @supplier_update_flag > 0
+        purchase_order_data_params = { supplier_responsible_id: @supplier_responsible_id }
+        tmp_purchase_order_data.update(purchase_order_data_params)
+      end
     end
 	
   end
@@ -1238,27 +1339,85 @@ class QuotationMaterialHeadersController < ApplicationController
     
     @email = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:email1).flatten.join(" ")
 	  @responsible = SupplierMaster.where(:id => params[:supplier_id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
-	 
-    #quotation_material_header = QuotationMaterialHeader.find(params[:id]) #add181002
-    #upd181126
+	  
+    #upd210715
+    purchase_order_data = PurchaseOrderDatum.where(:supplier_master_id => params[:supplier_id]).
+                               where(:construction_datum_id => params[:construction_id]).first
+    
+    if purchase_order_data.present?
+      
+      #
+      @supplier_responsibles = SupplierResponsible.where(:id => purchase_order_data.supplier_responsible_id).
+               pluck("responsible_name, id")
+      
+      @supplier_responsibles += SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               where.not(:id => purchase_order_data.supplier_responsible_id).
+                                            pluck("responsible_name, id")
+      #
+      #email
+      @supplier_responsible_emails = SupplierResponsible.where(:id => purchase_order_data.supplier_responsible_id).
+               pluck("responsible_email, id")
+      
+      @supplier_responsible_emails += SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               where.not(:id => purchase_order_data.supplier_responsible_id).
+                                            pluck("responsible_email, id")
+      #
+    else
+      
+      #見積データ存在する場合
+      quotation_material_header = QuotationMaterialHeader.where(:id => params[:id]).first
+      supplier_responsible_id = 0
+      
+      if params[:supplier_id_1].present? && (params[:supplier_id] == params[:supplier_id_1])
+        #responsibleと照合
+        supplier_responsible_id = quotation_material_header.supplier_responsible_id_1
+      elsif params[:supplier_id_2].present? && (params[:supplier_id] == params[:supplier_id_2])
+        supplier_responsible_id = quotation_material_header.supplier_responsible_id_2
+      elsif params[:supplier_id_3].present? && (params[:supplier_id] == params[:supplier_id_3])
+        supplier_responsible_id = quotation_material_header.supplier_responsible_id_3
+      end
+      
+      if supplier_responsible_id > 0
+        
+        #
+        @supplier_responsibles = SupplierResponsible.where(:id => supplier_responsible_id).
+               pluck("responsible_name, id")
+      
+        @supplier_responsibles += SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               where.not(:id => supplier_responsible_id).
+                                            pluck("responsible_name, id")
+        #
+        #email
+        @supplier_responsible_emails = SupplierResponsible.where(:id => supplier_responsible_id).
+               pluck("responsible_email, id")
+      
+        @supplier_responsible_emails += SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               where.not(:id => supplier_responsible_id).
+                                          pluck("responsible_email, id")
+      else
+      #該当なし => all
+          @supplier_responsibles = SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               pluck("responsible_name, id")
+          @supplier_responsible_emails = SupplierResponsible.where(:supplier_master_id => params[:supplier_id]).
+                                               pluck("responsible_email, id")
+      end
+    end
+    #
+    
     quotation_material_header = QuotationMaterialHeader.where(params[:id]).first
    
 	  exist = false
-	 
-    #add180919
-     
+	   
 	  if params[:supplier_id_1].present?
 	    if params[:supplier_id] == params[:supplier_id_1]
         
-        #add181002
         #備考をセット
         if quotation_material_header.present?
           @notes = quotation_material_header.notes_1
         end
         
-        
-        if params[:quotation_email_flag_1] == "true" #add180919
-	        exist = true 
+        if params[:quotation_email_flag_1] == "true" 
+          exist = true 
         end
 	    end
     end 
@@ -1397,7 +1556,9 @@ class QuotationMaterialHeadersController < ApplicationController
 	                 :supplier_master_id, :responsible, :email, :delivery_place_flag, :notes_1, :notes_2, :notes_3,
                      :total_quotation_price_1, :total_quotation_price_2, :total_quotation_price_3,
                      :total_order_price_1, :total_order_price_2, :total_order_price_3,
-                     :supplier_id_1, :supplier_id_2, :supplier_id_3, :quotation_email_flag_1, 
+                     :supplier_id_1, :supplier_id_2, :supplier_id_3,
+                     :supplier_responsible_id_1, :supplier_responsible_id_2, :supplier_responsible_id_3,
+                     :quotation_email_flag_1, 
                      :quotation_email_flag_2, :quotation_email_flag_3, :order_email_flag_1, :order_email_flag_2, :order_email_flag_3, 
                       quotation_material_details_attributes: [:id, :material_id, :material_code, :material_name, :maker_id, :maker_name, 
                       :quantity, :unit_master_id, :list_price, :quotation_unit_price_1, :quotation_unit_price_2, :quotation_unit_price_3, 

@@ -76,7 +76,8 @@
       <th><%= model_class.human_attribute_name(:unit_price) %></th>
 	  <th><%= model_class.human_attribute_name(:unit_id) %></th>
       <th><%= model_class.human_attribute_name(:physical_amount) %></th>
-      <th><%= model_class.human_attribute_name(:book_quantity) %></th>
+      <!--<th><%= model_class.human_attribute_name(:book_quantity) %></th>-->
+      <th><%= sort_link(@q, :book_quantity, model_class.human_attribute_name(:book_quantity) ) %></th>
       <th>差異</th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
@@ -98,8 +99,12 @@
 		<% end %>
         <td><%= stocktake.physical_amount %></td>
         <td><%= stocktake.book_quantity %></td>
-        <td><%= stocktake.physical_quantity - stocktake.book_quantity %></td>
-		
+        <% if stocktake.physical_quantity.present? && stocktake.book_quantity.present? %>
+           <td><%= stocktake.physical_quantity - stocktake.book_quantity %></td>
+        <% else %>
+           <td></td>
+        <% end %>	
+	
         <td><%=l stocktake.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

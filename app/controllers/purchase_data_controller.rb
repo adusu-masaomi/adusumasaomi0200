@@ -237,8 +237,6 @@ class PurchaseDataController < ApplicationController
     end
     #####
 	
-    
-    
 	respond_to do |format|
 	  
 	  format.html

@@ -9,7 +9,7 @@ class PurchaseOrderHistory < ActiveRecord::Base
     #add210518
     #納品場所
     def self.delivery_place 
-      [["現場", 0], ["事務所", 1]] 
+      [["現場", 0], ["事務所", 1], ["引取", 2]] 
     end
     
 	#eメール取得用
@@ -57,7 +57,7 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	
 	validates_associated :orders
 	
-	#validates :quantity, presence: true
+    #validates :quantity, presence: true
     #validate :no_quantity
 	
 	#def no_quantity

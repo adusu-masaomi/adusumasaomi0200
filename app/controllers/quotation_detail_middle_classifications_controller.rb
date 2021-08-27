@@ -69,7 +69,8 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	
 
     @quotation_detail_middle_classifications = @q.result(distinct: true)
-	
+	  #kaminari用設定
+    @quotation_detail_middle_classifications  = @quotation_detail_middle_classifications .page(params[:page])
 	
 	#add171016
 	#ビューでのソート処理追加
@@ -150,7 +151,14 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   
     @quotation_detail_middle_classification = QuotationDetailMiddleClassification.new
     @quotation_detail_large_classification = QuotationDetailLargeClassification.all
+    #upd210707
+    #@quotation_detail_large_classification = QuotationDetailLargeClassification.all.includes(:QuotationHeader)
     
+    #@working_middle_item = WorkingMiddleItem.all  #add210707
+    @working_category = WorkingCategory.all       #add210707
+    
+    #includes(:user)
+   
     ###
     #初期値をセット(見出画面からの遷移時のみ)
     @@new_flag = params[:new_flag]
@@ -159,9 +167,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
       @quotation_header_id = params[:quotation_header_id]
       #add180803
       #確定済みのものは、変更できないようにする
-      quotation_header = QuotationHeader.find(params[:quotation_header_id])
-      if quotation_header.present?
-        if quotation_header.fixed_flag == 1
+      #quotation_header = QuotationHeader.find(params[:quotation_header_id])
+      @quotation_header = QuotationHeader.where(:id => params[:quotation_header_id]).first
+      if @quotation_header.present?
+        if @quotation_header.fixed_flag == 1
           @status = "fixed"
         else
           @status = "not_fixed"
@@ -171,15 +180,15 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     end
 	
     if @@new_flag == "1"
-       @quotation_detail_middle_classification.quotation_header_id ||= @quotation_header_id
-	   if params[:quotation_detail_large_classification_id].present?
-         @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= params[:quotation_detail_large_classification_id]
-	   else
-		 @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= @quotation_detail_large_classification_id
-       end
+      @quotation_detail_middle_classification.quotation_header_id ||= @quotation_header_id
+	    if params[:quotation_detail_large_classification_id].present?
+        @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= params[:quotation_detail_large_classification_id]
+	    else
+        @quotation_detail_middle_classification.quotation_detail_large_classification_id ||= @quotation_detail_large_classification_id
+      end
     end 
     
-	#行番号を取得する
+	  #行番号を取得する
     get_line_number
     
     #カテゴリー保持フラグを取得
@@ -187,10 +196,19 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     get_category_save_flag
     get_category_id
     
+    
+    #add210708
+    #先に抽出しておく
+    extract_middle_item
+    
   end
 
   # GET /quotation_detail_middle_classifications/1/edit
   def edit
+    
+    @working_middle_item = WorkingMiddleItem.all  #add210707
+    @working_category = WorkingCategory.all
+    
     #カテゴリー保持フラグを取得
     #add180210
     get_category_save_flag
@@ -215,38 +233,35 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   # POST /quotation_detail_middle_classifications.json
   def create
     
-	#作業明細マスターの更新
-	update_working_middle_item
-	
+    #作業明細マスターの更新
+    update_working_middle_item
+
     ###モーダル化対応
     @quotation_detail_middle_classification = QuotationDetailMiddleClassification.create(quotation_detail_middle_classification_params)
     
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
-	#小計を再計算する
-	recalc_subtotal  
-	
-     #手入力用IDの場合は、単位マスタへも登録する。
+    #小計を再計算する
+    recalc_subtotal  
+  
+    #手入力用IDの場合は、単位マスタへも登録する。
     @working_unit = nil
     if @quotation_detail_middle_classification.working_unit_id == 1
+      #既に登録してないかチェック
+      @check_unit = WorkingUnit.find_by(working_unit_name: @quotation_detail_middle_classification.working_unit_name)
        
-	   #既に登録してないかチェック
-       @check_unit = WorkingUnit.find_by(working_unit_name: @quotation_detail_middle_classification.working_unit_name)
-       
-	   if @check_unit.nil?
-          unit_params = { working_unit_name:  @quotation_detail_middle_classification.working_unit_name }
-          @working_unit = WorkingUnit.create(unit_params)
-		else
-		  @working_unit = @check_unit
-	   end
+	    if @check_unit.nil?
+        unit_params = { working_unit_name:  @quotation_detail_middle_classification.working_unit_name }
+        @working_unit = WorkingUnit.create(unit_params)
+		  else
+		    @working_unit = @check_unit
+	     end
     end
-      
-
-
-     #品目データの金額を更新
+    
+    #品目データの金額を更新
     save_price_to_large_classifications
     #行挿入する 
-	@max_line_number = @quotation_detail_middle_classification.line_number
+	  @max_line_number = @quotation_detail_middle_classification.line_number
     if (params[:quotation_detail_middle_classification][:check_line_insert] == 'true')
       line_insert
     end
@@ -258,15 +273,15 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #カテゴリー保持状態の保存
     set_category_save_flag
     
-	if params[:quotation_detail_middle_classification][:quotation_header_id].present?
+    if params[:quotation_detail_middle_classification][:quotation_header_id].present?
       @quotation_header_id = params[:quotation_detail_middle_classification][:quotation_header_id]
     end
-	if params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id].present?
+    if params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id].present?
       @quotation_detail_large_classification_id = params[:quotation_detail_middle_classification][:quotation_detail_large_classification_id]
     end
-	#
-	
-	@quotation_detail_middle_classifications = 
+    #
+  
+    @quotation_detail_middle_classifications = 
         QuotationDetailMiddleClassification.where(:quotation_header_id => @quotation_header_id).
              where(:quotation_detail_large_classification_id => @quotation_detail_large_classification_id)
 
@@ -279,47 +294,47 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   # PATCH/PUT /quotation_detail_middle_classifications/1.json
   def update
     
-	#作業明細マスターの更新
-	update_working_middle_item
+    #作業明細マスターの更新
+    update_working_middle_item
     
     @quotation_detail_middle_classification.update(quotation_detail_middle_classification_params)
     
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
-	#小計を再計算する
-	recalc_subtotal
+    #小計を再計算する
+    recalc_subtotal
 	
     #品目データの金額を更新
-	save_price_to_large_classifications
+    save_price_to_large_classifications
 	
     #add 180210
     #カテゴリー保持状態の保存
     set_category_save_flag
     
-	#行挿入する 
-	@max_line_number = @quotation_detail_middle_classification.line_number
+    #行挿入する 
+    @max_line_number = @quotation_detail_middle_classification.line_number
     if (params[:quotation_detail_middle_classification][:check_line_insert] == 'true')
        line_insert
     end
     
-	#行番号の最終を書き込む
+    #行番号の最終を書き込む
     quotation_dlc_set_last_line_number
 
     #手入力用IDの場合は、単位マスタへも登録する。
     @working_unit = nil
 	
     if @quotation_detail_middle_classification.working_unit_id == 1
+      
+      #既に登録してないかチェック
+      @check_unit = WorkingUnit.find_by(working_unit_name: @quotation_detail_middle_classification.working_unit_name)
        
-       #既に登録してないかチェック
-       @check_unit = WorkingUnit.find_by(working_unit_name: @quotation_detail_middle_classification.working_unit_name)
-       
-	   if @check_unit.nil?
-          unit_params = { working_unit_name:  @quotation_detail_middle_classification.working_unit_name }
+      if @check_unit.nil?
+        unit_params = { working_unit_name:  @quotation_detail_middle_classification.working_unit_name }
 		  
-          @working_unit = WorkingUnit.create(unit_params)
-	   else
+        @working_unit = WorkingUnit.create(unit_params)
+	    else
 	      @working_unit = @check_unit
-	   end
+	     end
     end
 	
 	
@@ -814,17 +829,20 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
      @working_middle_item_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_name).flatten.join(" ")
   end
   def working_middle_specification_select
+    
      @working_middle_specification = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_specification).flatten.join(" ")
   
      #add171124
      @working_middle_item_category_id  = WorkingMiddleItem.with_category.where(:id => params[:id]).pluck("working_categories.category_name, working_categories.id")
-	 #登録済みと異なるケースもあるので、任意で変更もできるように全て値をセット
-	 @working_middle_item_category_id  += WorkingCategory.all.pluck("working_categories.category_name, working_categories.id")
-	 #
+	   
+     #登録済みと異なるケースもあるので、任意で変更もできるように全て値をセット
+	   @working_middle_item_category_id  += WorkingCategory.all.pluck("working_categories.category_name, working_categories.id")
+	   #
 	 
-	 @working_middle_item_short_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_short_name).flatten.join(" ")
+	   @working_middle_item_short_name = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_middle_item_short_name).flatten.join(" ")
 	 
   end
+  
   def working_unit_price_select
      @working_unit_price = WorkingMiddleItem.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_unit_price).flatten.join(" ")
   end
@@ -1112,8 +1130,10 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_quotation_detail_middle_classification
+      #binding.pry
       @quotation_detail_middle_classification = QuotationDetailMiddleClassification.find(params[:id])
-	end
+      #@quotation_detail_middle_classification = QuotationDetailMiddleClassification.find(params[:id]).attributes.symbolize_keys
+    end
 
     #add171016
     def initialize_sort
@@ -1220,42 +1240,53 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 		   end 
         end 
     end
-    #行番号を取得し、インクリメントする。（新規用）
-    def get_line_number
-      @line_number = 1
+    
+  #行番号を取得し、インクリメントする。（新規用）
+  def get_line_number
+    @line_number = 1
 	  
+    #binding.pry
+    
 	  if $sort_qm != "asc"   #add171120
-        if @quotation_detail_middle_classification.quotation_header_id.present? && @quotation_detail_middle_classification.quotation_detail_large_classification_id.present?
-           @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
+      if @quotation_detail_middle_classification.quotation_header_id.present? && @quotation_detail_middle_classification.quotation_detail_large_classification_id.present?
+        @quotation_detail_large_classifiations = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
 		 
-		   if @quotation_detail_large_classifiations.present?
-              if @quotation_detail_large_classifiations.last_line_number.present?
-                 @line_number = @quotation_detail_large_classifiations.last_line_number + 1
-              end
-           end
+		    if @quotation_detail_large_classifiations.present?
+          if @quotation_detail_large_classifiations.last_line_number.present?
+            @line_number = @quotation_detail_large_classifiations.last_line_number + 1
+          end
         end
-	  else
-	  #add171120
-	  #昇順ソートしている場合は、行を最終ではなく先頭にする。
+      end
+    else
+      #add171120
+      #昇順ソートしている場合は、行を最終ではなく先頭にする。
 	    #登録済みレコードの行を全て事前に加算する
-		status = increment_line_number
+		  status = increment_line_number
 		
-		#インクリメント失敗していたら、行は０にする。
-		if status == false
-		  @line_number = 0
-		end
-	  end
-	  
-	  @quotation_detail_middle_classification.line_number = @line_number
+      #インクリメント失敗していたら、行は０にする。
+      if status == false
+        @line_number = 0
+      end
     end
+	  
+    @quotation_detail_middle_classification.line_number = @line_number
+  end
     
     #カテゴリー保持フラグの取得
     #add180210
     def get_category_save_flag
       if @quotation_detail_middle_classification.quotation_header_id.present?
-        @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_middle_classification.quotation_header_id)
-        if @quotation_headers.present?
-            @category_save_flag = @quotation_headers.category_saved_flag
+        
+        #binding.pry
+        
+        if @quotation_header.nil?
+          @quotation_header = QuotationHeader.find_by(id: @quotation_detail_middle_classification.quotation_header_id)
+        end
+        
+        #@quotation_headers = QuotationHeader.find_by(id: @quotation_detail_middle_classification.quotation_header_id)
+        
+        if @quotation_header.present?
+            @category_save_flag = @quotation_header.category_saved_flag
             #未入力なら、１をセット。
             if @category_save_flag.nil?
               @category_save_flag = 1
@@ -1267,27 +1298,53 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     #カテゴリー、サブカテゴリーの取得
     #add180210
     def get_category_id
-      if @quotation_headers.present? && @category_save_flag == 1
-        category_id = @quotation_headers.category_saved_id
-        subcategory_id = @quotation_headers.subcategory_saved_id
+      #if @quotation_headers.present? && @category_save_flag == 1
+      #  category_id = @quotation_headers.category_saved_id
+      #  subcategory_id = @quotation_headers.subcategory_saved_id
+      if @quotation_header.present? && @category_save_flag == 1
+        category_id = @quotation_header.category_saved_id
+        subcategory_id = @quotation_header.subcategory_saved_id
         @quotation_detail_middle_classification.working_middle_item_category_id_call = category_id
         @quotation_detail_middle_classification.working_middle_item_subcategory_id_call = subcategory_id
       end
     end
     #カテゴリー保持フラグの保存
-    #add180210
-    def set_category_save_flag
-      if @quotation_detail_large_classification.quotation_header_id.present?
-        @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_large_classification.quotation_header_id)
-        if @quotation_headers.present?
-           quotation_header_params = { category_saved_flag: params[:quotation_detail_middle_classification][:category_save_flag_child], 
-                                       category_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id_call],
-                                       subcategory_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_subcategory_id_call]}
-           @quotation_headers.attributes = quotation_header_params
-           @quotation_headers.save(:validate => false)
-		end
+  #add180210
+  def set_category_save_flag
+    if @quotation_detail_large_classification.quotation_header_id.present?
+      @quotation_headers = QuotationHeader.find_by(id: @quotation_detail_large_classification.quotation_header_id)
+      if @quotation_headers.present?
+        quotation_header_params = { category_saved_flag: params[:quotation_detail_middle_classification][:category_save_flag_child], 
+                                    category_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_category_id_call],
+                                    subcategory_saved_id: params[:quotation_detail_middle_classification][:working_middle_item_subcategory_id_call]}
+        @quotation_headers.attributes = quotation_header_params
+        @quotation_headers.save(:validate => false)
       end
     end
+  end
+  
+  #add210708
+  def extract_middle_item
+    
+    #binding.pry
+    
+    if @quotation_detail_middle_classification.working_middle_item_category_id_call.present?
+      @working_middle_item = WorkingMiddleItem.where(:id => "1")
+      @working_middle_item += WorkingMiddleItem.where(:working_middle_item_category_id => 
+                          @quotation_detail_middle_classification.working_middle_item_category_id_call).order(:seq)
+    
+      #arel使って一度に取得する場合--逆に遅い???
+      #working_middle_item_id = WorkingMiddleItem.arel_table[:id]
+      #working_middle_item_category_id = WorkingMiddleItem.arel_table[:working_middle_item_category_id]
+      #@working_middle_item = WorkingMiddleItem.where(working_middle_item_id.eq("1").or(working_middle_item_category_id
+      #                   .eq(@quotation_detail_middle_classification.working_middle_item_category_id_call))).order(:seq)
+      
+    else
+      
+      @working_middle_item = WorkingMiddleItem.all  #add210707
+      
+    end
+  end
     
 	#ストロングパラメータ
 	# Never trust parameters from the scary internet, only allow the white list through.

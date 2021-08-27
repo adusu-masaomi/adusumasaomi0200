@@ -56,6 +56,121 @@ class ApplicationController < ActionController::Base
     return japaneseCalendarChar
   end
   
+  #add210716
+  #仕入担当者の名前、Email取得
+  def app_set_responsible(param_responsible, param_email)
+    
+    #supplier_update_flag = nil
+    supplier_responsible = nil
+    
+    @supplier_responsible_id = 0
+    
+    if param_responsible.to_i > 0
+      #担当者選択した場合
+      supplier_responsible = SupplierResponsible.where(id: param_responsible).first
+      if supplier_responsible.present?
+        #担当者をセット
+        $responsible = supplier_responsible.responsible_name
+        #担当Emailをセット
+        $email_responsible = supplier_responsible.responsible_email
+        
+        #eメールがidの場合
+        #if param_email.to_i > 0
+        #  supplier_responsible2 = SupplierResponsible.where(id: param_email).first
+        #  param_email = supplier_responsible2.responsible_email
+        #  @supplier_responsible_id = supplier_responsible2.id  #見積データ更新用としてセット
+        #else 
+        #  #手入力の場合
+        #  @supplier_responsible_id = supplier_responsible.id  #見積データ更新用としてセット
+        #end
+        #
+        
+        #if (param_email != 
+        #  supplier_responsible.responsible_email)
+        
+        #if (param_email != 
+        #  supplier_responsible.responsible_email)
+        
+        #必ず更新とする  
+        @supplier_update_flag = 2
+            
+        #メアドのみ新規の場合
+        if param_email.to_i == 0
+          $email_responsible = param_email
+        else
+          #メアドが別IDのものの場合(あり得る？？)
+          #param_email
+          supplier_responsible_other = SupplierResponsible.
+                  where(id: param_email).first
+          if supplier_responsible_other.present?
+              $email_responsible = supplier_responsible_other.responsible_email
+          end
+        end
+        #end
+      end
+    else
+      #担当者手入力の場合
+        
+      @supplier_update_flag = 1
+        
+      #担当者をセット
+      $responsible = param_responsible
+      $email_responsible = param_email
+        
+      #メアドがIDの場合(違う名前で同一Emailの場合)
+      if param_email.to_i > 0
+        supplier_responsible = SupplierResponsible.where(id: 
+                                        param_email).first
+        if supplier_responsible.present?
+          $email_responsible = supplier_responsible.responsible_email
+        end
+      end
+    end
+    
+    #return supplier_update_flag
+  end
+  
+  #仕入担当者の追加・更新
+  def app_update_responsible(param_supplier_master_id, param_responsible, param_purchase_order_datum_id,
+                             purchase_order_update_flag)
+    
+    supplier_responsible_params = { supplier_master_id: param_supplier_master_id,
+                                    responsible_name: $responsible,
+                                    responsible_email: $email_responsible
+                                  }
+    
+    #@supplier_responsible_id = 0
+    
+    case @supplier_update_flag
+      when 1  #新規
+        supplier_responsible = SupplierResponsible.new(supplier_responsible_params)
+        supplier_responsible.save!(:validate => false)
+        
+        #パラメーターへ再び戻す
+        #params[:purchase_order_datum][:@supplier_responsible_id] = supplier_responsible.id
+        @supplier_responsible_id = supplier_responsible.id
+      when 2  #更新
+        supplier_responsible = SupplierResponsible.where(:id => param_responsible).first
+        
+        if supplier_responsible.present?
+          @supplier_responsible_id = supplier_responsible.id
+          supplier_responsible.update(supplier_responsible_params)
+        end
+    end
+    
+    #注文データの担当者もアプデしておく
+    if purchase_order_update_flag == 0  #注文履歴画面から呼んだ場合
+      if @supplier_update_flag > 0
+        purchase_order_data = PurchaseOrderDatum.where(:id => param_purchase_order_datum_id).first
+        if purchase_order_data.present?
+          purchase_order_data_params = { supplier_responsible_id: @supplier_responsible_id }
+          purchase_order_data.update(purchase_order_data_params)
+        end
+      end
+    end
+  end
+  
+  
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"      #平成の場合
   $gengo_name_2 = "令和"    #令和 〃

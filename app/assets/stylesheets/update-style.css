@@ -1,5 +1,14 @@
 
+.modal.fade .modal-dialog{
+  transition-duration: 0.05s;/*slide out のスピード*/
+  transform: translate3d(0, -5%, 0);/*slide開始位置(x,y,z)*/
+}
 
+/*slide in のスピード*/
+.modal.in .modal-dialog{
+  transition-duration: 0.01s;  /*slide in のスピード*/
+  transform: translate3d(0, 0, 0); /*slide終了位置(x,y,z)*/
+}
 
 /*待ち画面用*/
 #loading-indicator {

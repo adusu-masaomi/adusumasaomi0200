@@ -10,9 +10,11 @@ ja:
     responsible1: 担当者1
     responsible2: 担当者2
     responsible3: 担当者3
+    responsible_cc: 担当者(CC用)
     email1: 担当1Email
     email2: 担当2Email
     email3: 担当3Email
+    email_cc: 担当(CC用)Email
     estimated_amount: 予定金額
     final_amount: 決定金額
     supplier_name: 仕入先名
@@ -158,6 +160,7 @@ ja:
        purchase_order_datum: 注文Ｎｏデータ
        purchase_order_history: 注文データ
        supplier_master: 仕入先マスター
+       supplier_responsible: 仕入先担当者
        purchase_unit_price: 資材単価マスター
        customer_master: 得意先マスター
        maker_master: メーカーマスター
@@ -298,6 +301,9 @@ ja:
          book_quantity: 帳簿数量
          book_amount: 帳簿金額
          unit_price: 単価
+       supplier_responsible:
+         responsible_name: 担当者名
+         responsible_email: 担当Email
        contact:
          name: 氏名
          search_character: 検索文字

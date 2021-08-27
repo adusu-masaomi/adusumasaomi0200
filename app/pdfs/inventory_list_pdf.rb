@@ -6,7 +6,7 @@ class InventoryListPDF
       
        # tlfファイルを読み込む
        case $print_flag 
-         when "1"
+         when "1", "5"
            #在庫一覧表(画像付)
            report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_with_pic_pdf.tlf")
 		 when "2"
@@ -20,6 +20,13 @@ class InventoryListPDF
 	       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_pdf.tlf")
 	   end
 	   
+        #add210629
+        #ソート順
+        sort_str = "material_code"
+        if $print_flag == "5"   #在庫一覧(数量順の場合)
+          sort_str = "inventory_quantity desc"
+        end
+       
         # 1ページ目を開始
         report.start_new_page
         
@@ -36,7 +43,8 @@ class InventoryListPDF
         #$purchase_data.joins(:purchase_order_datum).order("purchase_date, purchase_order_code, id").each do |purchase_datum| 
 		#ソート順は仕入日、注文ナンバーの順とする。
 		
-		$inventories.joins(:material_master).order("material_code").each do |inventory| 
+		#$inventories.joins(:material_master).order("material_code").each do |inventory| 
+        $inventories.joins(:material_master).order(sort_str).each do |inventory| 
         
 		
         #---見出し---

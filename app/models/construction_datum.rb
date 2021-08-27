@@ -1,6 +1,7 @@
 class ConstructionDatum < ActiveRecord::Base
 	#kaminari用設定
-	paginates_per 200  # 1ページあたり項目表示
+    paginates_per 200  # 1ページあたり項目表示
+    #paginates_per 100   # 1ページあたり項目表示   #upd210707 読み込み遅いので100件にした
 
     belongs_to :CustomerMaster, :foreign_key => "customer_id"
     accepts_nested_attributes_for :CustomerMaster 

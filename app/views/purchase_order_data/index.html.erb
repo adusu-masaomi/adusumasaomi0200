@@ -120,9 +120,22 @@
 		   <% @supplier_name = "-" %>
         <% else %>
 		  <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
-		  <td><%= purchase_order_datum.supplier_master.responsible1 %></td>
-		  <td><%= purchase_order_datum.supplier_master.email1 %></td>
-		  <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
+		  
+          <!--<td><%= purchase_order_datum.supplier_master.responsible1 %></td>-->
+          <% if purchase_order_datum.supplier_responsible.present? %>
+            <td><%= purchase_order_datum.supplier_responsible.responsible_name %></td>
+          <% else %>
+            <td></td>
+          <% end %>
+          
+		  <!--<td><%= purchase_order_datum.supplier_master.email1 %></td>-->
+          <% if purchase_order_datum.supplier_responsible.present? %>
+            <td><%= purchase_order_datum.supplier_responsible.responsible_email %></td>
+          <% else %>
+            <td></td>
+          <% end %>
+		  
+          <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
         <% end %>
 		
 	    <td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>

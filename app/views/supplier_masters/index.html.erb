@@ -52,6 +52,8 @@
       <th><%= model_class.human_attribute_name(:email2) %></th>
       <th><%= model_class.human_attribute_name(:responsible3) %></th>
       <th><%= model_class.human_attribute_name(:email3) %></th>
+      <th><%= model_class.human_attribute_name(:responsible_cc) %></th>
+      <th><%= model_class.human_attribute_name(:email_cc) %></th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -65,13 +67,30 @@
         <td><%= supplier_master.fax_main %></td>
         <!--<td><%= supplier_master.email_main %></td>-->
         <td><%= mail_to(supplier_master.email_main, name = nil, {:style => 'text-decoration:underline'}) %></td>
+        
+        <!--
         <td><%= supplier_master.responsible1 %></td>
         <td><%= mail_to(supplier_master.email1, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%= supplier_master.responsible2 %></td>
         <td><%= mail_to(supplier_master.email2, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%= supplier_master.responsible3 %></td>
-        <!--<td><%= supplier_master.email3 %></td>-->
         <td><%= mail_to(supplier_master.email3, name = nil, {:style => 'text-decoration:underline'}) %></td>
+        -->
+        
+        <% cnt = 0 %>
+        <% supplier_master.supplier_responsibles.first(3).each do |rp| %>
+            <% cnt += 1 %>
+            <td><%= rp.responsible_name %></td>
+            <td><%= rp.responsible_email %></td>
+        <% end %>
+        <% until cnt >= 3 do %>
+          <% cnt += 1 %>
+          <td></td>
+          <td></td>
+        <% end %>
+        
+        <td><%= supplier_master.responsible_cc %></td>
+        <td><%= mail_to(supplier_master.email_cc, name = nil, {:style => 'text-decoration:underline'}) %></td>
         <td><%=l supplier_master.created_at %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

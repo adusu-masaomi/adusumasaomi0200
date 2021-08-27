@@ -7,6 +7,10 @@ class PurchaseOrderDatum < ActiveRecord::Base
     belongs_to :supplier_master
     accepts_nested_attributes_for :supplier_master, update_only: true
 
+    #add210703
+    belongs_to :supplier_responsible
+    accepts_nested_attributes_for :supplier_responsible, update_only: true
+
     belongs_to :purchase_datum
     
     has_many :purchase_order_history
@@ -29,9 +33,22 @@ class PurchaseOrderDatum < ActiveRecord::Base
     attr_accessor :address2
     #
     
+    #add210703
+    #attr_accessor :supplier_responsible_email
+    
     #validation
     validates :purchase_order_code, presence: true, uniqueness: true
+    validate :check_supplier   #add210727
+    
     #validates :purchase_order_code, uniqueness: {message: ",工事IDが同じ組み合わせのレコードが既に存在します。", scope: [:construction_datum_id]} 
+    
+    #add210727
+    def check_supplier
+      if supplier_master_id == 1
+        errors.add(:supplier_master_id, ": 選択してください。")
+      end
+    end
+        
     #scope
     scope :with_id,  -> { joins(:construction_datum) }
 	

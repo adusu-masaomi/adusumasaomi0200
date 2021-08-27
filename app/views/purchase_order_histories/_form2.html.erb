@@ -36,9 +36,12 @@
    <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
      <%= m.label :工事名：, {style: 'color:blue'} %>
      <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
+     <%= m.label :通称名：, {style: 'color:brown'} %>
+     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :alias_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
    <% end %>
    
-   ※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行うようにお願いします！
+   <!--※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行うようにお願いします！-->
+   ※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行って下さい。
    </br></br>
    
    <%= f.label :注文先　：, {style: 'color:blue'} %>
@@ -75,15 +78,36 @@
                 purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
    
    <% end %>
-
    
   
    </br>
    
-   <%= f.input :responsible , label:"担当者　", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
-   <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   <!--
+   <%= f.input :responsible , label:"担当者　", label_html: { style: 'color:blue;' }, 
+      input_html:{ id:"responsible", style: 'width:200px'} %>
+   -->
    
-   <%= f.label :納品場所　, {style: 'color:blue'} %>
+   <!--コンボに変更-->
+   <%= f.label :担当者　：, {:style => "color:blue"} %>
+   <%= f.collection_select :responsible, @supplier_responsible, :id, :responsible_name, {:include_blank => true, 
+                 :selected => @purchase_order_history.purchase_order_datum.supplier_responsible_id}, 
+                 {id:"supplier_responsible_id", class: "searchableResponsible" , style: 'width:200px', :tabindex=>"8"
+                 } %>
+   <!-- -->
+   
+   <!--
+   <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   -->
+   
+   <!-- コンボに変更 -->
+   <%= f.label :Email：, {:style => "color:blue"} %>
+   <%= f.collection_select :email_responsible, @supplier_responsible, :id, :responsible_email, {:include_blank => true,
+                 :selected => @purchase_order_history.purchase_order_datum.supplier_responsible_id}, 
+                 {id:"supplier_responsible_email", class: "searchableEmail" , style: 'width:420px', :tabindex=>"9"
+                 } %>
+   <!-- -->
+   
+   <%= f.label :納品場所, {style: 'color:blue'} %>
    <%= f.select :delivery_place_flag, PurchaseOrderHistory.delivery_place, {:include_blank => true}, 
        {id:'delivery_place_flag',  style: 'width:90px;height:30px;font-size:16px;margin-top:0px;' } %>
    
@@ -176,48 +200,80 @@
   $(document).ready(function(){
   //(document).on('turbolinks:load', function(){
       
-	  
 	  //$(".sortThese").sortable();
-	  
-	//  $("#filter").on("cocoon:after-insert", function() {
+	  //$("#filter").on("cocoon:after-insert", function() {
 	  //   $(".sortThese").sortable();
       //});
 	  
       //検索可能なリストボックス(品名の場合)
-       $(".searchableId").select2({ theme: "classic" });
-       $(".searchableMaterial").select2({ theme: "classic" });
+      $(".searchableId").select2({ theme: "classic" });
+      $( ".searchableId" ).change(function(e) {
+        //debugger
+        
+        //担当Emailを取得
+        setEmail()
+      })
+      
+      $(".searchableMaterial").select2({ theme: "classic" });
 	   
-       //$(".searchableConstructionCode").change(function(e) {
-       //  setConstructionDateDefault();
+      //担当者
+      $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+      $( ".searchableResponsible" ).change(function(e) {
+        
+        //obj = $(this)
+	    //担当Emailを取得
+        getEmail()
+      })
+      $( ".searchableResponsible" ).on("select2:close", function (e) {
+	    //要修正
+        $('[tabindex=9]').focus()
+	  })
+      //
+      //担当Email
+      $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+      $( ".searchableEmail" ).change(function(e) {
+        obj = $(this)
+	    //担当Emailを取得
+        //getEmail()
+      })
+      $( ".searchableEmail" ).on("select2:close", function (e) {
+	    //要修正
+        $('[tabindex=9]').focus()
+	  })
+      //
+      
+      //$(".searchableConstructionCode").change(function(e) {
+      //setConstructionDateDefault();
 	   
-	   //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
-       var flag = document.getElementById("mail_sent_flag").value;
-       if (flag == 1) {
-	     document.getElementById("mail_sent_button").disabled = true;
-	   }
+	  //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+      var flag = document.getElementById("mail_sent_flag").value;
+      //del210728
+      //if (flag == 1) {
+      //    document.getElementById("mail_sent_button").disabled = true;
+      //}
+	  
+      //debugger;
+      
+      //del210712
+	  //デフォルトのメアド・担当者取得
+	  //setEmail();
 	   
-	   //デフォルトのメアド・担当者取得
-	   setEmail();
-	   
-	   //
-	   //var visibled = sessionStorage.getItem('onvisible');
-	   //if (visibled == "true") {
-	   //  $('#filter').removeClass('hide');
-	   //}
+	  //
+	  //var visibled = sessionStorage.getItem('onvisible');
+	  //if (visibled == "true") {
+	  //  $('#filter').removeClass('hide');
+	  //}
 	   
 	   //$(".material_code").on('click', function(){
 	   //既に保存済みの、商品コードを変更した場合。
 	   $('.material_code').change(function() {
 	   
-	   
 	     var itemCode = $(this)[0].value;
-		 
 		
 		 if (itemCode != "") {
 	       //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
 		   searchItemCode(itemCode);
-		 
-	     }
+		 }
 	   });
 	  
        $(".searchableSelect1_1").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST  });
@@ -527,6 +583,8 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	 
 	 var visibled = sessionStorage.getItem('onvisible');
 	 
+     //debugger;
+     
 	 if (visibled == "true") {
 	     
        	 $('#filter').removeClass('hide');
@@ -698,10 +756,15 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
  function submitAfterValidation() {
  	var ok_flag = true;
 	var after_check = checkQuantity(ok_flag);
-	
-	
-	 if (after_check == true){
-       if (window.confirm('実行しますか？')) {
+    
+    //add210628
+    //納品場所チェック
+    if (after_check == true){
+      after_check = checkDeliveryPlace(ok_flag);  
+    }
+    
+	if (after_check == true){
+      if (window.confirm('実行しますか？')) {
 	     reset_value();
          
          document.getElementById("format").value = "html";
@@ -711,6 +774,19 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	 }
  }
  
+ var checkDeliveryPlace = function(ok_flag){ 
+    delivery_place_flag = document.getElementById("delivery_place_flag").value;
+    
+    if (document.getElementById("sent_flag").value == 1)  //メール送信時のみ
+    {
+      if (delivery_place_flag == "")
+      {
+        window.confirm('納品場所を選択して下さい。');
+        ok_flag = false;
+      }
+    }
+    return ok_flag;
+ }
  
  function submitFax()
  {
@@ -734,24 +810,28 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
  
 //仕入先別メアドのセット
 //ひとまず取得できるメアドは１つ(email1)とする。
-function setEmail()
- {
-   var supplier_id = document.getElementById("supplier_master_id").value;
-   $.get("<%= purchase_order_historiez_email_select_path %>",
-      { id: supplier_id },
-   function(data){ 
-       obj = document.getElementById("email_responsible").textContent;
-       document.getElementById("email_responsible").value = obj;
-	   
-	   //担当者
-	   //add170907
-	   obj = document.getElementById("responsible").textContent;
-       document.getElementById("responsible").value = obj;
-	   
-       }
-    );
+//function setEmail()
+// {
+//   var supplier_id = document.getElementById("supplier_master_id").value;
+//   $.get("<%= purchase_order_historiez_email_select_path %>",
+//      { id: supplier_id },
+//      function(data){ 
+//         
+//         if (document.getElementById("email_responsible") != undefined)
+//         {
+//           obj = document.getElementById("email_responsible").textContent;
+//           document.getElementById("email_responsible").value = obj;
+//	     }
+//	     //担当者
+//	     //add170907
+//         if (document.getElementById("responsible") != undefined){
+//	       obj = document.getElementById("responsible").textContent;
+//           document.getElementById("responsible").value = obj;
+//	     }
+//       }
+//    );
 		
- }
+// }
 
 
 function reset_value() {
@@ -813,6 +893,45 @@ function dispDiv() {
      }
    );
 };
+
+function getEmail()
+  {
+     
+     obj = document.getElementById("supplier_master_id")
+     supplier_master_id = obj.value
+  
+     obj = document.getElementById("supplier_responsible_id")
+     supplier_responsible_id = obj.value
+     
+     //if (supplier_responsible_id != "")
+     if (parseInt(supplier_responsible_id) > 0)
+     {
+       $.get("<%= purchase_order_datum_get_responsible_email_path %>",
+         {supplier_master_id: supplier_master_id, 
+          supplier_responsible_id: supplier_responsible_id},
+           function(data){
+           })
+     }else{
+       //メールはクリアする(新規入力の場合)
+       $(".searchableEmail").val(0).trigger("change");
+     }
+  }
+
+  //ajax
+  function setEmail()
+  {
+    
+    obj = document.getElementById("supplier_master_id")
+    supplier_master_id = parseInt(obj.value)
+    $.get("<%= purchase_order_datum_get_email1_path %>",
+      {id: supplier_master_id },
+      function(data){
+               
+        //メーカー名もセット
+   	    //obj = document.getElementById("supplier_responsible_id")
+   	    }
+    )
+  }
 
 function reloadDiv(){
   //画面再ロードする

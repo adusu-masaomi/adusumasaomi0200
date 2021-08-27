@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :supplier_responsibles
   resources :outsourcing_costs
   resources :sites
   resources :site_names
@@ -258,6 +259,9 @@ Rails.application.routes.draw do
   #add190226
   get "/purchase_order_historiez/material_extract_by_category" => 'purchase_order_histories#material_extract_by_category'
   
+  #add210710
+  #get '/purchase_order_historiez/get_email' => 'purchase_order_histories#get_email'
+  
   get '/purchase_order_datum/material_select' => 'purchase_order_data2#material_select'
   get '/construction_datum/working_safety_matter_name_select' => 'construction_data#working_safety_matter_name_select'
   get '/purchase_order_datum/get_last_number_select' => 'purchase_order_data#get_last_number_select'
@@ -265,6 +269,9 @@ Rails.application.routes.draw do
   get '/purchase_order_datum/get_email1' => 'purchase_order_data#get_email1'
   #add210610
   get '/purchase_order_datum/get_address' => 'purchase_order_data#get_address'
+  
+  #add210702
+  get '/purchase_order_datum/get_responsible_email' => 'purchase_order_data#get_responsible_email'
   
   get '/construction_dataz/construction_and_customer_select' => 'construction_data#construction_and_customer_select'
   get '/construction_dataz/quotation_header_select' => 'construction_data#quotation_header_select'
@@ -275,9 +282,10 @@ Rails.application.routes.draw do
   #add200130
   get '/construction_dataz/set_calculated_flag' => 'construction_data#set_calculated_flag'
   get '/construction_dataz/get_site_address' => 'construction_data#get_site_address'
-  
-  #add200111
   get '/construction_dataz/get_deposit_due_date' => 'construction_data#get_deposit_due_date'
+  
+  #add210611
+  get '/construction_dataz/get_customer_address' => 'construction_data#get_customer_address'
   
   get '/construction_daily_reportz' => 'construction_daily_reports#index'
   get '/construction_daily_reportz/start_day_select' => 'construction_daily_reports#start_day_select'
@@ -609,6 +617,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :supplier_responsibles
   resources :outsourcing_costs
   resources :sites
   resources :construction_attachments

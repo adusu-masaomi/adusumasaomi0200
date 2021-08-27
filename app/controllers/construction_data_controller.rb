@@ -465,7 +465,6 @@ class ConstructionDataController < ApplicationController
       @site = Site.where(["name = ?", 
              params[:construction_datum][:site_id]]).first
     end
-   
     
     if @site.nil?
       #if numeric == false
@@ -608,34 +607,56 @@ class ConstructionDataController < ApplicationController
   #add171121
   def customer_extract
     
-	if params[:customer_id] != ""
+    if params[:customer_id] != ""
+    
+      
+      #@construction = ConstructionDatum.all  #add210707
+      
       #初期値として、”手入力”も選択できるようにする
-	  @customer_extract = ConstructionDatum.where(:id => 1).where("id is NOT NULL").
-           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
-
-	  
-	  #カテゴリー別のアイテムをセット
-	  @customer_extract  += ConstructionDatum.where(:customer_id => params[:customer_id]).where("id is NOT NULL").order("construction_data.construction_code desc").
-           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
-    else
-	#未選択状態の場合は、全リストを出す
-	  #カテゴリー別のアイテムをセット
-	  
-	  #upd171205 リストに全て載せようとすると処理落ちするので
-	  #現在日から１年前からの、登録された工事データのみ表示させるようにする。
-	  #
-	  require 'date'
+      #del210708
+	    #@customer_extract = @construction.where(:id => 1).where("id is NOT NULL").
+      #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
+      
+      
+      #add210708
+      #リストに全て載せようとすると処理落ちするので
+      #現在日から１年前からの、登録された工事データのみ表示させるようにする。
+	    #
+	    require 'date'
       now_date = Date.today
       past_date = now_date << 12
-	  #
+      #
+      
 	  
-	  @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).order("construction_data.construction_code desc").
-	      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
-	  
-	  #@customer_extract  = ConstructionDatum.all.
+	    #カテゴリー別のアイテムをセット
+      #upd210707 to_aつけて速くなる
+	    @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).where(:customer_id => params[:customer_id]).
+      #@customer_extract  = @construction.where(:customer_id => params[:customer_id]).
+      #@customer_extract  += @construction.where(:customer_id => params[:customer_id]).
+           where("id is NOT NULL").order("construction_data.construction_code desc").
+           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
+      
+      #@customer_extract  += @construction.where(:customer_id => params[:customer_id]).where("id is NOT NULL").order("construction_data.construction_code desc").
       #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
-	
-	end
+    else
+      #未選択状態の場合は、全リストを出す
+      #カテゴリー別のアイテムをセット
+	  
+	    #upd171205 リストに全て載せようとすると処理落ちするので
+	    #現在日から１年前からの、登録された工事データのみ表示させるようにする。
+	    #
+	    require 'date'
+      now_date = Date.today
+      past_date = now_date << 12
+      #
+	  
+      @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).order("construction_data.construction_code desc").
+	      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
+	  
+      #@customer_extract  = ConstructionDatum.all.
+      #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
+  
+    end
   end
     
   # ajax
@@ -693,6 +714,21 @@ class ConstructionDataController < ApplicationController
 	   @address2 = add2 
 	 end
   end
+  
+  
+  #add210611
+  #得意先の住所取得
+  def get_customer_address
+    @post = CustomerMaster.where(:id => params[:customer_master_id]).
+                              where("id is NOT NULL").pluck(:post).flatten.join(" ")
+    @address = CustomerMaster.where(:id => params[:customer_master_id]).
+                              where("id is NOT NULL").pluck(:address).flatten.join(" ")
+    @house_number = CustomerMaster.where(:id => params[:customer_master_id]).
+                              where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+    @address2 = CustomerMaster.where(:id => params[:customer_master_id]).
+                              where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+  end
+  
   
   #add200111
   #請求予定日から入金予定日を取得

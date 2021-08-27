@@ -13,6 +13,8 @@
   <dd><%= @supplier_master.fax_main %></dd>
   <dt><strong><%= model_class.human_attribute_name(:email_main) %>:</strong></dt>
   <dd><%= @supplier_master.email_main %></dd>
+  
+  <!--  別テーブルで持つようにしたため除外
   <dt><strong><%= model_class.human_attribute_name(:responsible1) %>:</strong></dt>
   <dd><%= @supplier_master.responsible1 %></dd>
   <dt><strong><%= model_class.human_attribute_name(:email1) %>:</strong></dt>
@@ -25,6 +27,28 @@
   <dd><%= @supplier_master.responsible3 %></dd>
   <dt><strong><%= model_class.human_attribute_name(:email3) %>:</strong></dt>
   <dd><%= @supplier_master.email3 %></dd>
+  -->
+  <% cnt = 0 %>
+  <% @supplier_master.supplier_responsibles.first(3).each do |rp| %>
+      <% cnt += 1 %>
+      <dt><strong><%= "担当者" + cnt.to_s + ":" %></strong></dt>
+      <dd><%= rp.responsible_name %></dd>
+      <dt><strong><%= "担当" + cnt.to_s + "Email:" %></strong></dt>
+      <dd><%= rp.responsible_email %></dd>
+  <% end %>
+  <% until cnt >= 3 do %>
+    <% cnt += 1 %>
+    <dt><strong><%= "担当者" + cnt.to_s + ":" %></strong></dt>
+    <dd></dd>
+    <dt><strong><%= "担当" + cnt.to_s + "Email:" %></strong></dt>
+    <dd></dd>
+  <% end %>
+        
+  <dt><strong><%= model_class.human_attribute_name(:responsible_cc) %>:</strong></dt>
+  <dd><%= @supplier_master.responsible_cc %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:email_cc) %>:</strong></dt>
+  <dd><%= @supplier_master.email_cc %></dd>
+  
 </dl>
 
 <%= link_to t('.back', :default => t("helpers.links.back")),

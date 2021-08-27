@@ -39,6 +39,10 @@
   <%= f.input :reception_date , input_html:{:tabindex=>"6"} %>
   <%= f.label :得意先, {:class => "my-custom-class-l" }  %></br>
   <%= f.collection_select :customer_id, CustomerMaster.all, :id, :customer_name, {:prompt => "どれか一つを選択して下さい"} , {id:"customer_id", :tabindex=>"7", class: "searchableCustomerName" , style: 'width:330px' } %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <%= f.button_tag "得意先の住所をセットする", :type => 'button', name: "addressButton",  
+               :onclick => "setCustomerAddress()" , :class => 'btn btn-lime500_rsd btn-xs keep-disp' %>
   </br></br>
   
   <%= f.input :personnel , input_html:{style: 'width:330px', :tabindex=>"8"} %>
@@ -250,6 +254,31 @@
     document.getElementById("address").value = obj;
     
   }
+  
+  function setCustomerAddress()
+  {
+    if ( document.getElementById("customer_id").value != "")
+    {
+      customer_master_id = document.getElementById("customer_id").value;
+      $.get("<%= construction_dataz_get_customer_address_path %>",
+      {customer_master_id: customer_master_id }, function(data)
+      {
+        obj = document.getElementById("post").textContent;
+        document.getElementById("post").value = obj;
+        //
+        obj = document.getElementById("address").textContent;
+        document.getElementById("address").value = obj;
+        //
+        obj = document.getElementById("house_number").textContent;
+        document.getElementById("house_number").value = obj;
+        //
+        obj = document.getElementById("address2").textContent;
+        document.getElementById("address2").value = obj;
+        
+      });
+    }
+  }
+  
   //請求予定日→入金日のセット
   function getDepositDueDateAjax()
   {  

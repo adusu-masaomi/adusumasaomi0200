@@ -751,82 +751,87 @@ class WorkingMiddleItemsController < ApplicationController
   #ajax
   #カテゴリーから該当する商品を取得
   def item_extract
-    #if params[:working_middle_item_category_id] != "0"
-	#upd171113
-	if params[:working_middle_item_category_id] != ""
+    
+    #upd210708
+    #to_aをつけて高速化
+    #return  #test
+    
+    if params[:working_middle_item_category_id] != ""
       #初期値として、”手入力”も選択できるようにする
 	  @item_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_name, id")
+        pluck("working_middle_item_name, id").to_a
         
       #binding.pry
         
 	  #カテゴリー別のアイテムをセット
-	  @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_name, id")
+	  @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => params[:working_middle_item_category_id]).
+        where("id is NOT NULL").order(:seq).
+        pluck("working_middle_item_name, id").to_a
 	
 	  #初期値として、”手入力”も選択できるようにする
 	  @item_short_name_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_short_name, id")
+        pluck("working_middle_item_short_name, id").to_a
 	  #カテゴリー別のアイテムをセット
-	  @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_short_name, id")
+	  @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => 
+        params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
+        pluck("working_middle_item_short_name, id").to_a
     else
 	#カテゴリーがデフォルト（指定なし）の場合
 	  @item_extract = WorkingMiddleItem.all.order(:seq).
-        pluck("working_middle_item_name, id")
+        pluck("working_middle_item_name, id").to_a
 	
 	  @item_short_name_extract = WorkingMiddleItem.all.order(:seq).
-        pluck("working_middle_item_short_name, id")
+        pluck("working_middle_item_short_name, id").to_a
 	end
 	
   end
   
   #カテゴリー＆サブカテゴリーから該当する商品を取得
   def item_extract_subcategory
-  
-     #if params[:working_middle_item_category_id] != ""
-    #upd180208
+    #upd210708
+    #to_aをつけて高速化
+    
     if params[:working_middle_item_category_id] != "" && params[:working_subcategory_id] != ""
       
       #初期値として、”手入力”も選択できるようにする
 	  @item_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_name, id")
+        pluck("working_middle_item_name, id").to_a
 	  #カテゴリー別のアイテムをセット(以下のみ、”item_extract”ファンクションと異なる。)
       if params[:working_subcategory_id] == "1"
       #サブカテゴリーが１の場合は、サブカテゴリー未選択とみなす。
         @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => 
            params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
-          pluck("working_middle_item_name, id")
+          pluck("working_middle_item_name, id").to_a
       else
         @item_extract  += WorkingMiddleItem.where(:working_middle_item_category_id => 
            params[:working_middle_item_category_id]).where(:working_subcategory_id => 
            params[:working_subcategory_id]).where("id is NOT NULL").order(:seq).
-          pluck("working_middle_item_name, id")
+          pluck("working_middle_item_name, id").to_a
       end
       ##
       
 	  #初期値として、”手入力”も選択できるようにする
 	  @item_short_name_extract  = WorkingMiddleItem.where(:id => "1").where("id is NOT NULL").order(:seq).
-        pluck("working_middle_item_short_name, id")
+        pluck("working_middle_item_short_name, id").to_a
 	  #カテゴリー別のアイテムをセット
       if params[:working_subcategory_id] == "1"
       #サブカテゴリーが１の場合は、サブカテゴリー未選択とみなす。
 	    @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => 
           params[:working_middle_item_category_id]).where("id is NOT NULL").order(:seq).
-          pluck("working_middle_item_short_name, id")
+          pluck("working_middle_item_short_name, id").to_a
       else
         @item_short_name_extract += WorkingMiddleItem.where(:working_middle_item_category_id => 
           params[:working_middle_item_category_id]).where(:working_subcategory_id => 
            params[:working_subcategory_id]).where("id is NOT NULL").order(:seq).
-          pluck("working_middle_item_short_name, id")
+          pluck("working_middle_item_short_name, id").to_a
       end
     else
 	#カテゴリーがデフォルト（指定なし）の場合
-	  @item_extract = WorkingMiddleItem.all.order(:seq).
+	  @item_extract = WorkingMiddleItem.all.order(:seq).to_a.
         pluck("working_middle_item_name, id")
 	
 	  @item_short_name_extract = WorkingMiddleItem.all.order(:seq).
-        pluck("working_middle_item_short_name, id")
+        pluck("working_middle_item_short_name, id").to_a
 	end
 	
   end

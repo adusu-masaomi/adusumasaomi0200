@@ -106,18 +106,18 @@
   <!--落札フラグ-->
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.check_box :bid_flag_1,  :id => "bid_flag_1" %>
+  <%= f.check_box :bid_flag_1,  :id => "bid_flag_1" , :onchange => "checkQuotationPriceManual()" %>
   <%= f.label :bid_flag_1, '落札　　　', { style: 'color:red'}  %>
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.check_box :bid_flag_2,  :id => "bid_flag_2" %>
+  <%= f.check_box :bid_flag_2,  :id => "bid_flag_2" , :onchange => "checkQuotationPriceManual()" %>
   <%= f.label :bid_flag_2, '落札　　　', { style: 'color:red'}  %>
   
   
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  <%= f.check_box :bid_flag_3,  :id => "bid_flag_3" %>
+  <%= f.check_box :bid_flag_3,  :id => "bid_flag_3" , :onchange => "checkQuotationPriceManual()" %>
   <%= f.label :bid_flag_3, '落札　　　', { style: 'color:red'}  %></br>
   
   <!--備考-->
@@ -393,6 +393,7 @@
 		  price_2_win = true;
 	  }
 	  //〜〜〜価格３の判定〜〜〜
+    
 	  //価格3のみ存在？
 	  if (checkPrice_3[index].value > 0 && checkPrice_1[index].value == "" && checkPrice_2[index].value  == "" ){
 	    price_3_win = true;
@@ -437,7 +438,16 @@
 		 checkItem_2[index].checked = false;
 	  }
 	  
-	  
+    //
+    //add210621
+    //同値でどこもチェックついてない場合、全チェック解除
+	  if (price_1_win == false && price_2_win == false && price_3_win == false)
+    {	 
+      checkItem_1[index].checked = false;
+		  checkItem_2[index].checked = false;
+      checkItem_3[index].checked = false;
+		}
+    //
 	}
     
   }
@@ -454,12 +464,25 @@
 	 checkBidAll();
      
 	 //合計をセット
-	 setTotalQuotation(Flag);
-     
+   //add210621
+   for (let i = 1; i <= 3; i++) {
+     //setTotalQuotation(Flag);
+     setTotalQuotation(i);
+   }
      //add180412
      //注文前に仕入先を判定しセットする
      setSupplier(t);
 	 
+  }
+  
+  //見積もり価格をチェック(手動落札時)
+  function checkQuotationPriceManual()
+  {
+  
+    //合計金額をセット
+    for (let i = 1; i <= 3; i++) {
+      setTotalQuotation(i);
+    }
   }
   
   //add180412

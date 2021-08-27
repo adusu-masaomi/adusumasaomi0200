@@ -115,8 +115,8 @@
   </br></br></br>
   <!--upd end-->
   
-  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "9"}  %>
-  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"10" }  %>
+  <%= f.input :working_large_item_name , label: "項目名(手入力可)", input_html:{id:"working_large_item_name", style: 'width:420px', :tabindex=> "9", autocomplete: 'off'}  %>
+  <%= f.input :working_large_specification , label: "仕様名(手入力可)", input_html:{id:"working_large_specification", style: 'width:420px', :tabindex=>"10", autocomplete: 'off'}  %>
   
   <div class="col-xs-2" , style="margin-left : -15px">
   <!--<%= f.input :quantity, label: "見積数量", :input_html => {id:'quantity', :tabindex=>"11", style: 'width:120px',
@@ -151,11 +151,11 @@
   </div>
   
   <div class="col-xs-2" , style="margin-left : -15px;margin-top : -20px">
-  <%= f.input :quote_price,  :input_html => {id:'quote_price', :tabindex=>"17", style: 'width:120px'} %>
+  <%= f.input :quote_price,  :input_html => {id:'quote_price', :tabindex=>"17", style: 'width:120px', autocomplete: 'off'} %>
   </div>
   <!--<div style="margin-left : -50px;margin-top : -20px">-->
   <div class="col-xs-2",  style="margin-left : -0px;margin-top : -20px">
-  <%= f.input :execution_price, :input_html => {id:'execution_price', :tabindex=>"18", style: 'width:120px'} %>
+  <%= f.input :execution_price, :input_html => {id:'execution_price', :tabindex=>"18", style: 'width:120px', autocomplete: 'off'} %>
   </div>
   
   <div style="margin-top : 25px">

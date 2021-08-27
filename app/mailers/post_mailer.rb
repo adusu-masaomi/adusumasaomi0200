@@ -29,35 +29,40 @@ class PostMailer < ApplicationMailer
     #add end
     
 	@supplier_name = user.supplier_master.supplier_name
-    @responsible_name = user.supplier_master.responsible1 + "様"
     
-        #件名に日時を入れる（メール重なるのを防ぐため）
-        require 'date'
-        subject_time = "<" + Time.now.to_s + ">"
+    
+    #@responsible_name = user.supplier_master.responsible1 + "様"
+    #upd210705
+    #@responsible_name = user.supplier_responsible.responsible_name + "様"
+    @responsible_name = $responsible_name + "様"
+    
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    require 'date'
+    subject_time = "<" + Time.now.to_s + ">"
         
-        #本番用
-        if user.supplier_master.id != 5
-            mail to: "camille.saekiZZZ@gmail.com" ,
-            subject: '注文番号登録依頼' + subject_time
-        else
-        #ムサシで選んだ場合、テストメールとする
-            mail to: "kamille1973@live.jp" ,
-            cc: "ilovekyosukehimuro@yahoo.co.jp", 
-            subject: '注文番号登録依頼' + subject_time
-        end
+    #本番用
+    if user.supplier_master.id != 5
+        mail to: "camille.saekiZZZ@gmail.com" ,
+        subject: '注文番号登録依頼' + subject_time
+    else
+    #ムサシで選んだ場合、テストメールとする
+        mail to: "kamille1973@live.jp" ,
+        cc: "ilovekyosukehimuro@yahoo.co.jp", 
+        subject: '注文番号登録依頼' + subject_time
+    end
         
-        #mail to: $email_responsible ,
-        #upd180405 担当者２のメアドがあれば、CCに加える。
-        #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #mail to: $email_responsible ,
+    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
 
-        #test用
-        #mail to: "kamille1973@live.jp" ,
-        #cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    #test用
+    #mail to: "kamille1973@live.jp" ,
+    #cc: "ilovekyosukehimuro@yahoo.co.jp", 
         
-        #以下は消さない事!
-        #add180403
-        #件名に日時を入れる（メール重なるのを防ぐため）
-        #subject: '注文番号登録依頼' + subject_time
+    #以下は消さない事!
+    #add180403
+    #件名に日時を入れる（メール重なるのを防ぐため）
+    #subject: '注文番号登録依頼' + subject_time
   end
   
   #注文依頼
@@ -93,7 +98,8 @@ class PostMailer < ApplicationMailer
     
     #担当者
 	#if user.supplier_master.present? && user.supplier_master.responsible1.present?
-	if $responsible.present?
+	#upd210705
+    if $responsible.present?
       @responsible_name = $responsible + "様"
     else
 	  @responsible_name = "ご担当者様"
@@ -134,8 +140,11 @@ class PostMailer < ApplicationMailer
     @supplier_name = user.supplier_master.supplier_name + " 御中"
 	
 	#担当者
-	if user.responsible.present?
-      @responsible_name = user.responsible + "様"
+	#if user.responsible.present?
+    #  @responsible_name = user.responsible + "様"
+    #upd210705
+    if $responsible.present?
+      @responsible_name = $responsible + "様"
     else
 	  @responsible_name = "ご担当者様"
 	end
@@ -200,8 +209,11 @@ class PostMailer < ApplicationMailer
     @supplier_name = user.supplier_master.supplier_name + " 御中"
 	
 	#担当者
-	if user.responsible.present?
-      @responsible_name = user.responsible + "様"
+	#if user.responsible.present?
+    #  @responsible_name = user.responsible + "様"
+    #upd210705
+    if $responsible.present?
+      @responsible_name = $responsible + "様"
     else
 	  @responsible_name = "ご担当者様"
 	end

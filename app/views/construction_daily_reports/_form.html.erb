@@ -557,8 +557,10 @@
 			if (obj != null) {
 			  var affiliation = parseInt(obj);
 			  
-			  //upd170719 村山さんも原則的に社員扱い
-			  if (affiliation != AFFILIATION_OUTSOURCING || staff_id == 3) {
+			  //村山さんも原則的に社員扱い
+			  //須戸さんも同様 (upd210827)
+              //if (affiliation != AFFILIATION_OUTSOURCING || staff_id == 3) {
+              if (affiliation != AFFILIATION_OUTSOURCING || (staff_id == 3 || staff_id == 6)) {
 			      in_house = true;
 			  }
 			}

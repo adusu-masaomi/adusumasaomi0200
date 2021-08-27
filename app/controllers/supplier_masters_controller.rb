@@ -21,6 +21,8 @@ class SupplierMastersController < ApplicationController
   # GET /supplier_masters/new
   def new
     @supplier_master = SupplierMaster.new
+    #add210629
+    @supplier_master.supplier_responsibles.build
   end
 
   # GET /supplier_masters/1/edit
@@ -95,6 +97,8 @@ class SupplierMastersController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def supplier_master_params
       params.require(:supplier_master).permit(:supplier_name, :tel_main, :fax_main, :email_main, :responsible1, :email1, 
-           :responsible2, :email2, :responsible3, :email3, :search_character, :outsourcing_flag)
+           :responsible2, :email2, :responsible3, :email3, :responsible_cc, :email_cc, 
+           :search_character, :outsourcing_flag, 
+           supplier_responsibles_attributes: [:id, :responsible_name, :responsible_email, :_destroy])
     end
 end

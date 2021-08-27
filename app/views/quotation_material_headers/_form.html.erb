@@ -94,8 +94,23 @@
    
    </br>
    
+   <!--
    <%= f.input :responsible , label:"担当者", label_html: { style: 'color:blue;' }, input_html:{ id:"responsible", style: 'width:200px'} %>
-   <%= f.input :email , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email", style: 'width:350px'} %>
+   -->
+ 
+   <!--コンボに変更-->
+   <!--@supplier_responsible-->
+   
+   <%= f.label :担当者：, {:style => "color:blue"} %>
+   <%= f.collection_select :responsible, SupplierResponsible.all, :id, :responsible_name, {include_blank: true}, 
+                 {id:"supplier_responsible_id", class: "searchableResponsible" , style: 'width:200px'} %>
+   
+   <!--<%= f.input :email , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email", style: 'width:350px'} %>-->
+   <!--コンボに変更-->
+   <%= f.label :Email：, {:style => "color:blue"} %>
+   <%= f.collection_select :email, SupplierResponsible.all, :id, :responsible_email, {:include_blank => true
+                 }, 
+                 {id:"supplier_responsible_email", class: "searchableEmail" , style: 'width:340px', :tabindex=>"9"} %>
    
    <%= f.label :納品場所　, {style: 'color:blue'} %>
    <%= f.select :delivery_place_flag, PurchaseOrderHistory.delivery_place, {:include_blank => true}, 
@@ -371,6 +386,8 @@
   var disp_flag = 0;
   var quotation_flag = false; //見積済フラグ
   
+  const FLAG_ORDER = 3;       //注文の場合のフラグ
+  
   //フォーム上の制御
   $(document).ready(function(){
   //(document).on('turbolinks:load', function(){
@@ -381,10 +398,16 @@
 	  //   $(".sortThese").sortable();
       //});
 	  
-      //検索可能なリストボックス(品名の場合)
-       $(".searchableId").select2({ theme: "classic" });
-	   $(".searchableSupplier").select2({ theme: "classic" });
-       $(".searchableMaterial").select2({ theme: "classic" });
+   //検索可能なリストボックス(品名の場合)
+   $(".searchableId").select2({ theme: "classic" });
+	 $(".searchableSupplier").select2({ theme: "classic" });
+   $( ".searchableSupplier" ).change(function(e) {
+     //担当Emailを取得
+     //setEmail()
+   })
+      
+   
+   $(".searchableMaterial").select2({ theme: "classic" });
 	   
 	   $(".searchableQuotationOriginCode").select2({ theme: "classic", allowClear: true , placeholder: "" });
 	   //見積参照コードよりデータを呼び出す
@@ -484,6 +507,19 @@
 		   setNextControlOnSelect(e,control_name, 6);
 	   });
      
+     //担当者
+     $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+     $( ".searchableResponsible" ).change(function(e) {
+       //担当Emailを取得
+       getEmail()
+     })
+     $( ".searchableResponsible" ).on("select2:close", function (e) {
+	     //要修正
+       //$('[tabindex=9]').focus()
+	   })
+     
+     //担当Email
+     $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
   });  
 
 
@@ -513,8 +549,9 @@
          document.getElementById("sequential_id").value = obj;
 	   }else{
 	   //昇順の場合
-	     document.querySelectorAll("#sequential_id")[controlNum].value = obj;
-		
+       if (document.querySelectorAll("#sequential_id")[controlNum] != undefined){
+	       document.querySelectorAll("#sequential_id")[controlNum].value = obj;
+		   }
         //ループでインデックスを作り直す（うまくそろわないため）
 		if (obj != undefined){
 		   for (var i = 0; i <= parseInt(obj); i++) {
@@ -597,8 +634,18 @@
 		   setNextControlOnSelect(e,control_name, 6);
 	   });
      
-     
-	     
+     //担当者
+     $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+     $( ".searchableResponsible" ).change(function(e) {
+       //担当Emailを取得
+       //getEmail()
+     })
+     $( ".searchableResponsible" ).on("select2:close", function (e) {
+	     //要修正
+       //$('[tabindex=9]').focus()
+	   })
+	   //担当Email
+     $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
   });
 	
 
@@ -710,7 +757,7 @@
    if (flag == 1){
    //見積メールの場合
      document.getElementById("sent_flag").value = 1;
-   }else if (flag == 3){
+   }else if (flag == FLAG_ORDER){
    //注文メールの場合
      document.getElementById("sent_flag").value = 2;
    }
@@ -723,9 +770,15 @@
    var ok_flag = true;
 	
 	 var after_check = checkQuantity(ok_flag);
-	
+   
+   //add210628
+   //納品場所チェック
+   if (after_check == true){
+     after_check = checkDeliveryPlace(ok_flag, flag);   
+   }
 	 if (after_check == true){
-	   var after_check = checkSupplier(flag);
+	   //var after_check = checkSupplier(flag);
+     after_check = checkSupplier(flag);
 	 }
 	
 	 //メッセージを可変にする
@@ -734,7 +787,7 @@
 	   message = "見積依頼をメールしますか？"
 	 }else if (flag == 2){
 	   message = "登録のみ行いますか？"
-	 }else if (flag == 3){
+	 }else if (flag == FLAG_ORDER){
 	   message = "注文依頼をメールしますか？"
 	 }else if (flag == 4){
      document.getElementById("sent_flag").value = 4;  //add200428
@@ -746,9 +799,7 @@
      document.getElementById("sent_flag").value = 6;  //add200428
 	   message = "注文依頼をＦＡＸしますか？"
  	 }
-	
-   //debugger;
-    
+	  
 	 if (after_check == true){
 	   if (flag != 4){
 	   //比較表のみメッセージは非表示とする（ややうざいので・・）
@@ -764,6 +815,20 @@
      return false;  //add200501
 	 }
  }
+
+  var checkDeliveryPlace = function(ok_flag, flag){ 
+    delivery_place_flag = document.getElementById("delivery_place_flag").value;
+    
+    if (flag == FLAG_ORDER)  //メール送信時のみ
+    {
+      if (delivery_place_flag == "")
+      {
+        window.confirm('納品場所を選択して下さい。');
+        ok_flag = false;
+      }
+    }
+    return ok_flag;
+  }
 
 function checkSupplier(flag){
   var answer = true;
@@ -793,27 +858,21 @@ function resetResponsible()
 function setEmail()
  {
    
-   var supplier_id = document.getElementById("supplier_master_id").value;
+   var supplier_id = document.getElementById("supplier_master_id").value
+   //add210715
+   var construction_id = document.getElementById("construction_datum_id").value
    
-   
-  // debugger;
+   //debugger
    
    //IDもセット
    var id = document.getElementById("id").value;
    
    
-   //送信フラグ判定用 add170912
+   //送信フラグ判定用 
    var supplier_id_1 = document.getElementById("supplier_id_1").value;
    var supplier_id_2 = document.getElementById("supplier_id_2").value;
    var supplier_id_3 = document.getElementById("supplier_id_3").value;
    
-   
-   //↓ここがまだうまくいかない！！！！！！！！17.09.12
-   //var quotation_email_flag_1 = document.getElementById("quotation_email_flag_1").value;
-   //var quotation_email_flag_2 = document.getElementById("quotation_email_flag_2").value;
-   
-   
-   //add180918 
    var quotation_email_flag_1 = document.getElementById("quotation_email_flag_1").checked;
    var quotation_email_flag_2 = document.getElementById("quotation_email_flag_2").checked;
    var quotation_email_flag_3 = document.getElementById("quotation_email_flag_3").checked;
@@ -824,24 +883,14 @@ function setEmail()
    $.get("<%= quotation_material_headerz_email_select_path %>",
       { id: id, supplier_id: supplier_id , supplier_id_1: supplier_id_1, supplier_id_2: supplier_id_2, supplier_id_3: supplier_id_3, 
         quotation_email_flag_1: quotation_email_flag_1, quotation_email_flag_2: quotation_email_flag_2, 
-        quotation_email_flag_3: quotation_email_flag_3 },
-   function(data){ 
-       
-	   obj = document.getElementById("email").textContent;
-       document.getElementById("email").value = obj;
+        quotation_email_flag_3: quotation_email_flag_3, construction_id: construction_id },
+    function(data){ 
+     
+     //明細の、メールの送信フラグをリセットする。
+	   obj = document.getElementById("quotation_email_flag").textContent;
+     document.getElementById("quotation_email_flag").value = obj;
 	   
-	   //担当者もセット
-	   obj = document.getElementById("responsible").textContent;
-       document.getElementById("responsible").value = obj;
-	   
-	   //明細の、メールの送信フラグをリセットする。
-	   //debugger;
-       
-       obj = document.getElementById("quotation_email_flag").textContent;
-       document.getElementById("quotation_email_flag").value = obj;
-	   
-     //debugger;
-	   //備考をセット
+     //備考をセット
      obj = document.getElementById("notes").textContent;
      document.getElementById("notes").value = obj;
      
@@ -849,21 +898,13 @@ function setEmail()
 	   //注文NOも自動セットする。
 	   setOrderNumber();
 	   
-       //見積済出ない限り注文ボタンを押せないようにする
-       quotation_flag = document.getElementById("quotation_email_flag").value;
+     //見積済出ない限り注文ボタンを押せないようにする
+     quotation_flag = document.getElementById("quotation_email_flag").value;
        
-       //debugger;
-       
-       dispOrderButton();
+     dispOrderButton();
        
        
-	     //170929 ここでなぜかエラー！（必要ないか）確認・・・
-	   
-	     //if (obj != "1"){
-		 //  resetDetailsMailSentFlag();
-	     //}
-	   
-       }
+	  }
     );
 		
  }
@@ -881,7 +922,9 @@ function setOrderNumber() {
         last_header_number: last_header_number },
    function(data){
      
-	 obj = document.getElementById("purchase_order_code").textContent;
+     //debugger;
+     
+	   obj = document.getElementById("purchase_order_code").textContent;
      document.getElementById("purchase_order_code").value = obj;
 	 
        
@@ -1049,6 +1092,29 @@ function reloadDiv(){
   
   //$("body").css("cursor", "default");
 }
+
+  function getEmail()
+  {
+     
+     obj = document.getElementById("supplier_master_id")
+     supplier_master_id = obj.value
+  
+     obj = document.getElementById("supplier_responsible_id")
+     supplier_responsible_id = obj.value
+     
+     //if (supplier_responsible_id != "")
+     if (parseInt(supplier_responsible_id) > 0)
+     {
+       $.get("<%= purchase_order_datum_get_responsible_email_path %>",
+         {supplier_master_id: supplier_master_id, 
+          supplier_responsible_id: supplier_responsible_id},
+           function(data){
+           })
+     }else{
+       //メールはクリアする(新規入力の場合)
+       $(".searchableEmail").val(0).trigger("change");
+     }
+  }
 
  //保留中
  //分類別にアイテムを抽出する処理

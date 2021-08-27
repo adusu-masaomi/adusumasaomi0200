@@ -51,19 +51,51 @@
   <%= f.label :仕入先 , {:class => "my-custom-class-l"} %></br>
   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"7"} %></br></br>
   
-  <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
-     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"8"}  %>
+  <% if @supplier_responsibles.blank? %>
+     <% @supplier_responsibles = SupplierResponsible.all %>
   <% end %>
   
+  <div class="col-lg-3", style="margin-left : -15px">
+    <%= f.label :担当者 , {:class => "my-custom-class-l"} %></br>
+    <!--<%= f.collection_select :supplier_responsible_id, SupplierResponsible.all, :id, :responsible_name, {:include_blank => true}, 
+                 {id:"supplier_responsible_id", class: "searchableResponsible" , style: 'width:220px', :tabindex=>"8"} %>-->
+    <%= f.collection_select :supplier_responsible_id, @supplier_responsibles, :id, :responsible_name, {:include_blank => true}, 
+                 {id:"supplier_responsible_id", class: "searchableResponsible" , style: 'width:220px', :tabindex=>"8"} %>
+  </div>
+  
+  <div class="col-lg-3", style="margin-left : -60px">
+  <%= f.simple_fields_for :supplier_responsible, :remote => true do |k| %>
+    <%= k.label :担当Email , {:class => "my-custom-class-l"} %></br>
+    
+    <% if @supplier_responsible_emails.blank? %>
+      <% @supplier_responsible_emails = SupplierResponsible.all %>
+    <% end %>
+    
+    
+    <%= k.collection_select :responsible_email, @supplier_responsible_emails, :id, :responsible_email, {:include_blank => true}, 
+                 {id:"supplier_responsible_email", class: "searchableEmail" , style: 'width:420px', :tabindex=>"9"} %>
+  <% end %>
+  </div>
+  </br>
+  </br>
+  </br>  
+  
+  <!--
+  <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
+     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"10"}  %>
+  <% end %>
+  -->
+  
   <%= f.simple_fields_for :construction_datum, :remote => true do |m| %>
-  <!--   <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"9"}  %>-->
+    <!--   <%= m.input :alias_name, label:"通称" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"9"}  %>-->
     <%= m.input :alias_name, label:"通称" , as: :hidden  %>
   <% end %>
-  <%= f.input :alias_name, label:"通称／備考（メール送信しない場合は”備考”としても登録ができます。）" , input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"9"}  %>
+  <%= f.input :alias_name, label:"通称／備考（メール送信しない場合は”備考”としても登録ができます。）" , 
+           input_html:{ id:"alias_name",  style: 'width:220px', :tabindex=>"10"}  %>
   
   
   <%= f.check_box :mail_sent_flag,  { :id => "mail_sent_flag",  :class => "mail_sent_flag"} , '1', '0' %> 
-  <%= f.label :mail_sent_label, "メール送信済フラグ（障害発生等で再送信したい場合は、チェックを外してください）", {style: 'color: green;font-size:12px;', :tabindex=>"10"} %>
+  <%= f.label :mail_sent_label, "メール送信済フラグ（障害発生等で再送信したい場合は、チェックを外してください）", {style: 'color: green;font-size:12px;', :tabindex=>"12"} %>
   
   <!--<%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>-->
   
@@ -116,6 +148,30 @@
 	     $('[tabindex=8]').focus(); 
 	   });
 	   
+       $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+       $( ".searchableResponsible" ).change(function(e) {
+           obj = $(this);
+		   //分類からアイテム抽出する
+		   //setMaterialExtractByCategory(obj);
+           
+           //ここにajax
+           //担当Emailを取得
+           getEmail()
+       });
+       $( ".searchableResponsible" ).on("select2:close", function (e) {
+	     $('[tabindex=9]').focus(); 
+	   });
+       //Email
+       $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+       $( ".searchableEmail" ).change(function(e) {
+           obj = $(this);
+		   //分類からアイテム抽出する
+		   //setMaterialExtractByCategory(obj);
+       });
+       $( ".searchableEmail" ).on("select2:close", function (e) {
+	     $('[tabindex=10]').focus(); 
+	   });
+       
        //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
        //var flag = document.getElementById("mail_sent_flag").value;
 	   //if (flag == 1) {
@@ -147,6 +203,9 @@
     
     //住所を表示させる
     getAddress();
+    
+    //メール選択状態初期値
+    getEmail()
   } 
 
   function checkAutoOutSourcing() {
@@ -183,16 +242,23 @@
   //ajax
   function setEmail()
   {
-       obj = document.getElementById("supplier_master_id");
-       supplier_master_id = parseInt(obj.value);
-       $.get("<%= purchase_order_datum_get_email1_path %>",
-         {id: supplier_master_id },
-          function(data){
-               obj = document.getElementById("email1").textContent;
-			   document.getElementById("email1").value = obj;
-          }
-        );
-  };
+    obj = document.getElementById("supplier_master_id")
+    supplier_master_id = parseInt(obj.value)
+    $.get("<%= purchase_order_datum_get_email1_path %>",
+      {id: supplier_master_id },
+      function(data){
+        //obj = document.getElementById("email1").textContent
+        //document.getElementById("email1").value = obj
+               
+        //メーカー名もセット
+   	    obj = document.getElementById("supplier_responsible_id")
+   	    index = obj.selectedIndex
+        //上記でピンポイントしているので0とする
+        //index = 0;
+  	    //f.maker_name.value = obj.options[index].innerText;
+      }
+    )
+  }
 
   //ajax
   function getSupplier()
@@ -208,6 +274,28 @@
         }
      );
   };
+  
+  function getEmail()
+  {
+     obj = document.getElementById("supplier_master_id")
+     supplier_master_id = obj.value
+  
+     obj = document.getElementById("supplier_responsible_id")
+     supplier_responsible_id = obj.value
+     
+     //if (supplier_responsible_id != "")
+     if (parseInt(supplier_responsible_id) > 0)
+     {
+       $.get("<%= purchase_order_datum_get_responsible_email_path %>",
+         {supplier_master_id: supplier_master_id, 
+          supplier_responsible_id: supplier_responsible_id},
+           function(data){
+           })
+     }else{
+       //メールはクリアする(新規入力の場合)
+       $(".searchableEmail").val(0).trigger("change");
+     }
+  }
   
   //住所取得
   function getAddress()
