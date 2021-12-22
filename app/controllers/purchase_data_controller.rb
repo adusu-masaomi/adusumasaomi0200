@@ -693,10 +693,14 @@ class PurchaseDataController < ApplicationController
 		  @materials = MaterialMaster.find(params[:purchase_datum][:material_id])
           
           #資材コード、品名、単位を更新
+          #material_update_params = { material_code: params[:purchase_datum][:material_code],
+		  #                         material_name: params[:purchase_datum][:material_name],
+          #                         unit_id: params[:purchase_datum][:unit_id] }
+          
+          #upd211222 単位は更新しない(社長の見積注文での入出力に影響するため)
           material_update_params = { material_code: params[:purchase_datum][:material_code],
-		                           material_name: params[:purchase_datum][:material_name],
-                                   unit_id: params[:purchase_datum][:unit_id] }
-         
+		                           material_name: params[:purchase_datum][:material_name] }
+          
 	      @materials.update(material_update_params)
 	    end
 	  end

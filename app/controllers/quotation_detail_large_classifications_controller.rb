@@ -383,10 +383,14 @@ class QuotationDetailLargeClassificationsController < ApplicationController
     if @status != "fixed"
     
       @quotation_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
+      
+      #add210916
+      #行番号をインクリメントする
+      @quotation_detail_large_classification.line_number += 1
+      line_insert  
+      #
+      
       new_record = @quotation_detail_large_classification.deep_clone include: :quotation_detail_middle_classifications
-    
-      #status = new_record.save
-      #upd190225
       status = new_record.save(validate: false)
      
     #respond_to do |format|
@@ -879,14 +883,14 @@ class QuotationDetailLargeClassificationsController < ApplicationController
                      :labor_productivity_unit_total, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag)
     end
    
-    #以降のレコードの行番号を全てインクリメントする
-    def line_insert
-      QuotationDetailLargeClassification.where(["quotation_header_id = ? and line_number >= ? and id != ?", @quotation_detail_large_classification.quotation_header_id, @quotation_detail_large_classification.line_number, @quotation_detail_large_classification.id]).update_all("line_number = line_number + 1")
-      #最終行番号も取得しておく
-      @max_line_number = QuotationDetailLargeClassification.
-        where(["quotation_header_id = ? and line_number >= ? and id != ?", @quotation_detail_large_classification.quotation_header_id, 
-        @quotation_detail_large_classification.line_number, @quotation_detail_large_classification.id]).maximum(:line_number)
-    end
+  #以降のレコードの行番号を全てインクリメントする
+  def line_insert
+    QuotationDetailLargeClassification.where(["quotation_header_id = ? and line_number >= ? and id != ?", @quotation_detail_large_classification.quotation_header_id, @quotation_detail_large_classification.line_number, @quotation_detail_large_classification.id]).update_all("line_number = line_number + 1")
+    #最終行番号も取得しておく
+    @max_line_number = QuotationDetailLargeClassification.
+      where(["quotation_header_id = ? and line_number >= ? and id != ?", @quotation_detail_large_classification.quotation_header_id, 
+      @quotation_detail_large_classification.line_number, @quotation_detail_large_classification.id]).maximum(:line_number)
+  end
    
      #見出データへ合計保存用　
     def save_price_to_headers

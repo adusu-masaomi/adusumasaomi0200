@@ -47,7 +47,8 @@ class ConstructionDatum < ActiveRecord::Base
     #住所に数値が混じっていた場合も禁止する
     validate  :address_regex
     def address_regex
-      if address.match(/[0-9０-９]+$/)
+      #if address.match(/[0-9０-９]+$/)
+      if address.present? && address.match(/[0-9０-９]+$/)  #upd211005
         errors.add :address, ADDRESS_ERROR_MESSAGE_4
       end
     end

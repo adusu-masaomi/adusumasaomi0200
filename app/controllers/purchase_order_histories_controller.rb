@@ -511,26 +511,31 @@ class PurchaseOrderHistoriesController < ApplicationController
         if id != 1 then
           @material_master = MaterialMaster.find(id)
           item[:material_code] = @material_master.material_code
-              
-          if @material_master.list_price != 0  #upd170310
-			      #資材マスターの定価をセット
-			      #(マスター側未登録を考慮。但しアプデは考慮していない）
-            item[:list_price] = @material_master.list_price
+          
+          if item[:list_price].nil?   #add211222
+            if @material_master.list_price != 0  #upd170310
+			        #資材マスターの定価をセット
+			        #(マスター側未登録を考慮。但しアプデは考慮していない）
+              item[:list_price] = @material_master.list_price
+			      end
 			    end
-			  
           #if (item[:material_name] != @material_master.material_name) || 
           #   (item[:maker_id] != @material_master.maker_id)
               
-          #upd190226
           if (item[:material_name] != @material_master.material_name) || 
-               (item[:maker_id] != @material_master.maker_id ||
-                item[:material_category_id] != @material_master.material_category_id)
+               (item[:maker_id] != @material_master.maker_id) ||
+               (item[:list_price] != @material_master.list_price) ||
+               (item[:material_category_id] != @material_master.material_category_id) || 
+               (item[:unit_master_id] != @material_master.unit_id )
                  
 			      #品名・メーカーを登録or変更した場合は、商品マスターへ反映させる。
+            #upd211222 定価・単位も追加
 			      materials = MaterialMaster.where(:id => @material_master.id).first
 			      if materials.present?
                   materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
-                                               :notes => item[:notes], :material_category_id => item[:material_category_id] )
+                                               :list_price => item[:list_price], 
+                                               :notes => item[:notes], :material_category_id => item[:material_category_id],
+                                               :unit_id => item[:unit_master_id])
             end 
 			    end
 			  
@@ -542,8 +547,7 @@ class PurchaseOrderHistoriesController < ApplicationController
                    params[:purchase_order_history][:supplier_master_id], item[:material_id] ]).first 
 			  
 			    if item[:unit_master_id].present?
-			      #unit_price = purchase_unit_price.unit_price
-            unit_price = 0
+			      unit_price = 0
                 
             if purchase_unit_price.present? && purchase_unit_price.unit_price.present?
               unit_price = purchase_unit_price.unit_price
@@ -552,8 +556,7 @@ class PurchaseOrderHistoriesController < ApplicationController
             if item[:order_unit_price].present?
               unit_price = item[:order_unit_price].to_f
             end
-                #purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
-				  #                               unit_id: item[:unit_master_id]}
+          
             #upd210527 単価も更新
             purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:purchase_order_history][:supplier_master_id], 
 				                               unit_id: item[:unit_master_id], unit_price: unit_price}
@@ -578,10 +581,12 @@ class PurchaseOrderHistoriesController < ApplicationController
 				        #material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
                 #                      maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes] }
                   
-                #upd190226
+                #upd211222
+                #単位追加
                 material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
                                       maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes], 
-                                      material_category_id: item[:material_category_id] }
+                                      material_category_id: item[:material_category_id],
+                                      unit_id: item[:unit_master_id] }
                   
                 @material_master = MaterialMaster.create(material_master_params)
                 #生成された商品ＩＤをorderへセットする。
@@ -844,20 +849,26 @@ class PurchaseOrderHistoriesController < ApplicationController
   #商品名などを取得
   def material_select
   
-     @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
-	 @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
-	 @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
-     @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
-	 
-     #add190226
-     @material_category_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_category_id).flatten.join(" ")
+    @material_code = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_code).flatten.join(" ")
+    @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
+    @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
+    @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
+
+    @material_category_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_category_id).flatten.join(" ")
      
-	 @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+    #add211222
+    #単位はまず商品マスターから取得する(ここは見積・注文時のみ更新)、なければ仕入単価Mより取得
+    @unit_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:unit_id).flatten.join(" ")
+
+    if @unit_id.blank?  #ここは基本的に起こり得ない
+      @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                  params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
-	 #add170914 該当なければひとまず”個”にする
-	 if @unit_id.blank?
-	   @unit_id = "3"
-	 end
+    end
+    
+    #いずれも該当なければひとまず”個”にする
+    if @unit_id.blank?
+      @unit_id = "3"
+    end
      
      #supplier_master_id
      @order_unit_price = PurchaseUnitPrice.where(:material_id => params[:id], :supplier_id => params[:supplier_master_id]).

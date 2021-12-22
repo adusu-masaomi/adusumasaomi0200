@@ -39,7 +39,6 @@
   <%= f.input :quotation_unit_price_3,  label: "見積単価３", label_html:{style: 'color:purple'}, input_html:{ id: "quotation_unit_price_3",  style: 'width:100px;color:purple' , 
        class: "quotation_unit_price_3", :type=>"text", :tabindex=>"14", :onkeyup => "checkQuotationUnitPriceAll(this,3,event)"  } %>
   
-  
   </br>
   <!--upd170720マスター類はあらかじめセットされた変数から取得-->
   <!--<%= f.collection_select :material_id, @material_masters.all, :id, :p_material_code_name, {:selected => f.object.material_id || 1} , 
@@ -49,7 +48,6 @@
   {class: "searchableSelect1_1 form-control" , id: "material_id" ,  style: 'width:650px' } %>
   
   <%= f.label :数量, {style: 'width:28px'}  %>
-  <!--<%= f.text_field :quantity, size:10, name:"quantity[]", :tabindex=>"2"  %>-->
   <%= f.text_field :quantity, id: "quantity" ,  size:10,  :tabindex=>"2" , :onkeydown => "checkBytesQuantity(event, this)"  %>
   <td>&nbsp;&nbsp;</td>
   <!--<%= f.collection_select :unit_master_id, @unit_masters.all, :id, :unit_name, {:selected => f.object.unit_master_id || 3} , 
@@ -274,13 +272,7 @@
   
   //見積単価から金額を算出
   function checkQuotationUnitPriceAll(t, Flag,e){
-     
-	 //del180411
-	 //if (e.keyCode == 13 || e.keyCode == 9) {
-	 //} else {
-     //  return false;
-	 //}
-	 
+   
 	 var unit_price;
 	 var num = 0;
 	 
@@ -308,22 +300,27 @@
 		break;
     }
 	
-	for (var index = 0; index < unit_price.length  ; index ++)
+	  for (var index = 0; index < unit_price.length  ; index ++)
     {
 	  
-	  //add180120
-	  //全角入力→半角にする
-	  unit_price[index].value =  toHalfWidth(unit_price[index].value);
+	    //全角入力→半角にする
+	    unit_price[index].value =  toHalfWidth(unit_price[index].value);
 	  
-	  if (unit_price[index].value > 0 && quantity[index].value > 0){
+	    if (unit_price[index].value > 0 && quantity[index].value > 0){
 	    
-		price[index].value = parseInt(unit_price[index].value * quantity[index].value);
+		    price[index].value = parseInt(unit_price[index].value * quantity[index].value);
 		
-		//落札のチェックも行う
-		checkQuotationPriceAll(t,num);
+		    //落札のチェックも行う
+        //moved&del 211127
+		    //checkQuotationPriceAll(t,num);
+	    }
 	  }
-	}
-     
+    
+    //落札のチェックも行う
+    //moved 211127(処理落ちしていた)
+    checkQuotationPriceAll(t,num);
+	  
+    
   }
  
   //落札のチェックを行う。
@@ -456,21 +453,19 @@
   //見積もり価格をチェック＆落札チェック
   function checkQuotationPriceAll(t,Flag){
      
-	 
-	 //合計をセット
-	 //setTotalQuotation(Flag);
+	   //合計をセット
+	   setTotalQuotation(Flag);
      
-	 //落札をチェック
-	 checkBidAll();
+	   //落札をチェック
+     checkBidAll();
      
-	 //合計をセット
-   //add210621
-   for (let i = 1; i <= 3; i++) {
-     //setTotalQuotation(Flag);
-     setTotalQuotation(i);
-   }
-     //add180412
+	   //合計をセット
+     for (let i = 1; i <= 3; i++) {
+       setTotalQuotation(i);
+     }
+     
      //注文前に仕入先を判定しセットする
+     //(ここは処理落ちで影響してない,ok  211127)
      setSupplier(t);
 	 
   }

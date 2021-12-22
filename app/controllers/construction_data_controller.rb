@@ -667,8 +667,12 @@ class ConstructionDataController < ApplicationController
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
         #更新する
-        construction_data_params = { billed_flag: params[:billed_flag] }
-        construction_data.update(construction_data_params)
+        #construction_data_params = { billed_flag: params[:billed_flag] }
+        #construction_data.update(construction_data_params)
+        
+        #upd211005 validateしない
+        construction_data.billed_flag = params[:billed_flag]
+        construction_data.save(:validate => false)
     end
   end
   #受注フラグのON/OFF
@@ -676,8 +680,12 @@ class ConstructionDataController < ApplicationController
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
         #更新する
-        construction_data_params = { order_flag: params[:order_flag] }
-        construction_data.update(construction_data_params)
+        #construction_data_params = { order_flag: params[:order_flag] }
+        #construction_data.update(construction_data_params)
+        
+        #upd211005 validateしない
+        construction_data.order_flag = params[:order_flag]
+        construction_data.save(:validate => false)
     end
   end
   #集計フラグのON/OFF(add200130)
@@ -685,8 +693,12 @@ class ConstructionDataController < ApplicationController
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
         #更新する
-        construction_data_params = { calculated_flag: params[:calculated_flag] }
-        construction_data.update(construction_data_params)
+        #construction_data_params = { calculated_flag: params[:calculated_flag] }
+        #construction_data.update(construction_data_params)
+        
+        #upd211005 validateしない
+        construction_data.calculated_flag = params[:calculated_flag]
+        construction_data.save(:validate => false)
     end
   end
   

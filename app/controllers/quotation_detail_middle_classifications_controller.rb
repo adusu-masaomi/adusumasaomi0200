@@ -534,6 +534,11 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
     if @status != "fixed"
       @quotation_detail_middle_classification.working_middle_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
     
+      #add210916
+      @quotation_detail_middle_classification.line_number += 1
+      line_insert  #行番号をインクリメントする
+      #
+    
       new_record = @quotation_detail_middle_classification.dup
       status = new_record.save
     
@@ -548,11 +553,11 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
         notice = 'Quotation detail middle classification was unfortunately failed...'
       end
         
-        #redirect_to :action => "index", :notice => notice,  :quotation_header_id => params[:quotation_header_id], 
-        #    :quotation_header_name => params[:quotation_header_name],  
-        #    :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id],
-        #    :working_large_item_name => params[:working_large_item_name], 
-        #    :working_large_specification => params[:working_large_specification]
+      #redirect_to :action => "index", :notice => notice,  :quotation_header_id => params[:quotation_header_id], 
+      #    :quotation_header_name => params[:quotation_header_name],  
+      #    :quotation_detail_large_classification_id => params[:quotation_detail_large_classification_id],
+      #    :working_large_item_name => params[:working_large_item_name], 
+      #    :working_large_specification => params[:working_large_specification]
     end
   end
   
@@ -1146,60 +1151,64 @@ class QuotationDetailMiddleClassificationsController < ApplicationController
 	  @action_flag = params[:action]
 	end
 
-    #以降のレコードの行番号を全てインクリメントする
-    def line_insert
-      QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ? and line_number >= ? and id != ?", @quotation_detail_middle_classification.quotation_header_id, @quotation_detail_middle_classification.quotation_detail_large_classification_id, @quotation_detail_middle_classification.line_number, @quotation_detail_middle_classification.id]).update_all("line_number = line_number + 1")
+  #以降のレコードの行番号を全てインクリメントする
+  def line_insert
+    QuotationDetailMiddleClassification.where(["quotation_header_id = ? and quotation_detail_large_classification_id = ? and line_number >= ? and id != ?",
+      @quotation_detail_middle_classification.quotation_header_id, 
+      @quotation_detail_middle_classification.quotation_detail_large_classification_id, 
+      @quotation_detail_middle_classification.line_number, 
+      @quotation_detail_middle_classification.id]).update_all("line_number = line_number + 1")
        
-      #最終行番号も取得しておく
-      @max_line_number = QuotationDetailMiddleClassification.
-        where(["quotation_header_id = ? and quotation_detail_large_classification_id = ? and line_number >= ? and id != ?", @quotation_detail_middle_classification.quotation_header_id, 
-        @quotation_detail_middle_classification.quotation_detail_large_classification_id, @quotation_detail_middle_classification.line_number, 
-        @quotation_detail_middle_classification.id]).maximum(:line_number)
-    end 
+    #最終行番号も取得しておく
+    @max_line_number = QuotationDetailMiddleClassification.
+       where(["quotation_header_id = ? and quotation_detail_large_classification_id = ? and line_number >= ? and id != ?", @quotation_detail_middle_classification.quotation_header_id, 
+       @quotation_detail_middle_classification.quotation_detail_large_classification_id, @quotation_detail_middle_classification.line_number, 
+       @quotation_detail_middle_classification.id]).maximum(:line_number)
+  end 
 
-    #見積品目データへ合計保存用　
-    def save_price_to_large_classifications
-        @quotation_detail_large_classification = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", 
-                @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
-
-     if @quotation_detail_large_classification.present?
-
-        #
-        #数量が１より大きい場合の対応
-        tmp_quote_total_price = quote_total_price
-        tmp_execution_total_price = execution_total_price
-        
-        if @quotation_detail_large_classification.quantity > 1
-          @quotation_detail_large_classification.working_unit_price = quote_total_price
-          @quotation_detail_large_classification.execution_unit_price = execution_total_price
-          
-          
-          #金額は数量*単価でかける
-          tmp_quote_total_price = quote_total_price.to_i * @quotation_detail_large_classification.quantity
-          tmp_execution_total_price = execution_total_price.to_i * @quotation_detail_large_classification.quantity
-        end 
-        #
-
-        #見積金額
-        #@quotation_detail_large_classification.quote_price = quote_total_price
-        @quotation_detail_large_classification.quote_price = tmp_quote_total_price
-        
-        #実行金額
-        #@quotation_detail_large_classification.execution_price = execution_total_price
-        @quotation_detail_large_classification.execution_price = tmp_execution_total_price
-        
-        #歩掛り
-        @quotation_detail_large_classification.labor_productivity_unit = labor_total
-		#歩掛計
-        @quotation_detail_large_classification.labor_productivity_unit_total = labor_all_total
-
-        @quotation_detail_large_classification.save
+  #見積品目データへ合計保存用　
+  def save_price_to_large_classifications
     
-        #見出データへも合計保存
-        save_price_to_headers
-     end
+    @quotation_detail_large_classification = QuotationDetailLargeClassification.where(["quotation_header_id = ? and id = ?", 
+    @quotation_detail_middle_classification.quotation_header_id,@quotation_detail_middle_classification.quotation_detail_large_classification_id]).first
 
+    if @quotation_detail_large_classification.present?
+
+      #
+      #数量が１より大きい場合の対応
+      tmp_quote_total_price = quote_total_price
+      tmp_execution_total_price = execution_total_price
+        
+      if @quotation_detail_large_classification.quantity > 1
+        @quotation_detail_large_classification.working_unit_price = quote_total_price
+        @quotation_detail_large_classification.execution_unit_price = execution_total_price
+          
+        #金額は数量*単価でかける
+        tmp_quote_total_price = quote_total_price.to_i * @quotation_detail_large_classification.quantity
+        tmp_execution_total_price = execution_total_price.to_i * @quotation_detail_large_classification.quantity
+      end 
+      #
+
+      #見積金額
+      #@quotation_detail_large_classification.quote_price = quote_total_price
+      @quotation_detail_large_classification.quote_price = tmp_quote_total_price
+        
+      #実行金額
+      #@quotation_detail_large_classification.execution_price = execution_total_price
+      @quotation_detail_large_classification.execution_price = tmp_execution_total_price
+        
+      #歩掛り
+      @quotation_detail_large_classification.labor_productivity_unit = labor_total
+		  #歩掛計
+      @quotation_detail_large_classification.labor_productivity_unit_total = labor_all_total
+
+      @quotation_detail_large_classification.save
+    
+      #見出データへも合計保存
+      save_price_to_headers
     end
+
+  end
 
     #見出データへ合計保存用
     def save_price_to_headers

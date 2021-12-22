@@ -18,7 +18,7 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     #ransack保持用コード
     @null_flag = ""
     
-	if params[:delivery_slip_header_id].present?
+    if params[:delivery_slip_header_id].present?
       @delivery_slip_header_id = params[:delivery_slip_header_id]
     end
 	
@@ -31,13 +31,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     if @null_flag == "" 
       query = params[:q]
       query ||= eval(cookies[:recent_search_history].to_s)  	
-      
-	end
+    end
 	
-	#ransack保持用
+	  #ransack保持用
     @q = DeliverySlipDetailLargeClassification.ransack(query)
     
-	if @null_flag == ""
+    if @null_flag == ""
       #ransack保持用コード
       search_history = {
        value: params[:q],
@@ -45,42 +44,42 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
       }
       cookies[:recent_search_history] = search_history if params[:q].present?
     end 
-	#
+    #
 
     @delivery_slip_detail_large_classifications = @q.result(distinct: true)
     
-	#ビューでのソート処理追加
-	if (params[:q].present? && params[:q][:s].present?) || $sort_dl != nil
+    #ビューでのソート処理追加
+    if (params[:q].present? && params[:q][:s].present?) || $sort_dl != nil
 	    
-		#order順のパラメータ(asc/desc)がなぜか１パターンしか入らないので、カラム強制にセットする。
-	    column_name = "line_number"
+      #order順のパラメータ(asc/desc)がなぜか１パターンしか入らないので、カラム強制にセットする。
+      column_name = "line_number"
 	    
-		if $not_sort_dl != true
-		#ここでにソートを切り替える。（パラメータで入ればベストだが）
-		#（モーダル編集、行ソートでこの処理をしないようにしている）
+      if $not_sort_dl != true
+      #ここでにソートを切り替える。（パラメータで入ればベストだが）
+      #（モーダル編集、行ソートでこの処理をしないようにしている）
 		
-		  if params[:q].present? 
-            if $sort_dl.nil?
-	           $sort_dl = "desc"
+        if params[:q].present? 
+          if $sort_dl.nil?
+	          $sort_dl = "desc"
 	        end   
  
-		    if $sort_dl != "asc"
-		      $sort_dl = "asc"
-		    else
-		      $sort_dl = "desc"
-		    end
+          if $sort_dl != "asc"
+            $sort_dl = "asc"
+          else
+            $sort_dl = "desc"
+          end
 	      end
-		else
-		  $not_sort_dl = false
-		end
+      else
+        $not_sort_dl = false
+      end
 		
-		#並び替えする（降順/昇順）
-		if $sort_dl == "asc"
+      #並び替えする（降順/昇順）
+      if $sort_dl == "asc"
 	      @delivery_slip_detail_large_classifications = @delivery_slip_detail_large_classifications.order(column_name + " asc")
-		elsif $sort_dl == "desc"
-	      @delivery_slip_detail_large_classifications = @delivery_slip_detail_large_classifications.order(column_name + " desc")
-		end
-	end
+      elsif $sort_dl == "desc"
+        @delivery_slip_detail_large_classifications = @delivery_slip_detail_large_classifications.order(column_name + " desc")
+      end
+    end
 	
     #
     #内訳データ見出用
@@ -89,19 +88,17 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     end
     #
 	
+    @print_type = params[:print_type]
     
-	@print_type = params[:print_type]
-    
-	if  params[:format] == "pdf" then
+    if params[:format] == "pdf" then
          
-	
-	  #見積書PDF発行
+      #見積書PDF発行
       respond_to do |format|
         format.html # index.html.erb
-	    #format.any do
+	      #format.any do
         format.pdf do
             
-            $print_type = @print_type
+          $print_type = @print_type
 			
 	        case @print_type
             when "1"
@@ -113,66 +110,66 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
             when "3"
             #納品書（印付）
               report = DeliverySlipPDF.create @delivery_slip_detail_large_classifications
-            end 
+          end 
 	         
-            #現在時刻をセットする
-            require "date"
-            d = DateTime.now
-            now_date_time = d.strftime("%Y%m%d%H%M%S")
+          #現在時刻をセットする
+          require "date"
+          d = DateTime.now
+          now_date_time = d.strftime("%Y%m%d%H%M%S")
 		  
 		    # ブラウザでPDFを表示する
             # disposition: "inline" によりダウンロードではなく表示させている
             send_data report.generate,
-		      filename:    "納品書-" + now_date_time + ".pdf",
+		        filename:    "納品書-" + now_date_time + ".pdf",
               type:        "application/pdf",
               disposition: "inline"
        
-		#	format.html { render :action => "index"}
-	    end
-      end
-    #
-	
-	else
+		    #	format.html { render :action => "index"}
+	      end  #format.pdf do
+      end    #respond_to do |format|
+      #
+    else
 
-	  #請求書・見積書のデータ削除＆コピー処理を行う。
-	  @data_type = params[:data_type]
-	  case @data_type
+      #請求書・見積書のデータ削除＆コピー処理を行う。
+      @data_type = params[:data_type]
+  
+      case @data_type
         when "1"
-		  #請求書データ削除
-		  delete_invoice
-		  #請求書データ作成
-		  create_invoice
-		when "2"
+		      #請求書データ削除
+		      delete_invoice
+		      #請求書データ作成
+		      create_invoice
+		    when "2"
           #見積書データ削除
-		  delete_quotation
-		  #見積書データ作成
-		  create_quotation
+		      delete_quotation
+		      #見積書データ作成
+		      create_quotation
         when "3"
-        #add180423
-        #明細へデータ移行
+          #add180423
+          #明細へデータ移行
           move_large_to_middle
-	  end
+	    end
 	  
-	  if @success_flag == true
-	    flash[:notice] = "データ作成が完了しました。"
-	  end
-	end
+	    if @success_flag == true
+	      flash[:notice] = "データ作成が完了しました。"
+	    end
+    end
 
   end
   
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
   def reorder
     
-	$not_sort_dl = true               
+    $not_sort_dl = true               
 	
-	if $sort_dl != "asc"              
-	  row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
-	else                              
-	  row = params[:row].split(",")   
-	end
-	  
+    if $sort_dl != "asc"              
+      row = params[:row].split(",").reverse    #ビューの並びが逆のため、パラメータの配列を逆順でセットさせる。
+    else                              
+	    row = params[:row].split(",")   
+    end
+    
     #行番号へセットするため、配列は１から開始させる。
-	row.each_with_index {|row, i| DeliverySlipDetailLargeClassification.update(row, {:line_number => i + 1})}
+    row.each_with_index {|row, i| DeliverySlipDetailLargeClassification.update(row, {:line_number => i + 1})}
     render :text => "OK"
 
     #小計を全て再計算する
@@ -198,25 +195,25 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     #確定済みのものは、変更できないようにする
     delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
     if delivery_slip_header.present?
-        if delivery_slip_header.fixed_flag == 1
-            @status = "fixed"
-        else
-            @status = "not_fixed"
-        end
+      if delivery_slip_header.fixed_flag == 1
+        @status = "fixed"
+      else
+        @status = "not_fixed"
+      end
     end
     #
 	
-	###
+	  ###
     #初期値をセット(見出画面からの遷移時のみ)
     @@new_flag = params[:new_flag]
     if @@new_flag == "1"
-       @delivery_slip_detail_large_classification.delivery_slip_header_id ||= @delivery_slip_header_id
+      @delivery_slip_detail_large_classification.delivery_slip_header_id ||= @delivery_slip_header_id
     end 
     
-	#行番号を取得する
-	get_line_number
+    #行番号を取得する
+    get_line_number
 	
-	#カテゴリー保持フラグを取得
+    #カテゴリー保持フラグを取得
     get_category_save_flag
     get_category_id
   end
@@ -226,7 +223,6 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     #カテゴリー保持フラグを取得
     get_category_save_flag
     
-    #add180817
     #確定済みのものは、変更できないようにする
     if params[:delivery_slip_header_id].present?
       delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
@@ -239,22 +235,16 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
       end
     end
     #
-        
   end
 
   # POST /delivery_slip_detail_large_classifications
   # POST /delivery_slip_detail_large_classifications.json
   def create
-  
-  
     
     #作業明細マスターの更新
-	#add170822
-    update_working_middle_item
-  
+	  update_working_middle_item
     
     @delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.create(delivery_slip_detail_large_classification_params)
-    
     
     #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
@@ -277,20 +267,20 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 
     #手入力用IDの場合は、単位マスタへも登録する。
     if @delivery_slip_detail_large_classification.working_unit_id == 1
-       #既に登録してないかチェック
-       @check_unit = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
-       if @check_unit.nil?
-          unit_params = { working_unit_name:  @delivery_slip_detail_large_classification.working_unit_name }
-          @working_unit = WorkingUnit.create(unit_params)
+      #既に登録してないかチェック
+      @check_unit = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
+      if @check_unit.nil?
+        unit_params = { working_unit_name:  @delivery_slip_detail_large_classification.working_unit_name }
+        @working_unit = WorkingUnit.create(unit_params)
 			
-		  #内訳マスター更用の単位インデックスを取得
-		  @working_units = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
-       else 
-		 @working_units = @check_unit
-	   end
+        #内訳マスター更用の単位インデックスを取得
+		    @working_units = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
+      else 
+		    @working_units = @check_unit
+	    end
     end
 
-	@delivery_slip_detail_large_classifications = DeliverySlipDetailLargeClassification.
+    @delivery_slip_detail_large_classifications = DeliverySlipDetailLargeClassification.
                    where(:delivery_slip_header_id => @delivery_slip_detail_large_classification.delivery_slip_header_id)
 	
   end
@@ -300,12 +290,12 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
   def update
     
     #作業明細マスターの更新
-	update_working_middle_item
+	  update_working_middle_item
   
     @delivery_slip_detail_large_classification.update(delivery_slip_detail_large_classification_params)
     
     
-	#歩掛りの集計を最新のもので書き換える。
+    #歩掛りの集計を最新のもので書き換える。
     update_labor_productivity_unit_summary
     #小計を再計算する
     recalc_subtotal
@@ -327,25 +317,24 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     #####
     #手入力用IDの場合は、単位マスタへも登録する。
     if @delivery_slip_detail_large_classification.working_unit_id == 1
-       #既に登録してないかチェック
-       @check_unit = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
-       if @check_unit.nil?
-          unit_params = { working_unit_name:  @delivery_slip_detail_large_classification.working_unit_name }
-          @working_unit = WorkingUnit.create(unit_params)
+      #既に登録してないかチェック
+      @check_unit = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
+      if @check_unit.nil?
+        unit_params = { working_unit_name:  @delivery_slip_detail_large_classification.working_unit_name }
+        @working_unit = WorkingUnit.create(unit_params)
 			
-		  #内訳マスター更用の単位インデックスを取得
-		  @working_units = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
-	   else
-		 @working_units = @check_unit
-	   end
+		    #内訳マスター更用の単位インデックスを取得
+		    @working_units = WorkingUnit.find_by(working_unit_name: @delivery_slip_detail_large_classification.working_unit_name)
+	    else
+		    @working_units = @check_unit
+	    end
     end
       
-      @delivery_slip_detail_large_classifications = DeliverySlipDetailLargeClassification.
-                   where(:delivery_slip_header_id => @delivery_slip_detail_large_classification.delivery_slip_header_id)
+    @delivery_slip_detail_large_classifications = DeliverySlipDetailLargeClassification.
+       where(:delivery_slip_header_id => @delivery_slip_detail_large_classification.delivery_slip_header_id)
       
   end
   
-  #add 180911
   #レコードをコピーする
   def copy
     
@@ -364,10 +353,14 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     
     if @status != "fixed"
       @delivery_slip_detail_large_classification.working_large_item_name += $STRING_COPY  #名前が被るとまずいので、文字を加えておく。
-      new_record = @delivery_slip_detail_large_classification.deep_clone include: :delivery_slip_detail_middle_classifications
       
-      #status = new_record.save
-      #upd190225
+      #add210916
+      #行番号をインクリメントする
+      @delivery_slip_detail_large_classification.line_number += 1
+      line_insert  
+      #
+      
+      new_record = @delivery_slip_detail_large_classification.deep_clone include: :delivery_slip_detail_middle_classifications
       status = new_record.save(validate: false)
      
       #respond_to do |format|
@@ -390,95 +383,92 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
   #作業明細マスターの更新
   def update_working_middle_item
   
-      if params[:delivery_slip_detail_large_classification][:working_large_item_id] == "1"
-         if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true"   
-		   @check_item = WorkingMiddleItem.find_by(working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
-		     working_middle_specification: params[:delivery_slip_detail_large_classification][:working_large_specification] )
-        else
-		#固有マスターより検索
-		   @check_item = WorkingSpecificMiddleItem.find_by(working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
-		     delivery_slip_header_id: params[:delivery_slip_detail_large_classification][:delivery_slip_header_id] )
-		end
-	  else
-	    #手入力以外の場合 
-		if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true" 
-		   @check_item = WorkingMiddleItem.find(params[:delivery_slip_detail_large_classification][:working_large_item_id])
-        else
-		#固有マスターより検索
-		  if params[:delivery_slip_detail_large_classification][:working_middle_specific_item_id].present?
-		    @check_item = WorkingSpecificMiddleItem.find(params[:delivery_slip_detail_large_classification][:working_middle_specific_item_id])
-		  end 
-		
-		end
-	  end
-		
-		 @working_unit_id_params = params[:delivery_slip_detail_large_classification][:working_unit_id]
+    if params[:delivery_slip_detail_large_classification][:working_large_item_id] == "1"
+      if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true"   
+        @check_item = WorkingMiddleItem.find_by(working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
+        working_middle_specification: params[:delivery_slip_detail_large_classification][:working_large_specification] )
+      else
+        #固有マスターより検索
+        @check_item = WorkingSpecificMiddleItem.find_by(working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
+        delivery_slip_header_id: params[:delivery_slip_detail_large_classification][:delivery_slip_header_id] )
+      end
+    else
+      #手入力以外の場合 
+      if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true" 
+         @check_item = WorkingMiddleItem.find(params[:delivery_slip_detail_large_classification][:working_large_item_id])
+      else
+      #固有マスターより検索
+        if params[:delivery_slip_detail_large_classification][:working_middle_specific_item_id].present?
+          @check_item = WorkingSpecificMiddleItem.find(params[:delivery_slip_detail_large_classification][:working_middle_specific_item_id])
+        end 
+      end
+    end
+
+    @working_unit_id_params = params[:delivery_slip_detail_large_classification][:working_unit_id]
 		 
-         if @working_units.present?
-           @working_unit_id_params = @working_units.id
-		 end 
+    if @working_units.present?
+      @working_unit_id_params = @working_units.id
+    end 
  
-          large_item_params = nil   
+    large_item_params = nil   
+      
+    #短縮名（手入力）
+    if params[:delivery_slip_detail_large_classification][:working_large_item_short_name_manual] != "<手入力>"
+      working_large_item_short_name_manual = params[:delivery_slip_detail_large_classification][:working_large_item_short_name_manual]
+    else
+      working_large_item_short_name_manual = ""
+    end
+    ##
 		  
-		  #短縮名（手入力）
-		  if params[:delivery_slip_detail_large_classification][:working_large_item_short_name_manual] != "<手入力>"
-		    working_large_item_short_name_manual = params[:delivery_slip_detail_large_classification][:working_large_item_short_name_manual]
-		  else
-		    working_large_item_short_name_manual = ""
-		  end
-		  ##
-		  
-		  # 全選択の場合
-		  if params[:delivery_slip_detail_large_classification][:check_update_all] == "true" 
-		      large_item_params = { working_middle_item_name:  params[:delivery_slip_detail_large_classification][:working_large_item_name], 
+    # 全選択の場合
+    if params[:delivery_slip_detail_large_classification][:check_update_all] == "true" 
+      large_item_params = { working_middle_item_name:  params[:delivery_slip_detail_large_classification][:working_large_item_name], 
                                     working_middle_item_short_name: working_large_item_short_name_manual, 
                                     working_middle_specification:  params[:delivery_slip_detail_large_classification][:working_large_specification] , 
                                     working_middle_item_category_id: params[:delivery_slip_detail_large_classification][:working_middle_item_category_id], 
                                     working_subcategory_id: params[:delivery_slip_detail_large_classification][:working_middle_item_subcategory_id], 
-									working_unit_id: @working_unit_id_params, 
+                                    working_unit_id: @working_unit_id_params, 
                                     working_unit_price: params[:delivery_slip_detail_large_classification][:working_unit_price] ,
                                     execution_unit_price: params[:delivery_slip_detail_large_classification][:execution_unit_price] ,
                                     labor_productivity_unit: params[:delivery_slip_detail_large_classification][:labor_productivity_unit] ,
                                     labor_productivity_unit_total: params[:delivery_slip_detail_large_classification][:labor_productivity_unit_total] 
                                   }
-          else
-		     # アイテムのみ更新の場合
-			 #short_name抹消(無駄に１が入るため)
+    else
+       # アイテムのみ更新の場合
+       #short_name抹消(無駄に１が入るため)
 			 
-		     if params[:delivery_slip_detail_large_classification][:check_update_item] == "true" 
-		         large_item_params = { working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
+       if params[:delivery_slip_detail_large_classification][:check_update_item] == "true" 
+             large_item_params = { working_middle_item_name: params[:delivery_slip_detail_large_classification][:working_large_item_name] , 
                  working_middle_item_short_name: working_large_item_short_name_manual, 
                  working_middle_item_category_id: params[:delivery_slip_detail_large_classification][:working_middle_item_category_id], 
                  working_subcategory_id: params[:delivery_slip_detail_large_classification][:working_middle_item_subcategory_id], 
-				 working_middle_specification: params[:delivery_slip_detail_large_classification][:working_large_specification] ,
+                 working_middle_specification: params[:delivery_slip_detail_large_classification][:working_large_specification] ,
                  working_unit_id: @working_unit_id_params } 
-		   
-		     end
-		   
-          end
+       end
+    end
 
-          if large_item_params.present?
-		     if @check_item.nil?
-			   if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true"   
-		         @check_item = WorkingMiddleItem.create(large_item_params)
+    if large_item_params.present?
+      if @check_item.nil?
+        if params[:delivery_slip_detail_large_classification][:master_insert_flag] == "true"   
+          @check_item = WorkingMiddleItem.create(large_item_params)
 		     
-			     #手入力の場合のパラメータを書き換える。
-			     params[:delivery_slip_detail_large_classification][:working_large_item_id] = @check_item.id
-			     params[:delivery_slip_detail_large_classification][:working_large_item_short_name] = @check_item.id
-			   else
-			   #固有マスターへ登録
-			     #ヘッダIDを連想配列へ追加
-				 large_item_params.store(:delivery_slip_header_id, params[:delivery_slip_detail_large_classification][:delivery_slip_header_id])
+          #手入力の場合のパラメータを書き換える。
+          params[:delivery_slip_detail_large_classification][:working_large_item_id] = @check_item.id
+          params[:delivery_slip_detail_large_classification][:working_large_item_short_name] = @check_item.id
+        else
+          #固有マスターへ登録
+          #ヘッダIDを連想配列へ追加
+          large_item_params.store(:delivery_slip_header_id, params[:delivery_slip_detail_large_classification][:delivery_slip_header_id])
 				 
-			     @check_item = WorkingSpecificMiddleItem.create(large_item_params)
-		         #手入力の場合のパラメータを書き換える。
-			     params[:delivery_slip_detail_large_classification][:working_specific_middle_item_id] = @check_item.id
+          @check_item = WorkingSpecificMiddleItem.create(large_item_params)
+          #手入力の場合のパラメータを書き換える。
+          params[:delivery_slip_detail_large_classification][:working_specific_middle_item_id] = @check_item.id
 			   
-			   end
-			 else
-			   @check_item.update(large_item_params)
-		     end
-		  end
+        end
+      else
+        @check_item.update(large_item_params)
+      end
+    end
   end
 
    # DELETE /delivery_slip_detail_large_classifications/1
@@ -520,48 +510,45 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 
   #請求金額トータル
   def delivery_slip_total_price
-     @execution_total_price = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", @delivery_slip_detail_large_classification.delivery_slip_header_id]).sumpriceDeliverySlip
+    @execution_total_price = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", @delivery_slip_detail_large_classification.delivery_slip_header_id]).sumpriceDeliverySlip
   end 
   #実行金額トータル
   def execution_total_price
-     @execution_total_price = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", @delivery_slip_detail_large_classification.delivery_slip_header_id]).sumpriceExecution
+    @execution_total_price = DeliverySlipDetailLargeClassification.where(["delivery_slip_header_id = ?", @delivery_slip_detail_large_classification.delivery_slip_header_id]).sumpriceExecution
   end
 
   def subtotal_select
   #小計を取得、セットする
-     @search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:delivery_slip_header_id])
-     if @search_records.present?
+    @search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:delivery_slip_header_id])
+    if @search_records.present?
+      start_line_number = 0
+      end_line_number = 0
+      current_line_number = params[:line_number].to_i
         
-        
-        start_line_number = 0
-        end_line_number = 0
-        
-        current_line_number = params[:line_number].to_i
-        
-		@search_records.order(:line_number).each do |idlc|
-           if idlc.construction_type.to_i != $INDEX_SUBTOTAL &&
-              idlc.construction_type.to_i != $INDEX_DISCOUNT  
-			  #小計,値引き以外なら開始行をセット
-             if start_line_number == 0
-                start_line_number = idlc.line_number
-		     end
-		   else 
-		     if idlc.line_number < current_line_number
-		       start_line_number = 0   #開始行を初期化
-			 end
-           end
-		   
-		   if idlc.line_number < current_line_number   #更新の場合もあるので現在の行はカウントしない。
-		     end_line_number = idlc.line_number  #終了行をセット
-           end
+      @search_records.order(:line_number).each do |idlc|
+        if idlc.construction_type.to_i != $INDEX_SUBTOTAL &&
+           idlc.construction_type.to_i != $INDEX_DISCOUNT  
+			    #小計,値引き以外なら開始行をセット
+          if start_line_number == 0
+            start_line_number = idlc.line_number
+		      end
+        else 
+		      if idlc.line_number < current_line_number
+		        start_line_number = 0   #開始行を初期化
+          end
         end
+		   
+        if idlc.line_number < current_line_number   #更新の場合もあるので現在の行はカウントしない。
+          end_line_number = idlc.line_number  #終了行をセット
+        end
+      end
         
-        #範囲内の計を集計
-        @delivery_slip_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:delivery_slip_price)
-        @execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
-        @labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+      #範囲内の計を集計
+      @delivery_slip_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:delivery_slip_price)
+      @execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+      @labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
         
-     end
+    end
   end 
   
   def recalc_subtotal_all
@@ -570,81 +557,79 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     execution_price_sum = 0
     labor_productivity_unit_total_sum  = 0
 	
-	@search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:ajax_delivery_slip_header_id])
+    @search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:ajax_delivery_slip_header_id])
     
-	if @search_records.present?
+    if @search_records.present?
       @search_records.order(:line_number).each do |dsdlc|
-	    if dsdlc.construction_type.to_i != $INDEX_SUBTOTAL
+	      if dsdlc.construction_type.to_i != $INDEX_SUBTOTAL
           if dsdlc.construction_type.to_i != $INDEX_DISCOUNT
             #小計・値引き以外？
             delivery_slip_price_sum += dsdlc.delivery_slip_price.to_i
-			execution_price_sum += dsdlc.execution_price.to_i
-			labor_productivity_unit_total_sum += dsdlc.labor_productivity_unit_total.to_f
-		  end
-		else
-		#小計？=>更新
-		    subtotal_params = {delivery_slip_price: delivery_slip_price_sum, execution_price: execution_price_sum, labor_productivity_unit_total: labor_productivity_unit_total_sum}
-		    dsdlc.update(subtotal_params)
-
-			
-			#カウンターを初期化
-		    delivery_slip_price_sum = 0
-            execution_price_sum = 0
-            labor_productivity_unit_total_sum  = 0
+            execution_price_sum += dsdlc.execution_price.to_i
+            labor_productivity_unit_total_sum += dsdlc.labor_productivity_unit_total.to_f
+          end
+        else
+          #小計？=>更新
+          subtotal_params = {delivery_slip_price: delivery_slip_price_sum, execution_price: execution_price_sum, labor_productivity_unit_total: labor_productivity_unit_total_sum}
+          dsdlc.update(subtotal_params)
+          #カウンターを初期化
+          delivery_slip_price_sum = 0
+          execution_price_sum = 0
+          labor_productivity_unit_total_sum  = 0
         end
-	  end
+	    end  #do end
     end
   end
   
   def recalc_subtotal
   #小計を再計算する
-     @search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:delivery_slip_detail_large_classification][:delivery_slip_header_id])
-     if @search_records.present?
-		start_line_number = 0
-        end_line_number = 0
-        current_line_number = params[:delivery_slip_detail_large_classification][:line_number].to_i
+    @search_records = DeliverySlipDetailLargeClassification.where("delivery_slip_header_id = ?", params[:delivery_slip_detail_large_classification][:delivery_slip_header_id])
+    if @search_records.present?
+      start_line_number = 0
+      end_line_number = 0
+      current_line_number = params[:delivery_slip_detail_large_classification][:line_number].to_i
         
-		subtotal_exist = false
-		id_saved = 0
-		@search_records.order(:line_number).each do |idlc|
-           if idlc.construction_type.to_i != $INDEX_SUBTOTAL &&
-              idlc.construction_type.to_i != $INDEX_DISCOUNT  
+      subtotal_exist = false
+      id_saved = 0
+       
+      @search_records.order(:line_number).each do |idlc|
+        if idlc.construction_type.to_i != $INDEX_SUBTOTAL &&
+             idlc.construction_type.to_i != $INDEX_DISCOUNT  
 			  
-			 #小計,値引き以外なら開始行をセット
-             if start_line_number == 0
-                start_line_number = idlc.line_number
-		     end
-		   else 
+          #小計,値引き以外なら開始行をセット
+          if start_line_number == 0
+            start_line_number = idlc.line_number
+		      end
+        else 
 		     
-			 if idlc.line_number < current_line_number
-		       start_line_number = 0   #開始行を初期化
-			 elsif idlc.line_number > current_line_number
-             #小計欄に来たら、処理を抜ける。
-			   subtotal_exist = true
-			   id_saved = idlc.id
-               
-			   break
-			 end
-           end
-		   
-		   if idlc.line_number >= current_line_number   
-		     end_line_number = idlc.line_number  #終了行をセット
-           end
+          if idlc.line_number < current_line_number
+		        start_line_number = 0   #開始行を初期化
+          elsif idlc.line_number > current_line_number
+            #小計欄に来たら、処理を抜ける。
+			      subtotal_exist = true
+			      id_saved = idlc.id
+            break
+          end
         end
-        #範囲内の計を集計
-		if subtotal_exist == true
-          subtotal_records = DeliverySlipDetailLargeClassification.find(id_saved)
+		   
+		    if idlc.line_number >= current_line_number   
+		      end_line_number = idlc.line_number  #終了行をセット
+        end
+       end
+       #範囲内の計を集計
+       if subtotal_exist == true
+         subtotal_records = DeliverySlipDetailLargeClassification.find(id_saved)
     
-	      if subtotal_records.present?
-		    delivery_slip_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:delivery_slip_price)
-            execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
-            labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
+	       if subtotal_records.present?
+		       delivery_slip_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:delivery_slip_price)
+           execution_price = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:execution_price)
+           labor_productivity_unit_total = @search_records.where("line_number >= ? and line_number <= ?", start_line_number, end_line_number).sum(:labor_productivity_unit_total)
 
-            subtotal_records.update_attributes!(:delivery_slip_price => delivery_slip_price, :execution_price => execution_price, 
+           subtotal_records.update_attributes!(:delivery_slip_price => delivery_slip_price, :execution_price => execution_price, 
                                                 :labor_productivity_unit_total => labor_productivity_unit_total)
 	      end
-		end
-     end
+      end
+    end
   end 
   
   #行を全て＋１加算する。 
@@ -860,14 +845,14 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
       @delivery_slip_detail_large_classification = DeliverySlipDetailLargeClassification.find(params[:id])
     end
     
-	def initialize_sort
-	  $not_sort_dl = true
+    def initialize_sort
+      $not_sort_dl = true
     end
 	
     #新規か編集かの判定フラグ
     def set_action_flag
-	  @action_flag = params[:action]
-	end
+      @action_flag = params[:action]
+    end
     
     #以降のレコードの行番号を全てインクリメントする
     def line_insert
@@ -881,73 +866,70 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
     
     #見出データへ合計保存用　
     def save_price_to_headers
-        @delivery_slip_header = DeliverySlipHeader.find(@delivery_slip_detail_large_classification.delivery_slip_header_id)
-        #請求金額
-        @delivery_slip_header.delivery_amount = delivery_slip_total_price
-        #実行金額
-        @delivery_slip_header.execution_amount = execution_total_price
-        @delivery_slip_header.save
+      @delivery_slip_header = DeliverySlipHeader.find(@delivery_slip_detail_large_classification.delivery_slip_header_id)
+      #請求金額
+      @delivery_slip_header.delivery_amount = delivery_slip_total_price
+      #実行金額
+      @delivery_slip_header.execution_amount = execution_total_price
+      @delivery_slip_header.save
     end
     
-	#見出しデータへ最終行番号保存用
-    def delivery_slip_headers_set_last_line_number
+  #見出しデータへ最終行番号保存用
+  def delivery_slip_headers_set_last_line_number
+    @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
+    check_flag = false
+    if @delivery_slip_headers.last_line_number.nil? 
+      check_flag = true
+    else
+      if (@delivery_slip_headers.last_line_number < @max_line_number) then
+        check_flag = true
+      end
+    end
+    if (check_flag == true)
+      delivery_slip_header_params = { last_line_number:  @max_line_number}
+      if @delivery_slip_headers.present?
+        @delivery_slip_headers.attributes = delivery_slip_header_params
+           @delivery_slip_headers.save(:validate => false)
+      end 
+    end 
+  end
+  
+  #行番号を取得し、インクリメントする。（新規用）
+  def get_line_number
+    @line_number = 1
+    
+    if $sort_dl != "asc"   
+      if @delivery_slip_detail_large_classification.delivery_slip_header_id.present?
         @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
-        check_flag = false
-	    if @delivery_slip_headers.last_line_number.nil? 
-          check_flag = true
-        else
-	      if (@delivery_slip_headers.last_line_number < @max_line_number) then
-           check_flag = true
-		  end
-	    end
-	    if (check_flag == true)
-	       delivery_slip_header_params = { last_line_number:  @max_line_number}
-		   if @delivery_slip_headers.present?
-		      
-			 @delivery_slip_headers.attributes = delivery_slip_header_params
-             @delivery_slip_headers.save(:validate => false)
-			 
-		   end 
-        end 
-    end
-    #行番号を取得し、インクリメントする。（新規用）
-    def get_line_number
-      @line_number = 1
-	  
-	  if $sort_dl != "asc"   
-        if @delivery_slip_detail_large_classification.delivery_slip_header_id.present?
-           @delivery_slip_headers = DeliverySlipHeader.find_by(id: @delivery_slip_detail_large_classification.delivery_slip_header_id)
-           if @delivery_slip_headers.present?
-              if @delivery_slip_headers.last_line_number.present?
-                 @line_number = @delivery_slip_headers.last_line_number + 1
-              end
-           end
+        if @delivery_slip_headers.present?
+          if @delivery_slip_headers.last_line_number.present?
+            @line_number = @delivery_slip_headers.last_line_number + 1
+          end
         end
-	  else
-	  #昇順ソートしている場合は、行を最終ではなく先頭にする。
-	    #登録済みレコードの行を全て事前に加算する
-		status = increment_line_number
+      end
+    else
+      #昇順ソートしている場合は、行を最終ではなく先頭にする。
+      #登録済みレコードの行を全て事前に加算する
+      status = increment_line_number
 		
-		#インクリメント失敗していたら、行は０にする。
-		if status == false
-		  @line_number = 0
-		end
-	  end
-	  
-	  @delivery_slip_detail_large_classification.line_number = @line_number
+      #インクリメント失敗していたら、行は０にする。
+      if status == false
+        @line_number = 0
+      end
     end
     
-    #ストロングパラメータ
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def delivery_slip_detail_large_classification_params
+    @delivery_slip_detail_large_classification.line_number = @line_number
+  end
+    
+  #ストロングパラメータ
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def delivery_slip_detail_large_classification_params
       params.require(:delivery_slip_detail_large_classification).permit(:delivery_slip_header_id, :delivery_slip_items_division_id, :working_large_item_id, :working_specific_middle_item_id,
                      :working_large_item_name, :working_large_item_short_name, :working_middle_item_category_id, :working_middle_item_category_id_call, 
                      :working_middle_item_subcategory_id, :working_middle_item_subcategory_id_call, :working_large_specification, :line_number, :quantity, :execution_quantity, :working_unit_id, :working_unit_name, :working_unit_price, :delivery_slip_price, :execution_unit_price, :execution_price, :labor_productivity_unit, :labor_productivity_unit_total, 
                      :last_line_number, :remarks, :construction_type, :piping_wiring_flag, :equipment_mounting_flag, :labor_cost_flag )
-    end
-	
-	
-	
+  end
+
 	
   ########  請求書関連データ操作
   def delete_invoice
@@ -1095,22 +1077,22 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 ########  見積書関連データ操作
 
   def delete_quotation
-  #既存の見積書データを全て削除する
+    #既存の見積書データを全て削除する
     if params[:delivery_slip_code].present?
-	  @quotation_header = QuotationHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
+      @quotation_header = QuotationHeader.find_by(delivery_slip_code: params[:delivery_slip_code])
     
-	  if @quotation_header.present?
-	    quotation_header_id = @quotation_header.id
-		
-		#明細データ抹消
-	    QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
+      if @quotation_header.present?
+        quotation_header_id = @quotation_header.id
+        #明細データ抹消
+        QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
         #内訳データ抹消
-	    QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id).destroy_all
-	    #見出データ抹消
-	    QuotationHeader.where(id: quotation_header_id).destroy_all
-	  end
-	end
+        QuotationDetailLargeClassification.where(quotation_header_id: quotation_header_id).destroy_all
+        #見出データ抹消
+        QuotationHeader.where(id: quotation_header_id).destroy_all
+      end
+    end
   end
+  
   def create_quotation
   #納品書データを見積書データへ丸ごとコピー（もっと単純な方法ない？）
 	  @success_flag = true

@@ -336,18 +336,23 @@ class QuotationMaterialHeadersController < ApplicationController
 	  @material_name = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_name).flatten.join(" ")
 	  @list_price = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:list_price).flatten.join(" ")
     @maker_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:maker_id).flatten.join(" ")
-	 
-	  @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
-                 params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
 	  
-    #該当なければひとまず”個”にする
+    #add211222
+    #単位はまず商品マスターから取得する(ここは見積・注文時のみ更新)、なければ仕入単価Mより取得
+    @unit_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:unit_id).flatten.join(" ")
+    
+    if @unit_id.blank?  #ここは基本的に起こり得ない
+ 	    @unit_id = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
+                 params[:supplier_master_id], params[:id] ]).pluck(:unit_id).flatten.join(" ")
+	  end
+    
+    #どちらも該当なければひとまず”個”にする
 	  if @unit_id.blank?
 	    @unit_id = "3"
 	  end
      
     @notes = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:notes).flatten.join(" ")
   
-    #add200129
     @material_category_id = MaterialMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:material_category_id).flatten.join(" ")
     
   end
@@ -634,31 +639,37 @@ class QuotationMaterialHeadersController < ApplicationController
                  (item[:maker_id] != @material_master.maker_id)  || 
                  (item[:list_price] != @material_master.list_price)  ||
                  (item[:notes] != @material_master.notes) ||
-                 (item[:material_category_id] != @material_master.material_category_id)
+                 (item[:material_category_id] != @material_master.material_category_id) || 
+                 (item[:unit_master_id] != @material_master.unit_id )
 			    #↑フィールド追加時注意！
               #マスター情報変更した場合は、商品マスターへ反映させる。
                 
 			    materials = MaterialMaster.where(:id => @material_master.id).first
 			    if materials.present?
-                  #add200129 分類追加
-                  #品名・メーカーID・定価・備考・分類を更新
-                  materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
+                #品名・メーカーID・定価・備考・分類を更新
+                #upd211222 単位も追加
+                materials.update_attributes!(:material_name => item[:material_name], :maker_id => item[:maker_id], 
                                                :list_price => item[:list_price], :notes => item[:notes], 
-                                               :material_category_id => item[:material_category_id])
+                                               :material_category_id => item[:material_category_id], 
+                                               :unit_id => item[:unit_master_id])
           end
  
 			  end
 			  
 			  
-			  #仕入単価マスターの単位も更新する
+			  #仕入単価マスターも更新する
 			  if params[:quotation_material_header][:supplier_master_id] != "1"   #手入力仕入先以外
 			    purchase_unit_price = PurchaseUnitPrice.where(["supplier_id = ? and material_id = ?", 
                    params[:quotation_material_header][:supplier_master_id], item[:material_id] ]).first
 			  
 			     if item[:unit_master_id].present?
-			       purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:quotation_material_header][:supplier_master_id], 
-			                                     unit_id: item[:unit_master_id]}
-				     if purchase_unit_price.present?
+			       #purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:quotation_material_header][:supplier_master_id], 
+			       #                              unit_id: item[:unit_master_id]}
+             #upd211222
+             #単位は更新しない
+             purchase_unit_price_params = {material_id: item[:material_id], supplier_id: params[:quotation_material_header][:supplier_master_id]}
+             
+             if purchase_unit_price.present?
 			         purchase_unit_price.update(purchase_unit_price_params)
 				     else
 				     #新規登録も考慮する。
@@ -679,10 +690,12 @@ class QuotationMaterialHeadersController < ApplicationController
 			      #商品マスターへセット(商品コード存在しない場合)
 			      if @material_master.nil?
             
-              #add200129 分類追加
+              #upd212122
+              #単位追加
 				      material_master_params = {material_code: item[:material_code], material_name: item[:material_name], 
-                                        maker_id: item[:maker_id], list_price: item[:list_price], :notes => item[:notes],
-                                        :material_category_id => item[:material_category_id] }
+                                        maker_id: item[:maker_id], list_price: item[:list_price], notes: item[:notes],
+                                        material_category_id: item[:material_category_id],
+                                        unit_id: item[:unit_master_id] }
                                         
 			        @material_master = MaterialMaster.create(material_master_params)
 			      end
@@ -827,8 +840,6 @@ class QuotationMaterialHeadersController < ApplicationController
       set_order_mail_flag_for_comparison
 	  end
    
-    #binding.pry
-
     if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2" 
       if $seq_exists > 0
       #昇順(編集時)になっている場合は、明細パラメータを本来の降順にしておく。
