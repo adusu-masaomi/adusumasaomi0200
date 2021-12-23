@@ -146,6 +146,10 @@
                                    :class => 'btn btn-lime500_rsd keep-disp'  %>-->
 	   <%= link_to t('.back', :default => t("注文一覧へ")), purchase_order_data_path(purchase_order_id: params[:purchase_order_id], 
                     construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-info'  %>
+       
+       <!-- 最安値ボタン追加 add211223 -->
+       <%= f.button "最安値", type: 'submit', name: "subaction", value: "bestprice", class: 'btn btn-red300_rsd'%>
+       
        <!--<%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default'%>-->
        <td><font size="3">合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></font></td>
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

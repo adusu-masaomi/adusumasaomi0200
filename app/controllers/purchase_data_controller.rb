@@ -48,136 +48,131 @@ class PurchaseDataController < ApplicationController
   @@count = 0
   
   def index
-        
-        #ransack保持用コード
-        query = params[:q]
+    
+    #ransack保持用コード
+    query = params[:q]
 
-        #クッキーへのget/putはヘルパーに設定
-        cky = get_cookies("recent_search_history_purchase")
-        query ||= eval(cky.to_s)   
+    #クッキーへのget/putはヘルパーに設定
+    cky = get_cookies("recent_search_history_purchase")
+    query ||= eval(cky.to_s)   
         
         
-        #
-        #クッキーをクリアさせる場合の処理
-        if @@clear == true
-          query = eval(cky.to_s) 
-          @@count += 1
+    #
+    #クッキーをクリアさせる場合の処理
+    if @@clear == true
+      query = eval(cky.to_s) 
+      @@count += 1
           
-          if @@count == 1    #centos(本番)用
-          #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
-            @@clear = false
-            @@count = 0
-          end
-        end
-        #
+      if @@count == 1    #centos(本番)用
+      #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
+        @@clear = false
+        @@count = 0
+      end
+    end
+    #
         
-        @purchase_order_data_extract = PurchaseOrderDatum.all  
-        @construction_code_extract = ConstructionDatum.all     
+    @purchase_order_data_extract = PurchaseOrderDatum.all  
+    @construction_code_extract = ConstructionDatum.all     
         
-        #注文番号の絞り込み（登録済みのものだけにする） 
-        if query.present? && query[:with_construction].present?
-          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: query[:with_construction])
+    #注文番号の絞り込み（登録済みのものだけにする） 
+    if query.present? && query[:with_construction].present?
+      @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: query[:with_construction])
           
-          #add210319
-          #仕入業者の絞り込み
-          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+      #add210319
+      #仕入業者の絞り込み
+      @supplier_master_extract = SupplierMaster.joins(:purchase_data).
                           where('purchase_data.construction_datum_id = ?', query[:with_construction]).distinct
-        end
+    end
         
-        #件名の絞り込み addd180830
-        if query.present? && query[:with_customer].present?
-          @construction_code_extract = ConstructionDatum.where(customer_id: query[:with_customer]).order("construction_code desc")
-        end
-        ##upd end
+    #件名の絞り込み addd180830
+    if query.present? && query[:with_customer].present?
+      @construction_code_extract = ConstructionDatum.where(customer_id: query[:with_customer]).order("construction_code desc")
+    end
+    ##upd end
         
-        #binding.pry
-        
-        case params[:move_flag]
-		when "1"
-          #工事一覧画面から遷移した場合
+    case params[:move_flag]
+    when "1"
+      #工事一覧画面から遷移した場合
           
-          construction_id = params[:construction_id]
-		  query = {"with_construction"=> construction_id }
-		  
-		  #注文番号のパラメータが存在した場合にセットする
-		  if params[:purchase_order_id].present?
-		    purchase_order_id = params[:purchase_order_id]
-            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
-          end
+      construction_id = params[:construction_id]
+      query = {"with_construction"=> construction_id }
+
+      #注文番号のパラメータが存在した場合にセットする
+      if params[:purchase_order_id].present?
+        purchase_order_id = params[:purchase_order_id]
+        query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
+      end
          
-		  #仕入業者のパラメータが存在した場合にセットする
-		  if params[:supplier_master_id].present?
-		    supplier_master_id = params[:supplier_master_id]
-            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
+      #仕入業者のパラメータが存在した場合にセットする
+      if params[:supplier_master_id].present?
+        supplier_master_id = params[:supplier_master_id]
+        query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
                      "supplier_id_eq"=> supplier_master_id}
-          end
-		  
-          #検索用クッキーへも保存
-          params[:q] = query
+      end
+      
+      #検索用クッキーへも保存
+      params[:q] = query
           
-          #注文番号の絞り込み（登録済みのものだけにする） upd180403
-          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
+      #注文番号の絞り込み（登録済みのものだけにする） upd180403
+      @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
         
-          #add210319
-          #仕入業者の絞り込み
-          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
-                          where('purchase_data.construction_datum_id = ?', params[:construction_id]).distinct
+      #add210319
+      #仕入業者の絞り込み
+      @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+                      where('purchase_data.construction_datum_id = ?', params[:construction_id]).distinct
           
+    when "2"
           
-        when "2"
-          
-		  #注文一覧画面から遷移した場合
-		  if params[:construction_id].present?
-		  #工事→注文→仕入→注文の場合の分岐
-		    params[:move_flag] = "1"
-		  end
+      #注文一覧画面から遷移した場合
+      if params[:construction_id].present?
+      #工事→注文→仕入→注文の場合の分岐
+        params[:move_flag] = "1"
+      end
 		  
-		  purchase_order_id = params[:purchase_order_id]
-          #工事番号のパラメータが存在した場合にセットする
-		  query = {"purchase_order_datum_id_eq"=> purchase_order_id }
-		  if params[:construction_id].present?
-		    construction_id = params[:construction_id]
-            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
-          end
-		  #仕入業者のパラメータが存在した場合にセットする
-		  if params[:supplier_master_id].present?
-		    supplier_master_id = params[:supplier_master_id]
-            query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
+      purchase_order_id = params[:purchase_order_id]
+      #工事番号のパラメータが存在した場合にセットする
+      query = {"purchase_order_datum_id_eq"=> purchase_order_id }
+      if params[:construction_id].present?
+        construction_id = params[:construction_id]
+        query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id}
+      end
+      #仕入業者のパラメータが存在した場合にセットする
+      if params[:supplier_master_id].present?
+        supplier_master_id = params[:supplier_master_id]
+        query = {"with_construction"=> construction_id , "purchase_order_datum_id_eq"=> purchase_order_id,
                      "supplier_id_eq"=> supplier_master_id}
-          end
+      end
           
-          #add181001
-          #検索用クッキーへも保存
-          params[:q] = query
+      #add181001
+      #検索用クッキーへも保存
+      params[:q] = query
           
-          #注文番号の絞り込み（登録済みのものだけにする） upd180403
-          @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
+      #注文番号の絞り込み（登録済みのものだけにする） upd180403
+      @purchase_order_data_extract = PurchaseOrderDatum.where(construction_datum_id: params[:construction_id])
           
-          #add210319
-          #仕入業者の絞り込み
-          @supplier_master_extract = SupplierMaster.joins(:purchase_data).
+      #add210319
+      #仕入業者の絞り込み
+      @supplier_master_extract = SupplierMaster.joins(:purchase_data).
                           where('purchase_data.construction_datum_id = ?', params[:construction_id]).distinct
-		end
+    end
 		
-        #@q = PurchaseDatum.ransack(params[:q]) 
-        #ransack保持用--上記はこれに置き換える
-		@q = PurchaseDatum.ransack(query)
-		
-        #ransack保持用コード
-        search_history = {
-        value: params[:q],
-        expires: 4.hours.from_now
-        }
-        #upd180403
-        #クッキーは仕入専用とする（工事画面に影響してしまうので）
+    #@q = PurchaseDatum.ransack(params[:q]) 
+    #ransack保持用--上記はこれに置き換える
+    @q = PurchaseDatum.ransack(query)
+
+    #ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 4.hours.from_now
+    }
+    #upd180403
+    #クッキーは仕入専用とする（工事画面に影響してしまうので）
         
-        #cookies[:recent_search_history_purchase] = search_history if params[:q].present?
-        if params[:q].present?
+    #cookies[:recent_search_history_purchase] = search_history if params[:q].present?
+    if params[:q].present?
           set_cookies("recent_search_history_purchase", search_history)
-                   
-          
-        end
-        #
+    end
+    #
         
 
 	@purchase_data = @q.result(distinct: true)
@@ -191,14 +186,44 @@ class PurchaseDataController < ApplicationController
     end
     ###
     
-    #add210319
+    single_record = false
+    
+    #単価の最安値で検索する場合
+    if params[:subaction].present? &&
+       params[:subaction] == "bestprice"
+      
+      search_day = false
+      if params[:q].present? &&
+         (params[:q][:purchase_date_gteq].present? ||
+         params[:q][:purchase_date_lteq].present?)
+        search_day = true
+      end
+      
+      #直近１年間にする(仕入日が入力されてない場合)
+      if !search_day
+        to    = Time.current.at_beginning_of_day
+        from  = (to - 1.year)
+        @purchase_data = @purchase_data.where(created_at: from...to)
+      end
+      #
+      @purchase_data = @purchase_data.where(purchase_unit_price: @purchase_data.minimum(:purchase_unit_price)).order(created_at: :desc)
+      
+      single_record = true
+    end
+    ##
+    
     if @supplier_master_extract.blank?
       @supplier_master_extract = SupplierMaster.all
     end
     
 	#kaminari用設定。
-	@purchase_data = @purchase_data.page(params[:page])
-	
+    if !single_record
+      @purchase_data = @purchase_data.page(params[:page])
+	else
+      #最安値の場合。一件だけ表示
+      @purchase_data = @purchase_data.page(params[:page]).limit(1)
+    end
+    
 	@maker_masters = MakerMaster.all
 	@purchase_divisions = PurchaseDivision.all
 	@supplier_masters = SupplierMaster.all
