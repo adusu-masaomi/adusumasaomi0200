@@ -3,8 +3,9 @@ class SupplierMaster < ActiveRecord::Base
 
 	belongs_to :PurchaseDatum  #--> necessary??
   has_many :purchase_unit_prices	
-  #add210319
   has_many :purchase_data, :foreign_key => "supplier_id"
+  #add220108
+  has_many :purchase_order_data
   
   #add210629
   has_many :supplier_responsibles, dependent: :destroy

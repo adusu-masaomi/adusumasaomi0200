@@ -6,17 +6,20 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	has_many :orders
     accepts_nested_attributes_for :orders, allow_destroy: true
     
-    #add210518
     #納品場所
     def self.delivery_place 
       [["現場", 0], ["事務所", 1], ["引取", 2]] 
     end
     
+    #add220108
+    #画面遷移用
+    #attr_accessor :construction_id
+    #attr_accessor :move_flag
+    
 	#eメール取得用
     attr_accessor :email_responsible
 	
     #担当者
-    #add170907
     attr_accessor :responsible
     
 	#ボタン切り分け用
@@ -36,7 +39,6 @@ class PurchaseOrderHistory < ActiveRecord::Base
 	attr_accessor :material_id_select_hide
 	#資材コード(ajax明細用)
 	attr_accessor :material_code_hide
-    #add190226
     attr_accessor :material_code_select_hide
 	#資材名(ajax明細用)
 	attr_accessor :material_name_hide
@@ -47,7 +49,6 @@ class PurchaseOrderHistory < ActiveRecord::Base
     attr_accessor :unit_id_hide
 	#定価(ajax明細用)
     attr_accessor :list_price_hide
-    #add190226
     #分類(ajax明細用)
     attr_accessor :material_category_id_hide
     

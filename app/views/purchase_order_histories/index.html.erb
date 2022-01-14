@@ -1,5 +1,6 @@
 <script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
 <!--カスタマイズ版を使用-->
+<!--※※※※※2022年現在、このindexは使用していない。※※※※※-->
 <%- model_class = PurchaseOrderDatum -%>
 <% provide(:title, model_class.model_name.human.pluralize.titleize) %>
 <div class="page-header", style="width:1920px">
@@ -78,8 +79,9 @@
 		
 		<td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
         <td>
+          <!--upd220108 historyからhistoriesへ変更-->
           <%= link_to t('.edit', :default => t("作成")),
-                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_history, :id => purchase_order_datum.id), :class => 'btn btn-info btn-xs' %>
+                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_histories, :id => purchase_order_datum.id), :class => 'btn btn-info btn-xs' %>
           
 		  <%= link_to "一覧",
             purchase_order_histories_list_path(purchase_order_datum_id: purchase_order_datum.id, purchase_order_code: @purchase_order_code, 
@@ -87,7 +89,7 @@
             :class => 'btn btn-xs btn-warning' %>
 		  
 		  <!--<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
-                      purchase_order_history_path(purchase_order_datum.purchase_order_history),
+                      purchase_order_history_path(purchase_order_datum.purchase_order_histories),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
                       :class => 'btn btn-xs btn-danger' %>-->

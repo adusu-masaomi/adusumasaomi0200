@@ -49,6 +49,8 @@ class PurchaseDataController < ApplicationController
   
   def index
     
+    #binding.pry
+    
     #ransack保持用コード
     query = params[:q]
 
@@ -261,7 +263,14 @@ class PurchaseDataController < ApplicationController
       end
     end
     #####
-	
+
+    #add220114
+    #一括変換した場合の処理
+    if params[:commit] == "更新"
+      all_convert_delivery_slip(params)
+    end
+    #
+    
 	respond_to do |format|
 	  
 	  format.html
@@ -308,7 +317,72 @@ class PurchaseDataController < ApplicationController
       
   end
   
-
+  
+  #伝票一括変更処理
+  def all_convert_delivery_slip(params)
+    
+    if @purchase_data.present?
+      if params[:old_slip_code].present?  #伝票番号で絞り込んでない場合は変換しない
+        @purchase_data.find_each do |purchase_datum|
+          
+          update_flag = false
+          
+          #伝票番号の変更
+          if params[:new_slip_code].present? && params[:new_slip_code][:value].present?
+            purchase_datum.slip_code = params[:new_slip_code][:value]
+            update_flag = true
+          end
+          
+          #仕入日の変更
+          if params[:new_purchase_date].present? && 
+             params[:new_purchase_date]["new_date(1i)"].present? && 
+             params[:new_purchase_date]["new_date(2i)"].present? &&
+             params[:new_purchase_date]["new_date(3i)"].present?
+             
+             new_date = Date.new(params[:new_purchase_date]["new_date(1i)"].to_i,
+                                 params[:new_purchase_date]["new_date(2i)"].to_i,
+                                 params[:new_purchase_date]["new_date(3i)"].to_i)
+                                 
+             purchase_datum.purchase_date = new_date
+             
+             update_flag = true
+          end
+          
+          #注文Noの変更
+          if params[:new_purchase_order_datum_id].present? && 
+             params[:new_purchase_order_datum_id][:value].present?
+             
+             new_purchase_order_datum_id = params[:new_purchase_order_datum_id][:value].to_i
+             #工事IDも変換させる
+             purchase_order_datum = PurchaseOrderDatum.find(new_purchase_order_datum_id)
+             new_construction_id = purchase_order_datum.construction_datum_id
+             
+             purchase_datum.purchase_order_datum_id = new_purchase_order_datum_id
+             purchase_datum.construction_datum_id = new_construction_id
+             
+             update_flag = true
+          end
+          #
+          
+          #備考の変更
+          if (params[:new_notes].present? && 
+             params[:new_notes][:value].present?) ||
+             (params[:new_notes_check].present? && 
+             params[:new_notes_check][:value] == "1")
+             
+             purchase_datum.notes = params[:new_notes][:value]
+             update_flag = true
+          end
+          #
+          
+          if update_flag
+            purchase_datum.save!(:validate => false)
+          end
+        end
+      end
+    end
+  end
+  
   # GET /purchase_data/1
   # GET /purchase_data/1.json
   def show

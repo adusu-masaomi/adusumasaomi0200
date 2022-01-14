@@ -88,7 +88,131 @@ class PurchaseOrderHistoriesController < ApplicationController
     @orders  = @orders.page(params[:page])
     
   end
-
+ 
+  def index3
+  #add220107
+  #注文明細用
+    
+    #binding.pry
+    
+    #ransack保持用コード
+    query = params[:q]
+    query ||= eval(cookies[:recent_search_history].to_s)  	
+    
+    #if construction_datum_id.present?
+    #他で使えそうなので消さないこと。(ネストモデルの呼び出し)
+    #  @orders = Order.joins({:purchase_order_history => :purchase_order_datum}).where("purchase_order_data.construction_datum_id = ?", 
+    #                               construction_datum_id)
+    #end
+    
+    construction_datum_id = params[:construction_id]
+    
+    case params[:move_flag] 
+      when "1"
+        #工事一覧画面から遷移した場合
+        #construction_datum_id = params[:construction_id]
+        #注文No,仕入先もセット
+        purchase_order_datum_id = params[:purchase_order_datum_id]
+        supplier_master_id = params[:supplier_master_id]
+        
+        #binding.pry
+        
+        if params[:q].present?
+          params[:q][:purchase_order_history_purchase_order_datum_construction_datum_id_eq] = construction_datum_id
+          query = params[:q]
+        else
+        #前画面からの初期値をセットする
+          query = {"purchase_order_history_purchase_order_datum_construction_datum_id_eq"=> construction_datum_id,
+                   "purchase_order_history_purchase_order_datum_id_eq" => purchase_order_datum_id, 
+                   "purchase_order_history_purchase_order_datum_supplier_master_id_eq" => supplier_master_id }
+        end
+      else
+        #明細画面で検索かけた場合
+        if construction_datum_id.nil?
+          if params[:q].present? && params[:q][:purchase_order_history_purchase_order_datum_construction_datum_id_eq].present?
+            construction_datum_id = params[:q][:purchase_order_history_purchase_order_datum_construction_datum_id_eq]
+            #画面遷移用にセット
+            params[:construction_id] = params[:q][:purchase_order_history_purchase_order_datum_construction_datum_id_eq]
+          end
+        end
+    end
+    
+    #ransack保持用コード
+    if query.nil?
+      query = params[:q]
+    end
+    
+    @q = Order.ransack(query)
+    
+    #ransack保持用コード
+    search_history = {
+    value: params[:q],
+    expires: 24.hours.from_now
+    }
+    cookies[:recent_search_history] = search_history if params[:q].present?
+    #
+    
+    #一覧ヘッダ表示用
+    @construction_name = ""
+    if construction_datum_id.present?
+      construction = ConstructionDatum.find(construction_datum_id)
+      if construction.present?
+        @construction_name = construction.construction_name
+      end
+    end
+    @purchase_order_code = params[:purchase_order_code]
+    @supplier_name = params[:supplier_name]
+	  #
+    
+    #検索用
+    @purchase_order_datum = PurchaseOrderDatum.where(construction_datum_id: construction_datum_id)
+    @supplier = SupplierMaster.joins(:purchase_order_data).where('purchase_order_data.construction_datum_id = ?', construction_datum_id)
+    #
+    
+    @orders  = @q.result(distinct: true)
+    @orders  = @orders.page(params[:page])
+    
+    #global set
+	  $orders = @orders
+    
+	  #PDF用
+    #工事コード、工事名、得意先名
+    if construction.present?
+      if params[:format].present? && params[:format] == "pdf"
+        $customer_name_for_detail_pdf = construction.CustomerMaster.customer_name
+        $construction_code_for_detail_pdf = construction.construction_code
+        $construction_name_for_detail_pdf = construction.construction_name
+      end 
+    end
+    #
+    
+    respond_to do |format|
+	    
+      format.html
+	    #pdf
+	    format.pdf do
+        report = OrderDetailListPDF.create @order_detail_list 
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data(
+          report.generate,
+          filename:  "order_detail_list.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
+      end
+      
+      #納品フラグ全チェック/解除処理
+      if params[:delivery].present?
+        all_check_delivery(params[:delivery])
+        format.js {render inline: "location.reload();" }
+      end
+      #
+    end
+    
+    
+    
+  end
+    
   # GET /purchase_order_histories/1
   # GET /purchase_order_histories/1.json
   def show
@@ -837,6 +961,20 @@ class PurchaseOrderHistoriesController < ApplicationController
     end
   end
   
+  #納品フラグ全チェック/解除処理
+  def all_check_delivery(params)
+    if @orders.present?
+      @orders.find_each do |order|
+        if params == "all_check"
+          order.delivery_complete_flag = 1
+          order.save
+        elsif params == "all_uncheck"
+          order.delivery_complete_flag = 0
+          order.save
+        end
+      end
+    end
+  end
  
   # ajax
   def email_select

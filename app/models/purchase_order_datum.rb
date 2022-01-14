@@ -13,11 +13,14 @@ class PurchaseOrderDatum < ActiveRecord::Base
 
     belongs_to :purchase_datum
     
-    has_many :purchase_order_history
+    #has_many :purchase_order_history
+    
 	  has_many :construction_costs, :foreign_key => "purchase_order_datum_id"
     has_many :orders
     accepts_nested_attributes_for :orders, :allow_destroy => true
-
+    
+    has_many :purchase_order_histories, through: :orders   #upd220108
+    
     #def self.header_numbers 
     #  [["B", 1], ["M", 2]] 
     #end

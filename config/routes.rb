@@ -244,6 +244,8 @@ Rails.application.routes.draw do
   get "/quotation_material_headerz/get_purchase_order_code" => 'quotation_material_headers#get_purchase_order_code'
   
   get '/purchase_order_histories_list' => "purchase_order_histories#index2"
+  #add220107
+  get '/purchase_order_histories_detail' => "purchase_order_histories#index3"
   
   #add170624
   #見積履歴一覧への遷移用
@@ -306,7 +308,11 @@ Rails.application.routes.draw do
   get '/construction_costz/purchase_amount_select' => 'construction_costs#purchase_amount_select'
 
   get '/construction_costz/set_caluculated_flag' => 'construction_costs#set_caluculated_flag'
-
+  
+  #add220108
+  get '/orderz/set_delivery_complete_flag' => 'orders#set_delivery_complete_flag'
+  #get '/orderz/set_all_delivery_complete_flag' => 'orders#set_all_delivery_complete_flag'
+  
   #add200917
   #見積書コード自動採番
   get "/quotation_headerz/set_quotation_code" => 'quotation_headers#set_quotation_code'

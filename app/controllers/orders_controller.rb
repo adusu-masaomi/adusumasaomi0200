@@ -59,11 +59,39 @@ class OrdersController < ApplicationController
   def destroy
     @order.destroy
     respond_to do |format|
-      format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
+      if params[:detail] == "1"
+        #注文明細画面から削除した場合
+        format.html {redirect_to purchase_order_histories_detail_path( :construction_id => params[:construction_id],
+                        :move_flag => params[:move_flag] , :q => params[:q]) }
+      
+      else
+        format.html { redirect_to orders_url, notice: 'Order was successfully destroyed.' }
+      
+      end
+      
+      
       format.json { head :no_content }
     end
   end
-
+  
+  def set_delivery_complete_flag
+    
+    delivery_complete_flag = params[:flag]
+    
+    #支払フラグをアップデートしておく
+    order = Order.find(params[:id])
+        
+    if order.present?     
+      order_params = {delivery_complete_flag: delivery_complete_flag.to_i}
+        
+      if order.present?
+        #ヴァリデーションしない
+        order.assign_attributes(order_params)
+        order.save!(:validate => false)
+      end
+    end
+  end
+  
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_order

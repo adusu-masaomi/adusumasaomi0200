@@ -37,13 +37,28 @@ class PurchaseOrderDataController < ApplicationController
         #工事一覧画面から遷移した場合
         construction_id = params[:construction_id]
         query = {"construction_datum_id_eq"=> construction_id }
-	   
+	    
+      else
+        #画面遷移用に工事ID、注文番号をセット
+        if query.present?  
+        if query[:id_eq].present?
+          params[:purchase_order_datum_id] = query[:id_eq]
+        end
+        if query[:construction_datum_id_eq].present?
+          params[:construction_id] = query[:construction_datum_id_eq]
+        end
+        if query[:supplier_master_id_eq].present?
+          params[:supplier_master_id] = query[:supplier_master_id_eq]
+        end
+      end
+      ##
+        
       #when "2"
         #   #注文一覧画面から遷移した場合
         #   purchase_order_id = params[:purchase_order_id]
         #   query = {"id_eq"=> purchase_order_id }
     end
-  
+    
     #@q = PurchaseOrderDatum.ransack(params[:q])   
     #ransack保持用--上記はこれに置き換える
      

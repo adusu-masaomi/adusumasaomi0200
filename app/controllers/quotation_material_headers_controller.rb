@@ -897,9 +897,11 @@ class QuotationMaterialHeadersController < ApplicationController
     #新規
       
       #ex. mail_sent_flagは現在使用してないので、1のセットは不要かもしれない...
+      #220111 納品場所追加
       purchase_order_history_params = { purchase_order_date: purchase_order_date, 
                                         supplier_master_id: params[:quotation_material_header][:supplier_master_id],
-                                        purchase_order_datum_id: @purchase_order_datum_id, mail_sent_flag: 1}
+                                        purchase_order_datum_id: @purchase_order_datum_id, mail_sent_flag: 1,
+                                        delivery_place_flag: params[:quotation_material_header][:delivery_place_flag]}
       
       @purchase_order_history = PurchaseOrderHistory.create(purchase_order_history_params)
       
@@ -919,13 +921,22 @@ class QuotationMaterialHeadersController < ApplicationController
     $tmp_detail_parameters.values.each_with_index.each do |item, index|
     
       #仕入先１〜３の判定
+      order_unit_price = 0
+      order_price = 0
+      
       case $supplier
       when 1
         @bid_flag = item[:bid_flag_1].to_i
+        order_unit_price = item[:quotation_unit_price_1].to_i
+        order_price = item[:quotation_price_1].to_i
 	    when 2
         @bid_flag = item[:bid_flag_2].to_i
+        order_unit_price = item[:quotation_unit_price_2].to_i
+        order_price = item[:quotation_price_2].to_i
 	    when 3
 	      @bid_flag = item[:bid_flag_3].to_i
+        order_unit_price = item[:quotation_unit_price_3].to_i
+        order_price = item[:quotation_price_3].to_i
 	    end
       
       #if item[:_destroy] != "1" && @bid_flag == 1 && @mail_sent_flag != "1"
@@ -944,10 +955,14 @@ class QuotationMaterialHeadersController < ApplicationController
         #quotation_flag = 1  #見積フラグ
         mail_sent_flag = 1  #送信済みにする
         sequential_id = index + 1
-      
+        
+        
+        #upd211226 単価・金額を更新するようにした。
+        
         order_params = {purchase_order_history_id: purchase_order_history_id, material_id: material_id,
                       material_code: material_code, material_name: material_name, maker_id: maker_id, 
                       maker_name: maker_name, quantity: quantity, unit_master_id: unit_master_id,
+                      order_unit_price: order_unit_price, order_price: order_price, 
                       list_price: list_price, mail_sent_flag: mail_sent_flag, 
                       sequential_id: sequential_id}
       

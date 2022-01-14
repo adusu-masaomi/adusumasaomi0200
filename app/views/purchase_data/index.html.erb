@@ -154,17 +154,71 @@
        <td><font size="3">合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></font></td>
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        <td><font size="2">合計数量(在庫確認用):<%= number_with_delimiter(@purchase_data.sumQuantity + @purchase_data.sumShipQuantity) %></font></td>
- 
+       
+       <!--伝票単位でまとめて更新させるための処理 add220114-->
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <button type="button" class="btn btn-xs btn-green100_rsd" data-toggle="modal" data-target="#convertModal">伝票一括更新</button>
      </div>
+     
+     
+     <!-- ボタン・リンククリック後に表示される画面の内容 -->
+<div class="modal" id="convertModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h4 class="modal-title">伝票一括更新</h4>
+        <!--<%= text_area :job_description, size: "5x10" %>-->
+        <%= label :old_slip_code_label, "現在伝票No:" %>
+        <%= text_field :old_slip_code, "伝票番号:", id: 'old_slip_code' , readonly: true, style: 'width:70px'  %>
+        
+      </div>
+
+      <div class="modal-body">
+        <p>新伝票番号</p>
+        <%= text_field :new_slip_code, "value", id: 'new_slip_code' , style: 'width:70px', tabindex: "1" %>
+        </br></br>
+        <p>新仕入日</p>
+        <%= date_select :new_purchase_date, "new_date" , id: 'new_date' , :include_blank => true, :default => nil %>
+        </br></br>
+        <p>新注文No</p>
+        <div style="margin:10px;">
+        <%= collection_select :new_purchase_order_datum_id, "value", PurchaseOrderDatum.all, :id, :purchase_order_code,
+            { include_blank: "" }, {style: 'width:100px;' , class: "new_purchase_order_datum_id" }%>
+        </div>
+        <p>新備考</p>
+        <%= text_field :new_notes, "value", id: 'new_notes' , style: 'width:300px', tabindex: "4"%>
+        </br></br>
+        
+        <%= check_box :new_notes_check, "value", id: 'new_notes_check' , tabindex: "5"%>
+        <%= label :new_notes_check_label, "備考を削除する(備考欄は空白にして下さい)" %>
+        </br></br>
+        
+        <%= submit_tag '更新', :class => "btn btn-primary", :onclick => "submitAfterValidation()" %>
+        <!--<button type="button" class="btn btn-primary" , id: 'modal_submit', onclick: "submitAfterValidation()">更新</button>-->
+        
+        <!--
+        <%= link_to t('.back', :default => t("helpers.links.back")),
+              purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd'  %>
+        -->
+        
+        <button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+     
+     
+     
    <% end %>
-   
    
     <!-- kaminari用追加箇所開始 -->
    <%= paginate @purchase_data %>
    <!-- kaminari用追加箇所終了 --> 
-   
+      
 </div>
- 
 
 <!--見出し固定用設定追加-->
 <div style="margin-top : -50px;", class="span11 table-scrollable" >
@@ -343,14 +397,13 @@
 </div>
  
 
-
 <script type="text/javascript">
   
   //var massageList = "指定無し";
   
   //検索可能なリストボックス
   $(document).ready(function(){
-	$(".searchablePurchaseCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchablePurchaseCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
 
         $(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST});
 
@@ -367,8 +420,9 @@
 
         $(".searchableSupplierName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST }); 
      
-     
-         
+        //モーダル用
+        $(".new_purchase_order_datum_id").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+      
      
      //見出し固定用設定追加
 	 var sz = window.parent.screen.width;
@@ -415,10 +469,54 @@
        }
           
      });
-
      
-     
+     //モーダルフォーム
+     $(function() {
+        var modal = $(".modal");
+        var body = $(window);
+        // Get modal size
+        var w = modal.width();
+        var h = modal.height();
+        // Get window size
+        var bw = body.width();
+        var bh = body.height();
+  
+        // Update the css and center the modal on screen
+        modal.css({
+        "position": "absolute",
+        "width": "100%",
+        "top": ((bh - h) / 2) + "px",
+        "left": ((bw - w) / 2) + "px"
+        })
+        
+      });
+      
+      //モーダル画面が開かれた場合
+      $('#convertModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var sampledata = button.data('sample');
+        var modal = $(this);
+        
+        //検索時の伝票番号をセット
+        var slip = document.getElementById("slip_code").value;
+        document.getElementById("old_slip_code").value = slip;
+      })
+  
   });
+  
+  function submitAfterValidation() {
+    
+    if (window.confirm('一括更新しますか？\n(事前に必ず伝票番号で検索していることを確認して下さい。)')) {
+      //ここでコントローラーのindexへ渡る
+      //モーダル画面を閉じる
+      $('#convertModal').modal('hide');
+    }else{
+      event.preventDefault();
+    }
+    
+    //document.forms[0].submit();  
+    
+  }
   
   //フォームロード時のイベント(再読込時も)
   window.onload = function(){
