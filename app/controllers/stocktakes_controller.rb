@@ -4,6 +4,7 @@ class StocktakesController < ApplicationController
   # GET /stocktakes
   # GET /stocktakes.json
   def index
+    
     #@stocktakes = Stocktake.all
    
     #ransack保持用コード
@@ -64,7 +65,9 @@ class StocktakesController < ApplicationController
       end
       #エアコン、配線器具などのサブタイトルをセットする
       if query["with_material_category_include"].present?
-        $stocktake_list_header_subtitle = Inventory.category[(query["with_material_category_include"].to_i)-1][0]
+        #$stocktake_list_header_subtitle = Inventory.category[(query["with_material_category_include"].to_i)-1][0]
+        inventory_category = InventoryCategory.find(query["with_material_category_include"].to_i)
+        $stocktake_list_header_subtitle = inventory_category.name
       end
     end
     
@@ -95,9 +98,9 @@ class StocktakesController < ApplicationController
     #最初にデータを一旦抹消させる。
     Stocktake.where(stocktake_date: params[:q][:stocktake_date_gteq]).destroy_all
     
-    #検索用のカテゴリーは１つずれているので、マイナスさせる
+    #検索用のカテゴリーは１つずれているので、マイナスさせる -> しない(220216)
     category = params[:q][:with_material_category_include].to_i 
-    category -= 1
+    #category -= 1
   
     Inventory.all.each do |iv|
       if  iv.material_master.inventory_category_id == category

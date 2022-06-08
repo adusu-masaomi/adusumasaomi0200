@@ -14,8 +14,8 @@
 
 	<%= f.label :material_name, '品名：' %>
     <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:330px', id: 'material_name'  %>
-	<%= f.label :inventory_category, 'カテゴリー：' %>
-    <%= f.select :with_material_category_include, Inventory.category.map{ |value, key| [value, key+1] }, {include_blank: true}, 
+    <%= f.label :inventory_category, 'カテゴリー：' %>
+    <%= f.select :with_material_category_include, InventoryCategory.all.map{|st| [st.name, st.id]}, {include_blank: true}, 
 	      {style: 'width:220px' , class: "searchableMaterialCode" } %></br>
 
 	<div>
@@ -82,6 +82,7 @@
       <th><%= model_class.human_attribute_name(:inventory_amount) %></th>
       <th><%= model_class.human_attribute_name(:current_unit_price) %></th>
       <th><%= model_class.human_attribute_name(:list_price) %></th>
+      <th style="width:80px;">分類</th>
       <th><%= model_class.human_attribute_name(:created_at) %></th>
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
     </tr>
@@ -124,6 +125,11 @@
         <%else%>
            <td>-</td>  
         <%end%>
+        <% if inventory.material_master.inventory_category.present? %>
+             <td style="font-size : 12px;"><%= inventory.material_master.inventory_category.name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
         <td><%=l inventory.created_at.in_time_zone('Tokyo') %></td>
         <td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

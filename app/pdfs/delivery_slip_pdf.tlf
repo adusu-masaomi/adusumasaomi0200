@@ -2317,7 +2317,71 @@
       "x": 409,
       "y": 360,
       "width": 172,
-      "height": 9.9,
+      "height": 12.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": true,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place_d1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 409,
+      "y": 354,
+      "width": 172,
+      "height": 9,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place_d2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 409,
+      "y": 366,
+      "width": 172,
+      "height": 9,
       "style": {
         "font-family": [
           "IPAMincho"

@@ -32,13 +32,11 @@
   <!--value~の部分は本来いらないが、入力後に日付を消したいために、あえてするVer-->
   <%= f.text_field :update_at_gteq, :value=> (f.object.update_at.strftime("%Y/%m/%d") if f.object.update_at), class:"input-append date datepicker", include_blank: true , size: "12", id: 'update_start'   %>
   
-  
-  <!--
+  <!--restore 220221-->
   <%= f.label :working_date, '作業日' %>
   <%= f.text_field :working_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'working_date_start'   %>
   <%= f.label :working_date, '〜' %>
   <%= f.text_field :working_date_lteq, class:"input-append date datepicker", include_blank: true ,  id: 'working_date_end'   %>
-  -->
   
   	<div>
         <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
@@ -105,7 +103,7 @@
       <th><%=t '.actions', :default => t("helpers.actions") %></th>
 	  <!--<th><%= '<No.>' %></th>-->
       <th><%= sort_link(@q, :construction_datum_construction_code, '<No.>') %></th>
-      
+      <th><%= '<工事名>' %></th>
     </tr>
   </thead>
   <tbody>
@@ -147,7 +145,9 @@
         </td>
         <% if construction_daily_report.construction_datum.present? %>
           <td><%= construction_daily_report.construction_datum.construction_code %></td>
+          <td><%= construction_daily_report.construction_datum.construction_name[0,10] %></td>
         <% else %>
+          <td>-</td>
           <td>-</td> 
         <% end %>
       </tr>

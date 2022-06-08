@@ -1,7 +1,7 @@
 class ConstructionDailyReportsController < ApplicationController
   before_action :set_construction_daily_report, only: [:show, :edit, :update, :destroy]
   
-  #V‹K“o˜^‚Ì‰æ–ÊˆøŒp—p
+  #æ–°è¦ç™»éŒ²ã®ç”»é¢å¼•ç¶™ç”¨
   @@construction_working_date = ""
   @@construction_datum_id = []
   @@new_flag = []
@@ -13,51 +13,51 @@ class ConstructionDailyReportsController < ApplicationController
   def index
     # @construction_daily_reports = ConstructionDailyReport.all
      
-	 #ƒOƒ‰ƒO‰æ–Ê‚Å•Û‚µ‚½H–ID‚ğŒ³‚É–ß‚·
+	 #ã‚°ãƒ©ã‚°ç”»é¢ã§ä¿æŒã—ãŸå·¥äº‹IDã‚’å…ƒã«æˆ»ã™
 	 if @@construction_id_for_report.present?
 	   params[:construction_id] = @@construction_id_for_report
 	   params[:move_flag] = "1"
 	   @@construction_id_for_report = nil
 	 end
 	 
-	 #ransack•Û—pƒR[ƒh
+	 #ransackä¿æŒç”¨ã‚³ãƒ¼ãƒ‰
      query = params[:q]
      query ||= eval(cookies[:recent_search_history].to_s)  	
 		
 	 
 	 if params[:move_flag] == "1"
-	   #H–ˆê——‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡
+	   #å·¥äº‹ä¸€è¦§ç”»é¢ã‹ã‚‰é·ç§»ã—ãŸå ´åˆ
 	   construction_id = params[:construction_id]
 	   query = {"construction_datum_id_eq"=> construction_id }
 	 end
 	 
      if query.present? && query["update_at_gteq"].present?
         #add191010
-        #XV“úŒŸõ‚ğ‚©‚¯‚éê‡A“ú•t‚ğ-1‚É‚·‚é(·‚ÌŠÖŒW?‚Å‚¤‚Ü‚­‚Å‚«‚È‚¢‚½‚ß)
+        #æ›´æ–°æ—¥æ¤œç´¢ã‚’ã‹ã‘ã‚‹å ´åˆã€æ—¥ä»˜ã‚’-1ã«ã™ã‚‹(æ™‚å·®ã®é–¢ä¿‚?ã§ã†ã¾ãã§ããªã„ãŸã‚)
         #dt = Date.parse(query["update_at_gteq"])
         dt = Time.parse(query["update_at_gteq"])
-        dt = dt - (60 * 60 * 9)  #ƒAƒƒŠƒJŠÔ‚Å‚XŠÔi‚ñ‚Å‚¢‚é‚Ì‚ÅAƒ}ƒCƒiƒX‚·‚é
+        dt = dt - (60 * 60 * 9)  #ã‚¢ãƒ¡ãƒªã‚«æ™‚é–“ã§ï¼™æ™‚é–“é€²ã‚“ã§ã„ã‚‹ã®ã§ã€ãƒã‚¤ãƒŠã‚¹ã™ã‚‹
         #dt -= 1  #NG
         query["update_at_gteq"] = dt.to_s
-        #ransack•Û—p
+        #ransackä¿æŒç”¨
         @q = ConstructionDailyReport.ransack(query)
         
-        #ã‹L‚Å“ú•t‚ğƒ}ƒCƒiƒX‚µ‚½‚½‚ßAÄŒŸõ—p‚É‚Ü‚½–ß‚·
+        #ä¸Šè¨˜ã§æ—¥ä»˜ã‚’ãƒã‚¤ãƒŠã‚¹ã—ãŸãŸã‚ã€å†æ¤œç´¢ç”¨ã«ã¾ãŸæˆ»ã™
         #dt += 1
         dt += (60 * 60 * 9)
         query["update_at_gteq"] = dt.to_s
      else
-        #ransack•Û—p
+        #ransackä¿æŒç”¨
         @q = ConstructionDailyReport.ransack(query)
      end
      #
      
 	 #@q = ConstructionDailyReport.ransack(params[:q])  
-     #ransack•Û—p--ã‹L‚Í‚±‚ê‚É’u‚«Š·‚¦‚é
+     #ransackä¿æŒç”¨--ä¸Šè¨˜ã¯ã“ã‚Œã«ç½®ãæ›ãˆã‚‹
 	 @q = ConstructionDailyReport.ransack(query)
      
      
-	 #ransack•Û—pƒR[ƒh
+	 #ransackä¿æŒç”¨ã‚³ãƒ¼ãƒ‰
      search_history = {
      value: params[:q],
      expires: 240.minutes.from_now
@@ -67,17 +67,17 @@ class ConstructionDailyReportsController < ApplicationController
 	 
 	 @construction_daily_reports = @q.result(distinct: true)
      
-	 #ƒOƒ‰ƒt—pƒf[ƒ^‚Æ‚µ‚Äˆê’U•Û
+	 #ã‚°ãƒ©ãƒ•ç”¨ãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦ä¸€æ—¦ä¿æŒ
 	 #@chart_data = @construction_daily_reports
 	 
 	 @construction_daily_reports = @construction_daily_reports.page(params[:page])
 	 
-	 #ƒOƒ‰ƒt—p
-	 # “ú‚²‚Æ‚Ì‡Œv’l
+	 #ã‚°ãƒ©ãƒ•ç”¨
+	 # æ—¥ã”ã¨ã®åˆè¨ˆå€¤
      #@chart_data = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('working_times / 3600')
   
    
-    # @users = User.all.order(sort_column + ' ' + sort_direction)@
+    # @users = User.all.order(sort_column + ' ' + sort_direction)ã€€
     
     @construction_data = ConstructionDatum.all
     @staff = Staff.all
@@ -97,25 +97,25 @@ class ConstructionDailyReportsController < ApplicationController
 	  format.pdf do
         case params[:pdf_flag] 
 		  when "1"
-          #˜J–±”ïWŒv•\
+          #åŠ´å‹™è²»é›†è¨ˆè¡¨
 		    if confirm_outsourcing == false
-            #cŒ^PDFiŠO’‚Ì‚¢‚È‚¢ê‡j
+            #ç¸¦å‹PDFï¼ˆå¤–æ³¨ã®ã„ãªã„å ´åˆï¼‰
 			  if exist_takano == false
                 report = LaborCostSummaryPDF.create @construction_daily_reports 
 			  else
 			    report = LaborCostSummaryMasaomiPDF.create @construction_daily_reports
 			  end
             else
-            #‰¡Œ^PDFiŠO’‚Ì‚¢‚éê‡j
+            #æ¨ªå‹PDFï¼ˆå¤–æ³¨ã®ã„ã‚‹å ´åˆï¼‰
               if exist_takano == false
                 report = LaborCostSummaryLandscapePDF.create @construction_daily_reports
               else
-              #ŠO’•‚–ì‚¢‚éê‡(‚½‚¾‚µA¬–öE{ŒËE‚–ì‚ÌƒyƒA‚Í‚È‚¢‚à‚Ì‚Æ‚·‚é)
+              #å¤–æ³¨ï¼†é«˜é‡ã„ã‚‹å ´åˆ(ãŸã ã—ã€å°æŸ³ãƒ»é ˆæˆ¸ãƒ»é«˜é‡ã®ãƒšã‚¢ã¯ãªã„ã‚‚ã®ã¨ã™ã‚‹)
                 report = LaborCostSummaryOutsourcingTakanoPDF.create @construction_daily_reports
               end
 		    end
 		  when "2"
-          #ì‹Æ“ú•ñ
+          #ä½œæ¥­æ—¥å ±
 		    report = DailyWorkReportPDF.create @daily_work_report
 		end
 		
@@ -125,11 +125,11 @@ class ConstructionDailyReportsController < ApplicationController
 		#  when "1"
         #    report = LaborCostSummaryPDF.create @construction_daily_reports 
         #  when "2"
-        #  #‰¡Œ^
+        #  #æ¨ªå‹
         #    report = LaborCostSummaryLandscapePDF.create @construction_daily_reports 
         #end
 		
-		# ƒuƒ‰ƒEƒU‚ÅPDF‚ğ•\¦‚·‚é
+		# ãƒ–ãƒ©ã‚¦ã‚¶ã§PDFã‚’è¡¨ç¤ºã™ã‚‹
         send_data(
           report.generate,
           filename:  "labor_cost_summary.pdf",
@@ -143,22 +143,22 @@ class ConstructionDailyReportsController < ApplicationController
   	
   end
   
-  #ƒOƒ‰ƒt•\¦—p
+  #ã‚°ãƒ©ãƒ•è¡¨ç¤ºç”¨
   def index2
     
 
-	 #ransack•Û—pƒR[ƒh
+	 #ransackä¿æŒç”¨ã‚³ãƒ¼ãƒ‰
      #query = params[:q]
      #query ||= eval(cookies[:recent_search_history].to_s)  	
 		
      
 	 if params[:move_flag] == "1"
-	   #H–ˆê——‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡
+	   #å·¥äº‹ä¸€è¦§ç”»é¢ã‹ã‚‰é·ç§»ã—ãŸå ´åˆ
 	   construction_id = params[:construction_id]
 	   #query = {"construction_datum_id_eq"=> construction_id }
 	   params[:q] = {"construction_datum_id_eq"=> construction_id }
 	 end
-	 #ƒƒCƒ“‚Ì‰æ–Ê‚©‚ç‚ÌŒŸõ—pH–ID‚ğ•Û
+	 #ãƒ¡ã‚¤ãƒ³ã®ç”»é¢ã‹ã‚‰ã®æ¤œç´¢ç”¨å·¥äº‹IDã‚’ä¿æŒ
 	 if params[:construction_id].present?
 	   @@construction_id_for_report = params[:construction_id]
 	 end
@@ -167,7 +167,7 @@ class ConstructionDailyReportsController < ApplicationController
 	 @q = ConstructionDailyReport.ransack(params[:q])   
 	 #@q = ConstructionDailyReport.ransack(query)
      
-	 #ransack•Û—pƒR[ƒh
+	 #ransackä¿æŒç”¨ã‚³ãƒ¼ãƒ‰
      #search_history = {
      #value: params[:q],
      #expires: 24.hours.from_now
@@ -177,13 +177,13 @@ class ConstructionDailyReportsController < ApplicationController
 	 
 	 @construction_daily_reports = @q.result(distinct: true)
      
-	 #ƒOƒ‰ƒt—pƒf[ƒ^‚Æ‚µ‚Äˆê’U•Û
+	 #ã‚°ãƒ©ãƒ•ç”¨ãƒ‡ãƒ¼ã‚¿ã¨ã—ã¦ä¸€æ—¦ä¿æŒ
 	 @chart_data = @construction_daily_reports
 	 
 	 @construction_daily_reports = @construction_daily_reports.page(params[:page])
 	 
-	 #ƒOƒ‰ƒt—p
-	 # “ú‚²‚Æ‚Ì‡Œv’l
+	 #ã‚°ãƒ©ãƒ•ç”¨
+	 # æ—¥ã”ã¨ã®åˆè¨ˆå€¤
      @chart_data_times = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('working_times / 3600')
 	 @chart_data_costs = @construction_daily_reports.joins(:construction_datum).order('construction_datum_id ASC').group(:construction_name).sum('labor_cost')
   
@@ -194,7 +194,7 @@ class ConstructionDailyReportsController < ApplicationController
   end
   
   
-  #‚–ìi‰‰‡Hj‚ª‚¢‚éê‡‚Ìƒ`ƒFƒN
+  #é«˜é‡ï¼ˆå¿œæ´ï¼Ÿï¼‰ãŒã„ã‚‹å ´åˆã®ãƒã‚§ã‚¯
   def exist_takano
     takano = @construction_daily_reports.where('staff_id= ?', '4')
     
@@ -208,8 +208,8 @@ class ConstructionDailyReportsController < ApplicationController
   
   
   def confirm_outsourcing
-  #ŠO’‚³‚ñ‚ªì‹Æ‚ÉŠÖ‚í‚Á‚Ä‚¢‚é‚©‚Ç‚¤‚©‚Ìƒ`ƒFƒbƒN(PDF—p)
-  #(ĞˆõID‚ª5‚Ü‚½‚Í6‚Ìê‡B)
+  #å¤–æ³¨ã•ã‚“ãŒä½œæ¥­ã«é–¢ã‚ã£ã¦ã„ã‚‹ã‹ã©ã†ã‹ã®ãƒã‚§ãƒƒã‚¯(PDFç”¨)
+  #(ç¤¾å“¡IDãŒ5ã¾ãŸã¯6ã®å ´åˆã€‚)
     #outsourcing = @construction_daily_reports.where('staff_id= ? OR staff_id= ?', '5', '6')
     check_outsourcing_5 = @construction_daily_reports.where('staff_id= ?', '5')
     if check_outsourcing_5.present?
@@ -234,7 +234,7 @@ class ConstructionDailyReportsController < ApplicationController
   # GET /construction_daily_reports/1.json
   def show
     @staff_pay = Staff.none
-    #V‹K“o˜^‚Ì‰æ–ÊˆøŒp—p
+    #æ–°è¦ç™»éŒ²ã®ç”»é¢å¼•ç¶™ç”¨
 	#binding.pry
     @@construction_working_date = @construction_daily_report.working_date
     @@construction_datum_id = @construction_daily_report.construction_datum_id
@@ -249,7 +249,7 @@ class ConstructionDailyReportsController < ApplicationController
 	@construction_daily_report.build_construction_datum
 	@construction_datum = ConstructionDatum.new
 	
-	#‰Šú’l‚ğƒZƒbƒg(show‰æ–Ê‚©‚ç‚Ì‘JˆÚ‚Ì‚İ)
+	#åˆæœŸå€¤ã‚’ã‚»ãƒƒãƒˆ(showç”»é¢ã‹ã‚‰ã®é·ç§»æ™‚ã®ã¿)
 	@@new_flag = params[:new_flag]
 	if @@new_flag == "1"
       @construction_daily_report.working_date = @@construction_working_date
@@ -257,7 +257,7 @@ class ConstructionDailyReportsController < ApplicationController
       @construction_daily_report.working_details = @@working_details
 	end
 	
-    #H–ˆê——‰æ–Ê‚©‚ç‘JˆÚ‚µ‚½ê‡
+    #å·¥äº‹ä¸€è¦§ç”»é¢ã‹ã‚‰é·ç§»ã—ãŸå ´åˆ
     if params[:move_flag] == "1"
       if params[:construction_id].present?
         construction_id = params[:construction_id]
@@ -274,7 +274,7 @@ class ConstructionDailyReportsController < ApplicationController
 	
 	@construction_data = ConstructionDatum.where(["id = ?", @construction_daily_report.construction_datum_id])
 	
-    #H–‚m‚‚Ì’ù³‰Â”\‚É‚·‚é
+    #å·¥äº‹ï¼®ï½ã®è¨‚æ­£å¯èƒ½ã«ã™ã‚‹
     #upd170707
     construction_all = ConstructionDatum.all
     @construction_data += construction_all
@@ -304,7 +304,7 @@ class ConstructionDailyReportsController < ApplicationController
         format.json { render json: @construction_daily_report.errors, status: :unprocessable_entity }
       end
 	  
-	  #H–ŠJnEI—¹“ú‚ğXV
+	  #å·¥äº‹é–‹å§‹ãƒ»çµ‚äº†æ—¥ã‚’æ›´æ–°
 	  @construction_daily_report.assign_attributes(construction_data_params)
 	  @construction_daily_report.update(construction_data_params)
       

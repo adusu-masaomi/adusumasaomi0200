@@ -58,39 +58,26 @@ class ApplicationController < ActionController::Base
   
   #add210716
   #仕入担当者の名前、Email取得
-  def app_set_responsible(param_responsible, param_email)
+  def app_set_responsible(param_responsible, param_email, param_supplier)
     
     #supplier_update_flag = nil
     supplier_responsible = nil
     
     @supplier_responsible_id = 0
     
+    $responsible = nil
+    $email_responsible = nil
+    
     if param_responsible.to_i > 0
       #担当者選択した場合
       supplier_responsible = SupplierResponsible.where(id: param_responsible).first
-      if supplier_responsible.present?
+      #if supplier_responsible.present?
+      if supplier_responsible.present? && (supplier_responsible.supplier_master_id == param_supplier.to_i)
         #担当者をセット
         $responsible = supplier_responsible.responsible_name
         #担当Emailをセット
         $email_responsible = supplier_responsible.responsible_email
-        
-        #eメールがidの場合
-        #if param_email.to_i > 0
-        #  supplier_responsible2 = SupplierResponsible.where(id: param_email).first
-        #  param_email = supplier_responsible2.responsible_email
-        #  @supplier_responsible_id = supplier_responsible2.id  #見積データ更新用としてセット
-        #else 
-        #  #手入力の場合
-        #  @supplier_responsible_id = supplier_responsible.id  #見積データ更新用としてセット
-        #end
-        #
-        
-        #if (param_email != 
-        #  supplier_responsible.responsible_email)
-        
-        #if (param_email != 
-        #  supplier_responsible.responsible_email)
-        
+       
         #必ず更新とする  
         @supplier_update_flag = 2
             
@@ -125,6 +112,22 @@ class ApplicationController < ActionController::Base
           $email_responsible = supplier_responsible.responsible_email
         end
       end
+    end
+    
+    #add220607
+    #処理遅延で担当者が空になっている場合、最初の担当とする
+    if $responsible.nil? && $email_responsible.nil?
+      
+      supplier_id = param_supplier.to_i
+      supplier_responsible = SupplierResponsible.where(supplier_master_id: supplier_id).first
+      
+      if supplier_responsible.present?
+        #担当者をセット
+        $responsible = supplier_responsible.responsible_name
+        #担当Emailをセット
+        $email_responsible = supplier_responsible.responsible_email
+      end
+    
     end
     
     #return supplier_update_flag

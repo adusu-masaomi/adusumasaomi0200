@@ -194,9 +194,10 @@ class DeliverySlipLandscapePDF
 		   #all_address = @delivery_slip_headers.construction_place
 		   #upd181011 郵便番号追加
            all_address = ""
-           if @delivery_slip_headers.construction_post.present?
-             all_address = @delivery_slip_headers.construction_post + "　"
-           end
+           #del220430 郵便番号は抹消
+           #if @delivery_slip_headers.construction_post.present?
+           #  all_address = @delivery_slip_headers.construction_post + "　"
+           #end
            all_address += @delivery_slip_headers.construction_place
 		   #
                       

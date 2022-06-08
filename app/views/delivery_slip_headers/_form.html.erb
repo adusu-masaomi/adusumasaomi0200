@@ -54,20 +54,24 @@
   <%= f.input :responsible2, input_html:{id:'responsible2', :tabindex=>"8", style: "width:220px;"} %>
   </div>
   </br></br></br>
-  <%= f.input :post, label:"郵便番号（得意先※マスターに反映されます）", input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"9"} %>
-  <!--<%= f.input :address, input_html:{id:"address", name:"address", :tabindex=>"10"} %>-->
+  <!--<%= f.input :post, label:"郵便番号（得意先※マスターに反映されます）", label_html:{style:"color: brown"}, input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"9"} %>-->
+  
+  <font color="red">===以下の住所を変更した場合、得意先マスターに反映しますのでご注意下さい。===</font>
+  
+  <!--<%= f.input :post, hint:"※この住所を変更した場合、得意先マスターに反映されるのでご注意下さい。", label:"郵便番号（得意先）", hint_html:{style:"color: red"}, input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"9"} %>-->
+  <%= f.input :post, label:"郵便番号（得意先）", input_html:{id:"post", :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','address','address');", :tabindex=>"9"} %>
   
   <div class="col-lg-6" , style="margin-left : -15px">
-  <%= f.input :address, label:"住所（得意先※マスターに反映されます）", hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"11",
+  <%= f.input :address, label:"住所（得意先）", hint: "＊都道府県市区町村のみ入力して下さい。", input_html:{id:"address", style: 'width:320px', name:"address", :tabindex=>"11",
                         :onkeydown => "setPostAuto($(this).val(), 'post', event)"} %>
   </div>
   
   <!--add171010-->
-  <%= f.input :house_number , hint: "＊番地のみ入力して下さい。", label:"番地（得意先※マスターに反映されます）", input_html:{id:"house_number", style: 'width:320px', :tabindex=>"12"} %>
-  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（得意先※マスターに反映されます）", label_html:{style: 'margin-top : -30px;'},  
+  <%= f.input :house_number , hint: "＊番地のみ入力して下さい。", label:"番地（得意先）", input_html:{id:"house_number", style: 'width:320px', :tabindex=>"12"} %>
+  <%= f.input :address2 , hint: "＊建物・部屋名がある場合は、こちらに入力して下さい。", label:"建物（得意先）", label_html:{style: 'margin-top : -30px;'},  
           input_html:{id:"address2", style: 'width:320px;', :tabindex=>"13"} %>
   <!--add end-->
-  
+  <font color="red">===ここまで===</font>
   
   <%= f.input :tel, input_html:{id:"tel", :tabindex=>"14"} %>
   <%= f.input :fax, input_html:{id:"fax", :tabindex=>"15"} %>

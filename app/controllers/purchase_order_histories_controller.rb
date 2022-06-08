@@ -474,9 +474,21 @@ class PurchaseOrderHistoriesController < ApplicationController
         #臨時FAX用
         set_order_data_fax(format)
         
+        #注文書発行
+        set_purchase_order(format)
+        
         #メール送信する
         send_email
-    
+        
+        #メール送信の場合(add220601)
+        if params[:purchase_order_history][:sent_flag] == "1" 
+          #format.js {render inline: "location.reload();" }
+          redirect_to request.referer, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
+          flash[:notice] = "メールを送信しました。"
+          
+          break
+        end
+        
         if params[:move_flag] != "1"
           format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully created.' }
             format.json { render :show, status: :created, location: @purchase_order_history }
@@ -485,6 +497,8 @@ class PurchaseOrderHistoriesController < ApplicationController
 		      format.html {redirect_to purchase_order_data_path( 
                  :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
         end
+        
+        
       end
     end
   end
@@ -504,42 +518,63 @@ class PurchaseOrderHistoriesController < ApplicationController
 	  #メール送信済みフラグをセット
 	  #set_mail_sent_flag
 	  
+    ##test now
+    #if params[:purchase_order_history][:sent_flag] == "1"
+    #  format.html
+    #end
+    
     respond_to do |format|
         
       #format.html
-
+      
       if @purchase_order_history.update(purchase_order_history_params)
           
         #臨時FAX用
         #save_only_flag = true
         set_order_data_fax(format)
-          
+        
+        #注文書発行
+        set_purchase_order(format)
+        
 		    #メール送信する
-		    send_email
-		  
-		    if params[:move_flag] != "1"
+        send_email
+        
+         #メール送信の場合(add220601)
+        if params[:purchase_order_history][:sent_flag] == "1"
+          
+          #redirect_to purchase_order_data_path(
+          #         :construction_id => params[:construction_id] , :move_flag => params[:move_flag] ) and return
+          
+          redirect_to request.referer, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
+          flash[:notice] = "メールを送信しました。"
+          
+          break
+        end
+          
+        if params[:move_flag] != "1"
           format.html { redirect_to @purchase_order_history, notice: 'Purchase order history was successfully updated.' }
           format.json { render :show, status: :created, location: @purchase_order_history }
         else
           #工事画面から遷移した場合→注文Noデータ一覧へ
           format.html {redirect_to purchase_order_data_path( 
-                 :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
+              :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
         end
+        
       else
-		  
-        set_edit_params
-          
+		    set_edit_params
         #ヴァリデーションはview側で行う(ここでは再読み込みされてうまくいかないため)
         #if $quantity_nothing = true then
         #  flash.now[:alert] = "※数量が未入力の箇所があります。確認してください。"
         #end
-		  
-        format.html { render :edit }
+		    format.html { render :edit }
         format.json { render json: @purchase_order_history.errors, status: :unprocessable_entity }
       end
-	  
+	    
     end
-	
+	  
+    
+   
+    
 	#
   end 
   
@@ -786,7 +821,8 @@ class PurchaseOrderHistoriesController < ApplicationController
       #app.contollerで処理
       #担当者/Emailをメール送信用のグローバルへセット・更新フラグをセット
       app_set_responsible(params[:purchase_order_history][:responsible],
-                                        params[:purchase_order_history][:email_responsible])
+                                        params[:purchase_order_history][:email_responsible],
+                                        params[:purchase_order_history][:supplier_master_id])
       
       #担当者
       #supplier_responsible = nil
@@ -920,34 +956,105 @@ class PurchaseOrderHistoriesController < ApplicationController
     end
   end
   
-  def set_order_data_fax(format)
+  #注文書の発行
+  def set_purchase_order(format)
     
+    $attachment = nil
     
     if params[:format] == "pdf"
-    #if params[:fax_flag] == "1"
-     
-      #params[:format] = "pdf"
+    #  if params[:print_type] == "purchase_order"
+         
+        #注文書の発行
+        save_only_flag = false
+        #global set
+        $purchase_order_history = @purchase_order_history 
+        
+        $mail_flag = 0
+        
+        #送信済み・削除判定が必要なので現在のパラメータをセット
+        $order_parameters = params[:purchase_order_history][:orders_attributes]
+        
+        
+        if params[:purchase_order_history][:sent_flag] != "1" 
+          format.pdf do
+            report = PurchaseOrderPDF.create @purchase_order
+            #report = PurchaseOrderAndEstimatePDF.create @purchase_order
+            # ブラウザでPDFを表示する
+            # disposition: "inline" によりダウンロードではなく表示させている
+            send_data(
+              report.generate,
+              filename:  "purchase_order.pdf",
+              type:        "application/pdf",
+              disposition: "inline")
+          end
+        else
+        #メール送信し添付する場合
+          
+        
+          $mail_flag = 1
+          #ＰＤＦを作成
+          #report = PurchaseOrderAndEstimatePDF.create @purchase_order
+          report = PurchaseOrderPDF.create @purchase_order
+            
+          # PDFファイルのバイナリデータを生成する
+          $attachment = report.generate
+            
+          # ダウンロードは必要なし。又ここでsend_dataするとredirectができない為、抹消
+          #send_data(
+          #  @file,
+          #  filename:  "purchase_order.pdf",
+          #  type:        "application/pdf",
+          #  disposition: "attachment")
+          
+        end
+        #pdf
+	      
+        ##########
+    #  end
+    end
+  end
+  
+  def set_order_data_fax(format)
+  #def print_fax_or_puchase_order(format)
     
-     
-      #ｆａｘ用紙の発行
-	  save_only_flag = false
-       
-		  #global set
-      $purchase_order_history = @purchase_order_history 
-      
-      #pdf
-	    #@print_type = params[:print_type]
-      format.pdf do
-        report = OrderFaxPDF.create @order_fax 
-        # ブラウザでPDFを表示する
-        # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "order_fax.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
+    if params[:format] == "pdf"
+      #FAXの場合
+      if params[:print_type] == "fax"
+        #ｆａｘ用紙の発行
+        save_only_flag = false
+        #global set
+        $purchase_order_history = @purchase_order_history 
+        #pdf
+	      format.pdf do
+          report = OrderFaxPDF.create @order_fax 
+          # ブラウザでPDFを表示する
+          # disposition: "inline" によりダウンロードではなく表示させている
+          send_data(
+            report.generate,
+            filename:  "order_fax.pdf",
+            type:        "application/pdf",
+            disposition: "inline")
+        end
+      #elsif params[:print_type] == "purchase_order"
+      #  #注文書の発行
+      #  save_only_flag = false
+      #  #global set
+      #  $purchase_order_history = @purchase_order_history 
+      #  $order_parameters = params[:purchase_order_history][:orders_attributes]
+      #  #pdf
+	    #  format.pdf do
+      #    report = PurchaseOrderPDF.create @purchase_order
+      #    # ブラウザでPDFを表示する
+      #    # disposition: "inline" によりダウンロードではなく表示させている
+      #    send_data(
+      #      report.generate,
+      #      filename:  "purchase_order.pdf",
+      #      type:        "application/pdf",
+      #      disposition: "inline")
+      #  end
       end
     end
+    
     ##
   end
   

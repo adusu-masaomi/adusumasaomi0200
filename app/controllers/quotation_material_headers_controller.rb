@@ -70,66 +70,62 @@ class QuotationMaterialHeadersController < ApplicationController
   
   #pdf(見積比較表)発行
   def set_quotation_compare_pdf(format)
-    #if params[:quotation_material_header][:sent_flag] == "3" then
-      
-  	  
-	  $quotation_material_header = @quotation_material_header
+    if params[:format] == "pdf"
     
-        format.pdf do
-          report = BidComparisonListPDF.create @bid_comparison_list 
+      $quotation_material_header = @quotation_material_header
+    
+      format.pdf do
+        report = BidComparisonListPDF.create @bid_comparison_list 
         
-          # ブラウザでPDFを表示する
-          # disposition: "inline" によりダウンロードではなく表示させている
-          send_data report.generate,
-		      filename:    "見積比較表.pdf",
-              type:        "application/pdf",
-              disposition: "inline"
-		  
-		  #send_data(
-          #  report.generate,
-          #  filename:  "bid_comparison_list.pdf",
-          #  type:        "application/pdf",
-          #  disposition: "inline")
-        end
-	#end
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data report.generate,
+        filename:    "見積比較表.pdf",
+            type:        "application/pdf",
+            disposition: "inline"
+      end
+    end
   end
 
   #pdf(見積ｆａｘ)発行
   def set_quotation_fax_pdf(format)
-      
-	  $quotation_material_header = @quotation_material_header
     
-        format.pdf do
-          report = QuotationFaxPDF.create @quotation_fax 
+    if params[:format] == "pdf"
+      $quotation_material_header = @quotation_material_header
+      format.pdf do
+        report = QuotationFaxPDF.create @quotation_fax 
         
-          # ブラウザでPDFを表示する
-          # disposition: "inline" によりダウンロードではなく表示させている
-          send_data report.generate,
-		      filename:    "見積ＦＡＸ.pdf",
-              type:        "application/pdf",
-              disposition: "inline"
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data report.generate,
+        filename:    "見積ＦＡＸ.pdf",
+            type:        "application/pdf",
+            disposition: "inline"
 		  
-	      end
-	end
+      end
+    end
+  end
 
   #pdf(注文ｆａｘ)発行
   def set_quotation_order_fax_pdf(format)
-      
-	  $quotation_material_header = @quotation_material_header
-    $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
-    #仕入先（１〜３）の判定 "$supplier"にセットされる
-    setSupplier
+    if params[:format] == "pdf"
+    
+	    $quotation_material_header = @quotation_material_header
+      $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
+      #仕入先（１〜３）の判定 "$supplier"にセットされる
+      setSupplier
   
-    format.pdf do
-      report = QuotationOrderFaxPDF.create @quotation_order_fax 
+      format.pdf do
+        report = QuotationOrderFaxPDF.create @quotation_order_fax 
         
-      # ブラウザでPDFを表示する
-      # disposition: "inline" によりダウンロードではなく表示させている
-      send_data report.generate,
-		  filename:    "見積注文ＦＡＸ.pdf",
-        type:        "application/pdf",
-        disposition: "inline"
-		end
+        # ブラウザでPDFを表示する
+        # disposition: "inline" によりダウンロードではなく表示させている
+        send_data report.generate,
+		    filename:    "見積注文ＦＡＸ.pdf",
+          type:        "application/pdf",
+          disposition: "inline"
+      end
+    end
 	end
 
 
@@ -179,10 +175,9 @@ class QuotationMaterialHeadersController < ApplicationController
 	  @quotation_material_header.construction_datum_id = params[:construction_id]
 	end
 	
-	
-	#見積コードの自動採番
-	get_last_quotation_code_select
-	
+	  
+    #見積コードの自動採番
+    get_last_quotation_code_select
 
   end
 
@@ -429,19 +424,43 @@ class QuotationMaterialHeadersController < ApplicationController
       #if @quotation_material_header.save
 	    if @quotation_material_header.save!(:validate => false)
         
-		    #upd170911
+        #比較表・ＦＡＸ
+        if params[:quotation_material_header][:sent_flag] == "4"
+          #見積比較表
+          set_quotation_compare_pdf(format) 
+        elsif params[:quotation_material_header][:sent_flag] == "5"
+          #見積ＦＡＸ
+          set_quotation_fax_pdf(format)
+        elsif params[:quotation_material_header][:sent_flag] == "6"
+          #注文ＦＡＸ
+          set_quotation_order_fax_pdf(format)
+        end
+        #
+        
+        #見積依頼書・注文書の発行
+        set_purchase_order_and_estimate(format)
+                
 		    #メール送信する
 		    send_email
-		
-		    if params[:format] == "pdf"  
-		    #pdf発行
+		    
+        #add220606
+        #メール送信の場合、見積／注文書を後から発行する場合もあるため、画面遷移させない
+        if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2"
           
-            set_quotation_compare_pdf(format)
-		    else
-	  	  #通常の更新の場合
-		      format.html {redirect_to quotation_material_header_path( @quotation_material_header,
+          #redirect_to request.referer, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
+          #redirect_to :back, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
+          redirect_to edit_quotation_material_header_path(@quotation_material_header, :id => @quotation_material_header.id,
+                                :construction_id => params[:construction_id] , :move_flag => params[:move_flag] ), 
+                                alert: "Successfully sending message"
+          
+          flash[:notice] = "メールを送信しました。"
+          
+          break
+        end
+        #
+		      
+        format.html {redirect_to quotation_material_headers_path( @quotation_material_header,
                  :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
-		    end
 		  else
         format.html { render :new }
         format.json { render json: @quotation_material_header.errors, status: :unprocessable_entity }
@@ -474,49 +493,52 @@ class QuotationMaterialHeadersController < ApplicationController
 	    #set_mail_sent_flag
 	  
       respond_to do |format|
+        
         if @quotation_material_header.update(quotation_material_header_params)
         
-		      #メール送信する
-		      send_email
-		  
-		      if params[:format] == "pdf"  
-		      #pdf発行
-          
-            #params[:quotation_material_header][:sent_flag] == "4"
-            
-            #upd200428
-            if params[:quotation_material_header][:sent_flag] == "4"
-            #見積比較ＦＡＸ
-              set_quotation_compare_pdf(format) 
-		        elsif params[:quotation_material_header][:sent_flag] == "5"
+          #比較表・ＦＡＸ
+          if params[:quotation_material_header][:sent_flag] == "4"
+            #見積比較表
+            set_quotation_compare_pdf(format) 
+          elsif params[:quotation_material_header][:sent_flag] == "5"
             #見積ＦＡＸ
-              set_quotation_fax_pdf(format)
-            elsif params[:quotation_material_header][:sent_flag] == "6"
+            set_quotation_fax_pdf(format)
+          elsif params[:quotation_material_header][:sent_flag] == "6"
             #注文ＦＡＸ
-              #binding.pry
-              
-              set_quotation_order_fax_pdf(format)
-            end
-		      else
-		      #通常の更新の場合
-            format.html {redirect_to quotation_material_header_path( 
+            set_quotation_order_fax_pdf(format)
+          end
+          #
+          
+          #見積依頼書・注文書の発行
+          set_purchase_order_and_estimate(format)
+          
+          #メール送信
+          send_email
+		      
+          #add220606
+          #メール送信の場合、見積／注文書を後から発行する場合もあるため、画面遷移させない
+          if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2"
+            redirect_to request.referer, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
+            flash[:notice] = "メールを送信しました。"
+            break
+          end
+          #
+		      
+          
+          #format.html {redirect_to quotation_material_header_path( 
+          #         :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
+          format.html {redirect_to quotation_material_headers_path( 
                    :construction_id => params[:construction_id] , :move_flag => params[:move_flag] )}
 				   
-		      end
-	      
-		  #format.json { render :show, status: :ok, location: @quotation_material_header }
-		  
-		  
-		  #format.html { redirect_to @quotation_material_header, notice: 'Quotation material header was successfully updated.' }
-          #format.json { render :show, status: :ok, location: @quotation_material_header }
-        else
+		    else
           format.html { render :edit }
           format.json { render json: @quotation_material_header.errors, status: :unprocessable_entity }
         end
-      end
+      end  #end do
 	  else
 	  #コードが新規コードの場合は、参照コードからの新規登録とみなす
       ####
+      
 	    create
 
 	  end
@@ -779,9 +801,12 @@ class QuotationMaterialHeadersController < ApplicationController
       
     #app.contollerで処理
     #担当者/Emailをメール送信用のグローバルへセット・更新フラグをセット
+    #app_set_responsible(params[:quotation_material_header][:responsible],
+    #                                    params[:quotation_material_header][:email])
     app_set_responsible(params[:quotation_material_header][:responsible],
-                                        params[:quotation_material_header][:email])
-     
+                                        params[:quotation_material_header][:email],
+                                        params[:quotation_material_header][:supplier_master_id])
+    
     #add180405
     #CC用に担当者２のアドレスもグローバルへセット
     $email_responsible2 = nil
@@ -800,14 +825,17 @@ class QuotationMaterialHeadersController < ApplicationController
     #仕入先（１〜３）の判定
     setSupplier
 	 
+    
+    mail_flag = false
+    
     if params[:quotation_material_header][:sent_flag] == "1" then
 	  #見積メールの場合
-	   
+	    mail_flag = true
       PostMailer.send_quotation_material(@quotation_material_header).deliver
-	   
+	    
     elsif params[:quotation_material_header][:sent_flag] == "2" then
 	  #注文メールの場合
-	   
+	    mail_flag = true
 	    #画面の注文Noをグローバルへセット（メール用）
 	    $purchase_order_code = nil
       $new_code_flag = false
@@ -854,17 +882,20 @@ class QuotationMaterialHeadersController < ApplicationController
     end
   
     #add210712
+    
     #仕入担当者の追加・更新
-    app_update_responsible(params[:quotation_material_header][:supplier_master_id],
+    if mail_flag  #add220606 誤更新の場合もあったため、メール送信時にのみ行う
+      app_update_responsible(params[:quotation_material_header][:supplier_master_id],
                            params[:quotation_material_header][:responsible], 0, 1)
-                             
+    end
   
     if params[:quotation_material_header][:sent_flag] == "2" 
       #注文番号が新規の場合に、更新させる
       set_new_purchase_order_code
       set_purchase_order_history
     
-    else 
+    #else  #upd220606
+    elsif params[:quotation_material_header][:sent_flag] == "1" 
       #見積の場合でも、担当者変更あり＆注文データがあれば担当者を更新
       purchase_order_data = PurchaseOrderDatum.where(:construction_datum_id => params[:quotation_material_header][:construction_datum_id]).
                                 where(:supplier_master_id => params[:quotation_material_header][:supplier_master_id]).
@@ -878,13 +909,97 @@ class QuotationMaterialHeadersController < ApplicationController
       end
     end
 	  
-    #add210716
     #仕入先担当者(1~3)のパラメータも更新
-    set_quotation_responsible_for_comparison
-   
+    if mail_flag  #add220606
+      set_quotation_responsible_for_comparison
+    end
   end
   
-  #add201002
+  #見積依頼書・注文書の発行
+  def set_purchase_order_and_estimate(format)
+    
+    check = false
+    mail_flag = false
+    
+    $request_type = 0
+    
+    if params[:quotation_material_header][:sent_flag] == "1" ||
+       params[:quotation_material_header][:sent_flag] == "2"
+    #メール送信した場合
+      check = true
+      mail_flag = true
+      $request_type = params[:quotation_material_header][:sent_flag].to_i  # 1 or 2
+    elsif params[:quotation_material_header][:sent_flag] == "7" ||
+       params[:quotation_material_header][:sent_flag] == "8"
+    #見積/注文書発行した場合
+      check = true
+      $request_type = params[:quotation_material_header][:sent_flag].to_i - 6 # 1 or 2
+    end
+    
+    $attachment = nil
+    
+    if check 
+      if params[:format] == "pdf"
+        #注文書の発行
+        #save_only_flag = false
+        #global set
+        #$purchase_order_history = @purchase_order_history 
+        $quotation_material_header = @quotation_material_header 
+        
+        #$mail_flag = 0
+        $mail_flag = false
+        
+        #注文の場合
+        if params[:quotation_material_header][:sent_flag] == "8"
+          $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
+        end
+        #仕入先（１〜３）の判定 "$supplier"にセットされる
+        setSupplier
+        
+        #送信済み・削除判定が必要なので現在のパラメータをセット
+        #$order_parameters = params[:purchase_order_history][:orders_attributes]
+        detail_parameters = params[:quotation_material_header][:quotation_material_details_attributes]
+	   
+        if $seq_exists > 0
+          #昇順になっている場合は、本来の降順にしておく。
+	        $detail_parameters = Hash[detail_parameters.sort.reverse]
+        else
+	        $detail_parameters = detail_parameters
+        end
+        #
+        
+        #if params[:quotation_material_header][:sent_flag] != "1" && params[:quotation_material_header][:sent_flag] != "2" 
+        if !mail_flag
+          format.pdf do
+            #report = PurchaseOrderAndEstimatePDF.create @purchase_order
+            report = PurchaseOrderAndEstimatePDF.create @quotation_material
+            
+            # ブラウザでPDFを表示する
+            # disposition: "inline" によりダウンロードではなく表示させている
+            send_data(
+              report.generate,
+              filename:  "estimate_request.pdf",
+              type:        "application/pdf",
+              disposition: "inline")
+          end
+        else
+        #メール送信し添付する場合
+          
+          #$mail_flag = 1
+          $mail_flag = true
+          #ＰＤＦを作成
+          #report = PurchaseOrderAndEstimatePDF.create @purchase_order
+          report = PurchaseOrderAndEstimatePDF.create @quotation_material
+            
+          # PDFファイルのバイナリデータを生成する
+          $attachment = report.generate
+          
+        end
+    #  end
+      end
+    end  #check
+  end
+  
   #注文データに保存する
   def set_purchase_order_history
     purchase_order_date = params[:quotation_material_header][:requested_date]
@@ -1237,7 +1352,27 @@ class QuotationMaterialHeadersController < ApplicationController
             if tmp_code[3,2].to_i >=
               @constant.purchase_order_last_header_code[3,2].to_i 
               update_flag = true
+            
+            elsif tmp_code[1,2] == @constant.purchase_order_last_header_code[1,2]
+              #add220115
+              
+              #年代が同じ場合で、アルファベットが上回った場合も更新
+              if tmp_code[0,1].ord >
+                @constant.purchase_order_last_header_code[0,1].ord 
+                update_flag = true
+              end
             end
+            
+            #以下は未検証で保留(起こり得ない....)
+            #(先頭３桁が同じ場合)  upd220115
+            #if tmp_code[0,3] == @constant.purchase_order_last_header_code[0,3]
+            #  if tmp_code[3,2].to_i >=
+            #    @constant.purchase_order_last_header_code[3,2].to_i 
+            #    update_flag = true
+            #  end
+            #end
+            
+            
           end
           
           if update_flag
@@ -1523,38 +1658,46 @@ class QuotationMaterialHeadersController < ApplicationController
   #ajax
   def get_purchase_order_code
      
-	 if params[:supplier_master_id].present? && params[:supplier_master_id].to_i > 1
+    if params[:supplier_master_id].present? && params[:supplier_master_id].to_i > 1
 	 
        #まず既存の注文コードがあれば、セット。
-	   @purchase_order_code = PurchaseOrderDatum.where(:construction_datum_id => params[:construction_datum_id]).
+	    @purchase_order_code = PurchaseOrderDatum.where(:construction_datum_id => params[:construction_datum_id]).
            where(:supplier_master_id => params[:supplier_master_id]).
            where("id is NOT NULL").pluck(:purchase_order_code).flatten.join(" ")
 	 
-	   ###
+	    ###
        
-       if @purchase_order_code.blank?
-	   #既存のものがなければ新規にコード生成する。
-         if @last_header_number.blank?
-	       @last_header_number = Constant.where(:id => 1).
+      if @purchase_order_code.blank?
+	      #既存のものがなければ新規にコード生成する。
+        if @last_header_number.blank?
+	         @last_header_number = Constant.where(:id => 1).
              where("id is NOT NULL").pluck(:purchase_order_last_header_code).flatten.join(" ")
-         end
+        end
      
-         @last_header_number = @last_header_number[0,1]   #下記の判定用に1文字だけ抜き取る
+        @last_header_number = @last_header_number[0,1]   #下記の判定用に1文字だけ抜き取る
      
-         #crescent = "%" + params[:last_header_number] + "%"
-         crescent = "%" + @last_header_number + "%"
+        #crescent = "%" + params[:last_header_number] + "%"
+        crescent = "%" + @last_header_number + "%"
        
-         @purchase_order_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
+        @purchase_order_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
          
-         #最終番号に１を足す。
-         newStr = @purchase_order_code[1, 4]
-         header = @purchase_order_code[0, 1]
-	     newNum = newStr.to_i + 1
-	 
-	     @purchase_order_code = header + newNum.to_s
-	   end
-	   ###
-	 end
+        #最終番号に１を足す。
+        newStr = @purchase_order_code[1, 4]
+        header = @purchase_order_code[0, 1]
+	      newNum = newStr.to_i + 1
+	     
+        #add220115
+        #アルファベットの最終の場合は、繰り上げる
+        if @purchase_order_code[3, 2].to_i == 99
+          newNum = @purchase_order_code[1, 2] + "00"
+          header = (header.ord + 1).chr
+        end
+       
+        #新年になるタイミングの切り替えは考慮していない...
+        @purchase_order_code = header + newNum.to_s
+	    end
+	    ###
+    end
   end
   
   private

@@ -33,6 +33,9 @@ class QuotationMaterialHeader < ActiveRecord::Base
   #add171023
   attr_accessor :purchase_order_code
   
+  #add220607
+  attr_accessor :format
+  
   #バリデーション
   validates :quotation_code, presence: true
   

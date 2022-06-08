@@ -7,58 +7,8 @@
   <p><%= @supplier_name %></p>
   <p><%= @responsible_name %></p>
   <p>いつもお世話になっております。</p>
-  <p>下記の商品につきまして、ご注文の程よろしくお願い申し上げます。</p>
-  <% if @notes.present? %>
-    <p><%= @notes %></p>
-  <% end %>
-  <p><%= @purchase_order_code %></p>
-  <p><%= @construction_name %></p>
-  <% if @delivery_place.present? %>
-    <p><%= @delivery_place %></p>
-  <% end %>
+  <p>注文書を添付いたしますので、ご確認の上よろしくお願いいたします。</p>
   </p>
-  </p>
-  <% cnt = 0 %>
-  <% $order_parameters.values.each_with_index.reverse_each do |item, index| %>
-    <% if item[:_destroy] != "1" && item[:mail_sent_flag] != "1" %>
-      
-      <%= "#{h(cnt + 1)}." %>
-      <% cnt += 1 %>
-      品番：
-      <%= item[:material_code] %></p>
-      &nbsp;&nbsp;&nbsp;品名：
-      <%= item[:material_name] %></p>
-      
-      <% if item[:notes].present? %>
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <%= "※" + item[:notes] %></p>
-      <% end %>
-      
-      
-      &nbsp;&nbsp;&nbsp;メーカー：
-      <%= item[:maker_name] %></p>
-      &nbsp;&nbsp;&nbsp;数量：
-      <%= item[:quantity]  %>
-	  <%= UnitMaster.all_list[(item[:unit_master_id].to_i) -1][0] %></p>
-      &nbsp;&nbsp;&nbsp;単価：
-	  <% if item[:order_unit_price].to_i > 0 %>
-	    <%= "￥" + item[:order_unit_price].to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')  %>
-	  <% else %>
-	    <%= "-" %>
-	  <% end %>
-	  </p>
-      &nbsp;&nbsp;&nbsp;注文金額：
-	  <% if item[:order_price].to_i > 0 %>
-	    <%= "￥" + item[:order_price].to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')  %>
-	  <% else %>
-	    <%= "-" %>
-	  <% end %>
-	  </p>
-      &nbsp;&nbsp;&nbsp;ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー</p>
-	<% end %>
-  <% end %>
-  
-  <p>以上、宜しくお願い致します。</p>
   </p>
   </p>
   ※このメールアドレスは配信専用です。このメッセージに返信しないようお願いいたします。

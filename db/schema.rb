@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20210629014057) do
+ActiveRecord::Schema.define(version: 20220126020607) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -646,6 +646,13 @@ ActiveRecord::Schema.define(version: 20210629014057) do
     t.datetime "updated_at",                           null: false
   end
 
+  create_table "inventory_categories", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "seq",        limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "inventory_histories", force: :cascade do |t|
     t.date     "inventory_date"
     t.integer  "inventory_division_id",    limit: 4
@@ -836,9 +843,10 @@ ActiveRecord::Schema.define(version: 20210629014057) do
     t.integer  "order_price",               limit: 4
     t.integer  "material_category_id",      limit: 4
     t.integer  "mail_sent_flag",            limit: 4
-    t.integer  "sequential_id",             limit: 4,   null: false
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.integer  "delivery_complete_flag",    limit: 4,   default: 0
+    t.integer  "sequential_id",             limit: 4,               null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
   end
 
   add_index "orders", ["purchase_order_history_id", "sequential_id"], name: "uq_seq", unique: true, using: :btree
@@ -918,14 +926,15 @@ ActiveRecord::Schema.define(version: 20210629014057) do
   end
 
   create_table "purchase_order_data", force: :cascade do |t|
-    t.string   "purchase_order_code",   limit: 255
-    t.integer  "construction_datum_id", limit: 4
-    t.integer  "supplier_master_id",    limit: 4
-    t.string   "alias_name",            limit: 255
+    t.string   "purchase_order_code",     limit: 255
+    t.integer  "construction_datum_id",   limit: 4
+    t.integer  "supplier_master_id",      limit: 4
+    t.integer  "supplier_responsible_id", limit: 4
+    t.string   "alias_name",              limit: 255
     t.date     "purchase_order_date"
-    t.integer  "mail_sent_flag",        limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "update_at",                         null: false
+    t.integer  "mail_sent_flag",          limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "update_at",                           null: false
   end
 
   create_table "purchase_order_histories", force: :cascade do |t|
@@ -1225,6 +1234,9 @@ ActiveRecord::Schema.define(version: 20210629014057) do
     t.integer  "supplier_id_1",              limit: 4
     t.integer  "supplier_id_2",              limit: 4
     t.integer  "supplier_id_3",              limit: 4
+    t.integer  "supplier_responsible_id_1",  limit: 4
+    t.integer  "supplier_responsible_id_2",  limit: 4
+    t.integer  "supplier_responsible_id_3",  limit: 4
     t.integer  "quotation_email_flag_1",     limit: 4
     t.integer  "quotation_email_flag_2",     limit: 4
     t.integer  "quotation_email_flag_3",     limit: 4

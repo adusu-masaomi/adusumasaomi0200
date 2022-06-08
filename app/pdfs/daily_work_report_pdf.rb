@@ -5,7 +5,8 @@ class DailyWorkReportPDF
      #作業日報PDF発行
  
             # tlfファイルを読み込む
-       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/daily_work_report_pdf.tlf")
+       #report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/daily_work_report_pdf.tlf")
+       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/daily_work_report_pdf.tlf") 
        
 	   # 1ページ目を開始
         report.start_new_page

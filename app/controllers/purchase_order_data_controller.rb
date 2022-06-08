@@ -517,6 +517,8 @@ class PurchaseOrderDataController < ApplicationController
         
         update_flag = false
     
+        #binding.pry
+    
         if current_header.ord == constant_header.ord
         #コンスタントとアルファベットが同じ場合
           #年が切り替わった場合
@@ -530,8 +532,11 @@ class PurchaseOrderDataController < ApplicationController
             end
           end
         else
-        #アルファベットが大きい場合、更新
-          if current_header.ord > constant_header.ord
+          #アルファベットが大きい場合、更新
+          #(同年で)  upd220118
+          #if current_header.ord > constant_header.ord
+          if (current_year == constant_year) && 
+             (current_header.ord > constant_header.ord)
             update_flag = true
           else 
             #年が切り替わった場合
@@ -617,6 +622,8 @@ class PurchaseOrderDataController < ApplicationController
     #binding.pry
     #d.strftime("%y")
     current_year = d.strftime("%y")
+    
+    #binding.pry
     
     #年が違った場合
     if current_year != year

@@ -14,7 +14,7 @@
     <%= f.text_field :stocktake_date_lteq, class:"input-append date datepicker", include_blank: true ,  
               id: 'stocktake_date_end'   %>
 	<%= f.label :inventory_category, 'カテゴリー：' %>
-    <%= f.select :with_material_category_include, Inventory.category.map{ |value, key| [value, key+1] }, {include_blank: true}, 
+    <%= f.select :with_material_category_include, InventoryCategory.all.map{|st| [st.name, st.id]}, {include_blank: true}, 
 	      {style: 'width:220px' , class: "searchableCategory" } %></br>
 			  
     <div>

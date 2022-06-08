@@ -47,8 +47,10 @@
   
   <%= f.input :personnel , input_html:{style: 'width:330px', :tabindex=>"8"} %>
   
-  <%= f.input :construction_period_start, default: Date.strptime("2022/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"9"} %>
-  <%= f.input :construction_period_end, default: Date.strptime("2022/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"10"} %>
+  <!--<%= f.input :construction_period_start, default: Date.strptime("2022/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"9"} %>-->
+  <!--<%= f.input :construction_period_end, default: Date.strptime("2022/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"10"} %>-->
+  <%= f.input :construction_period_start, default: Date.strptime(Date.today.year.to_s + "/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"9"} %>
+  <%= f.input :construction_period_end, default: Date.strptime(Date.today.year.to_s + "/01/01", "%Y/%m/%d"), hint: "*未定の場合は、このまま未入力にして下さい。", input_html:{:tabindex=>"10"} %>
   
   <%= f.input :post , hint: "＊数値のみ（ハイフンなし）で入力して下さい。" ,  
                        input_html:{id:"post",  :onchange => "formatPost()", :onKeyUp => "AjaxZip3.zip2addr(this,'','addressX','addressX');", :tabindex=>"11"} %>

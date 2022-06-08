@@ -53,9 +53,9 @@
   </div>
   
   <%= f.label_tag :inventory_category_id, '在庫品目(*在庫管理する場合のみ登録して下さい。)' , { style: 'margin-left:-15px' }%></br>
-  <%= f.select :inventory_category_id, Inventory.category, {:include_blank => true}, 
-      {id:'inventory_category_id', :class => "my-custom-class", :tabindex=>"7", 
-       style: 'width:140px;margin-left:-15px;font-size:16px;background-color:#ffffff;' } %>
+  <%= f.collection_select :inventory_category_id, InventoryCategory.all, :id, :name, {:include_blank => true}, 
+      {id:'inventory_category_id', :class => "searchableSelect2_4", 
+       style: 'width:220px;margin-left:-15px;font-size:16px;background-color:#ffffff;' } %>
   
   </br></br>
   
@@ -92,6 +92,9 @@
        //カテゴリー
        $(".searchableSelect2_3").select2({ theme: "bootstrap" }).on("load", function(e) { 
         $(this).prop('tabindex',6)}).trigger('load');
+       //在庫カテゴリー
+       $(".searchableSelect2_4").select2({ theme: "bootstrap" }).on("load", function(e) { 
+        $(this).prop('tabindex',7)}).trigger('load');
 
   });
 

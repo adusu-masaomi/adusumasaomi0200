@@ -155,6 +155,7 @@ ja:
     models:
        material_master: 資材マスター
        material_category: 資材分類
+       inventory_category: 在庫分類
        purchase_datum: 仕入データ
        purchase_header: 仕入見出データ
        purchase_order_datum: 注文Ｎｏデータ
@@ -236,6 +237,8 @@ ja:
          standard_quantity: 標準数量
          standard_labor_productivity_unit: 標準歩掛
        material_category:
+         name: 分類名
+       inventory_category:
          name: 分類名
        working_large_item:
          working_unit_price: 単価

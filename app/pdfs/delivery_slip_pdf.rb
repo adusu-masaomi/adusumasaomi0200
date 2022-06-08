@@ -160,22 +160,37 @@ class DeliverySlipPDF
 		 
 		   #住所（工事場所）
 		   all_address = ""
-           if @delivery_slip_headers.construction_post.present?
-             all_address = @delivery_slip_headers.construction_post + "　"
-           end
+           
+           address_1 = ""
+           address_2 = ""
+           #del220430 郵便番号は抹消
+           #if @delivery_slip_headers.construction_post.present?
+           #  all_address = @delivery_slip_headers.construction_post + "　"
+           #end
            #
            
            all_address += @delivery_slip_headers.construction_place
 		   if @delivery_slip_headers.construction_house_number.present?
 		     all_address += @delivery_slip_headers.construction_house_number
 		   end
+           
+           address_1 = all_address
+           
 		   if @delivery_slip_headers.construction_place2.present?
 		     all_address += "　" + @delivery_slip_headers.construction_place2
-		   end
-		   @report.page.item(:construction_place).value(all_address) 
-		   #add end
+		     address_2 = @delivery_slip_headers.construction_place2
+           end
            
-           
+		   #@report.page.item(:construction_place).value(all_address) 
+		   #upd220430 
+           #住所が長い場合は２行にする(自然改行させない)
+           if all_address.length <= 25
+             @report.page.item(:construction_place).value(all_address)
+           else
+             @report.page.item(:construction_place_d1).value(address_1)
+             @report.page.item(:construction_place_d2).value(address_2)
+           end
+           #binding.pry
            
            #納品日
 		   if @delivery_slip_headers.delivery_slip_date.present?

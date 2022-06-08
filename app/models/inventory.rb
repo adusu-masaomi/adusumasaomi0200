@@ -31,19 +31,22 @@ class Inventory < ActiveRecord::Base
     end
   }
   scope :with_material_category_include, -> (inventory_material_category=1) {
-    #idが１以上でないと呼び出されないため、viewで１をプラスしているので、ここでマイナスしてあげる。
+    
     category_id = inventory_material_category.to_i 
-	category_id -= 1
+
+    #220126抹消
+    #idが１以上でないと呼び出されないため、viewで１をプラスしているので、ここでマイナスしてあげる。
+    #category_id -= 1
 	 
     joins(:material_master).where("material_masters.inventory_category_id = ?", category_id )
   }
   
+  #del220126(マスター化)
   #在庫品目（品目を増やす場合はここで追記する。app.controllerにも定数追加(?不要?)。）
-  def self.category 
-    #[["エアコン部材", 0], ["配線器具", 1], ["ケーブル", 2]]
-    #[["エアコン部材", 0], ["配線器具", 1], ["ケーブル", 2], ["照明器具", 3], ["アンテナ", 4], ["分電盤", 5]]
-    [["エアコン部材", 0], ["配線器具", 1], ["ケーブル", 2], ["照明器具", 3], ["アンテナ", 4], ["分電盤", 5], ["ドアホン", 6], ["アース棒", 7]]
-  end
+  #def self.category 
+  #  [["エアコン部材", 0], ["配線器具", 1], ["ケーブル", 2], ["照明器具", 3], ["アンテナ", 4], ["分電盤", 5], ["ドアホン", 6], ["アース棒", 7], 
+  #  ["開閉器", 8] ]
+  #end
   
   def self.ransackable_scopes(auth_object=nil)
       [:with_material_name_include, :with_material_category_include]

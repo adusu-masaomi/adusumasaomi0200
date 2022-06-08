@@ -34,6 +34,10 @@ class PurchaseOrderHistory < ActiveRecord::Base
     attr_accessor :format
     #attr_accessor :fax_flag
 	
+    #add220526
+    #帳票切り分け用  
+    attr_accessor :print_type
+        
     #資材ID自動セット用
 	attr_accessor :material_id_hide
 	attr_accessor :material_id_select_hide

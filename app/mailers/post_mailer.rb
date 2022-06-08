@@ -39,30 +39,28 @@ class PostMailer < ApplicationMailer
     #件名に日時を入れる（メール重なるのを防ぐため）
     require 'date'
     subject_time = "<" + Time.now.to_s + ">"
-        
+    
     #本番用
-    if user.supplier_master.id != 5
-        mail to: "camille.saekiZZZ@gmail.com" ,
-        subject: '注文番号登録依頼' + subject_time
-    else
-    #ムサシで選んだ場合、テストメールとする
-        mail to: "kamille1973@live.jp" ,
-        cc: "ilovekyosukehimuro@yahoo.co.jp", 
-        subject: '注文番号登録依頼' + subject_time
-    end
-        
-    #mail to: $email_responsible ,
-    #upd180405 担当者２のメアドがあれば、CCに加える。
-    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
-
+    ######
+    #if user.supplier_master.id != 5
+    #    mail to: $email_responsible ,
+    #    cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #    subject: '注文番号登録依頼' + subject_time
+    #else
+    ##ムサシで選んだ場合、テストメールとする
+    #    mail to: "kamille1973@live.jp" ,
+    #    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    #    subject: '注文番号登録依頼' + subject_time
+    #end
+    
     #test用
-    #mail to: "kamille1973@live.jp" ,
-    #cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    mail to: "camille0816@gmail.com" ,
+    cc: "ilovekyosukehimuro@yahoo.co.jp", 
         
     #以下は消さない事!
     #add180403
     #件名に日時を入れる（メール重なるのを防ぐため）
-    #subject: '注文番号登録依頼' + subject_time
+    subject: '注文番号登録依頼' + subject_time
   end
   
   #注文依頼
@@ -109,14 +107,20 @@ class PostMailer < ApplicationMailer
     require 'date'
     subject_time = "<" + Time.now.to_s + ">"
 	
+    # 添付ファイル
+    #add220601
+    #attachments['sample.jpg'] = ..File.read(‘./tmp/sample.jpg')
+    send_time = Time.now.strftime('%Y%m%d%H%M%S')
+    attachments['注文書_' + send_time + '.pdf'] = $attachment
+  
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #upd180405 担当者２のメアドがあれば、CCに加える。
     #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
 
+    #2022 test時!!
     #メアドは画面より反映(ccは固定)
-    mail to: "kamille1973@live.jp" ,
+    mail to: "camille0816@gmail.com" ,
     cc: "ilovekyosukehimuro@yahoo.co.jp", 
 
     #以下は消さない事!
@@ -156,15 +160,21 @@ class PostMailer < ApplicationMailer
     #件名に日時を入れる（メール重なるのを防ぐため）
     require 'date'
     subject_time = "<" + Time.now.to_s + ">"
-
+    
+    # 添付ファイル
+    #add220601
+    send_time = Time.now.strftime('%Y%m%d%H%M%S')
+    attachments['見積依頼書_' + send_time + '.pdf'] = $attachment
+    
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #担当者２のメアドがあれば、CCに加える。
     #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
-
+    
+    #test時!!
     #メアドは画面より反映(ccは固定)
-    mail to: "kamille1973@live.jp" ,
+    mail to: "camille0816@gmail.com" ,
     cc: "i_kyohim@yahoo.co.jp", 
 
     #以下は消さない事!
@@ -237,15 +247,20 @@ class PostMailer < ApplicationMailer
     #件名に日時を入れる（メール重なるのを防ぐため）
     require 'date'
     subject_time = "<" + Time.now.to_s + ">"
-	
+    
+    # 添付ファイル
+    #add220601
+    send_time = Time.now.strftime('%Y%m%d%H%M%S')
+    attachments['注文書_' + send_time + '.pdf'] = $attachment
+    
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #upd180405 担当者２のメアドがあれば、CCに加える。
+    #担当者２のメアドがあれば、CCに加える。
     #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
 
     #メアドは画面より反映(ccは固定)
-    mail to: "kamille1973@live.jp" ,
+    mail to: "camille0816@gmail.com" ,
     cc: "i_kyohim@yahoo.co.jp", 
 
     #以下は消さない事!

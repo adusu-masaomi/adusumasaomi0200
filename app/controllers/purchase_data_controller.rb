@@ -322,7 +322,8 @@ class PurchaseDataController < ApplicationController
   def all_convert_delivery_slip(params)
     
     if @purchase_data.present?
-      if params[:old_slip_code].present?  #伝票番号で絞り込んでない場合は変換しない
+      if params[:old_slip_code].present? && params[:old_slip_code][:value].present?  #伝票番号で絞り込んでない場合は変換しない
+        
         @purchase_data.find_each do |purchase_datum|
           
           update_flag = false

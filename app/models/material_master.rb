@@ -8,6 +8,7 @@ class MaterialMaster < ActiveRecord::Base
     has_many :PurchaseUnitPrice, :foreign_key => "material_id"  #add201208
     
     belongs_to :material_category
+    belongs_to :inventory_category
     
     has_many :UnitMaster
 	

@@ -2470,6 +2470,70 @@
       "texts": [
         "FAX 0256-47-0211"
       ]
+    },
+    {
+      "id": "construction_place_d1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 337,
+      "width": 171.2,
+      "height": 7.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 7,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place_d2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 343,
+      "width": 171.2,
+      "height": 7.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 7,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
     }
   ],
   "state": {

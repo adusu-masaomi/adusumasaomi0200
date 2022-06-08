@@ -551,7 +551,13 @@ class InventoriesController < ApplicationController
           move_flag = 3
         else
           #現在ストックのある入庫日より前or同一日に入庫された場合or在庫数０の場合
-          move_flag = 2
+          if (@inventory.current_warehousing_date == @inventory_history.inventory_date &&
+              @inventory_division_id == $INDEX_INVENTORY_STOCK)
+            #同一日の入庫の場合は、先に入庫したものを現在数にさせる(先入先出法)(upd220304)
+            move_flag = 1
+          else
+            move_flag = 2
+          end
         end
         #
         

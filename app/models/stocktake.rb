@@ -17,13 +17,15 @@ class Stocktake < ActiveRecord::Base
   validates :stocktake_date,  presence: true, uniqueness: { scope: [:material_master_id] }
   
  scope :with_material_category_include, -> (inventory_material_category=1) {
-    #idが１以上でないと呼び出されないため、viewで１をプラスしているので、ここでマイナスしてあげる。
+    
     category_id = inventory_material_category.to_i 
-	category_id -= 1
+	
+    #del220126
+    #idが１以上でないと呼び出されないため、viewで１をプラスしているので、ここでマイナスしてあげる。
+    #category_id -= 1
 	 
     joins(:inventory).joins(:material_master).where("material_masters.inventory_category_id = ?", category_id )
 	
-	#binding.pry
   }
   
   def self.ransackable_scopes(auth_object=nil)

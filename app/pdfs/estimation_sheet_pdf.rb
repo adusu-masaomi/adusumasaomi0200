@@ -168,7 +168,11 @@ class EstimationSheetPDF
 		     if @quotation_headers.quote_price.present?
                #if @quotation_headers.quotation_date < date_per_ten_start
                #upd190919
-               if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               if @quotation_headers.quotation_date.nil?
+                 #日付なしの場合--消費税10%にする
+                 @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
+               #if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               elsif @quotation_headers.quotation_date < date_per_ten_start
                #消費税8%の場合 
                  @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
 		       else
@@ -182,7 +186,10 @@ class EstimationSheetPDF
 		     if @quotation_headers.quote_price.present?
 		       #if @quotation_headers.quotation_date < date_per_ten_start
                #upd190919
-               if @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               if @quotation_headers.quotation_date.nil?
+                 @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
+               #elseif @quotation_headers.quotation_date.nil? || @quotation_headers.quotation_date < date_per_ten_start
+               elsif @quotation_headers.quotation_date < date_per_ten_start
                #消費税8%の場合  
                  @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only
                else
@@ -235,9 +242,14 @@ class EstimationSheetPDF
            
            #upd181015 郵便番号追加
            all_address = ""
-           if @quotation_headers.construction_post.present?
-             all_address = @quotation_headers.construction_post + "　"
-           end
+           
+           address_1 = ""
+           address_2 = ""
+           
+           #del220430 郵便番号は抹消
+           #if @quotation_headers.construction_post.present?
+           #  all_address = @quotation_headers.construction_post + "　"
+           #end
            #
            
            all_address += @quotation_headers.construction_place
@@ -245,12 +257,23 @@ class EstimationSheetPDF
 		   if @quotation_headers.construction_house_number.present?
 		     all_address += @quotation_headers.construction_house_number
 		   end
+           
+           address_1 = all_address
+           
 		   if @quotation_headers.construction_place2.present?
 		     all_address += "　" + @quotation_headers.construction_place2
+             address_2 = @quotation_headers.construction_place2
 		   end
-		   #@report.page.item(:construction_place).value(@quotation_headers.construction_place) 
-		   @report.page.item(:construction_place).value(all_address) 
-		   #
+		   #@report.page.item(:construction_place).value(all_address) 
+		   #upd220430 
+           #住所が長い場合は２行にする(自然改行させない)
+           if all_address.length <= 25
+             @report.page.item(:construction_place).value(all_address)
+           else
+             @report.page.item(:construction_place_d1).value(address_1)
+             @report.page.item(:construction_place_d2).value(address_2)
+           end
+           #
 		   
 		   #取引方法
 		   @report.page.item(:trading_method).value(@quotation_headers.trading_method) 

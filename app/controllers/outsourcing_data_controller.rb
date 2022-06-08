@@ -1383,7 +1383,15 @@ class OutsourcingDataController < ApplicationController
       end
     
       
-    
+    elsif outsourcing_payment_flag == "0"
+      
+      #add220307 誤入力の場合に、解除もできるようにする
+      outsourcing_cost = OutsourcingCost.where(purchase_order_datum_id: purchase_data.purchase_order_datum_id).first
+      if outsourcing_cost.present?
+        purchase_params = {outsourcing_payment_flag: outsourcing_payment_flag.to_i, payment_date: nil}
+        purchase_data.assign_attributes(purchase_params)
+        purchase_data.save!(:validate => false)
+      end
     end
     #add end
     
