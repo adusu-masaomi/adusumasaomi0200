@@ -1,0 +1,134 @@
+<%- model_class = Order -%>
+<% provide(:title, '注文一覧データ') %>
+<div class="page-header", style="width:1920px">
+  <b>
+  </br>
+  <h1><%= "注文一覧データ" %></h1>
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @orders %>
+  <!-- 追加箇所終了 -->
+   <%= search_form_for @q ,:url => {:action => "index2"} do |f| %>
+      <!--<%= f.label :material_code, '品番：' %>-->
+      <!--<%= f.select :material_code_eq, options_from_collection_for_select(MaterialMaster.all, "id", "material_code") , {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseOrderCode" } %>-->
+  	  
+	  <%= f.label :purchase_order_date, '注文日' %>
+      <%= f.text_field :purchase_order_history_purchase_order_date_gteq, class:"input-append date datepicker", include_blank: true  %>
+      <%= f.label :purchase_order_date, '～' %>
+      <%= f.text_field :purchase_order_history_purchase_order_date_lteq, class:"input-append date datepicker", include_blank: true  %></br>
+		
+	  <%= f.label :material_code, '品番(キーワード)：' %>
+      <%= f.text_field :material_code_cont, include_blank: true  %></br>
+	  	
+	  <div>
+    	  <%= f.submit '検索する' %>
+  	  </div>
+   <% end %>
+</div>
+
+<div style="width:1920px;font-size:16px;">
+
+<% if params[:move_flag] == "1" %>
+   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-success' %>
+<% else %>
+   <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_histories_path, :class => 'btn btn-success' %>
+<% end %>
+<%= "注文番号:" %>
+<%= @purchase_order_code %>
+<%= "　" %>
+<%= "工事名:" %>
+<%= @construction_name %>
+<%= "　" %>
+<%= "仕入先:" %>
+<%= @supplier_name %>
+</div>				
+<!--<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_purchase_order_data2_path,
+            :class => 'btn btn-primary' %>-->
+
+<div class="span11 table-scrollable">
+ 
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <!--<th><%= model_class.human_attribute_name(:purchase_order_date) %></th>-->
+	  <th><%= sort_link(@q, :purchase_order_history_purchase_order_date, "注文日", default_order: :desc ) %></th>
+		
+      <!--<th><%= model_class.human_attribute_name(:material_code) %></th>-->
+	  <th><%= sort_link(@q, :material_code, model_class.human_attribute_name(:material_code) ) %></th>
+	  <!--<th><%= model_class.human_attribute_name(:material_name) %></th>-->
+	  <th><%= sort_link(@q, :material_name, model_class.human_attribute_name(:material_name) ) %></th>
+	  
+    <!--<th><%= model_class.human_attribute_name(:maker_name) %></th>-->
+    <th><%= sort_link(@q, :material_master_MakerMaster_maker_name, model_class.human_attribute_name(:maker_name) ) %></th>
+    <th><%= model_class.human_attribute_name(:quantity) %></th>
+    <th><%= model_class.human_attribute_name(:unit_id) %></th>
+    <th><%= model_class.human_attribute_name(:order_unit_price) %></th>
+    <th><%= model_class.human_attribute_name(:order_price) %></th>
+    <th><%= model_class.human_attribute_name(:list_price) %></th>
+	  <th><%= model_class.human_attribute_name(:created_at) %></th>
+	  
+    </tr>
+  </thead>
+  <tbody>
+    <% @orders.order("id desc").each do |orders| %>
+      <tr>
+        <td><%= link_to orders.id, orders_path(orders) %></td>
+        <td><%= orders.purchase_order_history.purchase_order_date %></td>
+        <td><%= orders.material_code %></td>
+        <td><%= orders.material_name %></td>
+        <td><%= orders.material_master.MakerMaster.maker_name %></td>
+        <td><%= orders.quantity %></td>
+        <% if orders.unit_master.present? %> 
+          <td><%= orders.unit_master.unit_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <!--単価-->
+        <% if orders.order_unit_price.present? %>
+          <td align="right"><%= number_to_currency(orders.order_unit_price,  precision: 2) %></td>
+        <% else %>
+          <td align="right"><%= orders.order_unit_price %></td>
+        <% end %>
+        <!--金額-->
+        <% if orders.order_price.present? %>
+          <td align="right"><%= number_to_currency(orders.order_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right"><%= orders.order_price %></td>
+        <% end %>
+        <!--定価-->
+        <% if orders.list_price.present? %>
+          <td align="right"><%= number_to_currency(orders.list_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right"><%= orders.list_price %></td>
+        <% end %>
+        
+        <td><%= orders.created_at.in_time_zone('Tokyo') %></td>
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @orders %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+
+        $(".searchablePurchaseOrderCode").select2({ theme: "classic" });
+	
+  });
+  
+  
+
+</script>

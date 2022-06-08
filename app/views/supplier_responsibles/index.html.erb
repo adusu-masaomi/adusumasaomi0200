@@ -1,0 +1,47 @@
+<%- model_class = SupplierResponsible -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+</div>
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_supplier_responsible_path,
+            :class => 'btn btn-primary' %>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:supplier_master_id) %></th>
+      <th><%= model_class.human_attribute_name(:responsible_name) %></th>
+      <th><%= model_class.human_attribute_name(:responsible_email) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @supplier_responsibles.each do |supplier_responsible| %>
+      <tr>
+        <td><%= link_to supplier_responsible.id, supplier_responsible_path(supplier_responsible) %></td>
+        <!--<td><%= supplier_responsible.supplier_master_id %></td>-->
+        
+        <% if supplier_responsible.supplier_master.present? %>
+          <td><%= supplier_responsible.supplier_master.supplier_name %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+    
+        <td><%= supplier_responsible.responsible_name %></td>
+        <td><%= supplier_responsible.responsible_email %></td>
+        <td><%=l supplier_responsible.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_supplier_responsible_path(supplier_responsible), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      supplier_responsible_path(supplier_responsible),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+

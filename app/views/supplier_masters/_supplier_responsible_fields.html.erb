@@ -1,0 +1,46 @@
+<div class="well nested-fields"> 
+  <%= f.label :担当者名, {style: 'width:60px'}  %>
+  <%= f.text_field :responsible_name, {style: 'width:100px', tabindex: "14"} %> 
+  <%= f.label :担当Email, {style: 'width:70px'}  %>
+  <%= f.text_field :responsible_email, {style: 'width:300px', tabindex: "15"} %> 
+  <%= link_to_remove_association "削除", f, :class => 'btn btn-xs btn-danger' %> 
+</div> 
+
+<script type="text/javascript">
+
+  //ENTER→TABキーに変換する処理。
+  //レンダリングの場合は、共通化ができない（なぜか）
+  $('[tabindex]').keydown(function (e) {
+  
+    if (e.keyCode == 13 || e.keyCode == 9) {
+     setNextControl(e);
+    }
+  })
+  
+  //次のコントロールにフォーカスを移す（レンダリングの場合）
+  function setNextControl(e){
+    
+    var current = document.activeElement;
+    var nm = "";
+    
+    //name属性に埋め込まれているIDを抜き出す(予め先頭のものを抜き出しておく）
+	controlName = current.name;
+    selectedIndex = controlName.slice(50);
+       
+    if (controlName.substr(-18,18) == "[responsible_name]") {
+      //nameに埋め込まれているIDを抜き出す
+      selectedIndex = selectedIndex.slice(0,-19);
+      nm = "supplier_master[supplier_responsibles_attributes][" + selectedIndex + "][responsible_email]"
+    }
+    
+    //debugger;
+    
+    if (nm != ""){
+      document.getElementsByName(nm)[0].focus();
+      e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+    }
+    
+    
+  }
+  
+</script>

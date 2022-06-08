@@ -1,0 +1,1334 @@
+{
+  "version": "0.9.1",
+  "items": [
+    {
+      "id": "construction_code",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 23.3,
+      "y": 61,
+      "width": 77.7,
+      "height": 12.2,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 161,
+      "y": 61,
+      "width": 231.3,
+      "height": 12.2,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 774,
+      "y": 61,
+      "width": 50,
+      "height": 16,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "注文明細表"
+      ]
+    },
+    {
+      "id": "customer_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 535,
+      "y": 61,
+      "width": 240.4,
+      "height": 12.2,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 120,
+      "y": 61,
+      "width": 56.7,
+      "height": 18.3,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "工事名："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 494,
+      "y": 61,
+      "width": 46.5,
+      "height": 20,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "得意先："
+      ]
+    },
+    {
+      "id": "default",
+      "type": "list",
+      "display": true,
+      "description": "",
+      "x": 12,
+      "y": 74.3,
+      "width": 812.8,
+      "height": 515.9,
+      "header": {
+        "enabled": true,
+        "height": 18.8,
+        "translate": {
+          "x": -13,
+          "y": -23.4
+        },
+        "items": [
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 86,
+            "y": 103.6,
+            "width": 29.9,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文No."
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 136,
+            "y": 103.6,
+            "width": 23,
+            "height": 12.9,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "品番"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 279,
+            "y": 103.6,
+            "width": 52.7,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "品　　　　名"
+            ]
+          },
+          {
+            "id": "",
+            "type": "rect",
+            "display": true,
+            "description": "",
+            "x": 35.1,
+            "y": 97.7,
+            "width": 802.7,
+            "height": 18.8,
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid",
+              "fill-color": "none"
+            },
+            "border-radius": 0
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 115.6,
+            "y1": 98.1,
+            "x2": 115.6,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 174,
+            "y1": 98.4,
+            "x2": 174,
+            "y2": 116.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 460.3,
+            "y1": 97.7,
+            "x2": 460.3,
+            "y2": 116.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 530.5,
+            "y1": 97.8,
+            "x2": 530.5,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 561.5,
+            "y1": 97.7,
+            "x2": 561.5,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 585.5,
+            "y1": 98,
+            "x2": 585.5,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 536,
+            "y": 103.6,
+            "width": 18.4,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "数量"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 564,
+            "y": 103.6,
+            "width": 20,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "単位"
+            ]
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 629,
+            "y1": 98,
+            "x2": 629,
+            "y2": 116.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 730,
+            "y1": 98,
+            "x2": 730,
+            "y2": 116.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 686,
+            "y1": 97.7,
+            "x2": 686,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 810,
+            "y1": 97.7,
+            "x2": 810,
+            "y2": 116.5
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 475,
+            "y": 103.6,
+            "width": 44.5,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "メーカー名"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 599,
+            "y": 103.6,
+            "width": 23.6,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "単価"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 640,
+            "y": 103.6,
+            "width": 41.7,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文金額"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 699,
+            "y": 103.6,
+            "width": 20.5,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "定価"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 756,
+            "y": 103.6,
+            "width": 37.4,
+            "height": 12.3,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文先"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 815.2,
+            "y": 103.6,
+            "width": 19.5,
+            "height": 12.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "納品"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 46,
+            "y": 103.7,
+            "width": 30,
+            "height": 11.2,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": []
+            },
+            "texts": [
+              "注文日"
+            ]
+          }
+        ]
+      },
+      "detail": {
+        "height": 16.8,
+        "translate": {
+          "x": -13,
+          "y": -47.5
+        },
+        "items": [
+          {
+            "id": "",
+            "type": "rect",
+            "display": true,
+            "description": "",
+            "x": 35.1,
+            "y": 140.6,
+            "width": 802.7,
+            "height": 16,
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid",
+              "fill-color": "none"
+            },
+            "border-radius": 0
+          },
+          {
+            "id": "purchase_order_code",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 85,
+            "y": 144.8,
+            "width": 28.3,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "material_code",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 117.8,
+            "y": 145.8,
+            "width": 55,
+            "height": 9,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "material_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 177.9,
+            "y": 144.8,
+            "width": 279.4,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "maker_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 463.3,
+            "y": 144.8,
+            "width": 64.3,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 8,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "quantity",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 534.5,
+            "y": 144.8,
+            "width": 22,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "unit_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 565.7,
+            "y": 144.3,
+            "width": 15.8,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "truncate",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "order_unit_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 589,
+            "y": 144.8,
+            "width": 35.4,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "order_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 632,
+            "y": 144.8,
+            "width": 50,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "list_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 690.6,
+            "y": 144.8,
+            "width": 35.4,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "supplier_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 735,
+            "y": 144.3,
+            "width": 72.6,
+            "height": 10.7,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "delivery_complete_flag",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 812.8,
+            "y": 144.3,
+            "width": 20.7,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 115.6,
+            "y1": 140.7,
+            "x2": 115.6,
+            "y2": 156.7
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 174,
+            "y1": 141,
+            "x2": 174,
+            "y2": 157
+          },
+          {
+            "id": "purchase_order_date",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 37,
+            "y": 144.8,
+            "width": 43.4,
+            "height": 10.5,
+            "style": {
+              "font-family": [
+                "Helvetica"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 460.3,
+            "y1": 140.6,
+            "x2": 460.3,
+            "y2": 156.6
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 530.5,
+            "y1": 140.6,
+            "x2": 530.5,
+            "y2": 156.6
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 561.5,
+            "y1": 141.2,
+            "x2": 561.5,
+            "y2": 157.2
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 585.5,
+            "y1": 141,
+            "x2": 585.5,
+            "y2": 157
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 629,
+            "y1": 140.6,
+            "x2": 629,
+            "y2": 156.6
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 730,
+            "y1": 141,
+            "x2": 730,
+            "y2": 157
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 810,
+            "y1": 140.6,
+            "x2": 810,
+            "y2": 157.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 686,
+            "y1": 140.6,
+            "x2": 686,
+            "y2": 157.4
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#ff0000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 82,
+            "y1": 140.7,
+            "x2": 82,
+            "y2": 156.7
+          }
+        ]
+      },
+      "page-footer": {
+        "enabled": true,
+        "height": 1.7,
+        "translate": {
+          "x": -13,
+          "y": -73.6
+        },
+        "items": []
+      },
+      "footer": {
+        "enabled": true,
+        "height": 3.7,
+        "translate": {
+          "x": -13,
+          "y": -104.1
+        },
+        "items": []
+      },
+      "content-height": 497.09999999999997,
+      "auto-page-break": true
+    },
+    {
+      "id": "pageno",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 795,
+      "y": 45,
+      "width": 29.3,
+      "height": 10.3,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ff0000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 69,
+      "y1": 75.4,
+      "x2": 69,
+      "y2": 93.8
+    }
+  ],
+  "state": {
+    "layout-guides": []
+  },
+  "title": "注文明細表",
+  "report": {
+    "paper-type": "A4",
+    "orientation": "landscape",
+    "margin": [
+      40,
+      0,
+      0,
+      10
+    ]
+  }
+}

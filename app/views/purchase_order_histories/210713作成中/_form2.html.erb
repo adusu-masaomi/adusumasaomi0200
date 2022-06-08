@@ -1,0 +1,945 @@
+<style>
+ body{margin:10px;padding:10px;}
+</style>
+
+<%- model_class = PurchaseOrderHistory -%>  
+
+
+
+<%= simple_form_for @purchase_order_history, :html => { :class => 'well form-inline', :style => "width: 1880px;"} do |f| %>
+   
+<% if @purchase_order_history.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @purchase_order_history.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @purchase_order_history.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+
+<!--ローカル（テスト環境）-->
+<img src="/images/gif-load.gif" id="loading-indicator" style="display:none" />
+
+<!--本番環境の場合-->
+<!--<img src="/rails/images/gif-load.gif" id="loading-indicator" style="display:none" />-->
+
+	
+   <div class = "form-inputs">
+    <%= f.label :注文Ｎｏ：, {style: 'color:blue'} %>
+   <%= f.collection_select :purchase_order_datum_id, PurchaseOrderDatum.all, :id, :purchase_order_code, {} , 
+      {id:"purchase_order_datum_id", class: "searchableId" , style: 'width:200px'} %>
+	  
+	
+   <%= f.simple_fields_for @purchase_order_data, :remote => true do |m| %>
+     <%= m.label :工事名：, {style: 'color:blue'} %>
+     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :construction_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
+     <%= m.label :通称名：, {style: 'color:brown'} %>
+     <%= m.collection_select :construction_datum_id, ConstructionDatum.all, :id, :alias_name, {} , { class: "searchableId" , style: 'width:400px', :disabled => true} %>
+   <% end %>
+   
+   <!--※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行うようにお願いします！-->
+   ※入力済みのデータを呼び出す場合は、↖左上の読み込みマークの回転が終わってから操作を行って下さい。
+   </br></br>
+   
+   <%= f.label :注文先　：, {style: 'color:blue'} %>
+   <!--<%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>-->
+   
+   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name,
+   {:selected => f.object.supplier_master_id || 2} , { id:"supplier_master_id", class: "searchableId" , style: 'width:200px', :onchange => "setEmail()"} %>
+   
+  
+   <!--<%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Date.today , style: 'width:220px'},as: :date_picker %>-->
+   <!--upd180821 海外時間になっていたので修正-->
+   <%= f.input :purchase_order_date , label:"注文日", label_html: { style: 'color:blue;' }, 
+        input_html:{ id:"purchase_order_date", :value => f.object.purchase_order_date || Time.now.in_time_zone('Tokyo').to_date , style: 'width:220px'},as: :date_picker %>
+   
+   <!--<%= f.hidden_field :mail_sent_flag, input_html:{id: "mail_sent_flag"} %>-->
+   <%= f.input :mail_sent_flag, input_html:{id: "mail_sent_flag"}, as: :hidden %>
+   <!--<%= f.label :eメール：, {style: 'color:blue', class: 'my-custom-class-l2'} %>-->
+   
+   <!--スペース空ける-->
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+   <!---->
+   <%= link_to '新規／データ呼出', { id: params[:id] , construction_id: params[:construction_id], move_flag: params[:move_flag] }, 
+                                 :onclick=> "dispDiv()", :class => 'btn btn-warning'  %>
+   
+   <% if params[:move_flag] == "1" %>
+   <!--工事画面から遷移した場合-->
+     <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), :onclick => "reset_value()", :class => 'btn btn-success' %>
+   <% else %>
+     <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_histories_path, :onclick => "reset_value()", :class => 'btn btn-default' %>
+   
+   <% end %>
+   
+  
+   </br>
+   
+   <!--
+   <%= f.input :responsible , label:"担当者　", label_html: { style: 'color:blue;' }, 
+      input_html:{ id:"responsible", style: 'width:200px'} %>
+   -->
+   
+   <!--コンボに変更-->
+   <%= f.label :担当者　：, {:style => "color:blue"} %>
+   <%= f.collection_select :responsible, @supplier_responsible, :id, :responsible_name, {:include_blank => true, 
+                 :selected => @purchase_order_history.purchase_order_datum.supplier_responsible_id}, 
+                 {id:"supplier_responsible_id", class: "searchableResponsible" , style: 'width:200px', :tabindex=>"8"
+                 } %>
+   <!-- -->
+   
+   <!--
+   <%= f.input :email_responsible , label:"Email", label_html: { style: 'color:blue;' }, input_html:{ id:"email_responsible", style: 'width:350px'} %>
+   -->
+   
+   <!-- コンボに変更 -->
+   <%= f.label :Email：, {:style => "color:blue"} %>
+   <%= f.collection_select :email_responsible, @supplier_responsible, :id, :responsible_email, {:include_blank => true,
+                 :selected => @purchase_order_history.purchase_order_datum.supplier_responsible_id}, 
+                 {id:"supplier_responsible_email", class: "searchableEmail" , style: 'width:420px', :tabindex=>"9"
+                 } %>
+   <!-- -->
+   
+   <%= f.label :納品場所, {style: 'color:blue'} %>
+   <%= f.select :delivery_place_flag, PurchaseOrderHistory.delivery_place, {:include_blank => true}, 
+       {id:'delivery_place_flag',  style: 'width:90px;height:30px;font-size:16px;margin-top:0px;' } %>
+   
+   </br></br>
+   <%= f.input :notes , label:"備考　　", label_html: { style: 'color:blue;' }, input_html:{ id:"notes", style: 'width:650px'} %>
+   
+   <%= f.collection_select :material_id_select_hide, @material_masters.all, :id, :p_material_code_name,  {} , 
+      {id:"material_id_select_hide", hidden: true } %>
+    
+   <!--add190226-->
+   <%= f.collection_select :material_code_select_hide, @material_masters.all, :material_code, :material_code,  {} , 
+      {id:"material_code_select_hide", hidden: true } %>
+   
+   <%= f.input :sent_flag, input_html:{id: "sent_flag", :value => 0 }, as: :hidden %>
+   <%= f.input :material_id_hide, input_html:{id: "material_id_hide" }, as: :hidden %>
+   
+   <!--明細ajax用 add171030-->
+   <%= f.input :maker_id_hide,  input_html:{id:"maker_id_hide", }, as: :hidden %></br>
+   <%= f.input :material_code_hide,  input_html:{id:"material_code_hide" }, as: :hidden %>
+   <%= f.input :material_name_hide,  input_html:{id:"material_name_hide" }, as: :hidden %>
+   <%= f.input :unit_id_hide,  input_html:{id:"unit_id_hide", }, as: :hidden %>
+   <%= f.input :list_price_hide,  input_html:{id:"list_price_hide", }, as: :hidden %>
+   <!--add190226-->
+   <%= f.input :material_category_id_hide,  input_html:{id:"material_category_id_hide", }, as: :hidden %>
+   <!-- -->
+   
+   <!--コントローラ側に画面遷移用のパラメータを渡すためのタグ。-->
+   <%= hidden_field_tag(:construction_id, params[:construction_id]) %>
+   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
+   <!--<%= f.hidden_field :construction_id, {:value => params[:construction_id] } %>-->
+   <!--<%= f.hidden_field :move_flag, {:value => params[:move_flag] } %>-->
+   
+   <%= hidden_field_tag(:format) %>
+   
+   
+   </br></br>
+	 <!--<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
+               id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
+                
+	  <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" %>-->
+	  
+	  
+	  <!-- moved170701 -->
+	  <div id="filter" > 
+	    <%= link_to_add_association 'アイテム追加' ,  f, :orders  ,   :class => 'btn btn-success',  :data => { association_insertion_method: "after" } %> 
+	   
+		<%= f.button_tag "メール送信＆登録", :type => 'button', :class => "btn btn-info", 
+               id: "mail_sent_button", name: "send", :onclick => "submitAfterValidationEmail()" %>
+        
+        <%= f.button_tag "登録のみ", :type => 'button', name: "upd", :class => "btn btn-primary", 
+               :onclick => "submitAfterValidation()" %>
+        
+        <!--add200427-->
+        <!--<%= f.submit "ＦＡＸ", :type => 'button', :value => 'pdf', :name => 'format',  class: "btn btn-pink500_ftg", formtarget: "_blank", 
+            :onclick => "submit()", params: { format: :pdf}  %>-->
+        <!--<%= f.button_to :button, 'ＦＡＸ', type: 'button', :onclick => "submitFax()", method: :get, params: { format: :pdf}  %>-->
+        <!--<%= f.button_to :button, 'ＦＡＸ', type: 'button',  method: :get, :onclick => "submit()", params: { format: :pdf}, formtarget: "_blank"   %>-->
+        
+        <%= f.button_tag( 'ＦＡＸ', :type => 'button', :value => 'fax', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank" , :onclick => "submitFax()") %>
+        
+         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+         <!--※２回目の登録以降は、Ｅｎｔｅｒ押下による移動はお勧めできません（動作不安定により）-->
+		 
+		 <hr style="border-top:3px outset #c0c0c0;width: 100%;height:3;">
+	   </div> 
+	  
+	  
+      </br></br>
+	  
+	       <div id="subForms" class="sortDone" >
+           	 <%= f.simple_fields_for :orders, @purchase_order_history.orders.order("sequential_id ASC"), :include_id => false  do |orders| %>
+
+               <%= render 'order_fields', f: orders, cache: true %>
+
+             <% end %> 
+           </div>
+
+<% end %>
+
+  </div>  
+
+<script type="text/javascript">
+
+  var disp_flag = 0;
+  var material_code = "";
+  
+  //フォーム上の制御
+  $(document).ready(function(){
+  //(document).on('turbolinks:load', function(){
+      
+	  //$(".sortThese").sortable();
+	  //$("#filter").on("cocoon:after-insert", function() {
+	  //   $(".sortThese").sortable();
+      //});
+	  
+      //検索可能なリストボックス(品名の場合)
+      $(".searchableId").select2({ theme: "classic" });
+      $( ".searchableId" ).change(function(e) {
+        //担当Emailを取得
+        setEmail()
+      })
+      
+      $(".searchableMaterial").select2({ theme: "classic" });
+	   
+      //担当者
+      $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+      $( ".searchableResponsible" ).change(function(e) {
+        
+        //obj = $(this)
+	    //担当Emailを取得
+        getEmail()
+      })
+      $( ".searchableResponsible" ).on("select2:close", function (e) {
+	    //要修正
+        $('[tabindex=9]').focus()
+	  })
+      //
+      //担当Email
+      $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+      $( ".searchableEmail" ).change(function(e) {
+        obj = $(this)
+	    //担当Emailを取得
+        //getEmail()
+      })
+      $( ".searchableEmail" ).on("select2:close", function (e) {
+	    //要修正
+        $('[tabindex=9]').focus()
+	  })
+      //
+      
+      //$(".searchableConstructionCode").change(function(e) {
+      //setConstructionDateDefault();
+	   
+	  //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+      var flag = document.getElementById("mail_sent_flag").value;
+      if (flag == 1) {
+	    document.getElementById("mail_sent_button").disabled = true;
+	  }
+	  
+      //debugger;
+      
+      //del210712
+	  //デフォルトのメアド・担当者取得
+	  //setEmail();
+	   
+	  //
+	  //var visibled = sessionStorage.getItem('onvisible');
+	  //if (visibled == "true") {
+	  //  $('#filter').removeClass('hide');
+	  //}
+	   
+	   //$(".material_code").on('click', function(){
+	   //既に保存済みの、商品コードを変更した場合。
+	   $('.material_code').change(function() {
+	   
+	     var itemCode = $(this)[0].value;
+		
+		 if (itemCode != "") {
+	       //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+		   searchItemCode(itemCode);
+		 }
+	   });
+	  
+       $(".searchableSelect1_1").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST  });
+	   //資材リスト操作後処理(既に登録済み)
+	   $( ".searchableSelect1_1" ).on("select2:open", function (e) {
+	       //一旦ここでY座標を取得
+		   gTop = $(this)[0].offsetTop;
+		   
+       });
+	   
+	   $( ".searchableSelect1_1" ).change(function(e) {
+       
+         //debugger;
+       
+         //品番IDを取得
+		 gMaterial_id = $(this)[0].value;
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-14);
+		 
+         //
+		 setItem(gMaterial_id, selectedIndex);
+       });
+	   
+	   
+	   $( ".searchableSelect1_1" ).on("select2:close", function (e) {
+	    
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	     selectedIndex = controlName.slice(42);
+         selectedIndex = selectedIndex.slice(0,-14);
+		 gSelectedIndex = selectedIndex;
+         //
+		 
+		 
+		 //次のコントロールへフォーカスを移す
+			setNextControlOnSelect(e,3);
+	   });
+ 
+	   //単位操作後処理(既に登録済み)
+	   $( ".searchableSelect1_2" ).on("select2:open", function (e) {
+	       //一旦ここでY座標を取得
+		   gTop = $(this)[0].offsetTop;
+		   
+       });
+	   $( ".searchableSelect1_2" ).on("select2:close", function (e) {
+	     //次のコントロールへフォーカスを移す
+			setNextControlOnSelect(e,2);
+	   });
+	  
+	  
+       //メーカー
+       //add180411
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true});
+	   //add end
+       
+	   //メーカー操作後処理(既に登録済み)
+	   $( ".searchableSelect1_3" ).on("select2:open", function (e) {
+	       //Y座標を取得
+		   gTop = $(this)[0].offsetTop;
+		   
+       });
+	   
+	   $( ".searchableSelect1_3" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //メーカーIDからアイテム抽出する
+		 setMaterialExtractByMaker(obj);
+       });
+	   
+	   $( ".searchableSelect1_3" ).on("select2:close", function (e) {
+	        //次のコントロールへフォーカスを移す
+			setNextControlOnSelect(e,1);
+       });
+	  
+	   //
+       $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+	   $(".searchInsertMaterial").change(function(e) {
+          
+          
+          searchItemCode(this);
+       });
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	   //次のコントロールへフォーカスを移す処理
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var child_index = 0;
+	     child_index = controlName.slice(42);
+         child_index = child_index.slice(0,-16);
+         var nm = "purchase_order_history[orders_attributes][" + child_index + "][material_name]"
+         if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+	     }
+         e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
+       //add190226
+       //分類
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+       $( ".searchableSelect1_4" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //分類からアイテム抽出する
+		 setMaterialExtractByCategory(obj);
+       });
+       //
+ });  
+
+//$(".message-class").on('click', function(){
+//  var messageid = $(this).attr("data-id");
+//  //alert(messageid);
+//});
+
+gSelectedIndex = 0;
+gMaterial_id = 0;
+gMaterial_code = "";
+gControl_id = 0;
+gTop = 0;
+
+gTrigger = false;
+
+//明細フォーム新規追加時の制御
+//※更新時は、上記の"document.loadで発生するので、同様に直す！"
+$(document).bind('cocoon:after-insert', function(e,inserted_item) {
+   
+    //連番をセットする
+    $.get("<%= purchase_order_historiez_set_sequence_path %>",
+    {},
+     function(data){
+       obj = document.getElementById("sequential_id").textContent;
+       document.getElementById("sequential_id").value = obj;
+     });
+   
+    ///////
+    //明細フォーム用(追加時のみ、ここが使用されるらしい。)
+	//検索可能なリストボックス(品名の場合)
+    $(".searchableSelect1_1").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST  });
+    
+	 $( ".searchableSelect1_1" ).change(function(e) {
+     //$('.searchableSelect1_1').on("select2:close", function (e) {
+     	
+         
+		 //品番IDを取得
+		 gMaterial_id = $(this)[0].value;
+		 
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+		 
+	     var selectedIndex = 0;
+	    
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-14);
+		 //
+		 
+		 //debugger;
+         
+         setItem(gMaterial_id, selectedIndex);
+     
+	
+       });
+       
+	 //資材リスト操作後処理(新規追加時)
+	   $( ".searchableSelect1_1" ).on("select2:open",(function(e) {
+           cIndex = 0;
+       
+	       //一旦ここでY座標を取得
+		   gTop = $(this)[0].offsetTop;
+		
+	   }));
+	   $( ".searchableSelect1_1" ).on("select2:close", function (e) {
+	     //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	     selectedIndex = controlName.slice(42);
+         selectedIndex = selectedIndex.slice(0,-14);
+		 gSelectedIndex = selectedIndex;
+         //
+	
+		 
+		 //次のコントロールへフォーカスを移す
+			setNextControlOnSelect(e,3);
+	   });
+	   
+   //単位
+       $(".searchableSelect1_2").select2({ theme: "classic" });
+       
+	 //単位操作後の処理(新規追加時)
+	   $( ".searchableSelect1_2" ).on("select2:open", function (e) {
+	       //Y座標を取得
+		   gTop = $(this)[0].offsetTop;
+		   
+       });
+	   
+	   
+	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+       $( ".searchableSelect1_2" ).on("select2:close", function (e) {
+         
+		 //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var selectedIndex = 0;
+	    
+		 selectedIndex = controlName.slice(42);
+		 selectedIndex = selectedIndex.slice(0,-17);
+		 
+		 gSelectedIndex = selectedIndex;
+		 //
+		 
+		 //次のコントロールへフォーカスを移す
+	     setNextControlOnSelect(e,2);
+		
+	   //     setTimeout(function() {
+       //    $('[tabindex=2]').focus();
+       // }, 0);  
+       });   
+       
+	   
+	   //メーカー(新規追加時)
+       //$(".searchableSelect1_3").select2({ theme: "classic" });
+       $(".searchableSelect1_3").select2({ theme: "classic", tags: true, allowClear: true , placeholder: MESSAGE_LIST});
+	   
+	   //メーカー操作後の処理(新規追加時)
+	   $( ".searchableSelect1_3" ).on("select2:open", function (e) {
+	       //Y座標を取得
+		   gTop = $(this)[0].offsetTop;
+       });
+	   
+	   $( ".searchableSelect1_3" ).change(function(e) {
+         
+		 obj = $(this);
+		 
+		 //メーカーIDからアイテム抽出する
+		 setMaterialExtractByMaker(obj);
+		
+       });
+	   
+       $( ".searchableSelect1_3" ).on("select2:close", function (e) {
+         //次のコントロールへフォーカスを移す
+			setNextControlOnSelect(e,1);
+	   });
+       
+       //
+       //$(".searchInsertMaterial").select2({ theme: "classic", tags: true, allowClear: true , placeholder: MESSAGE_LIST });
+       $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+       $(".searchInsertMaterial").change(function(e) {
+          searchItemCode(this);
+       });
+       $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	   //次のコントロールへフォーカスを移す処理
+         //name属性に埋め込まれているIDを抜き出す
+	     var controlName = $(this)[0].name;
+	     var child_index = 0;
+	     child_index = controlName.slice(42);
+         child_index = child_index.slice(0,-16);
+         var nm = "purchase_order_history[orders_attributes][" + child_index + "][material_name]"
+         if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+	     }
+         e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+       });
+       //
+       //add190226
+       //分類
+       $(".searchableSelect1_4").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+       $( ".searchableSelect1_4" ).change(function(e) {
+         obj = $(this);
+		 //分類からアイテム抽出する
+		 setMaterialExtractByCategory(obj);
+       });
+       //
+    
+	//商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+	//新規登録の、商品コードを変更した場合。
+	//$('.material_code').change(function() {
+	$('.material_code').blur(function() {
+	
+	     
+		 var itemCode = $(this)[0].value;
+		 
+		 if (itemCode != "") {
+	       //商品コードクリック時にインデックスを取得、更にプルダウンと照合する
+		   searchItemCode(itemCode);
+		   
+	     }
+	});
+	//
+	
+   // alert('Inserted!');
+});
+
+   window.onload = function(){
+     
+      //170719ソート機能は不安定のため、一旦保留に  
+      //$(".sortDone").sortable();
+
+	  //$("#filter").on("cocoon:after-insert", function() {
+	  //   $(".sortThese").parent().sortable();
+      //});
+	  
+	 
+	 var visibled = sessionStorage.getItem('onvisible');
+	 
+	 if (visibled == "true") {
+	     
+       	 $('#filter').removeClass('hide');
+		 // マウスカーソルの形を変える
+		 $("body").css("cursor", "default");
+	 }else{
+	     //$('#filter').addClass('hide');
+         //モバイル対応 add180829
+         //iodだと、removeclassが何故か機能しないので・・・
+         if(!( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) ) {
+           $('#filter').addClass('hide');
+         }
+	 }
+  }
+
+ //次のコントロールへフォーカスする（明細フォーム用）
+ //プルダウンは明細側のイベントを呼ばない為、フォームに記述
+ function setNextControlOnSelect(e,flag){
+   var current = document.activeElement;
+   gControl_id = current.id
+   
+   switch (flag){
+     case 1:
+	 //メーカー→定価の場合
+	 
+	   //if (gSelectedIndex >  0) {
+	     var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][list_price]";
+	     if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		   }
+		 }
+	   //}
+	   break;
+	 case 2:
+	 //単位→メーカーの場合
+	   
+	   //selectedIndex  = getSelectedChildIndexSome(4);
+       //gSelectedIndex = selectedIndex;
+       
+	   
+	   //171028 改修中！　インデックスは従来のものを使う！！！！！！！！！
+	   //document.getElementsByName("maker_id[]")[selectedIndex].focus();
+	   var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][maker_id]";
+	   
+	   document.getElementsByName(nm)[0].focus();
+	   
+	   break;
+	 case 3:
+	 //資材リスト→資材コードの場合
+	   //selectedIndex  = getSelectedChildIndexSome(5);
+       //gSelectedIndex = selectedIndex;
+       
+	   var nm = "purchase_order_history[orders_attributes][" + gSelectedIndex + "][material_code]";
+	   document.getElementsByName(nm)[0].focus();
+	   
+	   //document.getElementsByName("material_code[]")[selectedIndex].focus();
+	   
+	   break;
+   }
+   
+   e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+
+   return false;
+ }
+ 
+ //メーカー別にアイテムを抽出する処理
+ function setMaterialExtractByMaker(obj){
+ 
+   //name属性に埋め込まれているIDを抜き出す
+   var controlName = obj[0].name;
+   var selectedIndex = 0;
+   selectedIndex = controlName.slice(42);
+   selectedIndex = selectedIndex.slice(0,-11);
+   //
+		   
+   if (gTrigger == false){
+   	 //var maker_id = $(this)[0].value;
+     var maker_id = obj[0].value;
+     
+     var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+     material_code = document.getElementsByName(nm)[0].value;
+     
+     if (isNaN(maker_id) == false){
+     //add180411 idが名称の場合（メーカー新規）を除外
+     
+	   //メーカーIDから該当する品番リストを取得する
+       $.get("<%= purchase_order_historiez_material_extract_path %>",
+        {maker_id: maker_id},
+         function(data){
+	   
+	       if (document.getElementById("material_id_select_hide").innerHTML != "") {
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+	         document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	       }
+           if (material_code == "")
+           //商品コードが手入力されていたら、そのままにする
+           {
+             //商品コード
+             if (document.getElementById("material_code_select_hide").innerHTML != "") {
+               var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+	           document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_code_select_hide").innerHTML;
+             }
+           }
+	     });
+     }
+   }	 
+   //
+ }
+ 
+ 
+ //分類別にアイテムを抽出する処理
+ 
+ function setMaterialExtractByCategory(obj){
+ 
+   //name属性に埋め込まれているIDを抜き出す
+   var controlName = obj[0].name;
+   var selectedIndex = 0;
+   selectedIndex = controlName.slice(42);
+   selectedIndex = selectedIndex.slice(0,-23);
+   
+   //
+		   
+   if (gTrigger == false){
+   	 var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+     var material_id = document.getElementsByName(nm)[0].value;
+     //
+     var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+     material_code = document.getElementsByName(nm)[0].value;
+       
+        
+     var material_category_id = obj[0].value;
+     
+     //if (isNaN(material_category_id) == false){  //手入力(未選択)状態の場合のみ有効
+     if (material_id == "1" || material_id == "" )
+     {
+	   //メーカーIDから該当する品番リストを取得する
+       $.get("<%= purchase_order_historiez_material_extract_by_category_path %>",
+        {material_category_id: material_category_id},
+         function(data){
+	   
+	       if (document.getElementById("material_id_select_hide").innerHTML != "") {
+             var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_id]";
+	         document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_id_select_hide").innerHTML;
+	       }
+           
+           if (material_code == "")
+           //商品コードが手入力されていたら、そのままにする
+           {
+             //商品コード
+             if (document.getElementById("material_code_select_hide").innerHTML != "") {
+               var nm = "purchase_order_history[orders_attributes][" + selectedIndex + "][material_code]";
+	           document.getElementsByName(nm)[0].innerHTML = document.getElementById("material_code_select_hide").innerHTML;
+             }
+           }
+	     });
+     }
+   }	 
+ }
+ 
+ 
+ //入力チェック(eメール用）
+ function submitAfterValidationEmail(){
+   document.getElementById("sent_flag").value = 1;
+   submitAfterValidation();
+ }
+ 
+ //入力チェック後の、更新処理
+ function submitAfterValidation() {
+ 	var ok_flag = true;
+	var after_check = checkQuantity(ok_flag);
+    
+    //add210628
+    //納品場所チェック
+    if (after_check == true){
+      after_check = checkDeliveryPlace(ok_flag);  
+    }
+    
+	if (after_check == true){
+      if (window.confirm('実行しますか？')) {
+	     reset_value();
+         
+         document.getElementById("format").value = "html";
+         
+         document.forms[0].submit();
+       }
+	 }
+ }
+ 
+ var checkDeliveryPlace = function(ok_flag){ 
+    delivery_place_flag = document.getElementById("delivery_place_flag").value;
+    
+    if (document.getElementById("sent_flag").value == 1)  //メール送信時のみ
+    {
+      if (delivery_place_flag == "")
+      {
+        window.confirm('納品場所を選択して下さい。');
+        ok_flag = false;
+      }
+    }
+    return ok_flag;
+ }
+ 
+ function submitFax()
+ {
+ 
+      //debugger;
+      //var myparam = "abc";
+
+     // add hidden field to your form name="myparam" and value="abc"
+      //$('#receiptsForm').append('<input type="hidden" name="myparam " value="abc" />');
+      //$("#receiptsForm").submit();
+      
+      //ここでfaxフラグをセット
+      //document.getElementById("fax_flag").value = "1";
+      document.getElementById("format").value = "pdf";
+      
+      //document.forms[0].append('<input type="hidden" name="myparam " value="abc" />');
+      document.forms[0].submit();
+ 
+ }
+
+ 
+//仕入先別メアドのセット
+//ひとまず取得できるメアドは１つ(email1)とする。
+function setEmail()
+ {
+ 
+   var supplier_id = document.getElementById("supplier_master_id").value;
+   $.get("<%= purchase_order_historiez_email_select_path %>",
+      { id: supplier_id },
+      function(data){ 
+       
+         if (document.getElementById("email_responsible") != undefined)
+         {
+           obj = document.getElementById("email_responsible").textContent;
+           document.getElementById("email_responsible").value = obj;
+	     }
+       
+	     //担当者
+	     //add170907
+         if (document.getElementById("responsible") != undefined){
+	       obj = document.getElementById("responsible").textContent;
+           document.getElementById("responsible").value = obj;
+	     }
+       }
+    );
+		
+ }
+
+
+function reset_value() {
+//セッション用のパラメータをリセットする
+  sessionStorage.setItem('onvisible', 'false');
+}
+
+function dispDiv() {
+  //下記必須（ボタンが消えてしまう）
+  //event.preventDefault();
+  //debugger;
+  
+  //add200915
+  //ボタンが復活しない問題発生するため
+  //$('#filter').removeClass('hide');
+  
+  //ajax
+  //controllerのイベントを呼び出すため。
+  purchase_order_datum_id = document.getElementById("purchase_order_datum_id").value;
+  purchase_order_date = document.getElementById("purchase_order_date").value;
+  supplier_master_id = document.getElementById("supplier_master_id").value;
+  //add210521
+  delivery_place_flag = document.getElementById("delivery_place_flag").value;
+  
+  //セッション用のパラメータへセットする
+  sessionStorage.removeItem('onvisible');       //add200915 一旦消さないと壊れるケースあり？  
+  sessionStorage.setItem('onvisible', 'true');
+
+  $.get("<%= purchase_order_historiez_get_data_path %>",
+    {purchase_order_datum_id: purchase_order_datum_id, purchase_order_date: purchase_order_date, 
+     supplier_master_id: supplier_master_id, delivery_place_flag: delivery_place_flag},
+     function(data){
+	   // マウスカーソルの形を変える
+       $("body").css("cursor", "progress");
+	   
+	   // Loadingイメージ表示
+       $('#loading-indicator').show();
+	   
+       //add200915
+       //sessionStorage.setItem('onvisible', 'true');
+       
+       //5秒待つ（描写されないことがあるため）
+	   //centOS上では必須なようである！
+	   setTimeout("reloadDiv()", 5000);
+       
+	   //setTimeout(reloadDiv(), 30000);  
+       //reloadDiv();   	   
+
+	   //隠れていたボタンをここで表示させる
+       //$('#filter').removeClass('hide');
+       
+       //movev200915
+       //セッション用のパラメータへセットする
+       //sessionStorage.setItem('onvisible', 'true');
+       
+       // Loadingイメージを消す
+       // $('#loading-indicator').hide();
+
+     }
+   );
+};
+
+function getEmail()
+  {
+     
+     obj = document.getElementById("supplier_master_id")
+     supplier_master_id = obj.value
+  
+     obj = document.getElementById("supplier_responsible_id")
+     supplier_responsible_id = obj.value
+     
+     //if (supplier_responsible_id != "")
+     if (parseInt(supplier_responsible_id) > 0)
+     {
+       $.get("<%= purchase_order_datum_get_responsible_email_path %>",
+         {supplier_master_id: supplier_master_id, 
+          supplier_responsible_id: supplier_responsible_id},
+           function(data){
+           })
+     }else{
+       //メールはクリアする(新規入力の場合)
+       $(".searchableEmail").val(0).trigger("change");
+     }
+  }
+
+  //ajax
+  function setEmail()
+  {
+    obj = document.getElementById("supplier_master_id")
+    supplier_master_id = parseInt(obj.value)
+    $.get("<%= purchase_order_datum_get_email1_path %>",
+      {id: supplier_master_id },
+      function(data){
+               
+        //メーカー名もセット
+   	    //obj = document.getElementById("supplier_responsible_id")
+   	    }
+    )
+  }
+
+function reloadDiv(){
+  //画面再ロードする
+  //debugger;
+  
+  window.location.reload();
+  event.preventDefault();
+       
+  $("body").css("cursor", "default");
+}
+
+
+</script>
+
+  

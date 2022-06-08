@@ -1,0 +1,23 @@
+<%- model_class = SupplierResponsible -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:supplier_master_id) %>:</strong></dt>
+  <dd><%= @supplier_responsible.supplier_master.supplier_name %></dd>
+	<dt><strong><%= model_class.human_attribute_name(:responsible_name) %>:</strong></dt>
+  <dd><%= @supplier_responsible.responsible_name %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:responsible_email) %>:</strong></dt>
+  <dd><%= @supplier_responsible.responsible_email %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              supplier_responsibles_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_supplier_responsible_path(@supplier_responsible), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              supplier_responsible_path(@supplier_responsible),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

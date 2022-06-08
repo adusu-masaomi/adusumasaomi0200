@@ -1,0 +1,13 @@
+<%= simple_form_for @supplier_responsible, :html => { :class => 'well form-horizontal' } do |f| %>
+  <!--<%= f.input :supplier_master_id %>-->
+  <%= f.label :仕入業者 , {:class => "my-custom-class-l"} %></br>
+  <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {:prompt => "どれか一つを選択して下さい"},
+      {id:"supplier_master_id", :class => "searchableSelect2_1", style: 'width:220px', :tabindex=>"0" }  %>
+      
+  <%= f.input :responsible_name %>
+  <%= f.input :responsible_email %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                supplier_responsibles_path, :class => 'btn btn-default' %>
+<% end %>

@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  supplier_master_id: 1
+  responsible_name: MyString
+  responsible_email: MyString
+
+two:
+  supplier_master_id: 1
+  responsible_name: MyString
+  responsible_email: MyString

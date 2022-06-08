@@ -1,0 +1,228 @@
+<%- model_class = Order -%>
+<% provide(:title, '注文明細データ') %>
+<div class="page-header", style="width:1920px">
+  <h1><font size="5"><%= "注文明細データ" %></font></h1>
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @orders %>
+  <!-- 追加箇所終了 -->
+  <%= search_form_for @q ,:url => {:action => "index3"} do |f| %>
+    <!--<%= f.label :material_code, '品番：' %>-->
+    <!--<%= f.select :material_code_eq, options_from_collection_for_select(MaterialMaster.all, "id", "material_code") , {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseOrderCode" } %>-->
+  	  
+    <%= f.label :purchase_order_date, '注文日' %>
+    <%= f.text_field :purchase_order_history_purchase_order_date_gteq, class:"input-append date datepicker", include_blank: true, id: 'purchase_date_start'  %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartDate()" %>
+    <%= f.label :purchase_order_date, '～' %>
+    <%= f.text_field :purchase_order_history_purchase_order_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'purchase_date_end'  %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndDate()" %>
+    
+    <%= f.label :construction_datum_id, '工事名：：' %>
+	  <%= f.select :purchase_order_history_purchase_order_datum_construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, 
+             { style: 'width:440px' , class: "searchableSelect2_1"}  %>
+    
+    </br>
+
+    <%= f.label :material_code, '品番(キーワード)：' %>
+    <%= f.text_field :material_code_cont, include_blank: true, id: 'material_code_keyword'  %>
+	  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterialCodeKeyWord()" %>
+    
+    <%= f.label :supplier_master_id, '仕入先：：' %>
+    <%= f.select :purchase_order_history_purchase_order_datum_supplier_master_id_eq, @supplier.order("id asc").map{|st| [st.supplier_name, st.id]}, 
+               {include_blank: true}, {style: 'width:220px' , class: "searchableSupplier" } %>
+    <%= f.label :purchase_order_code, '注文No：' %>
+    <%= f.select :purchase_order_history_purchase_order_datum_id_eq, @purchase_order_datum.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
+       { style: 'width:220px' , class: "searchablePurchaseOrder"}  %>
+    
+    <%= f.label :delivery_place_flag, '納品場所' %>
+    <%= f.select :purchase_order_history_delivery_place_flag_eq, PurchaseOrderHistory.delivery_place.map{ |value, key| [value, key] }, {include_blank: true}, 
+            {id: 'delivery_place_flag', style: 'width:80px'} %>
+    
+    <%= f.label :delivery_complete_flag, '納品済' %>
+    <%= f.select :delivery_complete_flag_eq, Order.delivery_complete_check_list.map{ |value, key| [value, key] }, {include_blank: true}, 
+            {id: 'delivery_complete_flag', style: 'width:80px'} %>
+    
+    <div>
+      <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
+      <%= link_to "注文明細表",
+            purchase_order_histories_detail_path(@order, format: "pdf", construction_id: params[:construction_id], 
+                                                 purchase_order_datum_id: params[:purchase_order_datum_id], 
+                                                 supplier_master_id: params[:supplier_master_id],
+                                                 move_flag: params[:move_flag], print_type: "1"),
+            :class => 'btn  btn-lightblue200_ftg keep-disp', :target=>["_blank"] %>
+      <%= link_to t('.cancel', :default => t("前の画面に戻る")),
+                purchase_order_data_path(construction_id: params[:construction_id], move_flag: "1"), :class => 'btn btn-success' %>
+      
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      
+      <%= f.button '納品全チェック', type: 'submit' , 
+                     id: "submit_button_all_check", name: "delivery",value: "all_check" , 
+                     :class => 'btn btn-xs btn-lime200_rsd keep-disp'%>
+      <%= f.button '納品全解除', type: 'submit' , 
+                     id: "submit_button_all_uncheck", name: "delivery",value: "all_uncheck",
+                     :class => 'btn btn-xs btn-amber200_rsd keep-disp' %>
+                     
+     
+    </div>
+    
+  <% end %>
+  <!--<div id="order" data-order="<%= @orders.to_json.to_s %>"></div>-->
+</div>
+
+<div style="width:1920px;font-size:16px;">
+   
+
+
+<%= "工事名:" %>
+<%= @construction_name %>
+<!--以下は必要なし???
+<%= "　" %>
+<%= "注文番号:" %>
+<%= @purchase_order_code %>
+<%= "　" %>
+<%= "仕入先:" %>
+<%= @supplier_name %>
+-->
+</div>				
+<!--<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_purchase_order_data2_path,
+            :class => 'btn btn-primary' %>-->
+
+<div class="span11 table-scrollable">
+ 
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= sort_link(@q, :purchase_order_history_purchase_order_date, "注文日", default_order: :desc ) %></th>
+      <th><%= model_class.human_attribute_name(:purchase_order_code) %></th>
+      <th><%= sort_link(@q, :material_code, model_class.human_attribute_name(:material_code) ) %></th>
+      <th><%= sort_link(@q, :material_name, model_class.human_attribute_name(:material_name) ) %></th>
+      <th><%= sort_link(@q, :material_master_MakerMaster_maker_name, model_class.human_attribute_name(:maker_name) ) %></th>
+      <th><%= model_class.human_attribute_name(:quantity) %></th>
+      <th><%= model_class.human_attribute_name(:unit_id) %></th>
+      <th><%= model_class.human_attribute_name(:order_unit_price) %></th>
+      <th><%= model_class.human_attribute_name(:order_price) %></th>
+      <th><%= model_class.human_attribute_name(:list_price) %></th>
+      <th>仕入先名</th>
+      <th>納品済</th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th style="width:90px;"><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @orders.order("id desc").each do |orders| %>
+      <tr>
+        <td><%= link_to orders.id, orders_path(orders) %></td>
+        <td><%= orders.purchase_order_history.purchase_order_date %></td>
+        <td><%= orders.purchase_order_history.purchase_order_datum.purchase_order_code %></td>
+        <td><%= orders.material_code %></td>
+        <td><%= orders.material_name %></td>
+        <td><%= orders.material_master.MakerMaster.maker_name %></td>
+        <td><%= orders.quantity %></td>
+        <% if orders.unit_master.present? %> 
+          <td><%= orders.unit_master.unit_name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <!--単価-->
+        <% if orders.order_unit_price.present? %>
+          <td align="right"><%= number_to_currency(orders.order_unit_price,  precision: 2) %></td>
+        <% else %>
+          <td align="right"><%= orders.order_unit_price %></td>
+        <% end %>
+        <!--金額-->
+        <% if orders.order_price.present? %>
+          <td align="right"><%= number_to_currency(orders.order_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right"><%= orders.order_price %></td>
+        <% end %>
+        <!--定価-->
+        <% if orders.list_price.present? %>
+          <td align="right"><%= number_to_currency(orders.list_price,  precision: 0) %></td>
+        <% else %>
+          <td align="right"><%= orders.list_price %></td>
+        <% end %>
+        <td><%= orders.purchase_order_history.supplier_master.supplier_name %></td>
+        <!--納品済のチェック-->
+        <td><%= check_box("delivery_complete_flag", "active", {checked: check_if_true(orders.delivery_complete_flag) , 
+                  :multiple => true, :style => "margin-left: 16px;",  :disabled => false , :class => "delivery_complete_check",  :id => orders.id  }, "true", "false") %></td>
+
+        <td><%= orders.created_at.in_time_zone('Tokyo') %></td>
+        
+        <td>
+          <%= link_to '削除',
+                      order_path(orders, construction_id: params[:construction_id], move_flag: params[:move_flag], q: params[:q], detail: "1"),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
+        </td>
+        
+        
+      </tr>
+    <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @orders %>
+    <!-- 追加箇所終了 -->
+  </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+
+    $(".searchablePurchaseOrderCode").select2({ theme: "classic" });
+	  $(".searchableSupplier").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchablePurchaseOrder").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    
+    //納品済チェックをリアルタイム更新する
+     $(".delivery_complete_check").on('change', function(e) {
+       var $elem = $(e.target);
+       var id = $elem.context.id
+       var bool = $elem.is(':checked') ? 1 : 0;
+       
+       //var payment_date = document.getElementById("payment_date_input").value;
+       
+       //砂時計にする
+       $.get("<%= orderz_set_delivery_complete_flag_path %>",
+            {id: id , flag: bool},
+             function(data){
+            })
+       }
+	   );
+     
+     //全チェック
+     $("#submit_button_all_check").click(function(event) {
+       if (!window.confirm('全てチェックしますか？')) {
+	       event.preventDefault();
+       }
+     });
+     //全チェック解除
+     $("#submit_button_all_uncheck").click(function(event) {
+       if (!window.confirm('全て解除しますか？')) {
+	       event.preventDefault();
+       }
+     });
+  });
+  
+  //開始日を空にする
+  function clearStartDate(){
+    document.getElementById("purchase_date_start").value = "";
+  }
+  //開始日を空にする
+  function clearEndDate(){
+    document.getElementById("purchase_date_end").value = "";
+  }
+  //品番手入力を空にする
+  function clearMaterialCodeKeyWord(){
+    document.getElementById("material_code_keyword").value = "";
+  }
+  
+
+</script>

@@ -1,0 +1,94 @@
+<h1></h1>
+
+<p>
+  <font face="游ゴシック">
+  <p>見積依頼</p>
+  <p></p>
+  <p><%= @supplier_name %></p>
+  <p><%= @responsible_name %></p>
+  <p>いつもお世話になっております。</p>
+  <p>下記の商品につきまして、お見積りの程よろしくお願い申し上げます。</p>
+  <% if @notes.present? %>
+    <p><%= @notes %></p>
+  <% end %>
+  <p><%= @quotation_code %></p>
+  <p><%= @construction_name %></p>
+  </p>
+  </p>
+  
+  <% cnt = 0 %>
+  
+  <% $tmp_detail_parameters.values.each_with_index.reverse_each do |item, index| %>
+  
+	<!--仕入先１〜３の判定。-->
+    <% @mail_sent_flag = "0" %>
+    
+    <% case $supplier %>
+    <% when 1 %>
+      <% @mail_sent_flag = item[:quotation_email_flag_1] %>
+	  <!--先行して注文している場合を考慮する。→見積済とみなす-->
+	  <% if item[:order_email_flag_1] =="1" %>
+	    <% @mail_sent_flag = "1" %>
+	  <% end %>
+    <% when 2 %>
+      <% @mail_sent_flag = item[:quotation_email_flag_2] %>
+	  <!--先行して注文している場合を考慮する。→見積済とみなす-->
+	  <% if item[:order_email_flag_2] =="1" %>
+	    <% @mail_sent_flag = "1" %>
+	  <% end %>
+	<% when 3 %>
+	  <% @mail_sent_flag = item[:quotation_email_flag_3] %>
+	  <!--先行して注文している場合を考慮する。→見積済とみなす-->
+	  <% if item[:order_email_flag_3] =="1" %>
+	    <% @mail_sent_flag = "1" %>
+	  <% end %>
+	<% end %>
+	<!-- -->
+	
+	<% if item[:_destroy] != "1" && @mail_sent_flag != "1" %>
+          
+	  <%= "#{h(cnt + 1)}." %>
+      <% cnt += 1 %>
+      品番：
+      <%= item[:material_code] %></p>
+      &nbsp;&nbsp;&nbsp;品名：
+      <%= item[:material_name] %></p>
+      
+      <% if item[:notes].present? %>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <%= "※" + item[:notes] %></p>
+      <% end %>
+      
+      &nbsp;&nbsp;&nbsp;メーカー：
+      <%= item[:maker_name] %></p>
+      &nbsp;&nbsp;&nbsp;数量：
+      <%= item[:quantity]  %>
+      <%= UnitMaster.all_list[(item[:unit_master_id].to_i) -1][0] %></p>
+	  &nbsp;&nbsp;&nbsp;定価：
+	  <% if item[:list_price].present? %>
+        <%= "￥" + item[:list_price].to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\1,')  %>
+      <% else %>
+        <%= "" %>
+      <% end %>
+	  </p>
+      &nbsp;&nbsp;&nbsp;ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー</p>
+	<% end %>
+  <% end %>
+  
+  <p>以上、宜しくお願い致します。</p>
+  </p>
+  </p>
+  ※このメールアドレスは配信専用です。返信は下記のアドレスにお願いいたします。
+  <p>□■□■□■□■□■□■□■□■</p>
+  <p>アデュース電気 薄田</p>
+  <p>〒955-0021 新潟県三条市下保内1039-2</p>
+  <p>TEL：0256-47-0200</p>
+  <p>FAX：0256-47-0211</p>
+  <p>E-Mail：adusu@coda.ocn.ne.jp</p>
+  <p>□■□■□■□■□■□■□■□■</p>
+  </p>
+  
+  <font>
+</p>
+
+ 

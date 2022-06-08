@@ -1,0 +1,524 @@
+<script src="/assets/jquery.tablefix.js?body=1" type="text/javascript"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<%- model_class = PurchaseDatum -%>
+<% provide(:title, model_class.model_name.human.pluralize.titleize) %>
+<div class="page-header", style="width:1920px" >
+  <h1><font size="5"><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></font></h1>
+  
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @purchase_data %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q, :html => {:style=> 'width:1920px' } do |f| %>
+  <%= f.label :purchase_date, '仕入日' %>
+  <%= f.text_field :purchase_date_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'purchase_date_start'   %>
+  
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStartDate()" %>
+  
+  <%= f.label :purchase_date, '～' %>
+  <%= f.text_field :purchase_date_lteq, class:"input-append date datepicker", include_blank: true, id: 'purchase_date_end'  %>
+
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearEndDate()" %>
+
+  <%= f.label :maker_code, 'メーカー：：' %>
+  <%= f.select :maker_id_eq, MakerMaster.all.map{|st| [st.maker_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMakerName" } %>
+  <%= f.label :slip_code, '伝票No' %>
+  <%= f.text_field :slip_code_eq, include_blank: true, id: 'slip_code'  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSlipCode()" %>
+  
+  <%= f.label :supplier_id, '仕入先：：' %>
+  
+  <!---<%= f.select :supplier_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, 
+  {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>-->
+  
+  <%= f.select :supplier_id_eq, @supplier_master_extract.map{|st| [st.supplier_name, st.id]}, 
+  {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+  
+  
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSupplier()" %>
+  <% end %>
+  </br>
+  
+  <!--<%= f.text_field :purchase_date_gteq, class:"my-custom-class-d datepicker", include_blank: true  %>-->
+  <!--<%= f.text_field :purchase_date_gteq, as: :datepicker, required: false, include_blank: true  %>-->
+  
+  <%= f.label :purchase_order_datum_id, '注文No：：' %>
+  <%= f.select :purchase_order_datum_id_eq, @purchase_order_data_extract.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchablePurchaseCode"}  %>
+  
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrder()" %>
+  <% end %>
+  
+  <%= f.label :division_id, '仕入区分' %>
+  <%= f.select :division_id_eq, PurchaseDivision.all.map{|st| [st.purchase_division_name, st.id]}, {include_blank: true},
+       { id: 'division_id', style: 'width:120px' , class: "searchablePurchaseDivision"}  %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseDivision()" %>
+  
+  <%= f.label :division_id, '入出庫区分' %>
+  <%= f.select :inventory_division_id_eq, InventoryHistory.inventory_division.map{ |value, key| [value, key] }, {include_blank: true}, 
+       { id: 'inventory_division_id', style: 'width:120px'} %>
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearInventoryDivision()" %>
+       
+  <%= f.label :construction_code, '件名：：' %>
+  <!--<%= f.select :with_construction, ConstructionDatum.all.order("construction_code desc").map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id: 'id', style: 'width:440px' , class: "searchableConstructionCode" } %>-->
+  <%= f.select :with_construction,  @construction_code_extract.order("construction_code desc").map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, {id: 'id', style: 'width:440px' , class: "searchableConstructionCode" } %>
+  
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+  <% end %>
+  </br>
+  
+  <%= f.label :customer_id, '得意先：：' %>
+  <!--<%= f.select :with_customer, options_from_collection_for_select(CustomerMaster.all, "id", "customer_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableCustomerName" }  %>-->
+  <%= f.select :with_customer, CustomerMaster.all.map{|st| [st.customer_name, st.id]}, {include_blank: true}, {id: 'customer_id', style: 'width:220px' , 
+      class: "searchableCustomerName", :onchange => "setConstructionExtractByCutomer()" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearCustomer()" %>
+  <% end %>
+    
+  <%= f.label :material_code, '品番：：' %>
+  <!--<%= f.select :with_material_code, PurchaseDatum.group(:material_code).map{|st| [st.material_code, st.material_id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" } %>-->
+  <!--upd190207-->
+  <%= f.select :with_material_code, options_from_collection_for_select(MaterialMaster.all, "id", :p_material_code, params[:q].try(:[], :with_material_code)) ,
+       {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCode" }  %>
+       
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterial()" %>
+  <% end %>
+    
+  <%= f.label :material_category_id, '分類：：' %>
+  <%= f.select :with_material_category, MaterialCategory.order("seq asc").all.map{|st| [st.name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableMaterialCategory" } %>
+  <!--モバイル用対応  add180830-->
+  <% if browser.platform.ios? || browser.platform.android? %>
+    <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearMaterialCategory()" %>
+  <% end %>
+    
+    
+  <%= f.label :material_code, '　品番(キーワード)：' %>
+  <!--<%= f.text_field :material_code_cont, include_blank: true , id: 'material_code' %>-->
+  <%= f.text_field :with_material_code_include, include_blank: true , id: 'material_code' %>
+  
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemCodeKeyWords()" %>
+  
+  <%= f.label :material_code, '品名：' %>
+  <!--<%= f.text_field :material_name_cont, include_blank: true, style: 'width:330px', id: 'material_name'  %>-->
+  <%= f.text_field :with_material_name_include, include_blank: true, style: 'width:220px', id: 'material_name'  %>
+  
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemName()" %>
+  
+  <!--必要なし？-->
+  <%= f.label :material_code, '品名（手入力）：' %>
+  <%= f.text_field :material_name_cont, include_blank: true, style: 'width:220px', id: 'material_name_free'  %>
+
+  <!--add180117 クリアボタン追加-->
+  <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearItemNameManual()" %></br>
+  
+      <div>
+       <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+       
+       <%= f.button_tag "条件全クリア", :type => 'link', name: "clear",  
+               :onclick => "clearAllConditions()" %>
+       <%= link_to "仕入表(様式１)",
+            purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "1"),
+            :class => 'btn  btn-lightgreen500_ftg keep-disp', :target=>["_blank"] %>
+      <%= link_to "仕入表(様式２)",
+            purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "2"),
+            :class => 'btn  btn-pink300_ftg keep-disp', :target=>["_blank"] %>
+       <!--保留
+       <%= link_to "請求一覧(外注)",
+            purchase_data_path(@purchase_datum, format: "pdf", construction_id: params[:construction_id], move_flag: params[:move_flag], print_type: "3"),
+            :class => 'btn  btn-purple300_ftg', :target=>["_blank"] %>
+       -->
+       <%= link_to '新規作成',
+            new_purchase_datum_path(:new_flag => "0", construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+            supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag] ),
+            :class => 'btn btn-primary keep-disp' %>
+       <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+	   <!--<%= link_to t('.back', :default => t("工事費集計へ")), construction_costs_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
+                                   :class => 'btn btn-lime500_rsd keep-disp'  %>-->
+	   <%= link_to t('.back', :default => t("注文一覧へ")), purchase_order_data_path(purchase_order_id: params[:purchase_order_id], 
+                    construction_id: params[:construction_id], move_flag: params[:move_flag]), :class => 'btn btn-info'  %>
+       
+       <!-- 最安値ボタン追加 add211223 -->
+       <%= f.button "最安値", type: 'submit', name: "subaction", value: "bestprice", class: 'btn btn-red300_rsd'%>
+       
+       <!--<%= link_to "CSV", purchase_data_path(params.merge(format: 'csv')) ,:class => 'btn btn-default'%>-->
+       <td><font size="3">合計金額:<%=number_to_currency(@purchase_data.sumprice,  precision: 0 ) %></font></td>
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       <td><font size="2">合計数量(在庫確認用):<%= number_with_delimiter(@purchase_data.sumQuantity + @purchase_data.sumShipQuantity) %></font></td>
+ 
+     </div>
+   <% end %>
+   
+   
+    <!-- kaminari用追加箇所開始 -->
+   <%= paginate @purchase_data %>
+   <!-- kaminari用追加箇所終了 --> 
+   
+</div>
+ 
+
+<!--見出し固定用設定追加-->
+<div style="margin-top : -50px;", class="span11 table-scrollable" >
+ <style>
+   table { }
+   table th, table td { white-space:nowrap; overflow:hidden; }
+  </style>
+  <!--見出し固定用設定追加-->
+　<table id="tablefix", class="table  table-striped", style="font-size : 12px;width:1920px;table-layout:fixed;">
+  <thead>
+    <tr>
+      <th style="width:50px;"><%= sort_link(@q, :id, model_class.human_attribute_name(:id) ) %></th>
+      <th style="width:90px;"><%= sort_link(@q, :purchase_date, "仕入日" ) %></th>
+      <th style="width:55px;"><%= sort_link(@q, :purchase_order_datum_purchase_order_code, "注文No" ) %></th>
+      <th style="width:90px;"><%= sort_link(@q, :construction_datum_construction_code, "件名No" ) %></th>
+	  <th style="width:240px;"><%= sort_link(@q, :construction_datum_construction_name, "件　　名" ) %></th>
+      <th style="width:200px;"><%= sort_link(@q, :construction_datum_CustomerMaster_customer_name, "得意先名" ) %></th>
+      <th style="width:120px;"><%= sort_link(@q, :material_code, "品番" ) %></th>
+	  <th style="width:370px;"><%= sort_link(@q, :material_name, "品   名" ) %></th>
+	  <th style="width:110px;"><%= sort_link(@q, :maker_name, "メーカー" ) %></th>
+	  <th style="width:50px;"><%= sort_link(@q, :quantity, "数量" ) %></th>
+      <th style="width:50px;"><%= sort_link(@q, :unit_master_unit_name, "単位" ) %></th>
+	  <th style="width:85px;"><%= sort_link(@q, :purchase_unit_price, "仕入単価" ) %></th>
+	  <th style="width:80px;"><%= sort_link(@q, :purchase_amount, "金額" ) %></th>
+	  <th style="width:65px;"><%= sort_link(@q, :list_price, "定価" ) %></th>
+	  <th style="width:79px;"><%= sort_link(@q, :SupplierMaster_supplier_name, "仕入業者" ) %></th>
+	  <th style="width:40px;"><%= sort_link(@q, :PurchaseDivision_purchase_division_name, "区分" ) %></th>
+      <!--<th style="width:40px;">請求</th>-->
+      <!--<th>伝票No</th>-->
+      <th align="left;", style="width:50px;"><%= sort_link(@q, :slip_code, "伝票No" ) %></th>
+      <!--<th><%= model_class.human_attribute_name(:created_at) %></th>-->
+      <th style="width:90px;"><%=t '.actions', :default => t("helpers.actions") %></th>
+	  <th style="width:160px;"><%= model_class.human_attribute_name(:created_at) %></th>
+      <th style="width:80px;">分類</th>
+      <th style="width:25px;">完</th>
+    </tr>
+  </thead>
+  <tbody >
+    <% @purchase_data.order("id desc").each  do  |purchase_datum| %>
+      <tr>
+        <td style="font-size : 12px;"><%= link_to purchase_datum.id, purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'keep-disp'  %></td>
+        <td style="font-size : 12px;"><%= purchase_datum.purchase_date %></td>
+        <% if purchase_datum.purchase_order_datum.nil? %>
+           <td>-</td>
+        <% else %>
+		   <td style="font-size : 12px;"><%= purchase_datum.purchase_order_datum.purchase_order_code %></td>
+		<% end %>
+        <% if purchase_datum.construction_datum_id.nil? || purchase_datum.construction_datum.nil? %>
+           <td>-</td>
+        <% else %>
+		   <td style="font-size : 12px;"><%= purchase_datum.construction_datum.construction_code %></td>
+        <% end %>
+        <% if purchase_datum.construction_datum_id.present?  %>
+		   <% if purchase_datum.construction_datum_id!=1 then  %>
+		     <% if purchase_datum.construction_datum.present? %>
+               <td class="col-md-24", style="font-size : 12px;"><%= purchase_datum.construction_datum.construction_name %></td>
+             <% else %>
+			   <td></td>
+			 <% end %>
+		   <% else %>
+		      <% if purchase_datum.notes.present?  %>
+			    <td class="col-md-24", style="font-size : 12px;"><%= purchase_datum.notes %></td>
+			  <% else %>
+			    <td class="col-md-24">-</td>
+			  <% end %>  
+		   <% end %>
+		<% else %>
+           <td class="col-md-24">-</td>
+        <% end %>
+        <% if purchase_datum.construction_datum_id.present? && purchase_datum.construction_datum.present? && 
+                purchase_datum.construction_datum.CustomerMaster.present? %>
+           <td align="left", style="font-size : 12px;"><%= purchase_datum.construction_datum.CustomerMaster.customer_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+		<% if purchase_datum.material_code == "＜手入力用＞" %>
+		  <td style="font-size : 12px;">-</td>
+		<% else %>
+		  <% if purchase_datum.material_id != 1 && purchase_datum.MaterialMaster.present? %>
+            <td style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_code %></td>
+		  <% else %>
+            <td style="font-size : 12px;"><%= purchase_datum.material_code %></td>
+		  <% end %>
+		<% end %>
+		<% if purchase_datum.material_id != 1 && purchase_datum.MaterialMaster.present? %>
+		  <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_name %></td>
+		<% else %>
+	      <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.material_name %></td>
+		<% end %>
+        <td style="font-size : 12px;"><%= purchase_datum.maker_name %></td>
+        <!--<td align="right", style="font-size : 12px;"><%= purchase_datum.quantity %></td>-->
+        
+        <% first, second = purchase_datum.quantity.to_s.split('.') %>
+        <% if second.to_i > 0 %>
+          <td align="right", style="font-size : 12px;"><%= number_with_precision(purchase_datum.quantity, :precision => 2) %></td>
+        <% else %>
+          <td align="right", style="font-size : 12px;"><%= number_with_precision(purchase_datum.quantity, :precision => 0 ) %></td>
+        <% end %>
+        
+        <% if purchase_datum.unit_id.present? %>
+          <td align="center", style="font-size : 12px;"><%= purchase_datum.unit_master.unit_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        <td align="right", style="font-size : 12px;"><%= number_to_currency(purchase_datum.purchase_unit_price, :precision => 2)  %></td>
+        <% if purchase_datum.purchase_amount.present? %>
+           <td align="right", style="font-size : 12px;"><%= number_to_currency(purchase_datum.purchase_amount,  precision: 0) %></td>
+        <% else %>
+           <td align="right">-</td>
+        <% end %>
+        <% if purchase_datum.list_price.present? %>
+		  <% if purchase_datum.list_price > 0 %>
+             <td align="right", style="font-size : 12px;"><%= number_to_currency(purchase_datum.list_price, precision: 0) %></td>
+          <% else %>
+		     <td align="right">-</td>
+		  <% end %>
+		<% else %>
+           <td align="right">-</td>
+        <% end %>
+		
+		<% if purchase_datum.SupplierMaster.present? %>
+          <td style="font-size : 12px;"><%= purchase_datum.SupplierMaster.supplier_name %></td>
+		<% else %>
+		  <td style="font-size : 12px;"></td>
+		<% end %>
+		
+		<% if purchase_datum.PurchaseDivision.present? %>
+             <td style="font-size : 12px;"><%= purchase_datum.PurchaseDivision.purchase_division_name %></td>
+        <% else %>
+           <td>-</td>
+        <% end %>
+        
+        <!--請求のチェック追加--保留
+        <td><%= check_box("outsourcing_invoice_flag", "active", {checked: check_if_true(purchase_datum.outsourcing_invoice_flag) , 
+                  :multiple => true, :style => "margin-left: 16px;",  :disabled => false , :class => "outsourcing_check",  :id => purchase_datum.id  }, "true", "false") %></td>
+        -->
+        
+		<td style="font-size : 8px;"><%= purchase_datum.slip_code %></td>
+        <td>
+          <%= link_to '編集',
+                      edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd btn-xs keep-disp' %>
+          <!--集計ボタン(保留)-->
+          <!--<%= link_to '集計',
+                      edit_purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-purple300_rsd btn-xs' %>-->
+          <%= link_to '削除',
+                      purchase_datum_path(purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
+                      supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger keep-disp' %>
+        </td>
+        <td><%=l purchase_datum.created_at.in_time_zone('Tokyo') %></td>
+        
+        <!--分類-->
+        <% if purchase_datum.MaterialMaster.present? && purchase_datum.MaterialMaster.material_category.present? %>
+          <td class="col-md-3", style="font-size : 12px;"><%= purchase_datum.MaterialMaster.material_category.name %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        <!-- -->
+        <% if purchase_datum.purchase_header.present? %>
+          <td><%= check_box("complete_flag", "active", {checked: check_if_true(purchase_datum.purchase_header.complete_flag) , :multiple => true,
+                :style => "margin-left: 0px;" , :disabled => true}, "true", "false") %></td>
+        <% else %>
+          <td>-</td>
+        <% end %>
+        
+      </tr>
+    <% end %>
+   
+  </tbody>
+</table>
+</div>
+ 
+
+
+<script type="text/javascript">
+  
+  //var massageList = "指定無し";
+  
+  //検索可能なリストボックス
+  $(document).ready(function(){
+	$(".searchablePurchaseCode").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+
+        $(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST});
+
+        $(".searchableCustomerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST });
+
+        $(".searchableMaterialCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+        //$(".searchableInternalCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+
+        $(".searchableMaterialCategory").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+
+        $(".searchableMakerName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST});
+   
+         $(".searchablePurchaseDivison").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST});
+
+        $(".searchableSupplierName").select2({ theme: "classic" , allowClear: true , placeholder: MESSAGE_LIST }); 
+     
+     
+         
+     
+     //見出し固定用設定追加
+	 var sz = window.parent.screen.width;
+	 var fc = 1;    //デフォルトの固定列数(社長PC基準)
+	 //var ht = 618;  //デフォルトの高さ(社長PC基準)580
+        var ht = 690;  //デフォルトの高さ(社長PC基準)580
+	 
+	 //if (sz != 1920) {
+     if (sz < 1920) {
+	 //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+        //fc = 4;  //固定列数
+        fc = 1;  //固定列数
+		ht -= 70;
+        sz = 1920; //for ipad pro (add180829)
+	 }
+	 $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+	 //
+     
+     //add190205
+     $('form').keepPosition();
+     
+      //add190124
+     //請求済（外注用）チェックでリアルタイム更新する
+     $(".outsourcing_check").on('change', function(e) {
+       var $elem = $(e.target);
+       var id = $elem.context.id
+       var bool = $elem.is(':checked') ? 1 : 0;
+            
+       //チェック入った場合のみ、ajaxする
+       if (bool)
+         {
+           //砂時計にする
+           $("body").css("cursor", "progress");
+            
+           $.get("<%= purchase_datum_set_ajax_outsourcing_default_data_path %>",
+                {id: id },
+                function(data){
+                    //画面再描画のためリロードする
+		            window.location.reload();
+                    
+                    //$("body").css("cursor", "default");
+           }
+	     );
+       }
+          
+     });
+
+     
+     
+  });
+  
+  //フォームロード時のイベント(再読込時も)
+  window.onload = function(){
+    $("body").css("cursor", "default");
+  }
+  
+  //条件を全てクリアする
+  function clearAllConditions() {
+    document.getElementById("purchase_date_start").value = "";
+    document.getElementById("purchase_date_end").value = "";
+     
+    $(".searchablePurchaseCode").val(null).trigger("change");
+    $(".searchableConstructionCode").val(null).trigger("change");
+    $(".searchableCustomerName").val(null).trigger("change"); 
+    $(".searchableMaterialCode").val(null).trigger("change"); 
+    //$(".searchableInternalCode").val(null).trigger("change"); 
+    $(".searchableMakerName").val(null).trigger("change"); 
+    $(".searchablePurchaseDivison").val(null).trigger("change"); 
+    $(".searchableSupplierName").val(null).trigger("change"); 
+    
+    document.getElementById("division_id").value = 0;
+    document.getElementById("inventory_division_id").value = "";
+    document.getElementById("slip_code").value = "";
+	document.getElementById("material_code").value = "";
+	document.getElementById("material_name").value = "";
+	document.getElementById("material_name_free").value = "";
+	
+	
+ }
+ 
+ //得意先別に件名を抽出する処理
+ function setConstructionExtractByCutomer(){
+    var customer_id = document.getElementById("customer_id").value;
+	$.get("<%= construction_dataz_customer_extract_path %>",
+      {customer_id: customer_id},
+       function(data){
+		 
+		 document.getElementById("id").value = "";
+		 
+		 //リストを未選択状態にする
+		 //document.getElementById("working_middle_item_id_select_hide").value = "";
+		 //短縮名も同様
+		 //document.getElementById("working_middle_item_short_name_select_hide").value = "";
+	});
+ }
+ 
+ //モバイル用対応 add180830
+ //仕入先をクリアする
+ function clearSupplier(){
+   $(".searchableSupplierName").val(null).trigger("change"); 
+ }
+ function clearPurchaseOrder(){
+   $(".searchablePurchaseCode").val(null).trigger("change"); 
+ }
+ function clearConstruction(){
+   $(".searchableConstructionCode").val(null).trigger("change"); 
+ }
+ function clearCustomer(){
+   $(".searchableCustomerName").val(null).trigger("change"); 
+ }
+ function clearMaterial(){
+   $(".searchableMaterialCode").val(null).trigger("change"); 
+ }
+ function clearMaterialCategory(){
+   $(".searchableMaterialCategory").val(null).trigger("change"); 
+ }
+ //
+ 
+ //開始日を空にする
+ function clearStartDate(){
+   document.getElementById("purchase_date_start").value = "";
+ }
+ //開始日を空にする
+ function clearEndDate(){
+   document.getElementById("purchase_date_end").value = "";
+ }
+ 
+ //キーワードの品番を空にする
+ function clearItemCodeKeyWords(){
+   document.getElementById("material_code").value = "";
+ }
+ //キーワードの品名を空にする
+ function clearItemName(){
+   document.getElementById("material_name").value = "";
+ }
+ //手入力の品名を空にする
+ function clearItemNameManual(){
+   document.getElementById("material_name_free").value = "";
+ }
+ //手入力の伝票番号を空にする
+ function clearSlipCode(){
+   document.getElementById("slip_code").value = "";
+ }
+ //仕入区分を空にする
+ function clearPurchaseDivision(){
+   document.getElementById("division_id").selectedIndex = 0;
+ }
+ //入出庫区分を空にする
+ function clearInventoryDivision(){
+   document.getElementById("inventory_division_id").selectedIndex = 0;
+ }
+  
+</script>
