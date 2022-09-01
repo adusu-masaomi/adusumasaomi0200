@@ -173,14 +173,20 @@
             :onclick => "submit()", params: { format: :pdf}  %>-->
         
         
-        <%= f.button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
-             formtarget: "_blank" , :onclick => "submitFax()") %>
+        <!--<%= f.button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
+             formtarget: "_blank" , :onclick => "submitFax()") %>-->
+        
+        <%= f.button_tag( 'ＦＡＸ', :type => 'button', :class => "btn btn-lime500_ftg" , 
+             form: {target: '_blank'},  :onclick => "submitFax()") %>
         
         <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
         
-        <%= f.button_tag( '注文書', :value => 'pdf', :name => 'format', :class => "btn btn-orange500_ftg" , 
+        <!--<%= f.button_tag( '注文書', :value => 'pdf', :name => 'format', :class => "btn btn-orange500_ftg" , 
+             formtarget: "_blank" , :onclick => "return submitPurchaseOrder()") %>-->
+         
+         <%= f.button_tag( '注文書', :type => 'button', :class => "btn btn-orange500_ftg" , 
              formtarget: "_blank" , :onclick => "return submitPurchaseOrder()") %>
-                
+         
          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
          <!--※２回目の登録以降は、Ｅｎｔｅｒ押下による移動はお勧めできません（動作不安定により）-->
 		 
@@ -579,6 +585,24 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
 	});
 	//
 	
+  //$('#button').keypress(function (e) {
+  //$('#button').keydown(function (e) {
+  //document.getElementById("button").onkeydown = function(e){
+  //document.getElementById("button").onclick = function(e){
+  //document.getElementById("button").onkeypress = function(e){
+  //var key = e.which;
+  
+  //debugger;
+  //if(key == 13)  // the enter key code
+  //  {
+      
+  //    //$('input[name = butAssignProd]').click();
+  //    return false;  
+  //  }
+  //});
+  //}   
+  
+  
    // alert('Inserted!');
 });
 
@@ -786,6 +810,7 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
            sessionStorage.setItem('onvisible', 'true');
          }
          
+         document.forms[0].target = "";  //add220615
          document.forms[0].submit();
       }
 	 }
@@ -805,14 +830,20 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
     return ok_flag;
  }
  
+ 
  function submitFax()
  {
-    //
     document.getElementById("format").value = "pdf";
     //faxフラグをセット
     document.getElementById("print_type").value = "fax";
     //
-    //document.forms[0].submit();
+    
+    //return true;  //add220615
+    //restore 2206145
+    document.forms[0].target="_blank";
+    document.forms[0].submit();
+   
+
  }
 
  function submitPurchaseOrder()
@@ -828,8 +859,9 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
       return false;
     }
     
+    document.forms[0].target="_blank";  //add220615
+    document.forms[0].submit();
     return true;
-    //document.forms[0].submit();
  }
  
 //仕入先別メアドのセット

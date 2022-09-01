@@ -130,9 +130,11 @@ class QuotationDetailMiddleClassification < ActiveRecord::Base
   .where("quotation_detail_large_classifications.working_large_item_name = ?", quotation_detail_middle_classifications_quotation_detail_large_classification_id )
   .where("quotation_detail_large_classifications.working_large_specification = ?", hoge )}
   
+  scope :with_large_item_name, -> (quotation_detail_middle_classifications_quotation_detail_large_classification_id=1, item_name) { joins(:QuotationDetailLargeClassification)
+  .where("quotation_detail_large_classifications.working_large_item_name = ?", item_name)}
   
   def self.ransackable_scopes(auth_object=nil)
-     [:with_header_id, :with_large_item, :with_large_specification]
+     [:with_header_id, :with_large_item, :with_large_item_name, :with_large_specification]
   end
 
 end

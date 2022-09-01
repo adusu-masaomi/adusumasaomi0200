@@ -408,11 +408,14 @@
 	  
    //検索可能なリストボックス(品名の場合)
    $(".searchableId").select2({ theme: "classic" });
-	 $(".searchableSupplier").select2({ theme: "classic" });
-   $( ".searchableSupplier" ).change(function(e) {
+	 
+   $(".searchableSupplier").select2({ theme: "classic" });
+   
+   //del220704
+   //$( ".searchableSupplier" ).change(function(e) {
      //担当Emailを取得
      //setEmail()
-   })
+   //})
       
    
    $(".searchableMaterial").select2({ theme: "classic" });
@@ -451,6 +454,7 @@
 	   });
 	   
      
+     //upd220704
 	   //担当者のリセット(未選択状態にする)
 	   resetResponsible();
 	   
@@ -881,6 +885,16 @@ function checkSupplier(flag){
 function resetResponsible()
  {
     var index = 1;
+    
+    //add220704
+    //このイベントを強制発動させる必要がある->setEmailのパラメータが必要
+    var nowId = parseInt($(".searchableSupplier")[0].value);
+    if (nowId != undefined && nowId != 1)
+    {
+      index = nowId;
+    }
+    //
+    
     $(".searchableSupplier").val(index).trigger("change");
  
  }
@@ -893,8 +907,6 @@ function setEmail()
    var supplier_id = document.getElementById("supplier_master_id").value
    //add210715
    var construction_id = document.getElementById("construction_datum_id").value
-   
-   //debugger
    
    //IDもセット
    var id = document.getElementById("id").value;

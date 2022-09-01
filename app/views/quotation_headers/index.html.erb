@@ -19,8 +19,8 @@
   <% end %>
   
   <%= f.label :construction_code, '件名：' %>
-  <!--<%= f.select :with_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>-->
-  <%= f.select :with_id, QuotationHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %>
+  <!--<%= f.select :with_quotation_construction_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>-->
+  <%= f.select :with_quotation_construction_id, QuotationHeader.all.map{|st| [st.construction_name, st.id]}, {include_blank: true}, {style: 'width:440px' , class: "searchableConstructionName" } %>
   <!--モバイル用対応  add180830-->
   <% if browser.platform.ios? || browser.platform.android? %>
     <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
@@ -36,8 +36,12 @@
   </br>
   
   	<div>
-    	<%= f.submit '検索する' %>
-  	</div>
+      <!--<%= f.submit '検索する' %>-->
+      <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
+      
+  	  <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+    </div>
+    
    <% end %>
 
 

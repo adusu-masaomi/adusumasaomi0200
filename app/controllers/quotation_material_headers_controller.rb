@@ -518,8 +518,13 @@ class QuotationMaterialHeadersController < ApplicationController
           #add220606
           #メール送信の場合、見積／注文書を後から発行する場合もあるため、画面遷移させない
           if params[:quotation_material_header][:sent_flag] == "1" || params[:quotation_material_header][:sent_flag] == "2"
+            #binding.pry
+            
             redirect_to request.referer, alert: "Successfully sending message"  #ここでalertを適当に入れないと下部のflashメッセージが出ない。
             flash[:notice] = "メールを送信しました。"
+            
+            #binding.pry
+            
             break
           end
           #
@@ -950,7 +955,8 @@ class QuotationMaterialHeadersController < ApplicationController
         $mail_flag = false
         
         #注文の場合
-        if params[:quotation_material_header][:sent_flag] == "8"
+        #if params[:quotation_material_header][:sent_flag] == "8"
+        if $request_type == 2
           $purchase_order_code = params[:quotation_material_header][:purchase_order_code]
         end
         #仕入先（１〜３）の判定 "$supplier"にセットされる

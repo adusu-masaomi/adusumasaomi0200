@@ -57,8 +57,15 @@ class ConstructionDatum < ActiveRecord::Base
     geocoded_by :address_with_house_number
     after_validation :geocode, if: lambda {|obj| obj.address_changed?}
 	
-	scope :with_id,  -> { joins(:purchase_order_datum) }
-	scope :with_customer, -> { joins(:CustomerMaster) }  #add190612
+    #scope :with_id,  -> { joins(:purchase_order_datum) }
+    #upd220618
+    scope :with_id, -> (construction_id=1) { 
+	  if construction_id.present?
+	    joins(:purchase_order_datum).where("purchase_order_data.construction_datum_id = ?", construction_id )
+	  end
+    }
+    
+    scope :with_customer, -> { joins(:CustomerMaster) }  
     
 	def self.ransackable_scopes(auth_object=nil)
   		[:with_id, :with_customer]

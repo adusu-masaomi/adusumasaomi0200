@@ -67,6 +67,9 @@ class PurchaseOrderPDF
     #担当は先頭を取ってくる---複数の場合に無理があるかも??
     report.page.item(:supplier_responsible_name).value($purchase_order_history.supplier_master.supplier_responsibles[0].responsible_name + "様")
     
+    #add220729
+    report.page.item(:lbl_issue_date).value("注文日:")
+    
     #注文日
     report.page.item(:order_date).value($purchase_order_history.purchase_order_date)
   
@@ -92,16 +95,20 @@ class PurchaseOrderPDF
     #注文でループ
     $order_parameters.values.each_with_index.reverse_each do |item, index|
       
+      
       #出力判定
       check = false
       if $mail_flag == 0
       #帳票の場合
-        if item[:_destroy] != "true"
+        #if item[:_destroy] != "true"
+        if item[:_destroy] != "true" && item[:_destroy] != "1"
           check = true
         end
       else
       #メール送信の場合
-        if item[:_destroy] != "true" && item[:mail_sent_flag] != 1 && item[:mail_sent_flag] != "1"
+        #if item[:_destroy] != "true" && item[:mail_sent_flag] != 1 && item[:mail_sent_flag] != "1"
+        if item[:_destroy] != "true" && item[:_destroy] != "1" && 
+            item[:mail_sent_flag] != 1 && item[:mail_sent_flag] != "1"
           check = true
         end
       end

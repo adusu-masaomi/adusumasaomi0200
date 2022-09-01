@@ -11,7 +11,8 @@
   <%= f.label :construction_code, '件名　' %>
   <%= f.select :with_header_id, options_from_collection_for_select(InvoiceHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
   <%= f.label :working_large_item, '品目名　' %>
-  <%= f.select :working_large_item_name_eq, options_from_collection_for_select(InvoiceDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
+  <%= f.select :working_large_item_name_eq, options_from_collection_for_select(InvoiceDetailLargeClassification.
+                  select(:id, :working_large_item_name).group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %></br> 
 
   	<div>
     	<%= f.submit '検索する' %>

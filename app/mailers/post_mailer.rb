@@ -44,7 +44,7 @@ class PostMailer < ApplicationMailer
     ######
     #if user.supplier_master.id != 5
     #    mail to: $email_responsible ,
-    #    cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #    cc: ["adusu@coda.ocn.ne.jp", "adusu-info@eos.ocn.ne.jp" , $email_responsible2 ] ,
     #    subject: '注文番号登録依頼' + subject_time
     #else
     ##ムサシで選んだ場合、テストメールとする
@@ -55,7 +55,7 @@ class PostMailer < ApplicationMailer
     
     #test用
     mail to: "camille0816@gmail.com" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "i_kyohim@yahoo.co.jp", 
         
     #以下は消さない事!
     #add180403
@@ -116,12 +116,12 @@ class PostMailer < ApplicationMailer
     #本番用
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
-    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-info@eos.ocn.ne.jp" , $email_responsible2 ] ,
 
     #2022 test時!!
     #メアドは画面より反映(ccは固定)
     mail to: "camille0816@gmail.com" ,
-    cc: "ilovekyosukehimuro@yahoo.co.jp", 
+    cc: "i_kyohim@yahoo.co.jp", 
 
     #以下は消さない事!
     #add180403
@@ -170,7 +170,7 @@ class PostMailer < ApplicationMailer
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
     #担当者２のメアドがあれば、CCに加える。
-    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-info@eos.ocn.ne.jp" , $email_responsible2 ] ,
     
     #test時!!
     #メアドは画面より反映(ccは固定)
@@ -257,7 +257,7 @@ class PostMailer < ApplicationMailer
     #メアドは画面より反映(ccは固定)
     #mail to: $email_responsible ,
     #担当者２のメアドがあれば、CCに加える。
-    #cc: ["adusu@coda.ocn.ne.jp", "adusu-takano@aroma.ocn.ne.jp" , $email_responsible2 ] ,
+    #cc: ["adusu@coda.ocn.ne.jp", "adusu-info@eos.ocn.ne.jp" , $email_responsible2 ] ,
 
     #メアドは画面より反映(ccは固定)
     mail to: "camille0816@gmail.com" ,

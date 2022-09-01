@@ -12,10 +12,13 @@
   <%= f.select :with_header_id, options_from_collection_for_select(DeliverySlipHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
   
   <%= f.label :working_large_item, '品目名　' %>
-  <%= f.select :with_large_item, options_from_collection_for_select(DeliverySlipDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  <%= f.select :with_large_item_name, options_from_collection_for_select(DeliverySlipDetailLargeClassification.select(:id, :working_large_item_name).
+                                              group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
   
   <%= f.label :working_middle_item, '内訳名　' %>
-  <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(DeliverySlipDetailMiddleClassification.group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
+  <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(DeliverySlipDetailMiddleClassification.select(:id, :working_middle_item_name).
+                                             group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ) ,
+                                              {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
   
   	<div>
     	<%= f.submit '検索する' %>
@@ -63,10 +66,14 @@
 <%= @delivery_slip_header_name %>
 <%= "　　" %>
 <%= "項目:" %>
+<% if @working_large_item_name.present? %>
 <%= @working_large_item_name[0] %>
+<% end %>
 <%= "　　" %>
 <%= "仕様:" %>
+<% if @working_large_item_name.present? %>
 <%= @working_large_item_name[1] %>
+<% end %>
 </b></font>
 </div>
 

@@ -1,14 +1,15 @@
 class PurchaseOrderHistory < ActiveRecord::Base
 
     belongs_to :purchase_order_datum
-	belongs_to :supplier_master
-	
-	has_many :orders
+    belongs_to :supplier_master
+
+    has_many :orders
     accepts_nested_attributes_for :orders, allow_destroy: true
     
     #納品場所
     def self.delivery_place 
-      [["現場", 0], ["事務所", 1], ["引取", 2]] 
+      #[["現場", 0], ["事務所", 1], ["引取", 2]] 
+      [["現場", 0], ["事務所", 1], ["倉庫", 2], ["引取", 3]] 
     end
     
     #add220108
@@ -16,19 +17,19 @@ class PurchaseOrderHistory < ActiveRecord::Base
     #attr_accessor :construction_id
     #attr_accessor :move_flag
     
-	#eメール取得用
+    #eメール取得用
     attr_accessor :email_responsible
-	
+
     #担当者
     attr_accessor :responsible
     
-	#ボタン切り分け用
-	attr_accessor :sent_flag
-	
-	#画面見出し用
-	attr_accessor :purchase_order_code
-	attr_accessor :construction_name
-	attr_accessor :supplier_name
+    #ボタン切り分け用
+    attr_accessor :sent_flag
+ 
+    #画面見出し用
+    attr_accessor :purchase_order_code
+    attr_accessor :construction_name
+    attr_accessor :supplier_name
     
     #fax
     attr_accessor :format
@@ -39,14 +40,14 @@ class PurchaseOrderHistory < ActiveRecord::Base
     attr_accessor :print_type
         
     #資材ID自動セット用
-	attr_accessor :material_id_hide
-	attr_accessor :material_id_select_hide
-	#資材コード(ajax明細用)
-	attr_accessor :material_code_hide
+    attr_accessor :material_id_hide
+    attr_accessor :material_id_select_hide
+    #資材コード(ajax明細用)
+    attr_accessor :material_code_hide
     attr_accessor :material_code_select_hide
-	#資材名(ajax明細用)
-	attr_accessor :material_name_hide
-	#メーカーID用(ajax明細用)
+    #資材名(ajax明細用)
+    attr_accessor :material_name_hide
+    #メーカーID用(ajax明細用)
     attr_accessor :maker_id_hide
     
     #単位(ajax明細用)

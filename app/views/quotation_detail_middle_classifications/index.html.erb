@@ -16,11 +16,14 @@
   <%= f.select :with_header_id, options_from_collection_for_select(QuotationHeader.all, "id", "construction_name") , {include_blank: true}, {style: 'width:220px' , class: "searchableConstructionName" } %></br>
   
   <%= f.label :quotation_large_item, '品目名　' %>
-  <%= f.select :with_large_item, options_from_collection_for_select(QuotationDetailLargeClassification.group(:working_large_item_name), "working_large_item_name","working_large_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
+  <%= f.select :with_large_item_name, options_from_collection_for_select(QuotationDetailLargeClassification.select(:id, :working_large_item_name).
+                                         group(:working_large_item_name), "working_large_item_name","working_large_item_name" ), 
+                                         {include_blank: true}, {style: 'width:220px' , class: "searchableLargeItem" } %>
   
   <%= f.label :quotation_middle_item, '内訳名　' %>
-  <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ) , {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br> 
-  
+  <%= f.select :working_middle_item_name_eq, options_from_collection_for_select(QuotationDetailMiddleClassification.
+              select(:id, :working_middle_item_name).group(:working_middle_item_name), "working_middle_item_name","working_middle_item_name" ), 
+              {include_blank: true}, {style: 'width:220px' , class: "searchableMiddleItem" } %></br>
     <div>
         <%= f.submit '検索する' %>
     </div>
@@ -69,10 +72,14 @@
 <%= @quotation_header_name %>
 <%= "　　" %>
 <%= "項目:" %>
-<%= @working_large_item_name[0] %>
+<% if @working_large_item_name.present? %>
+  <%= @working_large_item_name[0] %>
+<% end %>
 <%= "　　" %>
 <%= "仕様:" %>
-<%= @working_large_item_name[1] %> 
+<% if @working_large_item_name.present? %>
+  <%= @working_large_item_name[1] %> 
+<% end %>
 </b></font>
 </div>
 

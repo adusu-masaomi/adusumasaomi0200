@@ -1017,6 +1017,8 @@ class PurchaseOrderHistoriesController < ApplicationController
   def set_order_data_fax(format)
   #def print_fax_or_puchase_order(format)
     
+    #binding.pry
+    
     if params[:format] == "pdf"
       #FAXの場合
       if params[:print_type] == "fax"

@@ -133,13 +133,17 @@ class DeliverySlipDetailMiddleClassification < ActiveRecord::Base
   
   scope :with_header_id, -> (delivery_slip_detail_middle_classifications_delivery_slip_header_id=1) { joins(:DeliverySlipHeader).where("delivery_slip_headers.id = ?", delivery_slip_detail_middle_classifications_delivery_slip_header_id )}
   #scope :with_large_item, -> (delivery_slip_detail_middle_classifications_delivery_slip_detail_large_classification_id=1) { joins(:DeliverySlipDetailLargeClassification).where("delivery_slip_detail_large_classifications.working_large_item_name = ?", delivery_slip_detail_middle_classifications_delivery_slip_detail_large_classification_id )}
-  #upd170308
+  #upd170308 -- 使えない??(220613)
   scope :with_large_item, -> (delivery_slip_detail_middle_classifications_delivery_slip_detail_large_classification_id=1, hoge) { joins(:DeliverySlipDetailLargeClassification)
          .where("delivery_slip_detail_large_classifications.working_large_item_name = ?", delivery_slip_detail_middle_classifications_delivery_slip_detail_large_classification_id )
          .where("delivery_slip_detail_large_classifications.working_large_specification = ?", hoge )}
-
+  
+  #add220613
+  scope :with_large_item_name, -> (delivery_slip_detail_middle_classifications_delivery_slip_detail_large_classification_id=1, item_name) { joins(:DeliverySlipDetailLargeClassification)
+         .where("delivery_slip_detail_large_classifications.working_large_item_name = ?", item_name) }
+         
   def self.ransackable_scopes(auth_object=nil)
-     [:with_header_id, :with_large_item]
+     [:with_header_id, :with_large_item, :with_large_item_name]
   end
 
 end

@@ -74,15 +74,24 @@ class PurchaseOrderAndEstimatePDF
     
     report.page.item(:supplier_name).value($quotation_material_header.supplier_master.supplier_name + "御中")
     
-    #binding.pry
-    
     #report.page.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.responsible1 + "様")
     #担当は先頭を取ってくる---複数の場合に無理があるかも??
     report.page.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.supplier_responsibles[0].responsible_name + "様")
     
     #見積依頼/注文日
-    report.page.item(:order_date).value($quotation_material_header.requested_date)
-  
+    #注文日:
+    issue = "注文日"
+    if $request_type == FLAG_ESTIMATE
+      issue = "依頼日:"
+    else
+      issue = "注文日:"
+    end
+    report.page.item(:lbl_issue_date).value(issue)
+    
+    #report.page.item(:order_date).value($quotation_material_header.requested_date)
+    #upd220721 発行した日付をセット
+    report.page.item(:order_date).value(Time.now.in_time_zone('Tokyo').to_date)
+    
     #注文番号(注文時のみ)
     if $request_type == FLAG_ORDER
       report.page.item(:order_code).value($purchase_order_code)

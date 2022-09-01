@@ -554,7 +554,7 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 430.5,
+      "x": 430,
       "y": 105,
       "width": 67.5,
       "height": 15,
@@ -572,7 +572,7 @@
         "font-style": []
       },
       "texts": [
-        "〒955-0021"
+        "〒955-0013"
       ]
     },
     {
@@ -580,9 +580,9 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 431.4,
+      "x": 430,
       "y": 122.4,
-      "width": 133,
+      "width": 137,
       "height": 12.5,
       "style": {
         "font-family": [
@@ -598,7 +598,7 @@
         "font-style": []
       },
       "texts": [
-        "新潟県三条市下保内1039-2"
+        "新潟県三条市井栗1丁目42-23"
       ]
     },
     {
@@ -719,32 +719,6 @@
       "y1": 115,
       "x2": 355,
       "y2": 115.8
-    },
-    {
-      "id": "",
-      "type": "text",
-      "display": true,
-      "description": "",
-      "x": 52,
-      "y": 145,
-      "width": 41,
-      "height": 14.7,
-      "style": {
-        "font-family": [
-          "IPAPGothic"
-        ],
-        "font-size": 10,
-        "color": "#000000",
-        "text-align": "left",
-        "vertical-align": "top",
-        "line-height": "",
-        "line-height-ratio": "",
-        "letter-spacing": "",
-        "font-style": []
-      },
-      "texts": [
-        "注文日:"
-      ]
     },
     {
       "id": "",
@@ -1354,7 +1328,7 @@
       "display": true,
       "description": "",
       "x": 50,
-      "y": 770,
+      "y": 765,
       "width": 525.2,
       "height": 63.7,
       "style": {
@@ -1376,9 +1350,9 @@
         "border-style": "solid"
       },
       "x1": 50,
-      "y1": 789.6,
+      "y1": 784.6,
       "x2": 575.2,
-      "y2": 789
+      "y2": 784
     },
     {
       "id": "",
@@ -1386,7 +1360,7 @@
       "display": true,
       "description": "",
       "x": 284,
-      "y": 774,
+      "y": 769,
       "width": 26,
       "height": 12.5,
       "style": {
@@ -1412,7 +1386,7 @@
       "display": true,
       "description": "",
       "x": 61.2,
-      "y": 798.9,
+      "y": 793.9,
       "width": 500.7,
       "height": 10,
       "style": {
@@ -1470,7 +1444,7 @@
       "display": true,
       "description": "",
       "x": 416,
-      "y": 775.6,
+      "y": 770.6,
       "width": 17.5,
       "height": 10,
       "style": {
@@ -1534,7 +1508,7 @@
       "display": true,
       "description": "",
       "x": 453.8,
-      "y": 776.4,
+      "y": 771.4,
       "width": 50.8,
       "height": 10,
       "style": {
@@ -1566,7 +1540,7 @@
       "display": true,
       "description": "",
       "x": 513.7,
-      "y": 775.4,
+      "y": 770.4,
       "width": 32.7,
       "height": 10,
       "style": {
@@ -1690,7 +1664,7 @@
       "display": true,
       "description": "",
       "x": 61.2,
-      "y": 815,
+      "y": 810,
       "width": 500.7,
       "height": 10,
       "style": {
@@ -1722,7 +1696,7 @@
       "display": true,
       "description": "",
       "x": 362.4,
-      "y": 775.3,
+      "y": 770.3,
       "width": 46.4,
       "height": 11.7,
       "style": {
@@ -1854,6 +1828,38 @@
         "letter-spacing": "",
         "font-style": [],
         "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "lbl_issue_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 52,
+      "y": 145,
+      "width": 41,
+      "height": 10,
+      "style": {
+        "font-family": [
+          "IPAPGothic"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
         "word-wrap": "none"
       },
       "reference-id": "",

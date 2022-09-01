@@ -1,33 +1,48 @@
 class QuotationHeadersController < ApplicationController
   before_action :set_quotation_header, only: [:show, :edit, :update, :destroy]
 
+  FLAG_WHEN_DESTROY = 1
+  FLAG_WHEN_UPDATE = 2
+
   # GET /quotation_headers
   # GET /quotation_headers.json
   def index
     
-    #add180929
-    #特定の検索クッキーを消去
-    #application = ApplicationController.new
-    #application.cookie_clear(cookies, "recent_search_history") #２番目のパラメータは、cookieから削除したくないパラメータ名
-    #
-    
-    #@quotation_headers = QuotationHeader.all
     #ransack保持用コード
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  	
-	
+    
+    #test
+    #cookies[:recent_search_history] = nil 
+    
+    #add220617
+    case params[:move_flag]
+      when "1"
+        #工事画面から遷移した場合
+        construction_id = params[:construction_id]
+        query = {"with_quotation_construction_id"=> construction_id }
+        #検索用クッキーへも保存
+        #params[:q] = query
+      else
+        #工事画面以外 -> 工事の検索条件はクリアする
+        if query.present?
+          query[:with_quotation_construction_id] = nil
+        end
+    end
+    #
+    
     #@q = QuotationHeader.ransack(params[:q])  
-     #ransack保持用--上記はこれに置き換える
+    #ransack保持用--上記はこれに置き換える
     @q = QuotationHeader.ransack(query)
-	
-	#ransack保持用コード
+	  
+    #ransack保持用コード
     search_history = {
     value: params[:q],
     expires: 24.hours.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
-	
+    
 	  @quotation_headers = @q.result(distinct: true)
     @quotation_headers  = @quotation_headers.page(params[:page])
 	
@@ -93,6 +108,10 @@ class QuotationHeadersController < ApplicationController
         #add190131
         update_construction_personnel
 		
+        #add220617
+        #工事の見積もりフラグを更新
+        update_construction_quotation_flag
+        
         format.html { redirect_to @quotation_header, notice: 'Quotation header was successfully created.' }
         format.json { render :show, status: :created, location: @quotation_header }
       else
@@ -116,6 +135,11 @@ class QuotationHeadersController < ApplicationController
     #見出しデータ（コピー元）の補完
     complementCopyHeader
     
+    #add220620
+    #工事コード変更した場合でも見積もりフラグを抹消
+    #delete_construction_quotation_flag_when_changed
+    delete_construction_quotation_flag(FLAG_WHEN_UPDATE)
+    
     respond_to do |format|
       if @quotation_header.update(quotation_header_params)
 	      #参照コードがあれば内訳マスターをコピー
@@ -127,6 +151,10 @@ class QuotationHeadersController < ApplicationController
         #工事担当者を更新
         #add190131
         update_construction_personnel
+
+        #add220617
+        #工事の見積もりフラグを更新
+        update_construction_quotation_flag
 
         format.html { redirect_to @quotation_header, notice: 'Quotation header was successfully updated.' }
         format.json { render :show, status: :ok, location: @quotation_header }
@@ -165,6 +193,9 @@ class QuotationHeadersController < ApplicationController
 	    #明細も消す
 	    QuotationDetailMiddleClassification.where(quotation_header_id: quotation_header_id).destroy_all
     
+      #見積もりフラグを消す
+      delete_construction_quotation_flag(FLAG_WHEN_DESTROY)
+      
     end
   end
   
@@ -211,6 +242,55 @@ class QuotationHeadersController < ApplicationController
     end 
   end
   
+  #add220617
+  #工事の見積もりフラグを更新
+  def update_construction_quotation_flag
+    if params[:quotation_header][:construction_datum_id].present?
+      id = params[:quotation_header][:construction_datum_id].to_i
+      construction = ConstructionDatum.where(:id => id).first
+      
+      if construction.present?
+        construction_params = { quotation_flag: 1}
+        construction.update(construction_params)
+      end
+    end
+  end
+  
+  #見積フラグの抹消
+  #flag ~> destroy時 or 工事No変更(update)時
+  def delete_construction_quotation_flag(flag)
+        
+    check = false
+    
+    if flag == FLAG_WHEN_DESTROY    #削除時
+      if @quotation_header.id.present?
+        check = true
+      end
+    elsif flag == FLAG_WHEN_UPDATE  #更新時
+      if @quotation_header.construction_datum_id !=
+          params[:quotation_header][:construction_datum_id].to_i
+        #工事コード変更した場合でも見積もりフラグを抹消
+        check = true
+      end
+    end
+        
+    #if @quotation_header.id.present?
+    if check
+      id = @quotation_header.id.to_i
+      construction_datum_id = @quotation_header.construction_datum_id.to_i
+      quotation_headers = QuotationHeader.where.not(id: id).where(:construction_datum_id => construction_datum_id)
+      
+      if quotation_headers.blank?
+        #カレントのみなら、見積フラグをリセット
+        construction = ConstructionDatum.where(:id => construction_datum_id).first
+        if construction.present?
+          construction_params = { quotation_flag: 0}
+          construction.update(construction_params)
+        end
+      end
+    end
+  end
+    
   #add190131
   #工事Mの担当者を更新
   def update_construction_personnel
@@ -290,7 +370,6 @@ class QuotationHeadersController < ApplicationController
   
   # ajax
   
-  #add180803
   #確定フラグのセット
   def set_fixed
     if params[:quotation_header_id].present?

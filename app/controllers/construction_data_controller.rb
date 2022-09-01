@@ -18,8 +18,10 @@ class ConstructionDataController < ApplicationController
        @construction_code_extract = ConstructionDatum.where(customer_id: query[:customer_id_eq]).order("construction_code desc")
     end
     ##upd end
- 
-   
+    
+    #test
+    #query = nil
+    
 	#@q = ConstructionDatum.ransack(params[:q])
     #ransack保持用--上記はこれに置き換える
     @q = ConstructionDatum.ransack(query)   
