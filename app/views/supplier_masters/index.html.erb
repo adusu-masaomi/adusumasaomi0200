@@ -18,6 +18,8 @@
         <%= link_to t('.new', :default => t("helpers.links.new")),
             new_supplier_master_path,
             :class => 'btn btn-primary keep-disp' %>
+            
+       <%= link_to "CSV", supplier_masters_path(params.merge(format: 'csv')),:class => 'btn btn-grey300_rsd btn-xs'%>
     </div>
    <% end %>
    <!-- kaminari用追加箇所開始 -->

@@ -22,9 +22,16 @@ class InvoicePDF
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
 	     #else
        when "3"
-       #請求書（印鑑有）--旧様式
-	       @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_pdf.tlf")
-	     #when "3"
+       #請求書（印鑑有）--従来様式
+         
+         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
+         
+         #221122del ハンコなくなった
+         #if !$public_flag
+	       #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_pdf.tlf")
+	       #else
+         #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_cs_pdf.tlf")
+         #end
        when "4"
          #請求書（印鑑有）--新様式--(210522-殆ど使わない)
 	       @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_new_pdf.tlf")

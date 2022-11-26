@@ -5,14 +5,44 @@ class SupplierMastersController < ApplicationController
   # GET /supplier_masters.json
   def index
     #@supplier_masters = SupplierMaster.all
-	
-	@q = SupplierMaster.ransack(params[:q])   
+    #@supplier_csv = SupplierMaster.all
+   
+    @q = SupplierMaster.ransack(params[:q])   
     @supplier_masters  = @q.result(distinct: true)
-	#kaminari用設定
+    
+    #kaminari用設定
     @supplier_masters  = @supplier_masters.page(params[:page])
-	
+    
+    respond_to do |format|
+	    format.html
+      #csv
+      format.csv { send_data @supplier_masters.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis', disposition: 'attachment' }
+      #format.csv { send_data SupplierMaster.all.to_csv }
+      
+      #format.csv do |csv|
+      #  send_posts_csv(@supplier_masters)
+      #end
+    end
+    
   end
-
+  
+  def send_posts_csv(supplier_masters)
+    csv_data = CSV.generate do |csv|
+      column_names = %w(投稿者名 タイトル 本文)
+      csv << column_names
+      supplier_masters.each do |supplier_master|
+        column_values = [
+          supplier_master.supplier_name,
+          supplier_master.tel_main,
+          supplier_master.fax_main,
+          supplier_master.responsible1,
+        ]
+        csv << column_values
+      end
+    end
+    send_data(csv_data, filename: "投稿一覧.csv")
+  end
+  
   # GET /supplier_masters/1
   # GET /supplier_masters/1.json
   def show

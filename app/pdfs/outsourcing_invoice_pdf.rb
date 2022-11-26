@@ -13,12 +13,12 @@ class OutsourcingInvoicePDF
   
           # tlfファイルを読み込む
           report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_pdf.tlf")
-       
+          
           # 1ページ目を開始
           report.start_new_page
         else
-          report.start_new_page layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_r_pdf.tlf"
         
+          report.start_new_page layout: "#{Rails.root}/app/pdfs/outsourcing_invoice_r_pdf.tlf"
         end
         
         

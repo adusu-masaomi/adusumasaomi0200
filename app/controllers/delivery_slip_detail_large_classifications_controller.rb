@@ -99,7 +99,10 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
         format.pdf do
             
           $print_type = @print_type
-			
+          
+          #官公庁・学校の判定
+          get_public_flag
+          
 	        case @print_type
             when "1"
             #納品書
@@ -155,6 +158,18 @@ class DeliverySlipDetailLargeClassificationsController < ApplicationController
 	    end
     end
 
+  end
+  
+  #官公庁・学校のフラグを判定(add221105)
+  def get_public_flag
+    
+    $public_flag = false
+    
+    delivery_slip_header = DeliverySlipHeader.find(params[:delivery_slip_header_id])
+    if delivery_slip_header.customer_master.public_flag == 1
+      $public_flag = true
+    end
+    
   end
   
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)

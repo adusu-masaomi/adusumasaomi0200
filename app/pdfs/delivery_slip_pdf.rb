@@ -13,7 +13,15 @@ class DeliverySlipPDF
        if $print_type == "1"
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_pdf.tlf")
        else
-         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_signed_pdf.tlf")
+         #221122 ハンコモードなくなった
+         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_pdf.tlf")
+         
+         #if !$public_flag
+         #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_signed_pdf.tlf")
+         #else
+         #  #官公庁・学校の場合で押印が異なる(upd221105)
+         #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_signed_cs_pdf.tlf")
+         #end
        end
 	   
 		# 1ページ目を開始

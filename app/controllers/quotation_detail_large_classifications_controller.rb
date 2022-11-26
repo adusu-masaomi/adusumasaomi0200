@@ -98,39 +98,43 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	
 	
     if  params[:format] == "pdf" then
-	
+      
+      
       #見積書PDF発行
       respond_to do |format|
         format.html # index.html.erb
         format.pdf do
           
-		  $print_type = @print_type
-		  
-      case @print_type
-		  when "1"
-		    #見積書
-			  report = EstimationSheetPDF.create @quotation_detail_large_classifications
-      when "2"	
-        #見積書(横)
-        #test del
-        report = EstimationSheetLandscapePDF.create @quotation_detail_large_classifications
-      #when "3"
-      when "3", "4"
-		    #見積書(印あり）
-        report = EstimationSheetPDF.create @quotation_detail_large_classifications
-		  end 	
+        $print_type = @print_type
+		    
+        #官公庁・学校の判定
+        get_public_flag
+        
+        case @print_type
+		    when "1"
+		      #見積書
+			    report = EstimationSheetPDF.create @quotation_detail_large_classifications
+        when "2"	
+          #見積書(横)
+          #test del
+          report = EstimationSheetLandscapePDF.create @quotation_detail_large_classifications
+        #when "3"
+        when "3", "4"
+		      #見積書(印あり）
+          report = EstimationSheetPDF.create @quotation_detail_large_classifications
+		    end 	
          
           #現在時刻をセットする
           require "date"
           d = DateTime.now
           now_date_time = d.strftime("%Y%m%d%H%M%S")
 
-          # ブラウザでPDFを表示する
-          # disposition: "inline" によりダウンロードではなく表示させている
-          send_data report.generate,
-		    filename:    "見積書-" + now_date_time + ".pdf",
-            type:        "application/pdf",
-            disposition: "inline"
+            #ブラウザでPDFを表示する
+            # disposition: "inline" によりダウンロードではなく表示させている
+            send_data report.generate,
+		        filename:    "見積書-" + now_date_time + ".pdf",
+              type:        "application/pdf",
+              disposition: "inline"
         end
       end
 	else
@@ -158,6 +162,18 @@ class QuotationDetailLargeClassificationsController < ApplicationController
 	  end
 	end
     #
+  end
+  
+  #官公庁・学校のフラグを判定(add221105)
+  def get_public_flag
+    
+    $public_flag = false
+    
+    quotation_header = QuotationHeader.find(params[:quotation_header_id])
+    if quotation_header.customer_master.public_flag == 1
+      $public_flag = true
+    end
+    
   end
   
   #add170412

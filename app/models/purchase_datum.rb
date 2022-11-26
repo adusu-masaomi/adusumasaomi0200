@@ -48,6 +48,8 @@ class PurchaseDatum < ActiveRecord::Base
     attr_accessor :closing_date_hide      
     attr_accessor :payment_due_date_hide  
     
+    attr_accessor :new_company_flag  #221104
+    
     #validation
     validates :material_id, presence: true
     validates :material_code, presence: true

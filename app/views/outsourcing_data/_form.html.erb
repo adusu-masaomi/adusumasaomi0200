@@ -188,8 +188,15 @@
     <% @button_caption = "請求書発行(外注)・更新する" %>
   <% end %>
   
+  
   <%= button_tag( @button_caption, :value => 'pdf', :name => 'format', :class => "btn btn-purple500_ftg" , 
              formtarget: "_blank", :onclick => "setOutSourcingFlag()" ) %>
+  
+  <!--  新会社表記　ひとまず保留(日付で判定)
+  <%= f.check_box :new_company_flag , {id:'new_company_flag' } %>
+  <%= f.label :new_company_flag, "新様式(株式会社)", {} %>
+  -->
+  
   <%= link_to t('.cancel', :default => t("helpers.links.back")),
                 outsourcing_data_path(construction_id: params[:construction_id], 
                 purchase_order_id: params[:purchase_order_id], 

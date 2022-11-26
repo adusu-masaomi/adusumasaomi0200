@@ -114,8 +114,11 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
         format.pdf do
           
 		  $print_type = @print_type
-		  
-          case @print_type
+
+      #官公庁・学校の判定
+      get_public_flag
+      
+      case @print_type
 		  when "1"
 		  #請求書
             report = InvoicePDF.create @invoice_detail_large_classifications
@@ -178,6 +181,18 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 	end
 	#
 	
+  end
+
+  #官公庁・学校のフラグを判定(add221105)
+  def get_public_flag
+    
+    $public_flag = false
+    
+    invoice_header = InvoiceHeader.find(params[:invoice_header_id])
+    if invoice_header.customer_master.public_flag == 1
+      $public_flag = true
+    end
+    
   end
 
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)

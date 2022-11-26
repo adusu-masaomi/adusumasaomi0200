@@ -22,7 +22,16 @@ class EstimationSheetPDF
           @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
         else
         #押印付バージョン
-          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
+          
+          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
+          
+          #221122 ハンコなくなった
+          #if !$public_flag
+          #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
+          #else
+          #  #官公庁・学校の場合で押印が異なる(upd221105)
+          #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_cs_pdf.tlf")
+          #end
         end
 	   
 		# 1ページ目を開始

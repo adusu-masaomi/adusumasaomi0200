@@ -677,6 +677,17 @@ class OutsourcingDataController < ApplicationController
         $purchase_data_current = @purchase_datum
       end
       
+      ###
+      #add221104
+      #新様式(株式会社)対応
+      #end_date = Date.new(2022, 11, 1)
+      #
+      #$outsourcing_new_company_flag = 0
+      #if params[:purchase_datum][:purchase_date] >= end_date
+      #  $outsourcing_new_company_flag = 1
+      #end
+      ###
+      
       format.pdf do
         
         report = OutsourcingInvoicePDF.create @outsourcing_invoice 

@@ -4,7 +4,7 @@ class ApplicationMailer < ActionMailer::Base
   layout 'mailer'
   
   #for centos6(220209) 
-  default from:     "アデュース電気<adusudenki@gmail.com>"
+  default from:     "株式会社アデュース<adusudenki@gmail.com>"
   #↑カッコのメアドがないと555のエラーが出て送信できないので注意！！
   #        reply_to: "sample+reply@gmail.com"
   #layout 'mailer' 
