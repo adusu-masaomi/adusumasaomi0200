@@ -15,24 +15,21 @@ class EstimationSheetPDF
           @history = true
 		end 
 		
-        # tlfファイルを読み込む
-        ##if $print_type == "1"
-		#upd170626
-		if $print_type == "1" || $print_type == "51"
-          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
-        else
-        #押印付バージョン
+    if $print_type == "1" || $print_type == "51"
+    #ハンコ無しVer
+      @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
+    else
+    #押印付Ver
+      @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
           
-          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
-          
-          #221122 ハンコなくなった
-          #if !$public_flag
-          #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
-          #else
-          #  #官公庁・学校の場合で押印が異なる(upd221105)
-          #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_cs_pdf.tlf")
-          #end
-        end
+      #221122 ハンコなくなった
+      #if !$public_flag
+      #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_pdf.tlf")
+      #else
+      #  #官公庁・学校の場合で押印が異なる(upd221105)
+      #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_cs_pdf.tlf")
+      #end
+    end
 	   
 		# 1ページ目を開始
         @report.start_new_page

@@ -11,22 +11,15 @@ class InvoicePDF
        d_heisei_limit = Date.parse("2019/5/1")
  
        # tlfファイルを読み込む
-	     #if $print_type == "1"
-       #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
-	     #else
-	     #   @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_pdf.tlf")
-	     #end
-       case $print_type
+	     case $print_type
        when "1"
        #請求書(印鑑なし)
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
 	     #else
        when "3"
        #請求書（印鑑有）--従来様式
+         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_pdf.tlf")
          
-         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_pdf.tlf")
-         
-         #221122del ハンコなくなった
          #if !$public_flag
 	       #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/invoice_signed_pdf.tlf")
 	       #else

@@ -111,15 +111,18 @@ class InvoiceHeadersController < ApplicationController
 
     respond_to do |format|
       if @invoice_header.save
-	  
+  
         #顧客Mも更新
-		if @manual_flag.blank?  
-	      update_params_customer
-	    end
+        if @manual_flag.blank?  
+          update_params_customer
+        end
 	    
         #工事担当者を更新
         #add190131
         update_construction_personnel
+        
+        #入金ファイルの完了フラグを更新
+        set_deposit_complete_flag
         
         format.html { redirect_to @invoice_header, notice: 'Invoice header was successfully created.' }
         format.json { render :show, status: :created, location: @invoice_header }
@@ -136,22 +139,27 @@ class InvoiceHeadersController < ApplicationController
   
     #住所のパラメータを正常化
     adjust_address_params
-	
-	#手入力時の顧客マスターの新規登録
+
+    #手入力時の顧客マスターの新規登録
   	create_manual_input_customer
       
     #工事集計の確定区分があればセット
     set_final_return_division_params
     
+    #binding.pry
+    
     respond_to do |format|
       if @invoice_header.update(invoice_header_params)
 
-		#顧客Mも更新
-		if @manual_flag.blank?  
+        #顧客Mも更新
+        if @manual_flag.blank?  
           update_params_customer
         end
         #工事担当者を更新
         update_construction_personnel
+        
+        #入金ファイルの完了フラグを更新
+        set_deposit_complete_flag
         
         #add200127
         #資金繰データ(会計)を更新
@@ -172,8 +180,8 @@ class InvoiceHeadersController < ApplicationController
   # DELETE /invoice_headers/1.json
   def destroy
     #ヘッダIDをここで保持(内訳・明細も消すため)
-	invoice_header_id = @invoice_header.id
-	
+    @invoice_header_id = @invoice_header.id
+
     @invoice_header.destroy
     respond_to do |format|
       format.html { redirect_to invoice_headers_url, notice: 'Invoice header was successfully destroyed.' }
@@ -182,16 +190,119 @@ class InvoiceHeadersController < ApplicationController
 	
     #資金繰りのデータも削除 (add200127)
     args = ["DELETE FROM account_cash_flow_detail_actual where invoice_header_id = ?" , 
-                                    invoice_header_id]
+                                    @invoice_header_id]
     sql = ActiveRecord::Base.send(:sanitize_sql_array, args)
     result_params = ActiveRecord::Base.connection.execute(sql)
     #add end    
     
-	#内訳も消す
-	InvoiceDetailLargeClassification.where(invoice_header_id: invoice_header_id).destroy_all
-		
-	#明細も消す
-	InvoiceDetailMiddleClassification.where(invoice_header_id: invoice_header_id).destroy_all
+    #内訳も消す
+    InvoiceDetailLargeClassification.where(invoice_header_id: @invoice_header_id).destroy_all
+
+    #明細も消す
+    InvoiceDetailMiddleClassification.where(invoice_header_id: @invoice_header_id).destroy_all
+    
+    #add230125
+    #入金・日次入出金ファイルをここで抹消
+    destroy_deposit
+    delete_daily_cash_flow
+  end
+  
+  #入金ファイルを抹消
+  def destroy_deposit
+    @deposit = Deposit.find_by(invoice_header_id: @invoice_header_id)
+    if @deposit.present?
+      #日次入出金ファイルを減算するために値取得
+      @differ_date = @deposit.deposit_due_date
+      @differ_amount = @deposit.deposit_amount
+      #
+      @deposit.destroy
+    end
+  end
+  
+  #日次入出金ファイルからマイナスする
+  #@differ_date, @differ_amountが取得されている事
+  def delete_daily_cash_flow
+    daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @differ_date)
+    if daily_cash_flow.present?
+      daily_cash_flow.income -= @differ_amount
+      #残高も要計算(保留)
+      #daily_cash_flow.balance = daily_cash_flow.previous_balance - daily_cash_flow.income - daily_cash_flow.expence.to_i
+      daily_cash_flow.save!(:validate => false)
+    end
+  end
+  
+  #入金ファイルの完了フラグを更新
+  def set_deposit_complete_flag
+    
+    @deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+    
+    #@deposit = nil
+    
+    if @invoice_header.deposit_complete_flag.present?  && 
+       @invoice_header.deposit_complete_flag == 1
+       
+       #@deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+       
+       if @deposit.present?
+         @deposit.completed_flag = 1
+         
+         ###
+         if @deposit.deposit_due_date != @invoice_header.payment_date
+         #入金予定日と入金日が異なった場合、増減させる
+            @differ_date = @deposit.deposit_due_date                  #予定日
+            @differ_amount = @deposit.deposit_amount
+            @payment_due_date = @invoice_header.payment_date      #実際の支払日
+            #
+            app_upsert_daily_cash_flow  #日次入出金マスターへの書き込み
+            #
+            @deposit.deposit_due_date = @invoice_header.payment_date  #実際の支払日で更新
+         end
+         ###
+         
+         @deposit.save!(:validate => false)
+         
+         #入出金管理ファイルの完了フラグを更新
+         set_daily_cash_flow_completed_flag
+       end
+    else
+      #フラグない場合でも既存の入金データがあれば解除する
+      if @deposit.present?
+         @deposit.completed_flag = 0
+         @deposit.save!(:validate => false)
+         
+         daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @deposit.deposit_due_date)
+         if daily_cash_flow.present?
+           daily_cash_flow.income_completed_flag = 0
+           daily_cash_flow.save!(:validate => false)
+         end
+      end
+    end
+  
+  end
+  
+  #入出金管理ファイルの完了フラグを更新
+  #@depositが取得されていること
+  def set_daily_cash_flow_completed_flag
+    #その他の同日の入金ファイル検索し、完了していたら管理ファイルも完了させる
+    deposits = Deposit.where(deposit_due_date: @deposit.deposit_due_date).
+                       where.not(id: @deposit.id)
+    all_deposit_flag = true
+    if deposits.present?
+      deposits.each do |deposit|
+        if deposit.completed_flag.blank? ||
+          deposit.completed_flag == 0
+          all_deposit_flag = false
+        end
+      end
+    end
+    if all_deposit_flag
+      daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @deposit.deposit_due_date)
+      if daily_cash_flow.present?
+        daily_cash_flow.income_completed_flag = 1
+        daily_cash_flow.save!(:validate => false)
+      end
+    end
+    #
   end
   
   #viewで拡散されたパラメータを、正常更新できるように復元させる。
@@ -233,6 +344,8 @@ class InvoiceHeadersController < ApplicationController
   
     end 
   end
+  
+  
   #add190131
   #工事Mの担当者を更新
   def update_construction_personnel
@@ -317,10 +430,10 @@ class InvoiceHeadersController < ApplicationController
   #def customer_name_select
   def customer_info_select
      @customer_name = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_name).flatten.join(" ")
-  	 @post = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
-	 @address = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
-	 @tel = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:tel_main).flatten.join(" ")
-	 @fax = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:fax_main).flatten.join(" ")
+     @post = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
+     @address = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+     @tel = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:tel_main).flatten.join(" ")
+     @fax = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:fax_main).flatten.join(" ")
      @responsible1 = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:responsible1).flatten.join(" ")
      @responsible2 = CustomerMaster.where(:id => params[:id]).where("id is NOT NULL").pluck(:responsible2).flatten.join(" ")
      #敬称

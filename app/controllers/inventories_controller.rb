@@ -210,8 +210,16 @@ class InventoriesController < ApplicationController
               end 
 
 		          if params[:purchase_datum][:quantity].to_i != @inventory_history.quantity then
-                #@differ_inventory_quantity = params[:purchase_datum][:quantity].to_i - @inventory_history.quantity
-			 
+              
+              #221223...(修正中)
+              #if params[:purchase_datum][:quantity].to_i != @inventory_history.quantity ||
+              #   params[:purchase_datum][:material_id] != @inventory_history.material_master_id
+                
+                #upd221223 品番変更した場合も考慮...(修正中)
+                #if params[:purchase_datum][:material_id] != @inventory_history.material_master_id
+                #  @inventory_history.material_master_id = params[:purchase_datum][:material_id]
+                #end
+                
                 #upd171228 マイナス入庫の登録もあるので、絶対値とする
                 quantity = params[:purchase_datum][:quantity].to_i.abs
                 
@@ -1384,6 +1392,6 @@ class InventoriesController < ApplicationController
     def inventory_params
       params.require(:inventory).permit(:warehouse_id, :location_id, :material_master_id, :inventory_quantity, :unit_master_id, :inventory_amount, :supplier_master_id,
       :current_history_id, :current_warehousing_date, :current_quantity, :current_unit_price, :last_unit_price, :last_warehousing_date, :next_history_id_1, :next_warehousing_date_1, :next_quantity_1, 
-      :next_unit_price_1, :next_history_id_2, :next_warehousing_date_2, :next_quantity_2, :next_unit_price_2 , :image)
+      :next_unit_price_1, :next_history_id_2, :next_warehousing_date_2, :next_quantity_2, :next_unit_price_2 , :no_stocktake_flag, :image)
     end
   end

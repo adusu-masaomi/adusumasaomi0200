@@ -762,9 +762,9 @@
               "border-style": "solid"
             },
             "x1": 540,
-            "y1": 141.2,
+            "y1": 140.6,
             "x2": 540,
-            "y2": 181.6
+            "y2": 181
           },
           {
             "id": "image",
@@ -779,6 +779,21 @@
               "position-x": "left",
               "position-y": "top"
             }
+          },
+          {
+            "id": "exclude_line",
+            "type": "line",
+            "display": false,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 3,
+              "border-style": "solid"
+            },
+            "x1": 21.3,
+            "y1": 161.1,
+            "x2": 595.3,
+            "y2": 161.8
           }
         ]
       },

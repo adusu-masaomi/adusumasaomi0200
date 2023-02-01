@@ -187,10 +187,18 @@ class StocktakesController < ApplicationController
           #add200629
           #単価の違う在庫も考慮(但し、単価違いは２つまで考慮とする)
           #差異数量=棚卸数-在庫数量
+          #binding.pry
+          
           differ_quantity = stocktake.physical_quantity - inventory.inventory_quantity
           
           #現在単価も更新用に保持
           current_quantity = inventory.current_quantity
+          #add230107
+          if current_quantity.nil?
+            current_quantity = 0
+          end
+          #
+          
           current_unit_price = inventory.current_unit_price
           
           #次回・次次回単価も更新用に保持しておく

@@ -931,8 +931,6 @@ class InvoiceDetailMiddleClassificationsController < ApplicationController
        #見積金額
           @invoice_header.billing_amount = invoice_total_price_Large
 		  
-		  #binding.pry
-		  
           #実行金額
           @invoice_header.execution_amount = execution_total_price_Large
           @invoice_header.save

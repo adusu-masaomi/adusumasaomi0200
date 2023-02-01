@@ -34,6 +34,9 @@
 	   <%= link_to "棚卸表(記入用／画像付)",
             inventories_path(@inventory, format: "pdf", :print_flag => "3"),
             :class => 'btn  btn-lightblue700_ftg', :target=>["_blank"] %>
+     <%= link_to "棚卸表(期末記入用／画像付)",
+            inventories_path(@inventory, format: "pdf", :print_flag => "6"),
+            :class => 'btn  btn-yellow200_ftg', :target=>["_blank"] %>
 	   <%= link_to "棚卸表(記入用)",
             inventories_path(@inventory, format: "pdf", :print_flag => "4"),
             :class => 'btn  btn-info', :target=>["_blank"] %>

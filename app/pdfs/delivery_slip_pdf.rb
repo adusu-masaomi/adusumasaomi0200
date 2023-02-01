@@ -11,10 +11,11 @@ class DeliverySlipPDF
        
        # tlfファイルを読み込む
        if $print_type == "1"
+         #ハンコ無Ver
          @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_pdf.tlf")
        else
-         #221122 ハンコモードなくなった
-         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_pdf.tlf")
+         #ハンコ有Ver
+         @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_signed_pdf.tlf")
          
          #if !$public_flag
          #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/delivery_slip_signed_pdf.tlf")

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20220126020607) do
+ActiveRecord::Schema.define(version: 20230120071934) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -417,6 +417,7 @@ ActiveRecord::Schema.define(version: 20220126020607) do
     t.integer  "billed_flag",                limit: 4
     t.integer  "calculated_flag",            limit: 4
     t.integer  "order_flag",                 limit: 4
+    t.integer  "quotation_flag",             limit: 4
     t.datetime "created_at",                                                     null: false
     t.datetime "update_at",                                                      null: false
   end
@@ -459,8 +460,20 @@ ActiveRecord::Schema.define(version: 20220126020607) do
     t.integer  "payment_bank_id",       limit: 4
     t.integer  "card_not_flag",         limit: 4
     t.integer  "contractor_flag",       limit: 4
+    t.integer  "public_flag",           limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "update_at",                         null: false
+  end
+
+  create_table "daily_cash_flows", force: :cascade do |t|
+    t.date     "cash_flow_date"
+    t.integer  "income",           limit: 4
+    t.integer  "expence",          limit: 4
+    t.integer  "balance",          limit: 4
+    t.integer  "plan_actual_flag", limit: 4
+    t.integer  "completed_flag",   limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
   end
 
   create_table "delivery_slip_detail_large_classifications", force: :cascade do |t|
@@ -576,6 +589,15 @@ ActiveRecord::Schema.define(version: 20220126020607) do
     t.datetime "updated_at",                                 null: false
   end
 
+  create_table "deposits", force: :cascade do |t|
+    t.integer  "invoice_header_id", limit: 4
+    t.date     "deposit_due_date"
+    t.integer  "deposit_amount",    limit: 4
+    t.integer  "completed_flag",    limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
   create_table "django_admin_log", force: :cascade do |t|
     t.datetime "action_time",                        precision: 6, null: false
     t.text     "object_id",       limit: 4294967295
@@ -641,6 +663,7 @@ ActiveRecord::Schema.define(version: 20220126020607) do
     t.date     "next_warehousing_date_2"
     t.float    "next_quantity_2",          limit: 24
     t.float    "next_unit_price_2",        limit: 24
+    t.integer  "no_stocktake_flag",        limit: 4
     t.string   "image",                    limit: 255
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false

@@ -15,34 +15,28 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
 	#ransack保持用コード
     @null_flag = ""
     
-	if params[:invoice_header_id].present?
-      #$invoice_header_id = params[:invoice_header_id]
-      #upd170626
+    if params[:invoice_header_id].present?
       @invoice_header_id = params[:invoice_header_id]
     end
 	
-    #if $invoice_header_id.present?
-    #upd170626
     if @invoice_header_id.present?
-	
-	  #query = {"invoice_header_id_eq"=>"", "with_header_id"=> $invoice_header_id, "invoice_large_item_name_eq"=>""}
-	  #upd170626
-	  query = {"invoice_header_id_eq"=>"", "with_header_id"=> @invoice_header_id, "invoice_large_item_name_eq"=>""}
+      #query = {"invoice_header_id_eq"=>"", "with_header_id"=> $invoice_header_id, "invoice_large_item_name_eq"=>""}
+	    #upd170626
+	    query = {"invoice_header_id_eq"=>"", "with_header_id"=> @invoice_header_id, "invoice_large_item_name_eq"=>""}
 	  
-	  @null_flag = "1"
-	end
+      @null_flag = "1"
+    end
 	
     #if query.nil?
     if @null_flag == "" 
       query = params[:q]
       query ||= eval(cookies[:recent_search_history].to_s)  	
-      
-	end
+    end
 	
     #ransack保持用
     @q = InvoiceDetailLargeClassification.ransack(query)
     
-	if @null_flag == ""
+    if @null_flag == ""
       #ransack保持用コード
       search_history = {
        value: params[:q],
@@ -51,7 +45,7 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
       }
       cookies[:recent_search_history] = search_history if params[:q].present?
     end 
-	#
+    #
 
     @invoice_detail_large_classifications = @q.result(distinct: true)
     
@@ -104,47 +98,46 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
     end
     #
 	
-	@print_type = params[:print_type]
-	
+    @print_type = params[:print_type]
+ 
     if  params[:format] == "pdf" then
 	
       #見積書PDF発行
       respond_to do |format|
         format.html # index.html.erb
+        
         format.pdf do
-          
-		  $print_type = @print_type
+          $print_type = @print_type
 
-      #官公庁・学校の判定
-      get_public_flag
+          #官公庁・学校の判定
+          get_public_flag
       
-      case @print_type
-		  when "1"
-		  #請求書
+          case @print_type
+		      when "1"
+		      #請求書
             report = InvoicePDF.create @invoice_detail_large_classifications
-		  when "2"
-		  #請求書(横)
-		    report = InvoiceLandscapePDF.create @invoice_detail_large_classifications
-		  when "3"
-		  #請求書（印鑑有）
+		      when "2"
+		      #請求書(横)
+		        report = InvoiceLandscapePDF.create @invoice_detail_large_classifications
+		      when "3"
+		      #請求書（印鑑有）
             report = InvoicePDF.create @invoice_detail_large_classifications
-		  when "4"
+		      when "4"
           #請求書（印鑑有-旧様式）
             report = InvoicePDF.create @invoice_detail_large_classifications
             
-		  #when "4"
-		  ##納品書(横)
-		  #  report = DeliverySlipLandscapePDF.create @delivery_slip_landscape
-		  #when "5"
-		  ##見積書
-          #  report = EstimationSheetPDF.create @estimation_sheet 
+		      #when "4"
+		      ##納品書(横)
+		      #  report = DeliverySlipLandscapePDF.create @delivery_slip_landscape
+		      #when "5"
+		      ##見積書
+              #  report = EstimationSheetPDF.create @estimation_sheet 
           #when "6"
-		  ##見積書(横)
+		      ##見積書(横)
           #  report = EstimationSheetLandscapePDF.create @estimation_sheet_landscape
-          
-		  end 	
+          end 	
 	      
-		  #現在時刻をセットする
+		      #現在時刻をセットする
           require "date"
           d = DateTime.now
           now_date_time = d.strftime("%Y%m%d%H%M%S")
@@ -155,34 +148,235 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
             filename:    "請求書-" + now_date_time + ".pdf",
             type:        "application/pdf",
             disposition: "inline"
-          end
-      end
-	else
+        end
+      end  #respond end
+      
+      #
+      #入金マスターへ書き込み
+      upsert_deposit_amount
+      #日次入出金マスターへ書き込み
+      #upsert_daily_cash_flow
+      app_upsert_daily_cash_flow
+      #
+      
+    else  #PDF以外
 
-	  #納品書・見積書のデータ削除＆コピー処理を行う。
-	  @data_type = params[:data_type]
-	  case @data_type
-        when "1"
+	    #納品書・見積書のデータ削除＆コピー処理を行う。
+	    @data_type = params[:data_type]
+	    case @data_type
+      when "1"
 		  #納品書データ削除
-		  delete_delivery_slip
+		    delete_delivery_slip
 		  #納品書データ作成
-		  create_delivery_slip
-		when "2"
-          #見積書データ削除
-		  delete_quotation
-		  #見積書データ作成
-		  create_quotation
-	  end
+		    create_delivery_slip
+		  when "2"
+      #見積書データ削除
+		    delete_quotation
+		    #見積書データ作成
+		    create_quotation
+	    end
 	  
-	  if @success_flag == true
-	    flash[:notice] = "データ作成が完了しました。"
-	  end
+	    if @success_flag == true
+	      flash[:notice] = "データ作成が完了しました。"
+	    end
 	
-	end
-	#
+    end
+	  #
 	
   end
 
+  #入金・管理マスターへ書き込み
+  def upsert_deposit_amount
+    
+    #binding.pry
+    @invoice_header = InvoiceHeader.find(@invoice_header_id)
+    
+    if @invoice_header.present?
+      
+      deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+      
+      ##
+      #入金額の計算
+      @billing_amount_with_tax = @invoice_header.billing_amount * $consumption_tax_include_per_ten
+      @billing_amount_with_tax = @billing_amount_with_tax.to_i #(整数化)
+      
+      #入金予定日の計算(戻り:@payment_due_date)
+      app_get_income_due_date(@invoice_header.customer_id, 
+                              @invoice_header.invoice_date, true)
+      #@payment_due_date
+      ##
+      
+      @differ_date = nil
+      
+      if deposit.nil?
+        #新規
+        
+        #差異数量
+        @differ_amount = @billing_amount_with_tax
+        #
+        
+        deposit_params = { invoice_header_id: @invoice_header.id, deposit_due_date: @payment_due_date,
+                           deposit_amount: @billing_amount_with_tax}
+        @check = Deposit.create(deposit_params)
+      else
+        #更新
+        
+        #差異数量をここで求める
+        @differ_amount = @billing_amount_with_tax - deposit.deposit_amount
+        #
+        
+        #日付違う場合のフラグ
+        if deposit.deposit_due_date != @payment_due_date
+          @differ_date = deposit.deposit_due_date
+          @differ_amount = @billing_amount_with_tax #変更後の数量(加算必要なため)
+        end
+        #
+        
+        deposit_params = { deposit_due_date: @payment_due_date,
+                           deposit_amount: @billing_amount_with_tax}
+        deposit.update(deposit_params)
+      end
+      
+    end
+  
+  end
+  
+  #(app.controllerへ移行)
+  #日次入出金マスターへの書き込み
+  #@differ_amount, @differ_date, @payment_due_dateが事前取得されていること
+  def upsert_daily_cash_flow
+  
+    daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @payment_due_date)
+    if daily_cash_flow.nil?
+    #データ無しの場合
+          
+      #前日までの残高を取得(保留)
+      #get_pre_balance
+          
+      #前日残をセット(保留)
+      #pre_balance = 0
+      #if @pre_balance.present?
+      #  pre_balance += @pre_balance
+      #end
+      
+      #残高をセット(保留)
+      #balance = pre_balance + @differ_amount
+      #
+      
+      
+      #daily_cash_flow_params = { cash_flow_date: @payment_due_date, income: @differ_amount,
+      #                          previous_balance: pre_balance, balance: balance }
+      
+      daily_cash_flow_params = { cash_flow_date: @payment_due_date, income: @differ_amount }
+      
+          
+      @check = DailyCashFlow.create(daily_cash_flow_params)
+    else
+    #データ存在している場合
+          
+      if @differ_amount.abs > 0
+        #残高をセット
+        income = daily_cash_flow.income.to_i + @differ_amount
+        #balance = daily_cash_flow.previous_balance.to_i + income - daily_cash_flow.expence.to_i
+        daily_cash_flow_params = { income: income, income_completed_flag: 0}  #追加を考慮し、完了フラグは0にする
+        daily_cash_flow.update(daily_cash_flow_params)
+      end
+    end
+        
+    #日付変わった場合、差異をマイナスする
+    if @differ_date.present?
+      delete_daily_cash_flow
+    end
+    #
+  
+    #end
+    
+    #同月内の、前日残高へ加算(保留)
+    #add_pre_balance_to_end_month
+    
+  end
+  
+    
+  #入出金データからマイナスする
+  #@differ_date, @differ_amountが取得されている事
+  def delete_daily_cash_flow
+    daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @differ_date)
+    
+    if daily_cash_flow.present?
+      #daily_cash_flow.income -= @billing_amount_with_tax
+      daily_cash_flow.income -= @differ_amount
+      
+      #binding.pry
+      
+      #残高も要計算(保留)
+      #daily_cash_flow.balance = daily_cash_flow.previous_balance - daily_cash_flow.income - daily_cash_flow.expence.to_i
+      
+      daily_cash_flow.save!(:validate => false)
+    end
+    
+  end
+  
+  def destroy_deposit
+  
+    @deposit = Deposit.find_by(invoice_header_id: @invoice_header_id)
+    
+    #binding.pry
+    
+    if @deposit.present?
+      #日次入出金ファイルを減算するために値取得
+      @differ_date = @deposit.deposit_due_date
+      @differ_amount = @deposit.deposit_amount
+      #delete_daily_cash_flow
+      #
+      @deposit.destroy
+    end
+  
+  end
+  
+  #同月内の、前日残高へ加算(保留)
+  #@differ_amountが計算されていること
+  def add_pre_balance_to_end_month
+    
+    if @differ_amount.abs > 0
+    
+      #1日後の日付
+      start_date = @payment_due_date + 1
+      #その月の末日
+      end_date = Date.new(@payment_due_date.year, @payment_due_date.month, -1)
+    
+      #@differ_amount
+      (start_date..end_date).each do|date|
+      
+        daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: date)
+      
+        if daily_cash_flow.present?
+          daily_cash_flow.previous_balance += @differ_amount
+          daily_cash_flow.balance += @differ_amount
+          
+          daily_cash_flow.save!(:validate => false)
+        end
+        
+      end
+    
+    end
+    
+  end
+
+  #前日までの残高を取得(保留)
+  def get_pre_balance
+    #その月の1日を求める
+    day_start = @payment_due_date.beginning_of_month
+    
+    #whereの".."は〜以上〜未満の意味。
+    daily_cash_flow_before = DailyCashFlow.where(cash_flow_date: DailyCashFlow.where(cash_flow_date: day_start..@payment_due_date).
+                        maximum('cash_flow_date')).first
+    
+    @pre_balance = daily_cash_flow_before.balance
+    
+    #daily_cash_flow_before = DailyCahFlow.where(
+    #result = Article.where(site_id:1).maximum(:created_at)
+  end
+    
   #官公庁・学校のフラグを判定(add221105)
   def get_public_flag
     
@@ -255,7 +449,7 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
   def create
   
     #作業明細マスターの更新
-	#add170822
+    #add170822
     update_working_middle_item
   
     @invoice_detail_large_classification = InvoiceDetailLargeClassification.create(invoice_detail_large_classification_params)
@@ -518,12 +712,16 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
     
     if params[:invoice_header_id].present?
       #$invoice_header_id = params[:invoice_header_id]
-	  #upd170626
-	  @invoice_header_id = params[:invoice_header_id]
-	end
+      #upd170626
+      @invoice_header_id = params[:invoice_header_id]
+    end
     
-	
-	@invoice_detail_large_classification.destroy
+    #入出金ファイルを抹消
+    #destroy_deposit
+	  #delete_daily_cash_flow
+    #
+	  
+    @invoice_detail_large_classification.destroy
     respond_to do |format|
       #format.html { redirect_to invoice_detail_large_classifications_url, notice: 'Invoice detail large classification was successfully destroyed.' }
       #format.json { head :no_content }
@@ -823,6 +1021,10 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
         @invoice_header = InvoiceHeader.find(@invoice_detail_large_classification.invoice_header_id)
         #請求金額
         @invoice_header.billing_amount = invoice_total_price
+        #add 230119
+        #税込金額をここで保存
+        #@invoice_header.billing_amount_tac_inc = invoice_total_price * $consumption_tax_include_per_ten
+        
         #実行金額
         @invoice_header.execution_amount = execution_total_price
         @invoice_header.save

@@ -50,6 +50,9 @@
   <%= f.input :next_unit_price_2,  input_html:{:tabindex=>"13"} %>
   <%= f.input :last_unit_price, label_html:{ style: 'color: gray;'},input_html:{ id: "last_unit_price", :tabindex=>"14"} %>
   
+  <%= f.check_box :no_stocktake_flag, {id:"no_stocktake_flag" }, '1', '0' %>
+  <%= f.label_tag :no_stocktake_flag, '在庫調査しない' %> 
+  </br>
   
   <%= f.button :submit, :class => 'btn-primary',  :tabindex => "15" %>
   

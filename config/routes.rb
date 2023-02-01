@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :daily_cash_flows
+  resources :deposits
   resources :inventory_categories
   resources :supplier_responsibles
   resources :outsourcing_costs
@@ -624,6 +626,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :daily_cash_flows
+  resources :deposits
   resources :inventory_categories
   resources :supplier_responsibles
   resources :outsourcing_costs

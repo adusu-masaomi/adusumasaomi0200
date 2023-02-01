@@ -4,21 +4,21 @@ class InventoryListPDF
   def self.create inventory_list
 	#入出庫表PDF発行
       
-       # tlfファイルを読み込む
-       case $print_flag 
-         when "1", "5"
-           #在庫一覧表(画像付)
-           report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_with_pic_pdf.tlf")
-		 when "2"
-           #在庫一覧表
-           report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_pdf.tlf")
-         when "3"
-	       #棚卸表（手書き用-画像付)
-	       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_with_pic_pdf.tlf")
-		 when "4"
-	       #棚卸表（手書き用)
-	       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_pdf.tlf")
-	   end
+        # tlfファイルを読み込む
+        case $print_flag 
+          when "1", "5"
+            #在庫一覧表(画像付)
+            report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_with_pic_pdf.tlf")
+          when "2"
+            #在庫一覧表
+            report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_pdf.tlf")
+          when "3", "6"
+	        #棚卸表（手書き用-画像付)
+	          report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_with_pic_pdf.tlf")
+          when "4"
+	          #棚卸表（手書き用)
+	          report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/inventory_list_entry_pdf.tlf")
+        end
 	   
         #add210629
         #ソート順
@@ -47,6 +47,7 @@ class InventoryListPDF
         $inventories.joins(:material_master).order(sort_str).each do |inventory| 
         
 		
+           
         #---見出し---
 		 #report.page.item(:issue_date).value(Date.today)
 		 
@@ -148,8 +149,18 @@ class InventoryListPDF
 						inventory_amount: inventory_amount,
                         list_price: list_price
               
-			  
-            end 
+        #add221221
+        if $print_flag == "3"
+          if inventory.no_stocktake_flag == 1
+            row.item(:exclude_line).visible(true)
+          else
+            row.item(:exclude_line).visible(false)
+          end
+        end
+        #
+    
+    
+      end 
 
 
 	    end	

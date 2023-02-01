@@ -173,6 +173,172 @@ class ApplicationController < ActionController::Base
     end
   end
   
+  #add220123
+  #請求日から入金予定日の計算
+  #(last_day_flag == true 締日未設定の場合でも予定日を月末か翌月末にする)
+  def app_get_income_due_date(customer_master_id, billing_date, last_day_flag)
+    
+    @customer = nil
+    if customer_master_id.present?
+      @customer = CustomerMaster.find(customer_master_id)
+    end
+    
+    if @customer.present?
+      
+      #@purchase_date = Date.parse(billing_date)
+      @purchase_date = billing_date
+ 
+      @closing_date = nil
+      @payment_due_date = nil
+      addMonth = 0
+    
+      #締め日算出
+      if @customer.closing_date_division == 1
+      #月末の場合
+        d = @purchase_date
+        @closing_date = Date.new(d.year, d.month, -1)
+      else
+      #日付指定の場合
+        d = @purchase_date
+          
+        if @customer.closing_date != 0
+          
+          if d.day <= @customer.closing_date  #bugfix 200127
+            if Date.valid_date?(d.year, d.month, @customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, @customer.closing_date)
+            end
+          else
+            #締め日を過ぎていた場合、月＋１
+            addMonth += 1
+            
+            d = d >> addMonth
+            
+            if Date.valid_date?(d.year, d.month, @customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, @customer.closing_date) 
+            end
+          end
+        else
+          #日付指定有で指定日未入力なら、月末とみなす
+          #add200110
+          d = @purchase_date
+          @closing_date = Date.new(d.year, d.month, -1)
+        end
+          
+      end
+        
+      #支払日算出
+      d = @closing_date   
+      if @customer.due_date.present?  && @customer.due_date > 0
+          
+        if @customer.due_date >= 28   #月末とみなす
+          d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
+            
+          addMonth = @customer.due_date_division 
+            
+          d2 = d2 >> addMonth
+          d2 = Date.new(d2.year, d2.month, -1)
+            
+          @payment_due_date = d2
+          
+        else
+        ##月末の扱いでなければ、そのまま
+          if Date.valid_date?(d.year, d.month, @customer.due_date)
+            d2 = Date.new(d.year, d.month, @customer.due_date)
+            
+            addMonth = @customer.due_date_division
+              
+            @payment_due_date = d2 >> addMonth
+            
+          end
+        end
+        
+      end
+    
+      #
+      #締日設定がない場合、月末を支払い日にする
+      if last_day_flag
+        if @payment_due_date.blank?
+          d = @purchase_date
+          addMonth = 0
+          
+          if d.day > 15
+            addMonth += 1
+          end
+          
+          d = d >> addMonth
+          @payment_due_date = Date.new(d.year, d.month, -1)
+        end
+      end
+      #
+    
+    end
+  end
+  ##
+  
+  #日次入出金マスターへの書き込み
+  #@differ_amount, @differ_date, @payment_due_dateが事前取得されていること
+  def app_upsert_daily_cash_flow
+  
+    daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @payment_due_date)
+    if daily_cash_flow.nil?
+    #データ無しの場合
+          
+      #前日までの残高を取得(保留)
+      #get_pre_balance
+      #前日残をセット(保留)
+      #pre_balance = 0
+      #if @pre_balance.present?
+      #  pre_balance += @pre_balance
+      #end
+      #残高をセット(保留)
+      #balance = pre_balance + @differ_amount
+      #
+      #daily_cash_flow_params = { cash_flow_date: @payment_due_date, income: @differ_amount,
+      #                          previous_balance: pre_balance, balance: balance }
+      
+      daily_cash_flow_params = { cash_flow_date: @payment_due_date, income: @differ_amount }
+      
+          
+      @check = DailyCashFlow.create(daily_cash_flow_params)
+    else
+    #データ存在している場合
+          
+      if @differ_amount.abs > 0
+        #残高をセット
+        income = daily_cash_flow.income.to_i + @differ_amount
+        #balance = daily_cash_flow.previous_balance.to_i + income - daily_cash_flow.expence.to_i
+        daily_cash_flow_params = { income: income, income_completed_flag: 0}  #追加を考慮し、完了フラグは0にする
+        daily_cash_flow.update(daily_cash_flow_params)
+      end
+    end
+        
+    #日付変わった場合、差異をマイナスする
+    if @differ_date.present?
+      app_delete_daily_cash_flow
+    end
+    #
+    
+    #同月内の、前日残高へ加算(保留)
+    #add_pre_balance_to_end_month
+  end
+  
+  #入出金データからマイナスする
+  #@differ_date, @differ_amountが取得されている事
+  def app_delete_daily_cash_flow
+    daily_cash_flow = DailyCashFlow.find_by(cash_flow_date: @differ_date)
+    
+    if daily_cash_flow.present?
+      daily_cash_flow.income -= @differ_amount
+      
+      #残高も要計算(保留)
+      #daily_cash_flow.balance = daily_cash_flow.previous_balance - daily_cash_flow.income - daily_cash_flow.expence.to_i
+      
+      daily_cash_flow.save!(:validate => false)
+    end
+    
+  end
+  ##
+  
   
   #元号の設定(改定時はここを変更する)
   $gengo_name = "平成"      #平成の場合

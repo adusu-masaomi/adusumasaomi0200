@@ -452,7 +452,14 @@ class PurchaseOrderDataController < ApplicationController
         construction_id = params[:construction_id]
         @construction_data = ConstructionDatum.where("id >= ?", construction_id)
       else
-        @construction_data = ConstructionDatum.order('construction_code DESC').all
+        if params[:construction_id].present?
+          #add230120
+          #工事Noで検索をかけた場合を考慮
+          construction_id = params[:construction_id]
+          @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+        else
+          @construction_data = ConstructionDatum.order('construction_code DESC').all
+        end
     end 
   end
   
