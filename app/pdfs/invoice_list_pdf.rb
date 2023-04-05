@@ -22,9 +22,9 @@ class InvoiceListPDF
 	 @commission_subtotal = 0
 	 @commission_total = 0
 	 
-     @month = ""
-	 @last_month = ""
-	 @year = ""
+    @month = ""
+    @last_month = ""
+    @year = ""
 	 
      #binding.pry
      
@@ -128,13 +128,38 @@ class InvoiceListPDF
 			  
               #月ごとの小計
               
+              #同じ年で月が異なるor
+              #12月で年月が異なる
+              
+              ###
+              is_subtotal = false
+              if @month != "" && (invoice_date.year == @year && invoice_date.mon != @month)
+                is_subtotal = true
+              end
+              if @year != "" 
+                if @year == 2022  #法人なりした月
+                  if @month == 10 && invoice_date.mon != @month
+                    is_subtotal = true
+                  end
+                elsif @year > 2022 #法人後の粘度は、９月決算となる
+                  if @month == 9 && invoice_date.mon != @month
+                    is_subtotal = true
+                  end
+                elsif @year < 2022
+                  if @month == 12 && (invoice_date.year > @year && invoice_date.mon != @month)
+                    is_subtotal = true
+                  end
+                end
+              end
+              ##
+              
               #12月の計が出ないバグ修正(upd180417)
-              #if @month != "" && (invoice_date.year == @year && invoice_date.mon != @month)
               if (@month != "" && (invoice_date.year == @year && invoice_date.mon != @month)) ||
                  (@month == 12 && (invoice_date.year > @year && invoice_date.mon != @month))
+				        
+                #binding.pry
 				
-				
-			    set_subtotal
+			          set_subtotal
 				
 				#report.list(:default).add_row  note: @note,
 				#		     billing_amount: @biling_amount_subtotal_formatted,
@@ -149,7 +174,7 @@ class InvoiceListPDF
                        row2.item(:fmeSituation).visible(false)
                        row2.item(:fmeCustomer).visible(false)
                        row2.item(:lineDelete).visible(false)
-				end
+				      end
              
 			    @biling_amount_subtotal = 0
 				@commission_subtotal = 0
@@ -169,22 +194,42 @@ class InvoiceListPDF
 				end
 				
 			  end
-		  
-		
-				
+		     
+        #upd230217
+        #法人成りのため集計区分変更
+		    is_total = false
+        
+        if @year != "" 
+          if @year == 2022  #法人なりした月
+            if invoice_date.month != @month && @month == 10
+              is_total = true
+            end
+          elsif @year > 2022 #法人後の粘度は、９月決算となる
+            if invoice_date.month != @month && @month == 9
+              is_total = true
+            end
+          elsif @year < 2022
+            
+            if invoice_date.year != @year
+              is_total = true
+            end
+          end
+        end
+        #
+        
 			  #
-		      if @year != "" && invoice_date.year != @year 
-			  #年ごとの小計(年またがりを考慮)
+        #if @year != "" && invoice_date.year != @year 
+        if is_total
+        #年ごとの小計(年またがりを考慮)
               
-                set_total
+          set_total
 				
 				#report.list(:default).add_row  
                 #             row.values note: @note,
 			    #             billing_amount: @biling_amount_total_formatted,
                 #             commission: @commission_total_formatted
                 
-                #upd180331
-                report.list(:default).add_row do |row2| 
+          report.list(:default).add_row do |row2| 
                        row2.values note: @note,
 			                 billing_amount: @biling_amount_total_formatted,
                              commission: @commission_total_formatted
@@ -192,12 +237,12 @@ class InvoiceListPDF
                        row2.item(:fmeSituation).visible(false)
                        row2.item(:fmeCustomer).visible(false)
                        row2.item(:lineDelete).visible(false)
-				end
+          end
                 
-                @biling_amount_subtotal = 0
-				@biling_amount_total = 0
-				@commission_subtotal = 0
-				@commission_total = 0
+          @biling_amount_subtotal = 0
+				  @biling_amount_total = 0
+				  @commission_subtotal = 0
+				  @commission_total = 0
 				
 			  end
               
@@ -312,8 +357,8 @@ class InvoiceListPDF
 			  #小計判定用
 			  if invoice_date.present?
 			    @month = invoice_date.mon
-			    @year = invoice_date.year
-              end
+          @year = invoice_date.year
+        end
 		      
           end 
 
@@ -323,10 +368,9 @@ class InvoiceListPDF
         page_count = report.page_count.to_s + "頁"
         report.page.item(:page_no).value(page_count)
        
-	    if @last_month ==  @month 
-		#小計
-		  
-		  set_subtotal
+	    if @last_month ==  @month  #単月で検索した場合
+		    #小計
+		    set_subtotal
 		  
 	      #report.list(:default).add_row  note: @note,
 		  #       billing_amount: @biling_amount_subtotal_formatted,
@@ -340,9 +384,10 @@ class InvoiceListPDF
                    row2.item(:fmeCustomer).visible(false)
                    row2.item(:lineDelete).visible(false)
           end
-        end
-		#合計
-		set_total
+      end
+		  
+      #合計
+		  set_total
 		
         #report.list(:default).add_row  note: @note,
 		#				   billing_amount: @biling_amount_total_formatted,
@@ -383,7 +428,27 @@ end
   
   def set_total
     
-    @note = @year.to_s + "年" + "　合計"
+    #
+    @term = @year
+    if @year == 2022
+    #11月以降、次年度となる
+      if @month > 10
+        @term = @year + 1
+      end
+    elsif @year > 2022
+    #10月以降、次年度となる
+      if @month > 9
+        @term = @year + 1
+      end
+    else
+    #そのまま
+      @term = @year
+    end
+    #
+    
+    #@note = @year.to_s + "年" + "　合計"
+    #@note = @term.to_s + "年度" + "　合計"
+    @note = @term.to_s + "年度" + "  合計"
 	#
 	@num = @biling_amount_total
 	formatNum()

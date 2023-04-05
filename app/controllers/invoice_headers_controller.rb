@@ -209,7 +209,8 @@ class InvoiceHeadersController < ApplicationController
   
   #入金ファイルを抹消
   def destroy_deposit
-    @deposit = Deposit.find_by(invoice_header_id: @invoice_header_id)
+    #@deposit = Deposit.find_by(invoice_header_id: @invoice_header_id)
+    @deposit = Deposit.find_by(table_id: @invoice_header_id)
     if @deposit.present?
       #日次入出金ファイルを減算するために値取得
       @differ_date = @deposit.deposit_due_date
@@ -234,7 +235,8 @@ class InvoiceHeadersController < ApplicationController
   #入金ファイルの完了フラグを更新
   def set_deposit_complete_flag
     
-    @deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+    #@deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+    @deposit = Deposit.find_by(table_id: @invoice_header.id)
     
     #@deposit = nil
     

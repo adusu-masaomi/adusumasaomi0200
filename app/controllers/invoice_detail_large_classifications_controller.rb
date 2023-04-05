@@ -188,12 +188,15 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
   #入金・管理マスターへ書き込み
   def upsert_deposit_amount
     
-    #binding.pry
     @invoice_header = InvoiceHeader.find(@invoice_header_id)
+    
+    #binding.pry
+    #@invoice_header.customer_master.payment_bank_id
     
     if @invoice_header.present?
       
-      deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+      #deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
+      deposit = Deposit.find_by(table_id: @invoice_header.id)
       
       ##
       #入金額の計算
@@ -203,8 +206,22 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
       #入金予定日の計算(戻り:@payment_due_date)
       app_get_income_due_date(@invoice_header.customer_id, 
                               @invoice_header.invoice_date, true)
-      #@payment_due_date
-      ##
+      
+      #送金先の銀行IDをセット
+      source_bank_id = $BANK_ID_DAISHI_HOKUETSU  #デフォルトは第四とする
+      if @invoice_header.customer_master.payment_bank_id.present?
+        source_bank_id = set_source_bank_id(@invoice_header.customer_master.payment_bank_id)
+      end
+      
+      table_type_id = 1  #テーブル種類ID(1で固定)
+      #得意先名を保存
+      customer_name = nil
+      if @invoice_header.customer_master.present?
+        if @invoice_header.customer_master.customer_name.present?
+          customer_name = @invoice_header.customer_master.customer_name
+        end
+      end
+      #
       
       @differ_date = nil
       
@@ -215,8 +232,14 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
         @differ_amount = @billing_amount_with_tax
         #
         
-        deposit_params = { invoice_header_id: @invoice_header.id, deposit_due_date: @payment_due_date,
-                           deposit_amount: @billing_amount_with_tax}
+        #deposit_params = { table_id: @invoice_header.id, deposit_due_date: @payment_due_date,
+        #                   deposit_amount: @billing_amount_with_tax, deposit_source_id: source_bank_id}
+        
+        deposit_params = { table_type_id: table_type_id, table_id: @invoice_header.id, 
+                           deposit_due_date: @payment_due_date, name: customer_name, 
+                           deposit_amount: @billing_amount_with_tax, deposit_source_id: source_bank_id}
+        
+        
         @check = Deposit.create(deposit_params)
       else
         #更新
@@ -232,8 +255,13 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
         end
         #
         
-        deposit_params = { deposit_due_date: @payment_due_date,
-                           deposit_amount: @billing_amount_with_tax}
+        #honban
+        #deposit_params = { deposit_due_date: @payment_due_date, name: customer_name,
+        #                   deposit_amount: @billing_amount_with_tax, deposit_source_id: source_bank_id}
+        
+        deposit_params = { table_type_id: table_type_id, deposit_due_date: @payment_due_date, name: customer_name,
+                           deposit_amount: @billing_amount_with_tax, deposit_source_id: source_bank_id}
+                           
         deposit.update(deposit_params)
       end
       
@@ -241,6 +269,22 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
   
   end
   
+  #送金先の銀行IDをセットする
+  #1:第四 3:さんしん 9:現金
+  def set_source_bank_id(bank_id)
+    
+    source_bank_id = bank_id
+     
+    case bank_id
+    when $BANK_ID_SANSHIN_TSUKANOME, $BANK_ID_SANSHIN_MAIN
+      #さんしんは塚野目にまとめる
+      source_bank_id = $BANK_ID_SANSHIN_TSUKANOME
+    end
+    
+    return source_bank_id
+    
+  end
+    
   #(app.controllerへ移行)
   #日次入出金マスターへの書き込み
   #@differ_amount, @differ_date, @payment_due_dateが事前取得されていること
@@ -277,8 +321,8 @@ class InvoiceDetailLargeClassificationsController < ApplicationController
       if @differ_amount.abs > 0
         #残高をセット
         income = daily_cash_flow.income.to_i + @differ_amount
-        #balance = daily_cash_flow.previous_balance.to_i + income - daily_cash_flow.expence.to_i
-        daily_cash_flow_params = { income: income, income_completed_flag: 0}  #追加を考慮し、完了フラグは0にする
+        #daily_cash_flow_params = { income: income, income_completed_flag: 0}  #追加を考慮し、完了フラグは0にする
+        daily_cash_flow_params = { income: income }  #upd230327 再発行でリセットされてしまうため 完了フラグは操作しない
         daily_cash_flow.update(daily_cash_flow_params)
       end
     end

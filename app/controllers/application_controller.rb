@@ -418,7 +418,8 @@ class ApplicationController < ActionController::Base
   $STRING_COPY = "(コピー)"      #明細をコピーした場合にアイテム名につける文字  (add180912)
   
   #ADUSU側銀行マスターID
-  $BANK_ID_SANSHIN_HOKUETSU = 1
+  #$BANK_ID_SANSHIN_HOKUETSU = 1
+  $BANK_ID_DAISHI_HOKUETSU = 1    #upd 230306
   $BANK_ID_SANSHIN_TSUKANOME = 3
   $BANK_ID_SANSHIN_MAIN = 4 #さんしん本店(*本来、支店IDで分けるべき?)
   $BANK_ID_CASH = 9 #現金(*本来、支店IDで分けるべき?)  #add200201

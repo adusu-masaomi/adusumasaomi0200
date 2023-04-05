@@ -9,7 +9,7 @@
       "x": 50,
       "y": 231.5,
       "width": 525.2,
-      "height": 480,
+      "height": 528,
       "header": {
         "enabled": true,
         "height": 19.2,
@@ -471,7 +471,7 @@
         },
         "items": []
       },
-      "content-height": 460.8,
+      "content-height": 508.8,
       "auto-page-break": true
     },
     {

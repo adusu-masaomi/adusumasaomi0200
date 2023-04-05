@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :monthly_balances
+  resources :expences
   resources :daily_cash_flows
   resources :deposits
   resources :inventory_categories
@@ -626,6 +628,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :monthly_balances
+  resources :expences
   resources :daily_cash_flows
   resources :deposits
   resources :inventory_categories

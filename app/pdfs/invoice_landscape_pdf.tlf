@@ -159,9 +159,9 @@
             "type": "text-block",
             "display": true,
             "description": "",
-            "x": 279.2,
+            "x": 275,
             "y": 327.8,
-            "width": 23.1,
+            "width": 27.3,
             "height": 11,
             "style": {
               "font-family": [
@@ -183,7 +183,11 @@
             "multiple-line": false,
             "format": {
               "base": "",
-              "type": ""
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
             }
           },
           {

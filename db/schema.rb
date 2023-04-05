@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20230120071934) do
+ActiveRecord::Schema.define(version: 20230309014315) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -239,6 +239,7 @@ ActiveRecord::Schema.define(version: 20230120071934) do
     t.integer  "source_bank_branch_id", limit: 4
     t.integer  "unpaid_amount",         limit: 4
     t.date     "unpaid_date"
+    t.integer  "completed_flag",        limit: 4,                 null: false
   end
 
   add_index "account_payment", ["account_title_id"], name: "account_payment_account_title_id_de8d3cfe_fk_account_a", using: :btree
@@ -260,6 +261,7 @@ ActiveRecord::Schema.define(version: 20230120071934) do
     t.integer  "partner_id",            limit: 4
     t.integer  "source_bank_id",        limit: 4
     t.integer  "source_bank_branch_id", limit: 4
+    t.integer  "completed_flag",        limit: 4
   end
 
   add_index "account_payment_reserve", ["account_title_id"], name: "account_pa_account_title_id_faeac2df_fk_account_account_title_id", using: :btree
@@ -467,13 +469,19 @@ ActiveRecord::Schema.define(version: 20230120071934) do
 
   create_table "daily_cash_flows", force: :cascade do |t|
     t.date     "cash_flow_date"
-    t.integer  "income",           limit: 4
-    t.integer  "expence",          limit: 4
-    t.integer  "balance",          limit: 4
-    t.integer  "plan_actual_flag", limit: 4
-    t.integer  "completed_flag",   limit: 4
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.integer  "income",                  limit: 4
+    t.integer  "expence",                 limit: 4
+    t.integer  "previous_balance",        limit: 4
+    t.integer  "balance",                 limit: 4
+    t.integer  "balance_daishi_hokuetsu", limit: 4
+    t.integer  "balance_sanshin",         limit: 4
+    t.integer  "balance_cash",            limit: 4
+    t.integer  "plan_actual_flag",        limit: 4
+    t.integer  "completed_flag",          limit: 4
+    t.integer  "income_completed_flag",   limit: 4
+    t.integer  "expence_completed_flag",  limit: 4
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
   end
 
   create_table "delivery_slip_detail_large_classifications", force: :cascade do |t|
@@ -593,6 +601,7 @@ ActiveRecord::Schema.define(version: 20230120071934) do
     t.integer  "invoice_header_id", limit: 4
     t.date     "deposit_due_date"
     t.integer  "deposit_amount",    limit: 4
+    t.integer  "deposit_source_id", limit: 4
     t.integer  "completed_flag",    limit: 4
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
@@ -639,6 +648,22 @@ ActiveRecord::Schema.define(version: 20230120071934) do
     t.integer  "dayly_pay",        limit: 4
     t.datetime "created"
     t.datetime "modified"
+  end
+
+  create_table "expences", force: :cascade do |t|
+    t.integer  "table_type_id",      limit: 4
+    t.integer  "table_id",           limit: 4
+    t.integer  "payment_method_id",  limit: 4
+    t.date     "payment_on"
+    t.date     "unpaid_on"
+    t.string   "name",               limit: 255
+    t.integer  "payment_amount",     limit: 4
+    t.date     "billing_year_month"
+    t.integer  "payment_source_id",  limit: 4
+    t.integer  "is_estimate",        limit: 4
+    t.integer  "is_completed",       limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
   end
 
   create_table "inventories", force: :cascade do |t|
@@ -850,6 +875,15 @@ ActiveRecord::Schema.define(version: 20230120071934) do
     t.string   "notes",                            limit: 255
     t.datetime "created_at",                                   null: false
     t.datetime "update_at",                                    null: false
+  end
+
+  create_table "monthly_balances", force: :cascade do |t|
+    t.string   "year_month",              limit: 255
+    t.integer  "balance_daishi_hokuetsu", limit: 4
+    t.integer  "balance_sanshin",         limit: 4
+    t.integer  "balance_cash",            limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "orders", force: :cascade do |t|
