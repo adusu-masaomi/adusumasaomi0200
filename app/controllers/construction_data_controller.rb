@@ -22,7 +22,7 @@ class ConstructionDataController < ApplicationController
     #test
     #query = nil
     
-	#@q = ConstructionDatum.ransack(params[:q])
+    #@q = ConstructionDatum.ransack(params[:q])
     #ransack保持用--上記はこれに置き換える
     @q = ConstructionDatum.ransack(query)   
     
@@ -41,21 +41,23 @@ class ConstructionDataController < ApplicationController
 
     @customer_masters = CustomerMaster.all
     
-	$construction_data = @construction_data
-	
+    #del230418
+    #$construction_data = @construction_data
+
     #add180903
     #資料フォルダを開く
-	if params[:document_flag] == "1"
+    if params[:document_flag] == "1"
       openFileDialog
     end
     
     if params[:document_flag] != "1"
       respond_to do |format|
-	    format.html
-		
-	    format.pdf do
+        format.html
+  
+        format.pdf do
         
-          report = ConstructionListPDF.create @construction_list 
+          #report = ConstructionListPDF.create @construction_list
+          report = ConstructionListPDF.create @construction_data   #upd230418
         
           # ブラウザでPDFを表示する
           # disposition: "inline" によりダウンロードではなく表示させている
@@ -64,9 +66,8 @@ class ConstructionDataController < ApplicationController
             filename:  "construction_list.pdf",
             type:        "application/pdf",
             disposition: "inline")
-        end
-	  end
-    
+        end  #format pdf do
+      end    #format do
     end
   end
 
@@ -82,13 +83,14 @@ class ConstructionDataController < ApplicationController
     #画像ファイル用
     #3.times { @construction_datum.construction_attachments.build }
     
-    
     Time.zone = "Tokyo"
 
     #工事コードの最終番号を取得
     get_last_construction_code_select
-    @construction_datum.construction_code = @@construction_new_code
-	
+    
+    #@construction_datum.construction_code = @@construction_new_code
+    @construction_datum.construction_code = @construction_new_code
+
   end
 
   # GET /construction_data/1/edit
@@ -160,9 +162,8 @@ class ConstructionDataController < ApplicationController
     @construction_datum.construction_start_date = '3000-01-01'
     @construction_datum.construction_end_date = '2000-01-01'
 
-    #binding.pry
-
-        respond_to do |format|
+    
+    respond_to do |format|
 
       if @construction_datum.save
         
@@ -180,7 +181,7 @@ class ConstructionDataController < ApplicationController
         #  @construction_datum.update(construction_params)
         #  #
        
-          #自社のコードを自動生成(在庫資材・消耗品・工具)
+        #自社のコードを自動生成(在庫資材・消耗品・工具)
         #  auto_create_own_code
         #end
         #
@@ -210,7 +211,7 @@ class ConstructionDataController < ApplicationController
         format.html { render :new }
         format.json { render json: @construction_datum.errors, status: :unprocessable_entity }
       end
-    end
+    end  #loop end
   end
 
   # PATCH/PUT /construction_data/1
@@ -232,38 +233,35 @@ class ConstructionDataController < ApplicationController
     
     if params[:directions].present?
 	  
-	  #手入力用IDの場合は、安全事項マスタへも登録する。
+      #手入力用IDの場合は、安全事項マスタへも登録する。
       @matter_name = nil
       if @construction_datum.working_safety_matter_id == 1
          
-       #既に登録してないかチェック
-	   new_name =  params[:construction_datum][:working_safety_matter_name]
+        #既に登録してないかチェック
+	      new_name =  params[:construction_datum][:working_safety_matter_name]
 	   
-	   if new_name != "" then
-             @check_matter = WorkingSafetyMatter.find_by(working_safety_matter_name: new_name)
-             if @check_matter.nil?
-	        matter_params = { working_safety_matter_name:  new_name }
-               @matter_name = WorkingSafetyMatter.create(matter_params)
-             end
-          end 
+        if new_name != "" then
+          @check_matter = WorkingSafetyMatter.find_by(working_safety_matter_name: new_name)
+          if @check_matter.nil?
+            matter_params = { working_safety_matter_name:  new_name }
+            @matter_name = WorkingSafetyMatter.create(matter_params)
+          end
+        end 
       end
-      
-	  
-	end
-	
-   
+  
+    end
+  
     respond_to do |format|
 	
       document_flag = false
     
-	  @update = nil
+      @update = nil
       if params[:documents].nil?
         #通常のアップデート
         @update = @construction_datum.update(construction_datum_params)
       else
         #資料のみ更新した場合
         @update = @construction_datum.update_attributes(construction_datum_attachments_params)
-      
         document_flag = true
       end
       
@@ -276,7 +274,7 @@ class ConstructionDataController < ApplicationController
         set_cash_flow = SetCashFlow.new
         set_cash_flow.set_cash_flow_detail_expected_for_construction(params, @construction_datum)
       
-	  #if @construction_datum.update(construction_datum_params)
+        #if @construction_datum.update(construction_datum_params)
         
         #add180903
         #OneDrive用のディレクトリを作る
@@ -289,55 +287,58 @@ class ConstructionDataController < ApplicationController
         if construction_cost.blank?
             construction_cost_params = {construction_datum_id: @construction_datum.id, purchase_amount: 0, 
                        execution_amount: 0, purchase_order_amount: ""}
-		
+
             @construction_cost = ConstructionCost.create(construction_cost_params)
         end
         #
-		if document_flag = false
+        if document_flag = false
           format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully updated.' }
-		else
-        #資料更新の場合、indexへそのまま戻る
+        else
+          #資料更新の場合、indexへそのまま戻る
           format.html { redirect_to action: "index", notice: 'Documents was successfully created.' }
         end
         
-		if params[:directions].present?
-		  #指示書の発行
-		  
-		  #global set
-          $construction_datum = @construction_datum 
-		  
-		  #作業日をグローバルへセット
-		  #$working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
+        if params[:directions].present?
+          #指示書の発行
+          #global set
+          #$construction_datum = @construction_datum  #del230418
+  
+          #作業日をグローバルへセット
+          #$working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
           #                params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
           working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
                           params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
-		  #upd191009
+		      #upd191009
           #曜日を追加
           week = %w{日 月 火 水 木 金 土}[Date.parse(working_date).wday]
-          $working_date = working_date + "（" + week + "）"
+          #$working_date = working_date + "（" + week + "）"
+          working_date = working_date + "（" + week + "）"
                     
-		  #発行日をグローバルへセット
-          #191009~現在未使用
-          $issue_date = params[:construction_datum][:issue_date]
+		      #発行日をグローバルへセット
+          #$issue_date = params[:construction_datum][:issue_date]
+          issue_date = params[:construction_datum][:issue_date]
           
           #復活した場合に残しておく
           #曜日を追加
           #issue_date = params[:construction_datum][:issue_date]
-		  #week = %w{日 月 火 水 木 金 土}[Date.parse(issue_date).wday]
+		      #week = %w{日 月 火 水 木 金 土}[Date.parse(issue_date).wday]
           #$issue_date = issue_date + "（" + week + "）"
           #復活~end
           
-		  #作業者をグローバルへセット
-		  staff_id = params[:construction_datum][:staff_id]
-		  @staff = Staff.find_by(id: staff_id)
-		  $staff_name = ""
-		  if @staff.present?
-		   $staff_name = @staff.staff_name
-		  end
-		  
-		  format.pdf do
-            report = WorkingDirectionsPDF.create @working_dirctions
-		    # ブラウザでPDFを表示する
+          #作業者をグローバルへセット
+          staff_id = params[:construction_datum][:staff_id]
+          @staff = Staff.find_by(id: staff_id)
+          #$staff_name = ""
+          staff_name = ""
+          if @staff.present?
+            #$staff_name = @staff.staff_name
+            staff_name = @staff.staff_name
+          end
+    
+          format.pdf do
+            #report = WorkingDirectionsPDF.create @working_dirctions
+            report = WorkingDirectionsPDF.create(@construction_datum, working_date, issue_date, staff_name)
+            # ブラウザでPDFを表示する
             # disposition: "inline" によりダウンロードではなく表示させている
             send_data(
               report.generate,
@@ -345,19 +346,19 @@ class ConstructionDataController < ApplicationController
               type:        "application/pdf",
               disposition: "inline")
           end
-		 end
+        end
 		
-         if document_flag == false
-           format.json { render :show, status: :ok, location: @construction_datum }
-         end
+        if document_flag == false
+          format.json { render :show, status: :ok, location: @construction_datum }
+        end
+        
       else
+      #if update failed
         format.html { render :edit }
         format.json { render json: @construction_datum.errors, status: :unprocessable_entity }
       end
 	  
-	
-    end
-    
+    end  #loop end
     
   end
   
@@ -469,8 +470,9 @@ class ConstructionDataController < ApplicationController
     end
     
     if @site.nil?
-      #if numeric == false
-      if numeric == false && params[:construction_datum][:site_id] != ""
+      #if numeric == false && params[:construction_datum][:site_id] != ""
+      #upd230711
+      if numeric == false && params[:construction_datum][:site_id].present?
       #文字の場合(コード入力はないものとする)
         site_params = {name: params[:construction_datum][:site_id], post: params[:construction_datum][:post], 
                        address: params[:construction_datum][:address], house_number: params[:construction_datum][:house_number],
@@ -525,39 +527,36 @@ class ConstructionDataController < ApplicationController
     
     #mac or windows の場合
     #if browser.platform.windows? || browser.platform.mac?
-    
-      dir_path += @construction_datum.construction_code + "-" + @construction_datum.construction_name
+    dir_path += @construction_datum.construction_code + "-" + @construction_datum.construction_name
       
-      #this can't sync folders...
-      #dir_path = "/rootOneDrive/共有/工事資料/"
-      dir_path = "/rootOneDrive/attachment/"       
+    #this can't sync folders...
+    #dir_path = "/rootOneDrive/共有/工事資料/"
+    dir_path = "/rootOneDrive/attachment/"       
 
-      #FileUtils.mkdir_p(dir_path) unless FileTest.exist?(dir_path)
-      FileUtils.mkdir_p(dir_path, :mode => 0777) unless FileTest.exist?(dir_path)
+    #FileUtils.mkdir_p(dir_path) unless FileTest.exist?(dir_path)
+    FileUtils.mkdir_p(dir_path, :mode => 0777) unless FileTest.exist?(dir_path)
     #end
     #
   end
   
   
   
-  #作業指示書PDF発行
+  #作業指示書PDF発行(未使用??)
   def set_pdf
       
-      
-	
-      #respond_to do |format|
-      #  format.html # index.html.erb
-        format.pdf do
+    #respond_to do |format|
+    #  format.html # index.html.erb
+    format.pdf do
          
-        report = WorkingDirectionsPDF.create @working_dirctions
-        # ブラウザでPDFを表示する
-        # disposition: "inline" によりダウンロードではなく表示させている
-        send_data(
-          report.generate,
-          filename:  "working_directions.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
-        end
+      report = WorkingDirectionsPDF.create @working_dirctions
+      # ブラウザでPDFを表示する
+      # disposition: "inline" によりダウンロードではなく表示させている
+      send_data(
+        report.generate,
+        filename:  "working_directions.pdf",
+        type:        "application/pdf",
+        disposition: "inline")
+    end
       
 	  #end
   end
@@ -578,17 +577,21 @@ class ConstructionDataController < ApplicationController
   
   #工事コードの最終番号(+1)を取得する
   def get_last_construction_code_select
-     #crescent = "%" + params[:header] + "%"
-     #@construction_new_code = ConstructionDatum.where('construction_code LIKE ?', crescent).all.maximum(:construction_code)
-     @construction_new_code = ConstructionDatum.all.maximum(:construction_code) 
+    #参考になるコードのため、消さない事
+    #crescent = "%" + params[:header] + "%"
+    #@construction_new_code = ConstructionDatum.where('construction_code LIKE ?', crescent).all.maximum(:construction_code)
+     
+    #@construction_new_code = ConstructionDatum.all.maximum(:construction_code)
+    construction_new_code = ConstructionDatum.all.maximum(:construction_code) 
+
+    #最終番号に１を足す。
+    #header = @construction_new_code[0, 1]  #参考になるコードのため、消さない事
+    #newNum = @construction_new_code.to_i + 1
+    newNum = construction_new_code.to_i + 1
 	 
-	 #最終番号に１を足す。
-	 #newStr = @construction_new_code[1, 4]
-	 #header = @construction_new_code[0, 1]
-	 newNum = @construction_new_code.to_i + 1
-	 
-     @@construction_new_code = newNum.to_s
-	 
+    #@@construction_new_code = newNum.to_s
+    @construction_new_code = newNum.to_s
+
   end
   
   #viewで分解されたパラメータを、正常更新できるように復元させる。
@@ -707,26 +710,26 @@ class ConstructionDataController < ApplicationController
   #現場名から住所をセットする
   def get_site_address
      
-	 #郵便番号・住所
-	 @post = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
-	 add1 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
-	 #番地  
-	 num = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
-	 add2 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+    #郵便番号・住所
+    @post = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
+    add1 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+    #番地  
+    num = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+    add2 = Site.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+
+    @address = ""
+    if add1.present?
+      @address = add1 
+    end
 	 
-	 @address = ""
-	 if add1.present?
-	   @address = add1 
-	 end
+    #番地
+    if num.present?
+      @house_number = num 
+    end
 	 
-	 #番地
-	 if num.present?
-	   @house_number = num 
-	 end
-	 
-	 if add2.present?
-	   @address2 = add2 
-	 end
+    if add2.present?
+      @address2 = add2 
+    end
   end
   
   
@@ -744,154 +747,144 @@ class ConstructionDataController < ApplicationController
   end
   
   
-  #add200111
   #請求予定日から入金予定日を取得
   def get_deposit_due_date
-    #binding.pry
     @customer = nil
     if params[:customer_id].present?
       @customer = CustomerMaster.find(params[:customer_id])
     end
     
     if @customer.present?
+      
+      @purchase_date = Date.parse(params[:billing_due_date])
         
-        @purchase_date = Date.parse(params[:billing_due_date])
-        
-        @closing_date = nil
-        @payment_due_date = nil
-        addMonth = 0
+      @closing_date = nil
+      @payment_due_date = nil
+      addMonth = 0
     
-        #締め日算出
-        if @customer.closing_date_division == 1
-        #月末の場合
-          d = @purchase_date
-          @closing_date = Date.new(d.year, d.month, -1)
-        else
-        #日付指定の場合
-          d = @purchase_date
+      #締め日算出
+      if @customer.closing_date_division == 1
+      #月末の場合
+        d = @purchase_date
+        @closing_date = Date.new(d.year, d.month, -1)
+      else
+      #日付指定の場合
+        d = @purchase_date
+        
+        if @customer.closing_date != 0
           
-          if @customer.closing_date != 0
-          
-            #if d.day < @customer.closing_date
-            if d.day <= @customer.closing_date  #bugfix 200127
-              if Date.valid_date?(d.year, d.month, @customer.closing_date)
-                @closing_date = Date.new(d.year, d.month, @customer.closing_date)
-              end
-            else
-            #締め日を過ぎていた場合、月＋１
-              addMonth += 1
-            
-              d = d >> addMonth
-            
-              if Date.valid_date?(d.year, d.month, @customer.closing_date)
-                @closing_date = Date.new(d.year, d.month, @customer.closing_date) 
-              end
+          #if d.day < @customer.closing_date
+          if d.day <= @customer.closing_date  #bugfix 200127
+            if Date.valid_date?(d.year, d.month, @customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, @customer.closing_date)
             end
           else
-          #日付指定有で指定日未入力なら、月末とみなす
-          #add200110
-            d = @purchase_date
-            @closing_date = Date.new(d.year, d.month, -1)
+          #締め日を過ぎていた場合、月＋１
+            addMonth += 1
+            
+            d = d >> addMonth
+            
+            if Date.valid_date?(d.year, d.month, @customer.closing_date)
+              @closing_date = Date.new(d.year, d.month, @customer.closing_date) 
+            end
           end
-          
+        else
+        #日付指定有で指定日未入力なら、月末とみなす
+          d = @purchase_date
+          @closing_date = Date.new(d.year, d.month, -1)
         end
+          
+      end
         
-        #支払日算出
-        d = @closing_date   
-        if @customer.due_date.present?  && @customer.due_date > 0
+      #支払日算出
+      d = @closing_date   
+      if @customer.due_date.present?  && @customer.due_date > 0
           
-          #binding.pry
-          
-          if @customer.due_date >= 28   #月末とみなす
-            d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
+        if @customer.due_date >= 28   #月末とみなす
+          d2 = Date.new(d.year, d.month, 28)  #一旦、エラーの出ない２８日を月末とさせる
             
-            addMonth = @customer.due_date_division 
+          addMonth = @customer.due_date_division 
             
-            d2 = d2 >> addMonth
-            d2 = Date.new(d2.year, d2.month, -1)
+          d2 = d2 >> addMonth
+          d2 = Date.new(d2.year, d2.month, -1)
             
             @payment_due_date = d2
           
-          else
-          ##月末の扱いでなければ、そのまま
-            if Date.valid_date?(d.year, d.month, @customer.due_date)
-              d2 = Date.new(d.year, d.month, @customer.due_date)
+        else
+        ##月末の扱いでなければ、そのまま
+          if Date.valid_date?(d.year, d.month, @customer.due_date)
+            d2 = Date.new(d.year, d.month, @customer.due_date)
             
-              addMonth = @customer.due_date_division
+            addMonth = @customer.due_date_division
               
-              @payment_due_date = d2 >> addMonth
+            @payment_due_date = d2 >> addMonth
             
-            end
           end
-        
         end
         
-        
-        
       end
+      ##
+    end  #if @customer.present?
   end
   
   #見積書などで使用
   def construction_and_customer_select
-     @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
-	 @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+    @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+    @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
 	 
-	 #郵便番号・住所
-	 @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
-	 add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
-	 #番地  
-	 num = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
-	 add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
+    #郵便番号・住所
+    @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
+    add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
+    #番地  
+    num = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
+    add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
 	 
-	 @address = ""
-	 if add1.present?
-	   @address = add1 
-	 end
-	 
-	 #番地
-	 if num.present?
-	   @house_number = num 
-	 end
-	 
-	 if add2.present?
-	   @address2 = add2 
-	 end
-	 
-     #担当名追加
-     #add190131
-     @personnel = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:personnel).flatten.join(" ")
+    @address = ""
+    if add1.present?
+      @address = add1 
+    end
+  
+    #番地
+    if num.present?
+      @house_number = num 
+    end
+    
+    if add2.present?
+      @address2 = add2 
+    end
+
+    #担当名追加
+    @personnel = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:personnel).flatten.join(" ")
      
   end
   
   #見積書をもとに、初期情報をセットする
   def quotation_header_select
-    
-	 @construction_name = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+    @construction_name = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+
+    customer = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+    @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
 	 
-	 customer = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
-     @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
-	 
-	 #郵便番号（*工事場所）
-     @post = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
-	 
-	 #住所（*工事場所）
-	 @address = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
- 
+    #郵便番号（*工事場所）
+    @post = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
+
+    #住所（*工事場所）
+    @address = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
   end
   
   #納品書をもとに、初期情報をセットする
   def delivery_slip_header_select
     
-	 @construction_name = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
-	 
-	 customer = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
-     @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
-	 
-	 #郵便番号（*工事場所）
-     @post = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
-	 
-	 #住所（*工事場所）
-	 @address = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
+    @construction_name = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
+    
+    customer = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
+    @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
+
+    #郵便番号（*工事場所）
+    @post = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
+  
+    #住所（*工事場所）
+    @address = DeliverySlipHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_place).flatten.join(" ")
  
   end
   

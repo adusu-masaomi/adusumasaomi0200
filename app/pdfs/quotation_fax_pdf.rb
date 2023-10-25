@@ -1,7 +1,8 @@
 class QuotationFaxPDF
     
   
-  def self.create quotation_fax
+  #def self.create quotation_fax
+  def self.create(quotation_material_header, responsible)
 	#見積fax用PDF発行
  
     # tlfファイルを読み込む
@@ -15,18 +16,20 @@ class QuotationFaxPDF
     #report.page.item(:construction_name).value($purchase_order_datum.alias_name)
       
     report.page.list(:default).header do |header|
-    
-      header.item(:supplier_name).value($quotation_material_header.supplier_master.supplier_name)
-      header.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.responsible1)
+      #$quotation_material_headerをとった(230509)
+      
+      header.item(:supplier_name).value(quotation_material_header.supplier_master.supplier_name)
+      #header.item(:supplier_responsible_name).value(quotation_material_header.supplier_master.responsible1)
+      header.item(:supplier_responsible_name).value(responsible)
       #注文番号
-      header.item(:quotation_code).value($quotation_material_header.quotation_code)
+      header.item(:quotation_code).value(quotation_material_header.quotation_code)
 	  #工事名
-      header.item(:construction_name).value($quotation_material_header.construction_datum.construction_name)
+      header.item(:construction_name).value(quotation_material_header.construction_datum.construction_name)
     end
     
     #明細取得
     @quotation_material_details = QuotationMaterialDetail.
-                   where(:quotation_material_header_id => $quotation_material_header.id).where("id is NOT NULL")
+                   where(:quotation_material_header_id => quotation_material_header.id).where("id is NOT NULL")
     
     if @quotation_material_details.present?
       

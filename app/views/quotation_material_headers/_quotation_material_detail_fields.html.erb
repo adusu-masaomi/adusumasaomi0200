@@ -1,9 +1,8 @@
 <div class="sortThese">
 <div class="nested-fields well form-inline">
-
   
   <!--<%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>-->
-  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , value: $seq_exists, style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
+  <%= f.input :sequential_id, label: "No", input_html:{ id: "sequential_id" , value: f.object.sequential_id  || $seq_exists, style: 'width:65px;text-align:right;margin: 0;', :readonly => true} %>
   
   <%= f.input :sequential_id_hide,  input_html:{id:"sequential_id_hide", }, as: :hidden %>
   <%= f.input :sort_order,  input_html:{id:"sort_order", }, as: :hidden %>

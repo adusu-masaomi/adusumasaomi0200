@@ -1,7 +1,8 @@
 class QuotationOrderFaxPDF
     
   
-  def self.create quotation_order_fax
+  #def self.create quotation_order_fax
+  def self.create(quotation_material_header, purchase_order_code, supplier, responsible)
 	#見積fax用PDF発行
  
     # tlfファイルを読み込む
@@ -15,35 +16,23 @@ class QuotationOrderFaxPDF
       
     report.page.list(:default).header do |header|
       
-      #注文金額合計
-      #total_order_price = 0
-      #case $supplier
-      #  when 1
-      #    total_order_price = $quotation_material_header.total_order_price_1
-      #  when 2
-      #    total_order_price = $quotation_material_header.total_order_price_2
-      #  when 3
-      #    total_order_price = $quotation_material_header.total_order_price_3
-      #end
+      #担当者
+      header.item(:supplier_name).value(quotation_material_header.supplier_master.supplier_name)
+      #header.item(:supplier_responsible_name).value(quotation_material_header.supplier_master.responsible1)
+      header.item(:supplier_responsible_name).value(responsible)
       
-      #@num = total_order_price
-      #formatNum
-      #total_order_price = @num
-	  #
-    
-      header.item(:supplier_name).value($quotation_material_header.supplier_master.supplier_name)
-      header.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.responsible1)
       #注文番号
-      header.item(:purchase_order_code).value($purchase_order_code)
-	  #工事名
-      header.item(:construction_name).value($quotation_material_header.construction_datum.construction_name)
+      header.item(:purchase_order_code).value(purchase_order_code)
+      #工事名
+      header.item(:construction_name).value(quotation_material_header.construction_datum.construction_name)
       ##注文金額
       #header.item(:total_order_price).value(total_order_price)
     end
     
     #明細取得
     @quotation_material_details = QuotationMaterialDetail.
-                   where(:quotation_material_header_id => $quotation_material_header.id).where("id is NOT NULL")
+                   where(:quotation_material_header_id => quotation_material_header.id).where("id is NOT NULL")
+                   #where(:quotation_material_header_id => $quotation_material_header.id).where("id is NOT NULL")
     
     if @quotation_material_details.present?
       
@@ -55,7 +44,8 @@ class QuotationOrderFaxPDF
       
       @quotation_material_details.each do |quotation_material_detail| 
       
-        if isBidSupplier(quotation_material_detail) == true
+        #if isBidSupplier(quotation_material_detail) == true
+        if isBidSupplier(quotation_material_detail, supplier) == true
           cnt += 1
           cnt_str = cnt.to_s + "."
         
@@ -110,11 +100,12 @@ class QuotationOrderFaxPDF
 end
 
 #落札した業者の判定、単価もセット
-def isBidSupplier(quotation_material_detail)
+def isBidSupplier(quotation_material_detail, supplier)
   
   isBid = false
   
-  case $supplier
+  #case $supplier
+  case supplier
     when 1
       if quotation_material_detail.bid_flag_1 == 1
         isBid = true

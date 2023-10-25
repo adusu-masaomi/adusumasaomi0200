@@ -41,14 +41,18 @@ class PurchaseDatum < ActiveRecord::Base
     
     #外注判定用
     attr_accessor :outsourcing
-	attr_accessor :construction_datum_id_hide
-	attr_accessor :material_category_id_hide
+    attr_accessor :construction_datum_id_hide
+    attr_accessor :material_category_id_hide
     attr_accessor :outsourcing_flag_hide 
     attr_accessor :price_disp_flag
     attr_accessor :closing_date_hide      
     attr_accessor :payment_due_date_hide  
-    
     attr_accessor :new_company_flag  #221104
+    
+    #add231021
+    #attr_accessor :purchase_unit_price_tax
+    attr_accessor :purchase_amount_tax
+    #add end
     
     #validation
     validates :material_id, presence: true

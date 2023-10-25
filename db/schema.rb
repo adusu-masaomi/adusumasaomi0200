@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20230309014315) do
+ActiveRecord::Schema.define(version: 20230518004527) do
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -100,6 +100,7 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.datetime "created_at",                         precision: 6
     t.datetime "update_at",                          precision: 6
     t.integer  "account_title_id",       limit: 4
+    t.integer  "partner_id",             limit: 4
     t.integer  "purchase_order_code_id", limit: 4
     t.integer  "staff_id",               limit: 4
     t.integer  "order",                  limit: 4,                 null: false
@@ -238,6 +239,7 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.integer  "source_bank_id",        limit: 4
     t.integer  "source_bank_branch_id", limit: 4
     t.integer  "unpaid_amount",         limit: 4
+    t.date     "unpaid_due_date"
     t.date     "unpaid_date"
     t.integer  "completed_flag",        limit: 4,                 null: false
   end
@@ -261,6 +263,9 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.integer  "partner_id",            limit: 4
     t.integer  "source_bank_id",        limit: 4
     t.integer  "source_bank_branch_id", limit: 4
+    t.integer  "unpaid_amount",         limit: 4
+    t.date     "unpaid_due_date"
+    t.date     "unpaid_date"
     t.integer  "completed_flag",        limit: 4
   end
 
@@ -463,25 +468,42 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.integer  "card_not_flag",         limit: 4
     t.integer  "contractor_flag",       limit: 4
     t.integer  "public_flag",           limit: 4
-    t.datetime "created_at",                        null: false
+    t.datetime "created_at"
     t.datetime "update_at",                         null: false
   end
 
   create_table "daily_cash_flows", force: :cascade do |t|
     t.date     "cash_flow_date"
-    t.integer  "income",                  limit: 4
-    t.integer  "expence",                 limit: 4
-    t.integer  "previous_balance",        limit: 4
-    t.integer  "balance",                 limit: 4
-    t.integer  "balance_daishi_hokuetsu", limit: 4
-    t.integer  "balance_sanshin",         limit: 4
-    t.integer  "balance_cash",            limit: 4
-    t.integer  "plan_actual_flag",        limit: 4
-    t.integer  "completed_flag",          limit: 4
-    t.integer  "income_completed_flag",   limit: 4
-    t.integer  "expence_completed_flag",  limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.integer  "income",                 limit: 4
+    t.integer  "expence",                limit: 4
+    t.integer  "previous_balance",       limit: 4
+    t.integer  "balance",                limit: 4
+    t.integer  "plan_actual_flag",       limit: 4
+    t.integer  "completed_flag",         limit: 4
+    t.integer  "income_completed_flag",  limit: 4
+    t.integer  "expence_completed_flag", limit: 4
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  create_table "daily_loan_details", force: :cascade do |t|
+    t.integer  "table_type_id",  limit: 4
+    t.integer  "table_id",       limit: 4
+    t.integer  "lend_borrow_id", limit: 4
+    t.date     "occurred_on"
+    t.string   "summary",        limit: 255
+    t.integer  "amount",         limit: 4
+    t.integer  "source_id",      limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  create_table "daily_loan_headers", force: :cascade do |t|
+    t.date     "occurred_on"
+    t.integer  "lend",        limit: 4
+    t.integer  "borrow",      limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
   end
 
   create_table "delivery_slip_detail_large_classifications", force: :cascade do |t|
@@ -598,13 +620,15 @@ ActiveRecord::Schema.define(version: 20230309014315) do
   end
 
   create_table "deposits", force: :cascade do |t|
-    t.integer  "invoice_header_id", limit: 4
+    t.integer  "table_type_id",     limit: 4
+    t.integer  "table_id",          limit: 4
     t.date     "deposit_due_date"
+    t.string   "name",              limit: 255
     t.integer  "deposit_amount",    limit: 4
     t.integer  "deposit_source_id", limit: 4
     t.integer  "completed_flag",    limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
   end
 
   create_table "django_admin_log", force: :cascade do |t|
@@ -658,6 +682,7 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.date     "unpaid_on"
     t.string   "name",               limit: 255
     t.integer  "payment_amount",     limit: 4
+    t.integer  "unpaid_amount",      limit: 4
     t.date     "billing_year_month"
     t.integer  "payment_source_id",  limit: 4
     t.integer  "is_estimate",        limit: 4
@@ -878,12 +903,24 @@ ActiveRecord::Schema.define(version: 20230309014315) do
   end
 
   create_table "monthly_balances", force: :cascade do |t|
-    t.string   "year_month",              limit: 255
+    t.string   "occur_year_month",        limit: 255
     t.integer  "balance_daishi_hokuetsu", limit: 4
     t.integer  "balance_sanshin",         limit: 4
     t.integer  "balance_cash",            limit: 4
+    t.integer  "is_actual",               limit: 4
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+  end
+
+  create_table "monthly_loans", force: :cascade do |t|
+    t.string   "occur_year_month", limit: 255
+    t.integer  "lend",             limit: 4
+    t.integer  "borrow",           limit: 4
+    t.integer  "lend_total",       limit: 4
+    t.integer  "borrow_total",     limit: 4
+    t.integer  "is_actual",        limit: 4
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
   end
 
   create_table "orders", force: :cascade do |t|
@@ -969,10 +1006,10 @@ ActiveRecord::Schema.define(version: 20230309014315) do
   end
 
   create_table "purchase_divisions", force: :cascade do |t|
-    t.string   "purchase_division_name",      limit: 255
+    t.string   "purchase_division_name",      limit: 255, default: "", null: false
     t.string   "purchase_division_long_name", limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "update_at",                               null: false
+    t.datetime "created_at",                                           null: false
+    t.datetime "update_at",                                            null: false
   end
 
   create_table "purchase_headers", force: :cascade do |t|
@@ -1013,7 +1050,7 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.integer  "list_price",             limit: 4
     t.integer  "unit_id",                limit: 4
     t.datetime "created_at",                         null: false
-    t.datetime "update_at",                          null: false
+    t.datetime "update_at"
   end
 
   create_table "quotation_breakdown_histories", force: :cascade do |t|
@@ -1383,10 +1420,10 @@ ActiveRecord::Schema.define(version: 20230309014315) do
   create_table "supplier_masters", force: :cascade do |t|
     t.string   "supplier_name",    limit: 255
     t.string   "tel_main",         limit: 255
-    t.string   "fax_main",         limit: 255
+    t.string   "fax_main",         limit: 255, default: ""
     t.string   "email_main",       limit: 255
     t.string   "responsible1",     limit: 255
-    t.string   "email1",           limit: 255
+    t.string   "email1",           limit: 255, default: ""
     t.string   "responsible2",     limit: 255
     t.string   "email2",           limit: 255
     t.string   "responsible3",     limit: 255
@@ -1395,8 +1432,8 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.string   "email_cc",         limit: 255
     t.string   "search_character", limit: 255
     t.integer  "outsourcing_flag", limit: 4
-    t.datetime "created_at",                   null: false
-    t.datetime "update_at",                    null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "update_at",                                 null: false
   end
 
   create_table "supplier_responsibles", force: :cascade do |t|
@@ -1406,6 +1443,14 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
   end
+
+  create_table "system_users", force: :cascade do |t|
+    t.text   "account_id", limit: 65535, null: false
+    t.text   "mail",       limit: 65535
+    t.string "pass",       limit: 255,   null: false
+  end
+
+  add_index "system_users", ["id"], name: "id", unique: true, using: :btree
 
   create_table "task_contents", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -1533,6 +1578,7 @@ ActiveRecord::Schema.define(version: 20230309014315) do
     t.string   "working_middle_item_name",        limit: 255
     t.string   "working_middle_item_short_name",  limit: 255
     t.integer  "working_middle_item_category_id", limit: 4
+    t.integer  "working_subcategory_id",          limit: 4
     t.string   "working_middle_specification",    limit: 255
     t.integer  "working_unit_id",                 limit: 4
     t.string   "working_unit_name",               limit: 255

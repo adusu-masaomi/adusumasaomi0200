@@ -38,9 +38,11 @@ class InvoiceHeader < ActiveRecord::Base
   #＊備考に"繰越"が入っていたら、入金日もセットで入れてもらうようにする
   validate  :check_payment_date
   def check_payment_date
-    if remarks.include?("繰越")
-      if payment_date.nil?
-        errors.add :payment_date, "を入力して下さい。"
+    if remarks.present?  #add230616
+      if remarks.include?("繰越")
+        if payment_date.nil?
+          errors.add :payment_date, "を入力して下さい。"
+        end
       end
     end
   end

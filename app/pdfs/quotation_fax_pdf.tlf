@@ -1,5 +1,5 @@
 {
-  "version": "0.9.1",
+  "version": "0.12.0",
   "items": [
     {
       "id": "default",
@@ -730,9 +730,9 @@
             "type": "text",
             "display": true,
             "description": "",
-            "x": 455,
+            "x": 468.8,
             "y": 569.4,
-            "width": 104.1,
+            "width": 90.9,
             "height": 15,
             "style": {
               "font-family": [
@@ -748,7 +748,7 @@
               "font-style": []
             },
             "texts": [
-              "アデュース電気"
+              "(株)アデュース"
             ]
           },
           {

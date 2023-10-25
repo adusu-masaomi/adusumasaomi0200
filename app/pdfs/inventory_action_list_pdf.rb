@@ -93,7 +93,12 @@ class InventoryActionListPDF
              if stocktake.physical_quantity.present? && stocktake.book_quantity.present?
 			   difference = stocktake.physical_quantity - stocktake.book_quantity
 			 end
-  
+      
+      
+       #if stocktake.material_master.id == 4455
+       #  binding.pry
+       #end 
+      
 			 #end
 			 #数値の様式設定
 			 #単価(最終)

@@ -16,36 +16,32 @@ class PurchaseDataController < ApplicationController
   #    cookies[cookie_key] = params[:q].to_json if params[:q]
   #    @query = params[:q].presence || JSON.load(cookies[cookie_key])
   #end
-
-  #@@material_masters = ""
-
+  
+  #スレッドセーフではない為、以下抹消(230415)
   #新規登録の画面引継用
-  @@purchase_datum_purchase_date = ""
-  @@purchase_datum_order_id = []
-  @@purchase_datum_slip_code = []
-  @@purchase_datum_construction_id = []
-  #@@purchase_datum_supplier_id = []
-  @@purchase_datum_supplier_id = nil   #upd200626
+  #@@purchase_datum_purchase_date = ""
+  #@@purchase_datum_order_id = []
+  #@@purchase_datum_slip_code = []
+  #@@purchase_datum_construction_id = []
+  #@@purchase_datum_supplier_id = nil   
+  #@@purchase_datum_notes = ""
+  #@@purchase_datum_division_id = []
+  #@@purchase_datum_inventory_division_id = ""   
+  #@@purchase_datum_unit_price_not_update_flag = ""
+  #@@new_flag = []
   
-  @@purchase_datum_notes = ""
-  @@purchase_datum_division_id = []
-  
-  @@purchase_datum_inventory_division_id = ""   #fix180223
-  @@purchase_datum_unit_price_not_update_flag = ""
-  
-  @@new_flag = []
-  
-  #@@supplier_material = []    #add200626
   
   #見積用の定価
-  @@list_price_quotation = 0
+  #@@list_price_quotation = 0
   
   # GET /purchase_data
   # GET /purchase_data.json
   
   include ApplicationHelper
-  @@clear = false
-  @@count = 0
+  
+  #del230417
+  #@@clear = false
+  #@@count = 0
   
   def index
     
@@ -58,19 +54,21 @@ class PurchaseDataController < ApplicationController
     cky = get_cookies("recent_search_history_purchase")
     query ||= eval(cky.to_s)   
         
-        
     #
     #クッキーをクリアさせる場合の処理
-    if @@clear == true
-      query = eval(cky.to_s) 
-      @@count += 1
-          
-      if @@count == 1    #centos(本番)用
-      #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
-        @@clear = false
-        @@count = 0
-      end
-    end
+    #if params[:is_clear].present? && params[:is_clear] == "true"
+    #end
+    
+    #del230417
+    #if @@clear == true
+    #  query = eval(cky.to_s) 
+    #  @@count += 1
+    #  if @@count == 1    #centos(本番)用
+    #  #if @@count == 2   #(mac用)２回目の遷移時に(なぜか)、正常なパラメータが送られてくる
+    #    @@clear = false
+    #    @@count = 0
+    #  end
+    #end
     #
         
     @purchase_order_data_extract = PurchaseOrderDatum.all  
@@ -393,23 +391,26 @@ class PurchaseDataController < ApplicationController
     @supplier_masters = SupplierMaster.all
     @purchase_divisions = PurchaseDivision.all
     
-    
     #新規登録の画面引継用
-    @@purchase_datum_purchase_date = @purchase_datum.purchase_date
-    @@purchase_datum_order_id = @purchase_datum.purchase_order_datum_id
-    @@purchase_datum_slip_code = @purchase_datum.slip_code
-    @@purchase_datum_construction_id = @purchase_datum.construction_datum_id
-    @@purchase_datum_supplier_id = @purchase_datum.supplier_id
-	@@purchase_datum_notes = @purchase_datum.notes
-	@@purchase_datum_division_id = @purchase_datum.division_id
-	@@purchase_datum_inventory_division_id = @purchase_datum.inventory_division_id
-	#add171216
-	@@purchase_datum_unit_price_not_update_flag = @purchase_datum.unit_price_not_update_flag
+    #@@purchase_datum_purchase_date = @purchase_datum.purchase_date
+    purchase_datum_purchase_date(@purchase_datum.purchase_date)
+     
+    #del230415
+    #@@purchase_datum_order_id = @purchase_datum.purchase_order_datum_id
+    #@@purchase_datum_slip_code = @purchase_datum.slip_code
+    #@@purchase_datum_construction_id = @purchase_datum.construction_datum_id
+    #@@purchase_datum_supplier_id = @purchase_datum.supplier_id
+    #@@purchase_datum_notes = @purchase_datum.notes
+    #@@purchase_datum_division_id = @purchase_datum.division_id
+    #@@purchase_datum_inventory_division_id = @purchase_datum.inventory_division_id
+    #@@purchase_datum_unit_price_not_update_flag = @purchase_datum.unit_price_not_update_flag
     
   end
 
   # GET /purchase_data/new
   def new
+    #binding.pry
+  
     @purchase_datum = PurchaseDatum.new
 	
     #ここで資材マスターもセットしておく(動作軽減のため)
@@ -418,40 +419,44 @@ class PurchaseDataController < ApplicationController
     
     Time.zone = "Tokyo"
 	
-      @purchase_unit_prices = PurchaseUnitPrice.none
-      @purchase_datum.build_PurchaseUnitPrice
-      @purchase_datum.build_MaterialMaster
+    @purchase_unit_prices = PurchaseUnitPrice.none
+    @purchase_datum.build_PurchaseUnitPrice
+    @purchase_datum.build_MaterialMaster
     
     #工事データ/注文データの初期値をセット
-	@outsourcing_flag = "0"
+	  @outsourcing_flag = "0"
     set_construction_and_order_default
 
+    #@@new_flag = params[:new_flag]
 
-       @@new_flag = params[:new_flag]
+    #binding.pry
 
-       #binding.pry
-
-       #初期値をセット(show画面からの遷移時のみ)
-	   if @@new_flag == "1"
-       #test del 200626
-         @purchase_datum.purchase_date ||= @@purchase_datum_purchase_date
-	     @purchase_datum.purchase_order_datum_id ||= @@purchase_datum_order_id
-	     @purchase_datum.slip_code ||= @@purchase_datum_slip_code 
-	     @purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
-		 @purchase_datum.supplier_id ||= @@purchase_datum_supplier_id    #200626
+    #初期値をセット(show画面からの遷移時のみ)
+    #if @@new_flag == "1"
+    if params[:new_flag] == "1"
+      #@purchase_datum.purchase_date ||= @@purchase_datum_purchase_date
+      #@purchase_datum.purchase_order_datum_id ||= @@purchase_datum_order_id
+      #@purchase_datum.slip_code ||= @@purchase_datum_slip_code
+      #@purchase_datum.construction_datum_id ||= @@purchase_datum_construction_id
+      #@purchase_datum.supplier_id ||= @@purchase_datum_supplier_id
+      #@purchase_datum.notes ||= @@purchase_datum_notes
+      #@purchase_datum.division_id ||= @@purchase_datum_division_id
+      
+      purchase_previous = PurchaseDatum.find(params[:id])
+      
+      @purchase_datum.purchase_date ||= purchase_previous.purchase_date
+      @purchase_datum.purchase_order_datum_id ||= purchase_previous.purchase_order_datum_id
+      @purchase_datum.slip_code ||= purchase_previous.slip_code
+      @purchase_datum.construction_datum_id ||= purchase_previous.construction_datum_id
+      @purchase_datum.supplier_id ||= purchase_previous.supplier_id
+      @purchase_datum.notes ||= purchase_previous.notes
+      @purchase_datum.division_id ||= purchase_previous.division_id
+      @purchase_datum.inventory_division_id ||= purchase_previous.inventory_division_id
+      @purchase_datum.unit_price_not_update_flag ||= purchase_previous.unit_price_not_update_flag
+      
+      ####@purchase_unit_prices = PurchaseUnitPrice.all
          
-         ##test
-         #@@supplier_material  = @@purchase_unit_prices.where(:supplier_id => @@purchase_datum_supplier_id).
-         #    where("supplier_id is NOT NULL").map{|x| [x.supplier_material_code, x.material_id]}
-         ##
-         @purchase_datum.notes ||= @@purchase_datum_notes
-         @purchase_datum.division_id ||= @@purchase_datum_division_id
-         @purchase_datum.inventory_division_id ||= @@purchase_datum_inventory_division_id
-         @purchase_datum.unit_price_not_update_flag ||= @@purchase_datum_unit_price_not_update_flag
-         
-         ####@purchase_unit_prices = PurchaseUnitPrice.all
-         
-	   end
+    end
 	   
        
       #add180223
@@ -928,7 +933,11 @@ class PurchaseDataController < ApplicationController
             if (params[:purchase_datum][:unit_price_not_update_flag] == '0')
               #見積用の定価をセット
               set_material_list_price_quotation
-              params[:purchase_datum][:MaterialMaster_attributes][:list_price_quotation] = @@list_price_quotation
+              
+              #binding.pry
+              
+              #params[:purchase_datum][:MaterialMaster_attributes][:list_price_quotation] = @@list_price_quotation
+              params[:purchase_datum][:MaterialMaster_attributes][:list_price_quotation] = @list_price_quotation
             
               #見積用の掛け率をセット
               params[:purchase_datum][:MaterialMaster_attributes][:standard_rate] = set_material_standard_rate
@@ -955,28 +964,35 @@ class PurchaseDataController < ApplicationController
   #見積用の定価を登録する
   def set_material_list_price_quotation
     
-    @@list_price_quotation = 0
+    #@@list_price_quotation = 0
+    @list_price_quotation = 0
     
     if params[:purchase_datum][:list_price].to_i > 0
-        @@list_price_quotation = params[:purchase_datum][:list_price]
+      #@@list_price_quotation = params[:purchase_datum][:list_price]
+      @list_price_quotation = params[:purchase_datum][:list_price]
     else
     #定価が0の場合は、単価を登録する
-        @@list_price_quotation = params[:purchase_datum][:purchase_unit_price]
+      #@@list_price_quotation = params[:purchase_datum][:purchase_unit_price]
+      @list_price_quotation = params[:purchase_datum][:purchase_unit_price]
     end
-    
     
   end
   
   #見積用の掛け率を登録する
   def set_material_standard_rate
+    
+    #binding.pry
+    
     standard_rate = 0
     
-    if @@list_price_quotation.to_f > 0
-        if params[:purchase_datum][:purchase_unit_price].to_f > 0
-            #if params[:purchase_datum][:purchase_unit_price] != @@list_price_quotation  #
-           standard_rate = params[:purchase_datum][:purchase_unit_price].to_f / @@list_price_quotation.to_f
-            #end
-        end
+    #if @@list_price_quotation.to_f > 0
+    if @list_price_quotation.to_f > 0
+      if params[:purchase_datum][:purchase_unit_price].to_f > 0
+        #if params[:purchase_datum][:purchase_unit_price] != @@list_price_quotation  #
+        #standard_rate = params[:purchase_datum][:purchase_unit_price].to_f / @@list_price_quotation.to_f
+        standard_rate = params[:purchase_datum][:purchase_unit_price].to_f / @list_price_quotation.to_f
+        #end
+      end
     end
     
     return standard_rate
@@ -1010,7 +1026,8 @@ class PurchaseDataController < ApplicationController
                #add180726
                #見積単価
                set_material_list_price_quotation
-               material_list_price_quotation = @@list_price_quotation
+               #material_list_price_quotation = @@list_price_quotation
+	       material_list_price_quotation = @list_price_quotation
                
                #見積用の掛け率をセット
                standard_rate = set_material_standard_rate
@@ -1074,7 +1091,8 @@ class PurchaseDataController < ApplicationController
            #add180726
            #見積単価
            set_material_list_price_quotation
-           material_list_price_quotation = @@list_price_quotation
+           #material_list_price_quotation = @@list_price_quotation
+	   material_list_price_quotation = @list_price_quotation	
            
            #見積用の掛け率をセット
            standard_rate = set_material_standard_rate
@@ -1353,6 +1371,8 @@ class PurchaseDataController < ApplicationController
   end
   #
   
+  #ajax
+  #(メニュー選択時に呼ばれている)
   #検索クッキーをクリアする
   def clear_cookies
     
@@ -1360,20 +1380,12 @@ class PurchaseDataController < ApplicationController
     #特定の検索クッキーを消去
     cookie_clear(cookies, "nothing") #２番目のパラメータは、cookieから削除したくないパラメータ名
     
-    @@count = 0
-    @@clear = true
-    
+    #@@count = 0
+    #@@clear = true
     
     respond_to do |format|
-      
       format.js {render inline: "location.reload();" }
-      
-      #redirect_to :back
-      #format.html {redirect_to purchase_data_path( :construction_id => params[:construction_id], 
-      #   :purchase_order_id => params[:purchase_order_id], :supplier_master_id => params[:supplier_master_id],
-      #   :move_flag => params[:move_flag])}
     end
-   
     #
   end
   
@@ -1482,6 +1494,9 @@ class PurchaseDataController < ApplicationController
            where("material_masters.id is NOT NULL").pluck("material_categories.id").flatten.join(",")
   end
   
+  def purchase_datum_purchase_date(purchase_date)
+    @purchase_datum_purchase_date ||= purchase_date
+  end
   
   private
     # Use callbacks to share common setup or constraints between actions.
@@ -1489,17 +1504,21 @@ class PurchaseDataController < ApplicationController
       @purchase_datum = PurchaseDatum.find(params[:id])
       
     end
-	
+    
+    def purchase_datum_purchase_date(purchase_date)
+      @purchase_datum_purchase_date ||= purchase_date
+    end
+    
     #add180627
     #def set_material
     ##  #ここで資材マスターもセットしておく(動作軽減のため)
     #  @@material_masters = MaterialMaster.all
     #end
     #add200626
-    def set_purchase_unit_price
-      #ここで資材マスターもセットしておく(動作軽減のため)
-      @@purchase_unit_prices = PurchaseUnitPrice.all
-    end
+    #def set_purchase_unit_price
+    #  #ここで資材マスターもセットしておく(動作軽減のため)
+    #  @@purchase_unit_prices = PurchaseUnitPrice.all
+    #end
     
 	# Never trust parameters from the scary internet, only allow the white list through.
     def purchase_datum_params

@@ -122,7 +122,7 @@ class InvoiceHeadersController < ApplicationController
         update_construction_personnel
         
         #入金ファイルの完了フラグを更新
-        set_deposit_complete_flag
+        set_deposit
         
         format.html { redirect_to @invoice_header, notice: 'Invoice header was successfully created.' }
         format.json { render :show, status: :created, location: @invoice_header }
@@ -159,7 +159,7 @@ class InvoiceHeadersController < ApplicationController
         update_construction_personnel
         
         #入金ファイルの完了フラグを更新
-        set_deposit_complete_flag
+        set_deposit
         
         #add200127
         #資金繰データ(会計)を更新
@@ -232,8 +232,8 @@ class InvoiceHeadersController < ApplicationController
     end
   end
   
-  #入金ファイルの完了フラグを更新
-  def set_deposit_complete_flag
+  #入金ファイルの完了フラグ等を更新
+  def set_deposit
     
     #@deposit = Deposit.find_by(invoice_header_id: @invoice_header.id)
     @deposit = Deposit.find_by(table_id: @invoice_header.id)
@@ -259,6 +259,23 @@ class InvoiceHeadersController < ApplicationController
             #
             @deposit.deposit_due_date = @invoice_header.payment_date  #実際の支払日で更新
          end
+         ###
+         
+         ###
+         #支払方法を更新(実際は現金で受け取った場合等を考慮)
+         deposit_source_id = nil  #default
+         
+         #ADUSUの支払方法IDをC#(共通)用のものに変換する
+         case @invoice_header.payment_method_id
+         when $PAYMENT_METHOD_ID_CASH
+           deposit_source_id = $BANK_ID_CASH
+         when $PAYMENT_METHOD_ID_DAISHI_HOKUETSU
+           deposit_source_id = $BANK_ID_DAISHI_HOKUETSU
+         when $PAYMENT_METHOD_ID_SANSHIN
+           deposit_source_id = $BANK_ID_SANSHIN_TSUKANOME #実際は本店であるがIDを合わせる
+         end
+         
+         @deposit.deposit_source_id = deposit_source_id
          ###
          
          @deposit.save!(:validate => false)

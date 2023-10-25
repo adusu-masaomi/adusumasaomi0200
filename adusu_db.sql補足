@@ -1,8 +1,8 @@
 データリストアした際、全件あるとパフォーマンスが落ちるので下記のように
 mysqlでデータ削除する。
 
-delete from purchase_data where purchase_date < '2021-01-01'
-delete from construction_data where created_at < '2020-01-01'
+delete from purchase_data where purchase_date < '2023-01-01'
+delete from construction_data where created_at < '2023-01-01'
 
 *リストアのコマンド
 mysql -u adusu -p adusu_db < adusu_db.sql

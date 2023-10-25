@@ -3,7 +3,8 @@ class BidComparisonListPDF
   @cheaper_flag_1 = false
   @cheaper_flag_2 = false
   
-  def self.create bid_comparison_list
+  #def self.create bid_comparison_list
+  def self.create quotation_material_header
   #見積比較表PDF発行
  
       #@@page_number = 0
@@ -31,7 +32,7 @@ class BidComparisonListPDF
     @total_low_price = 0
   
     
-	  quotation_material_header = $quotation_material_header
+	  #quotation_material_header = $quotation_material_header
 	  
 		#---見出し---
     page_count = report.page_count.to_s + "頁"

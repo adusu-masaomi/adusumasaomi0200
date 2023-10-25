@@ -107,7 +107,25 @@ class InventoriesController < ApplicationController
       format.json { head :no_content }
     end
   end
-
+  
+  #変更前と品番が異なった場合、一旦履歴を削除し在庫マスターも補填する
+  def self.destroy_history_on_differ_material(params, purchase_datum_id)
+    inventory_history_before = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
+    if inventory_history_before.present?
+      if inventory_history_before.material_master_id !=  params[:purchase_datum][:material_id]
+        #変更前と品番が異なった場合、一旦履歴を削除し在庫マスターも補填する
+        @inventory_history_before = inventory_history_before  #削除前のhistoryを保持
+        inventory_history_before.destroy #履歴を一旦削除
+      
+        @inventory_before = Inventory.where(material_master_id: @inventory_history_before.material_master_id, warehouse_id: 1, 
+                              location_id: 1 ).first
+        if @inventory_before.present?
+          update_inventory
+        end
+      end
+    end
+  end
+  
   #入出庫の場合は、在庫履歴データ、在庫マスターへも登録する。
   #(仕入マスター画面にて利用)
   def self.set_inventory_history(params, purchase_datum)
@@ -119,7 +137,12 @@ class InventoriesController < ApplicationController
       #新規の場合のID取得
       purchase_datum_id = purchase_datum.id
 	  end
-
+    
+    #add230718
+    #変更前と品番が異なった場合、一旦履歴を削除し在庫マスターも補填する
+    destroy_history_on_differ_material(params, purchase_datum_id)
+    #
+    
     #upd200703
     ##在庫マスターのデータをここで取得
     warehouse_id = 1
@@ -426,8 +449,6 @@ class InventoriesController < ApplicationController
       inventory_amount = @inventory.inventory_amount + @differ_inventory_price
     elsif @inventory_division_id == $INDEX_INVENTORY_SHIPPING
     #出庫
-      
-      #binding.pry
       
       #inventory_quantity = @inventory.inventory_quantity - @differ_inventory_quantit
       inventory_quantity = @inventory.inventory_quantity - (@differ_inventory_quantity + @differ_inventory_quantity2)
@@ -866,10 +887,13 @@ class InventoriesController < ApplicationController
         
         #在庫数量が繰り上がる場合
         if !upd_flag
-          current_warehousing_date = @inventory.next_warehousing_date_1
-          current_history_id = @inventory.next_history_id_1
-          current_unit_price = @inventory.next_unit_price_1
-          current_quantity = @inventory.next_quantity_1
+          #add231019 在庫0になると単価がクリアされてしまう為
+          if @inventory.next_quantity_1.present? && @inventory.next_quantity_1 > 0
+            current_warehousing_date = @inventory.next_warehousing_date_1
+            current_history_id = @inventory.next_history_id_1
+            current_unit_price = @inventory.next_unit_price_1
+            current_quantity = @inventory.next_quantity_1
+          end
         end
 		  end
 		#
@@ -995,6 +1019,7 @@ class InventoriesController < ApplicationController
         if @inventory_history.present?
 		      @inventory_history.destroy
           #在庫マスターもここで直接更新
+          @inventory_before = nil  #add230718
 		      self.update_inventory
 		    end
       end
@@ -1005,8 +1030,17 @@ class InventoriesController < ApplicationController
   #入出庫データを削除した場合、在庫マスターの数量も増減させる。
     warehouse_id = 1
     location_id = 1
-    @inventory = Inventory.where(material_master_id: @inventory_history.material_master_id, warehouse_id: warehouse_id, 
+    if @inventory_history.present?  #upd230718
+      @inventory = Inventory.where(material_master_id: @inventory_history.material_master_id, warehouse_id: warehouse_id, 
                               location_id: location_id ).first
+    end
+    
+    #add230718
+    if @inventory_before.present?
+      @inventory = @inventory_before
+      @inventory_history = @inventory_history_before
+    end
+    #
     
 	  differ_quantity = 0
 	  differ_amount = 0

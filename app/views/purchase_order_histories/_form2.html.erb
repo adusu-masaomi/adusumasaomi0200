@@ -197,10 +197,9 @@
       </br></br>
 	  
 	       <div id="subForms" class="sortDone" >
-           	 <%= f.simple_fields_for :orders, @purchase_order_history.orders.order("sequential_id ASC"), :include_id => false  do |orders| %>
-
+             <!-- upd231004 -->
+           	 <%= f.simple_fields_for :orders, @purchase_order_history.orders.order(@form_detail_order), :include_id => false  do |orders| %>
                <%= render 'order_fields', f: orders, cache: true %>
-
              <% end %> 
            </div>
 
@@ -813,6 +812,10 @@ $(document).bind('cocoon:after-insert', function(e,inserted_item) {
          document.forms[0].target = "";  //add220615
          document.forms[0].submit();
       }
+   }else{
+     //add231012
+     //↓記述がないとメール送信＆キャンセル＆注文書でメールが送られてしまう
+     document.getElementById("sent_flag").value = 0;
 	 }
  }
  
@@ -932,6 +935,7 @@ function dispDiv() {
        //5秒待つ（描写されないことがあるため）
 	   //centOS上では必須なようである！
 	   setTimeout("reloadDiv()", 5000);
+     //setTimeout("reloadDiv()", 30000);
        
 	   //setTimeout(reloadDiv(), 30000);  
        //reloadDiv();   	   
@@ -948,6 +952,14 @@ function dispDiv() {
 
      }
    );
+   
+   //debugger;
+   
+   //moved 230508
+   //reloadDiv();
+   //setTimeout("reloadDiv()", 5000);
+   
+   //setTimeout("reloadDiv()", 5000);
 };
 
 function getEmail()

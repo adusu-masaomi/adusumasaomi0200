@@ -74,8 +74,11 @@ class QuotationHeader < ActiveRecord::Base
    #scope :with_quotation_construction_id, -> (quotation_headers_id=1) { where("quotation_headers.id = ?", quotation_headers_id )}
    scope :with_quotation_construction_id, -> (construction_datum_id=1) { where("quotation_headers.construction_datum_id = ?", construction_datum_id )}
    
+   #add230523
+   scope :with_id, -> (quotation_headers_id=1) { where("quotation_headers.id = ?", quotation_headers_id )}
+   
    def self.ransackable_scopes(auth_object=nil)
-       [:with_quotation_construction_id]
+       [:with_quotation_construction_id, :with_id]
    end
      
 end

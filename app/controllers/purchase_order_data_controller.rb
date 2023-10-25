@@ -5,16 +5,13 @@ class PurchaseOrderDataController < ApplicationController
   
   before_action :set_purchase_order_datum, only: [:show, :edit, :update, :destroy]
   
-  #binding.pry
-    
-  
   def layout_by_resource
-   if params[:order_flag] == true
+    if params[:order_flag] == true
       'purchase_order_data2'
-     else
+    else
       'purchase_order_data'
     end
-   end
+  end
   
 	
   # Userクラスを作成していないので、擬似的なUser構造体を作る
@@ -28,19 +25,17 @@ class PurchaseOrderDataController < ApplicationController
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  
     
-    #add210521
     #注文画面でのパラメータを消す
     $delivery_place_flag = nil
     
     case params[:move_flag] 
-      when "1"
-        #工事一覧画面から遷移した場合
-        construction_id = params[:construction_id]
-        query = {"construction_datum_id_eq"=> construction_id }
-	    
-      else
-        #画面遷移用に工事ID、注文番号をセット
-        if query.present?  
+    when "1"
+      #工事一覧画面から遷移した場合
+      construction_id = params[:construction_id]
+      query = {"construction_datum_id_eq"=> construction_id }
+    else
+      #画面遷移用に工事ID、注文番号をセット
+      if query.present?  
         if query[:id_eq].present?
           params[:purchase_order_datum_id] = query[:id_eq]
         end
@@ -51,13 +46,13 @@ class PurchaseOrderDataController < ApplicationController
           params[:supplier_master_id] = query[:supplier_master_id_eq]
         end
       end
-      ##
+      #
         
       #when "2"
         #   #注文一覧画面から遷移した場合
         #   purchase_order_id = params[:purchase_order_id]
         #   query = {"id_eq"=> purchase_order_id }
-    end
+    end  #case end
     
     #@q = PurchaseOrderDatum.ransack(params[:q])   
     #ransack保持用--上記はこれに置き換える
@@ -78,15 +73,11 @@ class PurchaseOrderDataController < ApplicationController
     @construction_data = ConstructionDatum.all
   
     #データ呼び出し用変数を初期化(history用)
-    #add210827
     $purchase_order_history = nil
     $purchase_order_date =  nil
     $supplier_master_id =  nil
     #
     
-    #臨時FAX用
-    #binding.pry
-    #set_order_data_fax(format)
   end
 
   # GET /purchase_order_data/1
@@ -94,7 +85,7 @@ class PurchaseOrderDataController < ApplicationController
   def show
   end
 
-  @@update_flag = 0
+  @@update_flag = 0  #未使用??
 
   # GET /purchase_order_data/new
   def new
@@ -102,34 +93,29 @@ class PurchaseOrderDataController < ApplicationController
     @purchase_order_datum = PurchaseOrderDatum.new
     
     #工事データをビルド
-	  @purchase_order_datum.build_construction_datum
-	  
+    @purchase_order_datum.build_construction_datum
     
     #仕入先マスターをビルド
     #デフォルトのIDは２（＝岡田電気）とする
-	  #@supplier_master = SupplierMaster.find(2)
     #デフォルトのIDは未選択とする
-	  @supplier_master = SupplierMaster.find(1)
-	  @purchase_order_datum.supplier_master = @supplier_master
-	
-    #add210705
+    @supplier_master = SupplierMaster.find(1)
+    @purchase_order_datum.supplier_master = @supplier_master
+
     #仕入担当者をビルド
-	  @purchase_order_datum.build_supplier_responsible
-    
+    @purchase_order_datum.build_supplier_responsible
     @@update_flag =  1
     
-	#工事データの初期値をセット
+    #工事データの初期値をセット
     set_construction_default
-	
-	#@purchase_order_datum.mail_sent_flag = 0
-	
+  
+    #@purchase_order_datum.mail_sent_flag = 0
+    
   end
 
   # GET /purchase_order_data/1/edit
   def edit
     @@update_flag = 2
 	
-    #add210705
     #仕入担当者をビルド
 	  if @purchase_order_datum.supplier_responsible.nil?
       @purchase_order_datum.build_supplier_responsible
@@ -148,7 +134,6 @@ class PurchaseOrderDataController < ApplicationController
   def create
     @purchase_order_datum = PurchaseOrderDatum.new(purchase_order_datum_params)
     
-    #add180919
     #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
     update_constant
     
@@ -156,29 +141,19 @@ class PurchaseOrderDataController < ApplicationController
     update_address_to_construction
     
     #メール送信する(メール送信ボタン押した場合)
-	  if params[:send].present?
+    if params[:send].present?
       
       #画面のメアドをグローバルへセット
       set_responsible
     
-      #画面のメアドをグローバルへセット
-      #$email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-      #CC用に担当者２のアドレスもグローバルへセット
-      #$email_responsible2 = nil
-      #if params[:purchase_order_datum][:supplier_master_id].present?
-      #  supplier = SupplierMaster.where(id: params[:purchase_order_datum][:supplier_master_id]).first
-      #  if supplier.present? && supplier.email_cc.present?
-      #    $email_responsible2 = supplier.email_cc
-      #  end
-      #end
-      
-      #binding.pry
-      
       #メール送信フラグをセット
       params[:purchase_order_datum][:mail_sent_flag] = 1
 	    @purchase_order_datum = PurchaseOrderDatum.new(purchase_order_datum_params)  #add170922
    
-	    PostMailer.send_when_update(@purchase_order_datum).deliver
+      #PostMailer.send_when_update(@purchase_order_datum).deliver
+      #upd230502
+      PostMailer.send_when_update(@purchase_order_datum, @responsible_name, @email_responsible,
+                                  @email_responsible2).deliver
     end
 	
     respond_to do |format|
@@ -194,7 +169,6 @@ class PurchaseOrderDataController < ApplicationController
           format.json { render :show, status: :ok, location: @purchase_order_datum }
         end
       else
-        #add210727
         #バリデーション失敗の場合も、仕入担当者をリビルド
 	      @purchase_order_datum.build_supplier_responsible
       
@@ -203,74 +177,55 @@ class PurchaseOrderDataController < ApplicationController
       end
     end
 	
-	#メール送信する
-	#PostMailer.send_when_update(@purchase_order_datum).deliver
-	
+    #メール送信する
+    #PostMailer.send_when_update(@purchase_order_datum).deliver
+
   end
 
   # PATCH/PUT /purchase_order_data/1
   # PATCH/PUT /purchase_order_data/1.json
   def update
    
-    #add201229
     #コンスタントへ注文番号を書き込む(先頭記号が変わった時)
     update_constant
    
     #工事データの住所を更新
     update_address_to_construction
    
-    ###
+    #
     #メール送信する(メール送信ボタン押した場合)
-	  if params[:send].present?
+    if params[:send].present?
       
       #画面のメアドをグローバルへセット
       set_responsible
       
-      ##画面のメアドをグローバルへセット
-      #$email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-      ##CC用に担当者２のアドレスもグローバルへセット
-      #$email_responsible2 = nil
-      #if params[:purchase_order_datum][:supplier_master_id].present?
-      #  supplier = SupplierMaster.where(id: params[:purchase_order_datum][:supplier_master_id]).first
-      #  if supplier.present? && supplier.email_cc.present?
-      #    $email_responsible2 = supplier.email_cc
-      #  end
-      #end
-        
       #インスタンスへパラメータを再セット
       reset_parameters
 	  
 	    #メール送信フラグをセット
       params[:purchase_order_datum][:mail_sent_flag] = 1
 	    
-      #moved200519
-	    #PostMailer.send_when_update(@purchase_order_datum).deliver
-	  end
-    ###
+    end
+    #
    
-   
-   respond_to do |format|
-   
-     
+    respond_to do |format|
       if @purchase_order_datum.update(purchase_order_datum_params)
         
-        #moved 200519
-        ###
+        #
         #メール送信する(メール送信ボタン押した場合)
 	      if params[:send].present?
-          PostMailer.send_when_update(@purchase_order_datum).deliver
-	      end
-        ###
+          #PostMailer.send_when_update(@purchase_order_datum).deliver
+          #upd230502
+          PostMailer.send_when_update(@purchase_order_datum, @responsible_name, @email_responsible,
+                                      @email_responsible2).deliver
+        end
+        #
         
         save_only_flag = true
-     
+        
         #臨時FAX用
         set_order_data_fax(format)
      
-        #add210706
-        #仕入担当者の追加・更新
-        #update_responsible
-       
         #format.html { redirect_to @purchase_order_datum, notice: 'Purchase order datum was successfully updated.' }
 	      #format.json { render :show, status: :ok, location: @purchase_order_datum , construction_id: params[:construction_id], move_flag: params[:move_flag]}
 		    if save_only_flag
@@ -281,14 +236,13 @@ class PurchaseOrderDataController < ApplicationController
         
         end
       else
-        #add210727
         #バリデーション失敗の場合も、仕入担当者をリビルド
 	      @purchase_order_datum.build_supplier_responsible
         
         format.html { render :edit }
         format.json { render json: @purchase_order_datum.errors, status: :unprocessable_entity }
       end
-    end
+    end  #end do
 		
   end
   
@@ -298,23 +252,23 @@ class PurchaseOrderDataController < ApplicationController
     @supplier_update_flag = 0  # 1:new  2:upd
     
     #画面のメアドをグローバルへセット
-    #$email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-    #upd210703
     #仕入先担当Ｍから選択できるようにした  
-    $email_responsible = nil
-    $responsible_name = nil
+    #$email_responsible = nil
+    #$responsible_name = nil
+    @email_responsible = nil
+    @responsible_name = nil
     
     if params[:purchase_order_datum][:supplier_responsible_id].present?
       supplier_responsible = SupplierResponsible.where(id: params[:purchase_order_datum][:supplier_responsible_id]).first
       if supplier_responsible.present? && supplier_responsible.responsible_email.present?
-        $responsible_name = supplier_responsible.responsible_name
-        $email_responsible = supplier_responsible.responsible_email
+        #$responsible_name = supplier_responsible.responsible_name
+        #$email_responsible = supplier_responsible.responsible_email
+        @responsible_name = supplier_responsible.responsible_name
+        @email_responsible = supplier_responsible.responsible_email
         
         #メアドが異なっていた場合
         ##苗字変更は考慮しない--id変更と見分けがつかない為、不可とする
         
-        #if supplier_responsible.responsible_email != params[:purchase_order_datum][:supplier_master_attributes][:email1]
-        #params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
         if supplier_responsible.responsible_email != 
            params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
           
@@ -322,71 +276,67 @@ class PurchaseOrderDataController < ApplicationController
           
           #メアドのみ新規登録とみなす
           if params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email].to_i == 0
-            $email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
+            #$email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
+            @email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
           end
-          
           
           #メアドがIDの場合(違う名前で同一Emailの場合)
           update_email_when_id
         end
         
       else
-        #add210705
         #文字で入ってきてる場合
         if params[:purchase_order_datum][:supplier_responsible_id].to_i == 0
           @supplier_update_flag = 1
           
-          $responsible_name = params[:purchase_order_datum][:supplier_responsible_id]
+          #$responsible_name = params[:purchase_order_datum][:supplier_responsible_id]
+          @responsible_name = params[:purchase_order_datum][:supplier_responsible_id]
           
           #↓IDで入る場合もある  -->対策必要????
           
-          #$email_responsible = params[:purchase_order_datum][:supplier_master_attributes][:email1]
-          $email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
+          #$email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
+          @email_responsible = params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]
           
           #メアドがIDの場合(違う名前で同一Emailの場合)
           update_email_when_id
           
-          #if params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email].to_i > 0
-          #  supplier_responsible = SupplierResponsible.where(id: 
-          #                              params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]).first
-          #  if supplier_responsible.present?
-          #    $email_responsible = supplier_responsible.responsible_email
-          #  end
-          #end
-        
         end
       
       end
     end
     #
-    #add210727
-    if $responsible_name == nil
-      $responsible_name = "御担当者"
+    #if $responsible_name == nil
+    if @responsible_name == nil
+      #$responsible_name = "御担当者"
+      @responsible_name = "御担当者"
     end
     
     #CC用に担当者２のアドレスもグローバルへセット
-    $email_responsible2 = nil
+    #$email_responsible2 = nil
+    @email_responsible2 = nil
     if params[:purchase_order_datum][:supplier_master_id].present?
       supplier = SupplierMaster.where(id: params[:purchase_order_datum][:supplier_master_id]).first
       
       if supplier.present? && supplier.email_cc.present?
-        $email_responsible2 = supplier.email_cc
+        #$email_responsible2 = supplier.email_cc
+        @email_responsible2 = supplier.email_cc
       end
     end
     
-    #add210706
     #仕入担当者の追加・更新
     update_responsible
     
   end
   
   def update_email_when_id
+    
     #メアドがIDの場合(違う名前で同一Emailの場合)
     if params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email].to_i > 0
       supplier_responsible = SupplierResponsible.where(id: 
                                         params[:purchase_order_datum][:supplier_responsible_attributes][:responsible_email]).first
       if supplier_responsible.present?
-        $email_responsible = supplier_responsible.responsible_email
+        #$email_responsible = supplier_responsible.responsible_email
+        @email_responsible = supplier_responsible.responsible_email
       end
     end
   end
@@ -396,24 +346,25 @@ class PurchaseOrderDataController < ApplicationController
   def update_responsible
     
     supplier_responsible_params = { supplier_master_id: params[:purchase_order_datum][:supplier_master_id],
-                                    #responsible_name: params[:purchase_order_datum][:supplier_responsible_id],
-                                    responsible_name: $responsible_name,
-                                    responsible_email: $email_responsible
+                                    #responsible_name: $responsible_name,
+                                    #responsible_email: $email_responsible
+                                    responsible_name: @responsible_name,
+                                    responsible_email: @email_responsible
                                   }
     
     case @supplier_update_flag
-      when 1  #新規
-        supplier_responsible = SupplierResponsible.new(supplier_responsible_params)
-        supplier_responsible.save!(:validate => false)
+    when 1  #新規
+      supplier_responsible = SupplierResponsible.new(supplier_responsible_params)
+      supplier_responsible.save!(:validate => false)
         
-        #パラメーターへ再び戻す
-        params[:purchase_order_datum][:supplier_responsible_id] = supplier_responsible.id
-      when 2  #更新
-        supplier_responsible = SupplierResponsible.where(:id => params[:purchase_order_datum][:supplier_responsible_id]).first
+      #パラメーターへ再び戻す
+      params[:purchase_order_datum][:supplier_responsible_id] = supplier_responsible.id
+    when 2  #更新
+      supplier_responsible = SupplierResponsible.where(:id => params[:purchase_order_datum][:supplier_responsible_id]).first
         
-        if supplier_responsible.present?
-          supplier_responsible.update(supplier_responsible_params)
-        end
+      if supplier_responsible.present?
+        supplier_responsible.update(supplier_responsible_params)
+      end
     end
     
   end
@@ -422,15 +373,19 @@ class PurchaseOrderDataController < ApplicationController
     
     if params[:format] == "pdf"
      #ｆａｘ用紙の発行
-		  save_only_flag = false
+      save_only_flag = false
        
-		  #global set
+      #global set
       $purchase_order_datum = @purchase_order_datum 
-        
+      
+      #担当者をセット
+      set_responsible
+      
       #pdf
-	    #@print_type = params[:print_type]
-      format.pdf do
-        report = OrderNumberFaxPDF.create @order_number_fax 
+	    format.pdf do
+        #report = OrderNumberFaxPDF.create @order_number_fax
+        report = OrderNumberFaxPDF.create(@purchase_order_datum, @responsible_name)
+ 
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
         send_data(
@@ -446,20 +401,19 @@ class PurchaseOrderDataController < ApplicationController
   
   def set_construction_default
   #工事一覧画面等から遷移した場合に、フォームに初期値をセットさせる    
-	  case params[:move_flag] 
-      when "1"
-	    #工事一覧画面から遷移した場合
+    case params[:move_flag] 
+    when "1"
+      #工事一覧画面から遷移した場合
+      construction_id = params[:construction_id]
+      @construction_data = ConstructionDatum.where("id >= ?", construction_id)
+    else
+      if params[:construction_id].present?
+        #工事Noで検索をかけた場合を考慮
         construction_id = params[:construction_id]
         @construction_data = ConstructionDatum.where("id >= ?", construction_id)
       else
-        if params[:construction_id].present?
-          #add230120
-          #工事Noで検索をかけた場合を考慮
-          construction_id = params[:construction_id]
-          @construction_data = ConstructionDatum.where("id >= ?", construction_id)
-        else
-          @construction_data = ConstructionDatum.order('construction_code DESC').all
-        end
+        @construction_data = ConstructionDatum.order('construction_code DESC').all
+      end
     end 
   end
   
@@ -474,8 +428,7 @@ class PurchaseOrderDataController < ApplicationController
       
       @supplier_responsibles = SupplierResponsible.where(:supplier_master_id => supplier_master_id)
       @supplier_responsible_emails = SupplierResponsible.where(:supplier_master_id => supplier_master_id)
-      
-    end     
+    end 
   end
   
   #インスタンスへパラメータを再セットする
@@ -490,7 +443,6 @@ class PurchaseOrderDataController < ApplicationController
   # DELETE /purchase_order_data/1
   # DELETE /purchase_order_data/1.json
   def destroy
-    #add180926
     reset_last_number
   
     @purchase_order_datum.destroy
@@ -503,68 +455,53 @@ class PurchaseOrderDataController < ApplicationController
   end
   
   
-  #add180919
   #constantに注文Noを書き込む
   def update_constant
     constant = Constant.find(1)   #id=１に定数ファイルが保管されている
     
-    
-    #del201229
-    #if constant.purchase_order_last_header_code[0,1] != @purchase_order_datum.purchase_order_code[0,1]
-      #外注用のアルファベットを除く
-      #if @purchase_order_datum.purchase_order_code[0,1] != "M" && 
-      #     @purchase_order_datum.purchase_order_code[0,1] != "O"
+    current_header = @purchase_order_datum.purchase_order_code[0,1]
+    constant_header = constant.purchase_order_last_header_code[0,1]
         
-        #(header.ord + 1).chr
-        current_header = @purchase_order_datum.purchase_order_code[0,1]
-        constant_header = constant.purchase_order_last_header_code[0,1]
+    current_year = @purchase_order_datum.purchase_order_code[1,2].to_i
+    constant_year = constant.purchase_order_last_header_code[1,2].to_i
         
-        current_year = @purchase_order_datum.purchase_order_code[1,2].to_i
-        constant_year = constant.purchase_order_last_header_code[1,2].to_i
-        
-        update_flag = false
+    update_flag = false
     
-        #binding.pry
-    
-        if current_header.ord == constant_header.ord
-        #コンスタントとアルファベットが同じ場合
-          #年が切り替わった場合
-          if current_year > constant_year
-            update_flag = true
-          else  
-            #下２桁で比較
-            if @purchase_order_datum.purchase_order_code[3,2].to_i >=
-              constant.purchase_order_last_header_code[3,2].to_i 
-              update_flag = true
-            end
-          end
-        else
-          #アルファベットが大きい場合、更新
-          #(同年で)  upd220118
-          #if current_header.ord > constant_header.ord
-          if (current_year == constant_year) && 
-             (current_header.ord > constant_header.ord)
-            update_flag = true
-          else 
-            #年が切り替わった場合
-            if current_year > constant_year
-              update_flag = true
-            end
-          end
+    if current_header.ord == constant_header.ord
+      #コンスタントとアルファベットが同じ場合
+      #年が切り替わった場合
+      if current_year > constant_year
+        update_flag = true
+      else  
+        #下２桁で比較
+        if @purchase_order_datum.purchase_order_code[3,2].to_i >=
+          constant.purchase_order_last_header_code[3,2].to_i 
+          update_flag = true
         end
-        
-        #アルファベット以下の数値２桁が(AorB..+"xx")constant以上？
-        #if @purchase_order_datum.purchase_order_code[1,2].to_i >=
-        #   constant.purchase_order_last_header_code[1,2].to_i 
-        
-        if update_flag == true
-          #更新する
-          constant_params = { purchase_order_last_header_code: @purchase_order_datum.purchase_order_code}
-          constant.update(constant_params)
-        
+      end
+    else
+      #アルファベットが大きい場合、更新
+      #(同年で)  
+      if (current_year == constant_year) && 
+         (current_header.ord > constant_header.ord)
+        update_flag = true
+      else 
+      #年が切り替わった場合
+        if current_year > constant_year
+          update_flag = true
         end
-      #end
-    #end
+      end
+    end
+        
+    #アルファベット以下の数値２桁が(AorB..+"xx")constant以上？
+    #if @purchase_order_datum.purchase_order_code[1,2].to_i >=
+    #   constant.purchase_order_last_header_code[1,2].to_i 
+        
+    if update_flag == true
+      #更新する
+      constant_params = { purchase_order_last_header_code: @purchase_order_datum.purchase_order_code}
+      constant.update(constant_params)
+    end
   end
   
   #工事データの住所をアプデする
@@ -588,7 +525,6 @@ class PurchaseOrderDataController < ApplicationController
     
   end
     
-  #add180926
   def reset_last_number
     #Constantの最終番号に該当するものを削除した場合は、直近での最大値を再セットする
     last_number = @purchase_order_datum.purchase_order_code
@@ -601,8 +537,6 @@ class PurchaseOrderDataController < ApplicationController
       last_id = PurchaseOrderDatum.where('id < ?', remove_id).maximum(:id)
       last_new_number = PurchaseOrderDatum.find(last_id).purchase_order_code
       
-      #binding.pry
-      
       #更新する
       constant_params = { purchase_order_last_header_code: last_new_number}
       constant.update(constant_params)
@@ -610,15 +544,11 @@ class PurchaseOrderDataController < ApplicationController
     
   end
   
-  
   #ajax
   def get_last_number_select
-    
-     
-      #crescent = "%" + params[:header] + "%"
-     #@purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
-	  #upd201229
-    #自動で番号を繰り上げる
+    #crescent = "%" + params[:header] + "%"
+    #@purchase_order_datum_new_code = PurchaseOrderDatum.where('purchase_order_code LIKE ?', crescent).all.maximum(:purchase_order_code) 
+	  #自動で番号を繰り上げる
     constant = Constant.find(1)   #id=１に定数ファイルが保管されている
     @purchase_order_datum_new_code = constant.purchase_order_last_header_code
    
@@ -626,11 +556,7 @@ class PurchaseOrderDataController < ApplicationController
     year = @purchase_order_datum_new_code[1, 2]
     d = Date.today
     
-    #binding.pry
-    #d.strftime("%y")
     current_year = d.strftime("%y")
-    
-    #binding.pry
     
     #年が違った場合
     if current_year != year
@@ -654,13 +580,9 @@ class PurchaseOrderDataController < ApplicationController
       newNum = newStr.to_i + 1
       
     end
-   
-	  #最終番号に１を足す。
-	  #newStr = @purchase_order_datum_new_code[1, 4]
-	  #header = @purchase_order_datum_new_code[0, 1]
-   
-	  @purchase_order_datum_new_code = header + newNum.to_s
-	 
+    
+    @purchase_order_datum_new_code = header + newNum.to_s
+  
   end
   
   #頭文字で検索するajax
@@ -683,7 +605,6 @@ class PurchaseOrderDataController < ApplicationController
       @suppliers = SupplierMaster.all.pluck("supplier_masters.supplier_name, supplier_masters.id")
     end
     
-    
   end
   
   def get_alias_name
@@ -702,7 +623,6 @@ class PurchaseOrderDataController < ApplicationController
      #
   end
   
-  #add210702
   #担当Email取得
   def get_responsible_email
     @supplier_responsible_emails = SupplierResponsible.where(:id => params[:supplier_responsible_id]).pluck("responsible_email, id")
@@ -712,7 +632,6 @@ class PurchaseOrderDataController < ApplicationController
                                                where.not(:id => params[:supplier_responsible_id]).pluck("responsible_email, id")
   end
   
-  #add210610
   #住所取得
   def get_address
     @post = ConstructionDatum.where(:id => params[:construction_datum_id]).
@@ -733,9 +652,6 @@ class PurchaseOrderDataController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_datum_params
-      #params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id , :mail_sent_flag, 
-      #               :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity],
-      #               :construction_datum_attributes => [:alias_name])
       params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id,
                      :supplier_responsible_id, :alias_name, :mail_sent_flag, 
                      :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity])

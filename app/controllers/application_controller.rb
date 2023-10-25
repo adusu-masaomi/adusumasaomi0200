@@ -56,7 +56,6 @@ class ApplicationController < ActionController::Base
     return japaneseCalendarChar
   end
   
-  #add210716
   #仕入担当者の名前、Email取得
   def app_set_responsible(param_responsible, param_email, param_supplier)
     
@@ -65,32 +64,39 @@ class ApplicationController < ActionController::Base
     
     @supplier_responsible_id = 0
     
-    $responsible = nil
-    $email_responsible = nil
+    #$responsible = nil
+    #$email_responsible = nil
     
+    @responsible = nil
+    @email_responsible = nil
+        
     if param_responsible.to_i > 0
       #担当者選択した場合
       supplier_responsible = SupplierResponsible.where(id: param_responsible).first
       #if supplier_responsible.present?
       if supplier_responsible.present? && (supplier_responsible.supplier_master_id == param_supplier.to_i)
         #担当者をセット
-        $responsible = supplier_responsible.responsible_name
+        #$responsible = supplier_responsible.responsible_name
+        @responsible = supplier_responsible.responsible_name
         #担当Emailをセット
-        $email_responsible = supplier_responsible.responsible_email
+        #$email_responsible = supplier_responsible.responsible_email
+        @email_responsible = supplier_responsible.responsible_email
        
         #必ず更新とする  
         @supplier_update_flag = 2
             
         #メアドのみ新規の場合
         if param_email.to_i == 0
-          $email_responsible = param_email
+          #$email_responsible = param_email
+          @email_responsible = param_email
         else
           #メアドが別IDのものの場合(あり得る？？)
           #param_email
           supplier_responsible_other = SupplierResponsible.
                   where(id: param_email).first
           if supplier_responsible_other.present?
-              $email_responsible = supplier_responsible_other.responsible_email
+            #$email_responsible = supplier_responsible_other.responsible_email
+            @email_responsible = supplier_responsible_other.responsible_email
           end
         end
         #end
@@ -101,64 +107,76 @@ class ApplicationController < ActionController::Base
       @supplier_update_flag = 1
         
       #担当者をセット
-      $responsible = param_responsible
-      $email_responsible = param_email
+      #$responsible = param_responsible
+      #$email_responsible = param_email
+      @responsible = param_responsible
+      @email_responsible = param_email
         
       #メアドがIDの場合(違う名前で同一Emailの場合)
       if param_email.to_i > 0
         supplier_responsible = SupplierResponsible.where(id: 
                                         param_email).first
         if supplier_responsible.present?
-          $email_responsible = supplier_responsible.responsible_email
+          #$email_responsible = supplier_responsible.responsible_email
+          @email_responsible = supplier_responsible.responsible_email
         end
       end
     end
     
-    #add220607
     #処理遅延で担当者が空になっている場合、最初の担当とする
-    if $responsible.nil? && $email_responsible.nil?
+    #if $responsible.nil? && $email_responsible.nil?
+    if @responsible.nil? && @email_responsible.nil?
       
       supplier_id = param_supplier.to_i
       supplier_responsible = SupplierResponsible.where(supplier_master_id: supplier_id).first
       
       if supplier_responsible.present?
         #担当者をセット
-        $responsible = supplier_responsible.responsible_name
+        #$responsible = supplier_responsible.responsible_name
+        @responsible = supplier_responsible.responsible_name
         #担当Emailをセット
-        $email_responsible = supplier_responsible.responsible_email
+        #$email_responsible = supplier_responsible.responsible_email
+        @email_responsible = supplier_responsible.responsible_email
       end
     
     end
+    
+    #add230502
+    return @responsible, @email_responsible
     
     #return supplier_update_flag
   end
   
   #仕入担当者の追加・更新
   def app_update_responsible(param_supplier_master_id, param_responsible, param_purchase_order_datum_id,
-                             purchase_order_update_flag)
+                             purchase_order_update_flag, responsible, email_responsible)
+  #def app_update_responsible(param_supplier_master_id, param_responsible, param_purchase_order_datum_id,
+  #                           purchase_order_update_flag)
     
     supplier_responsible_params = { supplier_master_id: param_supplier_master_id,
-                                    responsible_name: $responsible,
-                                    responsible_email: $email_responsible
-                                  }
+                                    responsible_name: responsible,
+                                    responsible_email: email_responsible }
     
-    #@supplier_responsible_id = 0
+    #supplier_responsible_params = { supplier_master_id: param_supplier_master_id,
+    #                                responsible_name: $responsible,
+    #                                responsible_email: $email_responsible }
+    
     
     case @supplier_update_flag
-      when 1  #新規
-        supplier_responsible = SupplierResponsible.new(supplier_responsible_params)
-        supplier_responsible.save!(:validate => false)
+    when 1  #新規
+      supplier_responsible = SupplierResponsible.new(supplier_responsible_params)
+      supplier_responsible.save!(:validate => false)
         
-        #パラメーターへ再び戻す
-        #params[:purchase_order_datum][:@supplier_responsible_id] = supplier_responsible.id
+      #パラメーターへ再び戻す
+      #params[:purchase_order_datum][:@supplier_responsible_id] = supplier_responsible.id
+      @supplier_responsible_id = supplier_responsible.id
+    when 2  #更新
+      supplier_responsible = SupplierResponsible.where(:id => param_responsible).first
+        
+      if supplier_responsible.present?
         @supplier_responsible_id = supplier_responsible.id
-      when 2  #更新
-        supplier_responsible = SupplierResponsible.where(:id => param_responsible).first
-        
-        if supplier_responsible.present?
-          @supplier_responsible_id = supplier_responsible.id
-          supplier_responsible.update(supplier_responsible_params)
-        end
+        supplier_responsible.update(supplier_responsible_params)
+      end
     end
     
     #注文データの担当者もアプデしておく
@@ -183,6 +201,8 @@ class ApplicationController < ActionController::Base
       @customer = CustomerMaster.find(customer_master_id)
     end
     
+    #binding.pry
+    
     if @customer.present?
       
       #@purchase_date = Date.parse(billing_date)
@@ -191,6 +211,7 @@ class ApplicationController < ActionController::Base
       @closing_date = nil
       @payment_due_date = nil
       addMonth = 0
+      
     
       #締め日算出
       if @customer.closing_date_division == 1
@@ -200,12 +221,16 @@ class ApplicationController < ActionController::Base
       else
       #日付指定の場合
         d = @purchase_date
-          
+        
         if @customer.closing_date != 0
           
           if d.day <= @customer.closing_date  #bugfix 200127
             if Date.valid_date?(d.year, d.month, @customer.closing_date)
               @closing_date = Date.new(d.year, d.month, @customer.closing_date)
+            else
+            #日付指定で31日などを指定した場合(31日がない場合ここに来る)は、月末とみなす
+            #add230715
+              @closing_date = Date.new(d.year, d.month, -1)
             end
           else
             #締め日を過ぎていた場合、月＋１
@@ -242,6 +267,8 @@ class ApplicationController < ActionController::Base
           
         else
         ##月末の扱いでなければ、そのまま
+          #binding.pry
+          
           if Date.valid_date?(d.year, d.month, @customer.due_date)
             d2 = Date.new(d.year, d.month, @customer.due_date)
             
@@ -423,6 +450,12 @@ class ApplicationController < ActionController::Base
   $BANK_ID_SANSHIN_TSUKANOME = 3
   $BANK_ID_SANSHIN_MAIN = 4 #さんしん本店(*本来、支店IDで分けるべき?)
   $BANK_ID_CASH = 9 #現金(*本来、支店IDで分けるべき?)  #add200201
+  
+  #add230405
+  #支払方法ID(請求書ヘッダにて使用)
+  $PAYMENT_METHOD_ID_CASH = 1
+  $PAYMENT_METHOD_ID_DAISHI_HOKUETSU = 2
+  $PAYMENT_METHOD_ID_SANSHIN = 3
   
   #会計システム用の定数
   #勘定科目

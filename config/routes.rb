@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  resources :daily_loan_headers
+  resources :daily_loan_details
+  resources :monthly_loans
   resources :monthly_balances
   resources :expences
   resources :daily_cash_flows
@@ -628,6 +631,9 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :daily_loan_headers
+  resources :daily_loan_details
+  resources :monthly_loans
   resources :monthly_balances
   resources :expences
   resources :daily_cash_flows

@@ -1,6 +1,7 @@
 <%- model_class = Site -%>
 <div class="page-header">
   <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
   <%= search_form_for @q do |f| %>
    
    <%= f.label :name, '現場名：：' %>
@@ -14,9 +15,13 @@
             new_site_path,
             :class => 'btn btn-primary' %>
     </div>
-   <% end %>
-
+  <% end %>
+  <!-- 追加箇所開始 -->
+  <%= page_entries_info @sites %>
+  <!-- 追加箇所終了 -->
 </div>
+  
+  
 <table class="table table-striped">
   <thead>
     <tr>
@@ -51,6 +56,9 @@
         </td>
       </tr>
     <% end %>
+    <!-- 追加箇所開始 -->
+    <%= paginate @sites %>
+    <!-- 追加箇所終了 -->
   </tbody>
 </table>
 

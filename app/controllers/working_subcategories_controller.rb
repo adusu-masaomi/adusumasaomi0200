@@ -14,8 +14,12 @@ class WorkingSubcategoriesController < ApplicationController
     #主カテゴリー画面からの遷移の場合、初期値をセット。
     if params[:working_category_id].present?
       working_cartegory_id = params[:working_category_id]
-      #query = {"working_category_id_eq"=> working_cartegory_id}
-      query.store("working_category_id_eq", working_cartegory_id)
+      #upd 230501
+      if query.nil?
+        query = {"working_category_id_eq"=> working_cartegory_id}
+      else
+        query.store("working_category_id_eq", working_cartegory_id)
+      end
     end
     #####
     

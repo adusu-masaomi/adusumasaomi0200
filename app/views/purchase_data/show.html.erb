@@ -73,7 +73,8 @@
 <%= link_to t('.edit', :default => t("helpers.links.edit")),
               edit_purchase_datum_path(@purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
               supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]), :class => 'btn btn-white_rsd' %>
-<%= link_to t('.new', :default => t("helpers.links.new")), new_purchase_datum_path(:new_flag => "1"), :class => 'btn btn-primary' %>
+<%= link_to t('.new', :default => t("helpers.links.new")), new_purchase_datum_path(:new_flag => "1", 
+                                  :id => @purchase_datum.id), :class => 'btn btn-primary' %>
 <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
               purchase_datum_path(@purchase_datum, construction_id: params[:construction_id], purchase_order_id: params[:purchase_order_id], 
               supplier_master_id: params[:supplier_master_id], move_flag: params[:move_flag]),

@@ -20,7 +20,10 @@ class SitesController < ApplicationController
     #
 	
 	  @sites = @q.result(distinct: true)
-    #@material_masters = @material_masters.page(params[:page])
+    
+    #kaminari対応
+    @sites = @sites.page(params[:page])
+    
   end
 
   # GET /sites/1

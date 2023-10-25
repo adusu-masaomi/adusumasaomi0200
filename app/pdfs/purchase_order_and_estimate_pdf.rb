@@ -6,8 +6,11 @@ class PurchaseOrderAndEstimatePDF
   FLAG_ORDER = 2    #注文時
   
   #def self.create purchase_order_and_estimate
-  def self.create purchase_order
+  #def self.create purchase_order
+  def self.create(quotation_material_header, detail_parameters, supplier, request_type, purchase_order_code, mail_flag)
   #注文書PDF発行
+    @quotation_material_header = quotation_material_header
+    @supplier = supplier
   
     #新元号対応
     require "date"
@@ -36,7 +39,8 @@ class PurchaseOrderAndEstimatePDF
     
     pre_page_count = 1
     last_page_count = 1
-    $detail_parameters.values.each do 
+    #$detail_parameters.values.each do
+    detail_parameters.values.each do 
       cnt += 1
       cnt2 += 1
       
@@ -51,7 +55,8 @@ class PurchaseOrderAndEstimatePDF
     #
     
     #タイトル
-    if $request_type == FLAG_ESTIMATE
+    #if $request_type == FLAG_ESTIMATE
+    if request_type == FLAG_ESTIMATE
       title = "見積依頼書"
     else
       title = "注　文　書"
@@ -59,7 +64,7 @@ class PurchaseOrderAndEstimatePDF
     #
     report.page.item(:title).value(title)
     
-    if $request_type == FLAG_ESTIMATE
+    if request_type == FLAG_ESTIMATE
       request = "下記の通り見積依頼いたします。"
     else
       request = "下記の通り注文いたします。"
@@ -70,18 +75,19 @@ class PurchaseOrderAndEstimatePDF
     
     #見出し
     
-    ##$quotation_material_header
-    
-    report.page.item(:supplier_name).value($quotation_material_header.supplier_master.supplier_name + "御中")
+    #report.page.item(:supplier_name).value($quotation_material_header.supplier_master.supplier_name + "御中")
+    report.page.item(:supplier_name).value(@quotation_material_header.supplier_master.supplier_name + "御中")
     
     #report.page.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.responsible1 + "様")
     #担当は先頭を取ってくる---複数の場合に無理があるかも??
-    report.page.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.supplier_responsibles[0].responsible_name + "様")
+    #report.page.item(:supplier_responsible_name).value($quotation_material_header.supplier_master.supplier_responsibles[0].responsible_name + "様")
+    report.page.item(:supplier_responsible_name).value(@quotation_material_header.supplier_master.supplier_responsibles[0].responsible_name + "様")
     
     #見積依頼/注文日
     #注文日:
     issue = "注文日"
-    if $request_type == FLAG_ESTIMATE
+    #if $request_type == FLAG_ESTIMATE
+    if request_type == FLAG_ESTIMATE
       issue = "依頼日:"
     else
       issue = "注文日:"
@@ -93,17 +99,23 @@ class PurchaseOrderAndEstimatePDF
     report.page.item(:order_date).value(Time.now.in_time_zone('Tokyo').to_date)
     
     #注文番号(注文時のみ)
-    if $request_type == FLAG_ORDER
-      report.page.item(:order_code).value($purchase_order_code)
+    #if $request_type == FLAG_ORDER
+    if request_type == FLAG_ORDER
+      #report.page.item(:order_code).value($purchase_order_code)
+      report.page.item(:order_code).value(purchase_order_code)
     end
     #見積番号
-    report.page.item(:quotation_code).value($quotation_material_header.quotation_code)
+    #report.page.item(:quotation_code).value($quotation_material_header.quotation_code)
+    report.page.item(:quotation_code).value(@quotation_material_header.quotation_code)
     
     #工事名
-    report.page.item(:construction_name).value($quotation_material_header.construction_datum.construction_name)
+    #report.page.item(:construction_name).value($quotation_material_header.construction_datum.construction_name)
+    report.page.item(:construction_name).value(@quotation_material_header.construction_datum.construction_name)
     #納品先
-    if $quotation_material_header.delivery_place_flag.present?
-      report.page.item(:delivery_place).value(PurchaseOrderHistory.delivery_place[$quotation_material_header.delivery_place_flag][0])
+    #if $quotation_material_header.delivery_place_flag.present?
+    if @quotation_material_header.delivery_place_flag.present?
+      #report.page.item(:delivery_place).value(PurchaseOrderHistory.delivery_place[$quotation_material_header.delivery_place_flag][0])
+      report.page.item(:delivery_place).value(PurchaseOrderHistory.delivery_place[@quotation_material_header.delivery_place_flag][0])
     end
     
     #binding.pry
@@ -122,7 +134,8 @@ class PurchaseOrderAndEstimatePDF
     
     #明細
     #注文でループ
-    $detail_parameters.values.each_with_index.reverse_each do |item, index|
+    #$detail_parameters.values.each_with_index.reverse_each do |item, index|
+    detail_parameters.values.each_with_index.reverse_each do |item, index|
       
       #出力判定
       check = false
@@ -135,16 +148,20 @@ class PurchaseOrderAndEstimatePDF
       @order_email_sent_flag = false
       
       #仕入先１〜３の各判定
-      if $request_type == FLAG_ESTIMATE
+      #if $request_type == FLAG_ESTIMATE
+      if request_type == FLAG_ESTIMATE
         get_supplier_when_quotation(item)
-      elsif $request_type == FLAG_ORDER
+      #elsif $request_type == FLAG_ORDER
+      elsif request_type == FLAG_ORDER
         get_supplier_when_order(item)
       end
       
       #各アイテムの出力判定
-      if !$mail_flag
+      #if !$mail_flag
+      if !mail_flag
       #帳票の場合
-        if $request_type == FLAG_ESTIMATE
+        #if $request_type == FLAG_ESTIMATE
+        if request_type == FLAG_ESTIMATE
         #見積の場合
           if item[:_destroy] != "true"
             check = true
@@ -159,7 +176,8 @@ class PurchaseOrderAndEstimatePDF
         #注文の場合
       else
       #メール送信の場合
-        if $request_type == FLAG_ESTIMATE
+        #if $request_type == FLAG_ESTIMATE
+        if request_type == FLAG_ESTIMATE
         #見積の場合
           if item[:_destroy] != "true" && !@quotation_email_sent_flag
             check = true
@@ -209,7 +227,8 @@ class PurchaseOrderAndEstimatePDF
           #注文単価
           @num = 0  
           
-          if $request_type == 2
+          #if $request_type == 2
+          if request_type == 2
             @num = @quotation_unit_price
           end
           
@@ -227,7 +246,8 @@ class PurchaseOrderAndEstimatePDF
           #@num = item[:list_price].to_i #定価
           #金額
           amount = 0  
-          if $request_type == 2
+          #if $request_type == 2
+          if request_type == 2
             amount = item[:quantity].to_i * @quotation_unit_price
           end
           @num = amount
@@ -311,13 +331,17 @@ end
 #仕入先毎の備考を取得
 def get_notes_by_supplier
   
-  case $supplier
+  #case $supplier
+  case @supplier
     when 1
-      @notes = $quotation_material_header[:notes_1]
+      #@notes = $quotation_material_header[:notes_1]
+      @notes = @quotation_material_header[:notes_1]
     when 2
-      @notes = $quotation_material_header[:notes_2]
+      #@notes = $quotation_material_header[:notes_2]
+      @notes = @quotation_material_header[:notes_2]
     when 3
-      @notes = $quotation_material_header[:notes_3]
+      #@notes = $quotation_material_header[:notes_3]
+      @notes = @quotation_material_header[:notes_3]
   end
   
 end
@@ -325,7 +349,8 @@ end
 def get_supplier_when_quotation(item)
   
   #仕入先１〜３の判定
-  case $supplier
+  #case $supplier
+  case @supplier
     when 1
       @quotation_email_sent_flag = !item[:quotation_email_flag_1].to_i.zero?  
     when 2
@@ -341,7 +366,8 @@ end
 def get_supplier_when_order(item)
   
   #仕入先１〜３の判定
-  case $supplier
+  #case $supplier
+  case @supplier
     when 1
       @quotation_price = item[:quotation_price_1].to_i 
       @quotation_unit_price = item[:quotation_unit_price_1].to_i 

@@ -11,14 +11,23 @@
   <%= f.input :unit_price, input_html:{ :tabindex=>"3", id:"unit_price" } %>
   <%= f.input :unit_price_hide , input_html:{ id:"unit_price_hide"} , as: :hidden%>
   <%= f.input :physical_amount, input_html:{ id:"physical_amount", :tabindex=>"4"} %>
-  <%= f.input :book_quantity, input_html:{ id:"book_quantity", :readonly => true } %>
+  <!--<%= f.input :book_quantity, input_html:{ id:"book_quantity", :readonly => true } %>-->
+  <!--231017臨時調整用-->
+  <%= f.input :book_quantity, input_html:{ id:"book_quantity" } %>
   <%= f.input :quantity_hide , input_html:{ id:"quantity_hide"} , as: :hidden%>
-  <%= f.input :difference, label: "差異", input_html:{ id:"difference", :readonly => true } %>
+  <!--<%= f.input :difference, label: "差異", input_html:{ id:"difference", :readonly => true } %>-->
+  <!--231017臨時調整用-->
+  <%= f.input :difference, label: "差異", input_html:{ id:"difference" } %>
   
-  <%= f.input :book_amount, input_html:{ id:"book_amount", :readonly => true } %>
-  <%= f.input :amount_hide , input_html:{ id:"amount_hide"} , as: :hidden%>
+  <!--<%= f.input :book_amount, input_html:{ id:"book_amount", :readonly => true } %>-->
+  <!--231017臨時調整用-->
+  <%= f.input :book_amount, input_html:{ id:"book_amount"} %>
+ 
+ <%= f.input :amount_hide , input_html:{ id:"amount_hide"} , as: :hidden%>
   <!--<%= f.input :inventory_id , input_html:{ id:"inventory_id"} , as: :hidden%>-->
-  <%= f.input :different_amount, label: "差異金額", input_html:{ id:"different_amount", :value =>  0, :readonly => true } %>
+  <!--<%= f.input :different_amount, label: "差異金額", input_html:{ id:"different_amount", :value =>  0, :readonly => true } %>-->
+  <!--231017臨時調整用-->
+  <%= f.input :different_amount, label: "差異金額", input_html:{ id:"different_amount", :value =>  0} %>
   
   <%= f.button :submit, :class => 'btn-primary', :tabindex => "5" %>
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),

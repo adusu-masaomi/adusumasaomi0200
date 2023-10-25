@@ -1,5 +1,5 @@
 {
-  "version": "0.9.1",
+  "version": "0.12.0",
   "items": [
     {
       "id": "invoice_period_end_date",
@@ -1372,7 +1372,7 @@
       "type": "text",
       "display": true,
       "description": "",
-      "x": 402.2,
+      "x": 409.6,
       "y": 220.4,
       "width": 70.2,
       "height": 11.8,
@@ -1390,7 +1390,7 @@
         "font-style": []
       },
       "texts": [
-        "消費税（請求分）"
+        "消費税（10%）"
       ]
     },
     {
@@ -2089,7 +2089,7 @@
       "display": true,
       "description": "",
       "x": 414,
-      "y": 17,
+      "y": 25,
       "width": 141.6,
       "height": 53.6,
       "style": {
@@ -2106,7 +2106,7 @@
       "display": true,
       "description": "",
       "x": 423.5,
-      "y": 20,
+      "y": 28,
       "width": 32.1,
       "height": 12.6,
       "style": {
@@ -2132,7 +2132,7 @@
       "display": true,
       "description": "",
       "x": 470.5,
-      "y": 20,
+      "y": 28,
       "width": 32.1,
       "height": 11.6,
       "style": {
@@ -2158,7 +2158,7 @@
       "display": true,
       "description": "",
       "x": 517.3,
-      "y": 20,
+      "y": 28,
       "width": 30,
       "height": 13.2,
       "style": {
@@ -2189,9 +2189,9 @@
         "border-style": "solid"
       },
       "x1": 414.1,
-      "y1": 31.7,
+      "y1": 39.7,
       "x2": 555.1,
-      "y2": 31.7
+      "y2": 39.7
     },
     {
       "id": "",
@@ -2204,9 +2204,9 @@
         "border-style": "solid"
       },
       "x1": 461.2,
-      "y1": 17,
+      "y1": 25,
       "x2": 461.2,
-      "y2": 70.6
+      "y2": 78.6
     },
     {
       "id": "",
@@ -2219,9 +2219,9 @@
         "border-style": "solid"
       },
       "x1": 508.4,
-      "y1": 17,
+      "y1": 25,
       "x2": 508.4,
-      "y2": 70.6
+      "y2": 78.6
     },
     {
       "id": "",
@@ -2237,6 +2237,32 @@
       "y1": 265,
       "x2": 284.7,
       "y2": 815
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 419,
+      "y": 9,
+      "width": 145.3,
+      "height": 10.3,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "登録番号　T4-1100-0103-7084"
+      ]
     }
   ],
   "state": {
