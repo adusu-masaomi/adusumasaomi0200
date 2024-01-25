@@ -30,6 +30,8 @@ class ConstructionListPDF
 
       if construction_datum.reception_date.present?
         @reception_date = setGenGouDate(construction_datum.reception_date)
+        #test
+        #@reception_date = construction_datum.reception_date
         #@gengou = construction_datum.reception_date
         #@gengou = $gengo_name + "#{@gengou.year - $gengo_minus_ad}年#{@gengou.strftime('%-m')}月#{@gengou.strftime('%-d')}日"
       end

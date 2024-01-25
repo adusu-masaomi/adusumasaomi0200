@@ -41,9 +41,22 @@ class CustomerListCardPDF
 				 #end
 				 
 				 
+          #upd240105 
+          #住所は全て載せる様にする
+          address = customer.address
+          if customer.house_number.present?
+            address += customer.house_number
+          end
+          if customer.address2.present?
+            address += "　" + customer.address2
+          end
+          #
+          #house_number: customer.house_number(抹消)
+          #upd end
+          
 			     row.values ID: customer.id, customer_name: customer.customer_name,
-                            post: customer.post, address: customer.address,
-                            house_number: customer.house_number, tel: customer.tel_main,
+                            post: customer.post, address: address,
+                            tel: customer.tel_main,
                             fax: customer.fax_main, responsible: customer.responsible1
 					        #reception_date: @reception_date,
                             #construction_name: customer.construction_name,

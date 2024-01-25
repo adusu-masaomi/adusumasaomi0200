@@ -39,7 +39,9 @@ class PurchaseOrderPDF
       cnt2 += 1
       
       #if cnt > 19  #maxの行数 - 1
-      if cnt >= MAX_LINE  #maxの行数 - 1
+      #if cnt >= MAX_LINE  #maxの行数 - 1
+      #upd231205
+      if cnt > MAX_LINE  #maxの行数 - 1
         pre_page_count += 1
         cnt = 0
       end

@@ -358,6 +358,7 @@ class ConstructionCostsController < ApplicationController
     group('purchase_order_data.purchase_order_code').order('purchase_data.division_id, purchase_order_data.purchase_order_code').
     pluck("purchase_divisions.purchase_division_long_name, supplier_masters.supplier_name, purchase_order_data.purchase_order_code, SUM(purchase_data.purchase_amount) ").flatten.join(",")
     
+    #binding.pry
   end
   
   def purchase_amount_etc_select

@@ -1,5 +1,5 @@
 {
-  "version": "0.9.1",
+  "version": "0.12.0",
   "items": [
     {
       "id": "",
@@ -144,7 +144,7 @@
               ]
             },
             "texts": [
-              "住所１"
+              "住所"
             ]
           },
           {
@@ -173,34 +173,6 @@
             },
             "texts": [
               "電話番号"
-            ]
-          },
-          {
-            "id": "",
-            "type": "text",
-            "display": true,
-            "description": "",
-            "x": 509.9,
-            "y": 56.7,
-            "width": 41.6,
-            "height": 11.1,
-            "style": {
-              "font-family": [
-                "IPAPMincho"
-              ],
-              "font-size": 10,
-              "color": "#ffffff",
-              "text-align": "left",
-              "vertical-align": "top",
-              "line-height": "",
-              "line-height-ratio": "",
-              "letter-spacing": "",
-              "font-style": [
-                "bold"
-              ]
-            },
-            "texts": [
-              "住所２"
             ]
           },
           {
@@ -358,7 +330,7 @@
             "description": "",
             "x": 322.3,
             "y": 161.9,
-            "width": 178.1,
+            "width": 277,
             "height": 10.6,
             "style": {
               "font-family": [
@@ -446,21 +418,6 @@
             "y2": 174.6
           },
           {
-            "id": "line_4",
-            "type": "line",
-            "display": true,
-            "description": "",
-            "style": {
-              "border-color": "#f79646",
-              "border-width": 1,
-              "border-style": "solid"
-            },
-            "x1": 505.3,
-            "y1": 158.2,
-            "x2": 505.3,
-            "y2": 174.6
-          },
-          {
             "id": "line_1",
             "type": "line",
             "display": true,
@@ -491,38 +448,6 @@
               "font-size": 10,
               "color": "#000000",
               "text-align": "center",
-              "vertical-align": "top",
-              "line-height": "",
-              "line-height-ratio": "",
-              "letter-spacing": "",
-              "font-style": [],
-              "overflow": "fit",
-              "word-wrap": "none"
-            },
-            "reference-id": "",
-            "value": "",
-            "multiple-line": false,
-            "format": {
-              "base": "",
-              "type": ""
-            }
-          },
-          {
-            "id": "house_number",
-            "type": "text-block",
-            "display": true,
-            "description": "",
-            "x": 509.3,
-            "y": 161.9,
-            "width": 90.5,
-            "height": 11.1,
-            "style": {
-              "font-family": [
-                "IPAPMincho"
-              ],
-              "font-size": 10,
-              "color": "#000000",
-              "text-align": "left",
               "vertical-align": "top",
               "line-height": "",
               "line-height-ratio": "",

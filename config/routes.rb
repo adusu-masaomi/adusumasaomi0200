@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :storage_inventories
+  resources :daily_representative_loans
   resources :daily_loan_headers
   resources :daily_loan_details
   resources :monthly_loans
@@ -212,6 +214,9 @@ Rails.application.routes.draw do
   #
   
   post '/material_categoriez/reorder' => 'material_categories#reorder'
+  
+  #add231228
+  get '/storage_inventoriez/get_material_unit_price' => 'storage_inventories#get_material_unit_price'
   
   get '/material_masterz/get_material_id' => 'material_masters#get_material_id'
   
@@ -631,6 +636,7 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :storage_inventories
   resources :daily_loan_headers
   resources :daily_loan_details
   resources :monthly_loans

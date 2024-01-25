@@ -41,8 +41,9 @@
         <!--<td><%= working_middle_item.labor_cost_total %></td>-->
         <!--<td><%= working_middle_item.other_cost %></td>-->
 		<td><%= link_to working_middle_item.id, working_middle_item_path(working_middle_item) %></td>
-		<td><%=l working_middle_item.created_at %></td>
-        
+        <!--<td><%=l working_middle_item.created_at %></td>-->
+        <!-- upd230111 -->
+        <td><%=l working_middle_item.updated_at.in_time_zone('Tokyo') %></td>
 		
 		<td>
           <%= link_to t('.edit', :default => t("helpers.links.edit")),

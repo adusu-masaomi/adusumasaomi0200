@@ -40,6 +40,7 @@ ja:
     construction_datum_id: 工事ID
     construction_code: 工事コード
     created_at: 登録日
+    updated_at: 更新日
     customer_name: 得意先名
     slip_code: 伝票番号
     post: 郵便番号

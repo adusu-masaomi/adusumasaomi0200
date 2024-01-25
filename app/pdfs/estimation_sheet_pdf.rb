@@ -19,7 +19,9 @@ class EstimationSheetPDF
     end 
   
     #if $print_type == "1" || $print_type == "51"
-    if @print_type == "1" || @print_type == "51"
+    #if @print_type == "1" || @print_type == "51"
+    #upd231227 単価抜きVerも押印不要
+    if @print_type == "1" || @print_type == "51" || @print_type == "4"
       #ハンコ無しVer
       @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_pdf.tlf")
     else

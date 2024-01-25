@@ -54,12 +54,14 @@ ActiveRecord::Schema.define(version: 20230518004527) do
 
   create_table "account_balance_sheet", force: :cascade do |t|
     t.date    "accrual_date"
-    t.integer "borrow_lend_id",   limit: 4,   null: false
-    t.integer "amount",           limit: 4,   null: false
-    t.integer "bank_id",          limit: 4
-    t.string  "description",      limit: 255
-    t.integer "cash_book_id",     limit: 4
-    t.integer "account_title_id", limit: 4
+    t.integer "borrow_lend_id",    limit: 4,   null: false
+    t.integer "amount",            limit: 4,   null: false
+    t.integer "bank_id",           limit: 4
+    t.string  "description",       limit: 255
+    t.string  "description2",      limit: 255
+    t.boolean "is_representative"
+    t.integer "cash_book_id",      limit: 4
+    t.integer "account_title_id",  limit: 4
   end
 
   add_index "account_balance_sheet", ["account_title_id"], name: "account_balance_sheet_2101f742", using: :btree
@@ -178,6 +180,19 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer "actual_cash_company",        limit: 4, null: false
   end
 
+  create_table "account_daily_representative_loan", force: :cascade do |t|
+    t.integer  "table_type_id",  limit: 4
+    t.integer  "table_id",       limit: 4
+    t.date     "occurred_on",                              null: false
+    t.integer  "account_id",     limit: 4
+    t.integer  "sub_account_id", limit: 4
+    t.string   "description",    limit: 255,               null: false
+    t.integer  "debit",          limit: 4
+    t.integer  "credit",         limit: 4
+    t.datetime "created_at",                 precision: 6
+    t.datetime "updated_at",                 precision: 6
+  end
+
   create_table "account_partner", force: :cascade do |t|
     t.integer  "order",                 limit: 4,                 null: false
     t.string   "administrative_name",   limit: 255,               null: false
@@ -221,27 +236,28 @@ ActiveRecord::Schema.define(version: 20230518004527) do
   add_index "account_partner", ["source_bank_id"], name: "account_partner_source_bank_id_d58cbbcf_fk_account_bank_id", using: :btree
 
   create_table "account_payment", force: :cascade do |t|
-    t.integer  "order",                 limit: 4,                 null: false
-    t.date     "billing_year_month",                              null: false
-    t.integer  "trade_division_id",     limit: 4
-    t.integer  "billing_amount",        limit: 4
-    t.integer  "rough_estimate",        limit: 4
-    t.integer  "payment_method_id",     limit: 4
+    t.integer  "order",                    limit: 4,                 null: false
+    t.date     "billing_year_month",                                 null: false
+    t.integer  "trade_division_id",        limit: 4
+    t.integer  "billing_amount",           limit: 4
+    t.integer  "rough_estimate",           limit: 4
+    t.integer  "payment_method_id",        limit: 4
     t.date     "payment_due_date"
     t.date     "payment_date"
-    t.string   "note",                  limit: 255,               null: false
-    t.datetime "created_at",                        precision: 6
-    t.datetime "update_at",                         precision: 6
-    t.integer  "account_title_id",      limit: 4
-    t.integer  "partner_id",            limit: 4
-    t.integer  "commission",            limit: 4
-    t.integer  "payment_amount",        limit: 4
-    t.integer  "source_bank_id",        limit: 4
-    t.integer  "source_bank_branch_id", limit: 4
-    t.integer  "unpaid_amount",         limit: 4
+    t.string   "note",                     limit: 255,               null: false
+    t.datetime "created_at",                           precision: 6
+    t.datetime "update_at",                            precision: 6
+    t.integer  "account_title_id",         limit: 4
+    t.integer  "partner_id",               limit: 4
+    t.integer  "commission",               limit: 4
+    t.integer  "payment_amount",           limit: 4
+    t.integer  "source_bank_id",           limit: 4
+    t.integer  "source_bank_branch_id",    limit: 4
+    t.integer  "unpaid_amount",            limit: 4
     t.date     "unpaid_due_date"
     t.date     "unpaid_date"
-    t.integer  "completed_flag",        limit: 4,                 null: false
+    t.date     "payment_due_date_changed"
+    t.integer  "completed_flag",           limit: 4,                 null: false
   end
 
   add_index "account_payment", ["account_title_id"], name: "account_payment_account_title_id_de8d3cfe_fk_account_a", using: :btree
@@ -468,7 +484,7 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer  "card_not_flag",         limit: 4
     t.integer  "contractor_flag",       limit: 4
     t.integer  "public_flag",           limit: 4
-    t.datetime "created_at"
+    t.datetime "created_at",                        null: false
     t.datetime "update_at",                         null: false
   end
 
@@ -1001,15 +1017,16 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.date     "payment_date"
     t.date     "unpaid_payment_date"
     t.string   "notes",                      limit: 255
+    t.integer  "purchase_unit_price_tax",    limit: 4
     t.datetime "created_at",                                         null: false
     t.datetime "update_at",                                          null: false
   end
 
   create_table "purchase_divisions", force: :cascade do |t|
-    t.string   "purchase_division_name",      limit: 255, default: "", null: false
+    t.string   "purchase_division_name",      limit: 255
     t.string   "purchase_division_long_name", limit: 255
-    t.datetime "created_at",                                           null: false
-    t.datetime "update_at",                                            null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "update_at",                               null: false
   end
 
   create_table "purchase_headers", force: :cascade do |t|
@@ -1050,7 +1067,7 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer  "list_price",             limit: 4
     t.integer  "unit_id",                limit: 4
     t.datetime "created_at",                         null: false
-    t.datetime "update_at"
+    t.datetime "update_at",                          null: false
   end
 
   create_table "quotation_breakdown_histories", force: :cascade do |t|
@@ -1417,13 +1434,23 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.datetime "updated_at",                       null: false
   end
 
+  create_table "storage_inventories", force: :cascade do |t|
+    t.integer  "warehouse_id",       limit: 4
+    t.integer  "location_id",        limit: 4
+    t.integer  "material_master_id", limit: 4
+    t.integer  "quantity",           limit: 4
+    t.float    "unit_price",         limit: 24
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
   create_table "supplier_masters", force: :cascade do |t|
     t.string   "supplier_name",    limit: 255
     t.string   "tel_main",         limit: 255
-    t.string   "fax_main",         limit: 255, default: ""
+    t.string   "fax_main",         limit: 255
     t.string   "email_main",       limit: 255
     t.string   "responsible1",     limit: 255
-    t.string   "email1",           limit: 255, default: ""
+    t.string   "email1",           limit: 255
     t.string   "responsible2",     limit: 255
     t.string   "email2",           limit: 255
     t.string   "responsible3",     limit: 255
@@ -1432,8 +1459,8 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.string   "email_cc",         limit: 255
     t.string   "search_character", limit: 255
     t.integer  "outsourcing_flag", limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "update_at",                                 null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "update_at",                    null: false
   end
 
   create_table "supplier_responsibles", force: :cascade do |t|

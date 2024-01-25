@@ -115,12 +115,15 @@ class WorkingMiddleItemsController < ApplicationController
     i = 0
     newSeq = seq.reverse
     
+    ActiveRecord::Base.record_timestamps = false  #add240112
     
     @working_middle_items.order("seq").each do |working_middle_item|
       #更新する
       working_middle_item.update(seq: newSeq[i])
       i += 1
     end
+    
+    ActiveRecord::Base.record_timestamps = true  #add240112
   end
   
   #ドラッグ＆ドロップによる並び替え機能(seqをセットする)
@@ -136,8 +139,12 @@ class WorkingMiddleItemsController < ApplicationController
       row = params[:row].split(",")
     end
     
+    ActiveRecord::Base.record_timestamps = false  #add240112
+    
     row.each_with_index {|row, i| WorkingMiddleItem.update(row, {:seq => params[:category].to_i + i})}
     render :text => "OK"
+    
+    ActiveRecord::Base.record_timestamps = true  #add240112
   end
   
   # GET /working_middle_items/1
@@ -486,12 +493,17 @@ class WorkingMiddleItemsController < ApplicationController
           end
           #
           
-          
           if item[:working_small_item_id] == "1"
           #手入力の場合→新規登録
+            
+            
             #品番品名・メーカーのみ登録。
+            #material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
+            #                          maker_id: item[:maker_master_id] }
+            #upd240113
             material_master_params = {material_code: item[:working_small_item_code], material_name: item[:working_small_item_name], 
-                                      maker_id: item[:maker_master_id] }
+                                      maker_id: item[:maker_master_id], standard_quantity: item[:quantity], unit_id: item[:unit_master_id],
+                                      list_price_quotation: item[:unit_price], standard_labor_productivity_unit: item[:labor_productivity_unit] }
            
             if item[:working_small_item_code].present?  #add180131 品番がなければマスター反映させない。
               @material_master = MaterialMaster.find_by(material_code: item[:working_small_item_code], 
@@ -513,8 +525,14 @@ class WorkingMiddleItemsController < ApplicationController
       
             if @material_master.present?
               #品名・メーカーのみ登録とする
+              #material_master_params = {material_name: item[:working_small_item_name], 
+              #    maker_id: item[:maker_master_id] }    
+              #upd240113
               material_master_params = {material_name: item[:working_small_item_name], 
-                  maker_id: item[:maker_master_id] }    
+                  maker_id: item[:maker_master_id], standard_quantity: item[:quantity], unit_id: item[:unit_master_id],
+                  list_price_quotation: item[:unit_price], standard_labor_productivity_unit: item[:labor_productivity_unit] }
+              
+              
               @material_master.update(material_master_params)
             end
           end
@@ -628,7 +646,11 @@ class WorkingMiddleItemsController < ApplicationController
     #new_record = @working_middle_item.dup
     @working_middle_item.working_middle_item_name += $STRING_COPY  #わかりやすいように、名前を変更する
     
+    
     new_record = @working_middle_item.deep_clone include: :working_small_items
+    
+    #new_record = @working_middle_item.deep_clone(include: [:working_small_items])
+    #new_record = @working_middle_item.deep_clone(include: [:working_small_items], except: [{working_small_items: [:id] }])
     
     status = new_record.save
      
@@ -743,11 +765,23 @@ class WorkingMiddleItemsController < ApplicationController
 	
     # Never trust parameters from the scary internet, only allow the white list through.
     def working_middle_item_params
+      
+      #params.require(:working_middle_item).permit(:working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id,
+      #      :working_subcategory_id, :working_middle_specification, :working_unit_id, :working_unit_name, :working_unit_price, :execution_unit_price, :material_id, 
+      #      :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, 
+      #      :labor_unit_price, :labor_unit_price_standard, :labor_productivity_unit, :material_quantity,
+      #      :accessory_cost, :material_cost_total, :labor_cost_total, :other_cost, :seq, 
+      #      working_small_items_attributes:   [:id, :working_specific_middle_item_id, :working_small_item_id, :working_small_item_code, :working_small_item_name, 
+      #      :unit_price, :rate, :quantity, :material_price, :maker_master_id, :unit_master_id, :labor_productivity_unit, :_destroy] )
+        
+        #240111 フィールド追加(accessory_base_cost~)
         params.require(:working_middle_item).permit(:working_middle_item_name, :working_middle_item_short_name, :working_middle_item_category_id,
             :working_subcategory_id, :working_middle_specification, :working_unit_id, :working_unit_name, :working_unit_price, :execution_unit_price, :material_id, 
             :working_material_name, :execution_material_unit_price, :material_unit_price, :execution_labor_unit_price, 
             :labor_unit_price, :labor_unit_price_standard, :labor_productivity_unit, :material_quantity,
             :accessory_cost, :material_cost_total, :labor_cost_total, :other_cost, :seq, 
+            :accessory_base_cost, :accessory_rate, :miscellaneous_base_cost, :miscellaneous_rate, :miscellaneous_cost,
+            :other_base_cost, :other_rate, :benefit_rate, 
             working_small_items_attributes:   [:id, :working_specific_middle_item_id, :working_small_item_id, :working_small_item_code, :working_small_item_name, 
             :unit_price, :rate, :quantity, :material_price, :maker_master_id, :unit_master_id, :labor_productivity_unit, :_destroy] )
     end

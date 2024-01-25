@@ -25,12 +25,17 @@ class InventoriesController < ApplicationController
 	
     @inventories  = @q.result(distinct: true)
     
+    #moved231208
+    #global set
+    $inventories = @inventories
+    
     #kaminari用設定
     @inventories  = @inventories.page(params[:page])
 	#
 	
-	#global set
-	$inventories = @inventories
+  #global set
+	#$inventories = @inventories
+  
 	respond_to do |format|
 	  format.html
 	  #pdf
@@ -110,9 +115,13 @@ class InventoriesController < ApplicationController
   
   #変更前と品番が異なった場合、一旦履歴を削除し在庫マスターも補填する
   def self.destroy_history_on_differ_material(params, purchase_datum_id)
+    #binding.pry
+    
     inventory_history_before = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
     if inventory_history_before.present?
-      if inventory_history_before.material_master_id !=  params[:purchase_datum][:material_id]
+      #if inventory_history_before.material_master_id !=  params[:purchase_datum][:material_id]
+      #upd231106
+      if inventory_history_before.material_master_id !=  params[:purchase_datum][:material_id].to_i
         #変更前と品番が異なった場合、一旦履歴を削除し在庫マスターも補填する
         @inventory_history_before = inventory_history_before  #削除前のhistoryを保持
         inventory_history_before.destroy #履歴を一旦削除
@@ -205,13 +214,17 @@ class InventoriesController < ApplicationController
 		        #@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i
 		
             @current_quantity_before = 0
-    
+            
+            #binding.pry
+            
 		        #upd171228 マイナス入庫の登録もあるので、絶対値とする
 		        @differ_inventory_quantity = params[:purchase_datum][:quantity].to_i.abs
 		        @differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i.abs
 	          #
 		
             @differ_inventory_quantity2 = 0  #数２も考慮
+            
+            #binding.pry
             
 		        @inventory_history = InventoryHistory.where(purchase_datum_id: purchase_datum_id).first
             if @inventory_history.blank?
@@ -274,11 +287,17 @@ class InventoriesController < ApplicationController
               #binding.pry
       
 		          #if params[:purchase_datum][:price].to_i != @inventory_history.price then
-		          if ( params[:purchase_datum][:price].to_i != @inventory_history.price ) && @inventory_history.price.present? then
+		          #if ( params[:purchase_datum][:price].to_i != @inventory_history.price ) && @inventory_history.price.present? then
+              #upd231106
+              if ( params[:purchase_datum][:purchase_amount].to_i != @inventory_history.price ) && @inventory_history.price.present?
                   #@differ_inventory_price = params[:purchase_datum][:purchase_amount].to_i - @inventory_history.price
 			          #upd171228 マイナス入庫の登録もあるので、絶対値とする
 			          purchase_amount = params[:purchase_datum][:purchase_amount].to_i.abs
-			          @differ_inventory_price = purchase_amount - @inventory_history.price
+                
+			          #@differ_inventory_price = purchase_amount - @inventory_history.price
+                #upd231106
+                @differ_inventory_price = purchase_amount - @inventory_history.price.abs
+                                
 			        ##
 		          else
 		          #add170413
@@ -531,7 +550,9 @@ class InventoriesController < ApplicationController
         current_warehousing_date = @inventory_history.inventory_date
       end
       current_unit_price = @inventory_history.unit_price
-      current_quantity = @inventory_history.quantity
+      #current_quantity = @inventory_history.quantity
+      #upd231106
+      current_quantity = @inventory_history.quantity.abs
 
       #add170508
       last_unit_price = @inventory_history.unit_price
@@ -562,6 +583,7 @@ class InventoriesController < ApplicationController
 		    #if (@inventory.current_warehousing_date.present? && @inventory.current_warehousing_date < @inventory_history.inventory_date) ||
 		    #   @inventory_division_id == $INDEX_INVENTORY_SHIPPING
         
+        #231104 test
         #binding.pry
         
         #
@@ -583,6 +605,9 @@ class InventoriesController < ApplicationController
           if (@inventory.current_warehousing_date == @inventory_history.inventory_date &&
               @inventory_division_id == $INDEX_INVENTORY_STOCK)
             #同一日の入庫の場合は、先に入庫したものを現在数にさせる(先入先出法)(upd220304)
+            
+            #!!!
+            
             move_flag = 1
           else
             move_flag = 2
