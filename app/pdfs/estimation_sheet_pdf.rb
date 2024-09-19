@@ -3,7 +3,7 @@ class EstimationSheetPDF
   
   #def self.create quotation_detail_large_classifications
   def self.create(quotation_detail_large_classifications, print_type, sort_qm)
-  #見積書PDF発行
+    #見積書PDF発行
         
     #新元号対応 190401
     require "date"
@@ -37,17 +37,17 @@ class EstimationSheetPDF
       #  @report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/estimation_sheet_signed_cs_pdf.tlf")
       #end
     end
-	   
+     
     # 1ページ目を開始
     @report.start_new_page
-	    
+      
     # テーブルの値を設定
     # list に表のIDを設定する(デフォルトのID値: default)
     # add_row で列を追加できる
     # ブロック内のrow.valuesで値を設定する
-	  
+    
     @flag = nil
-	   
+     
     #ソートしている場合は、並び順を変える
     #念の為保管
     #if $sort_ql == "asc" 
@@ -56,7 +56,7 @@ class EstimationSheetPDF
     #  sort_string = "line_number ASC"
     #end
     #
-	   
+     
     @notSumFlag = false
     @existsDetail = false
     
@@ -70,7 +70,7 @@ class EstimationSheetPDF
                                                  where(:quotation_detail_large_classification_id => quotation_detail_large_classification.id).where("id is NOT NULL")
           quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification|
             if quotation_detail_middle_classification.quote_price.present? && 
-               quotation_detail_middle_classification.quote_price.to_i > 0
+              quotation_detail_middle_classification.quote_price.to_i > 0
               @existsDetail = true
             end
           end  #loop end
@@ -82,7 +82,7 @@ class EstimationSheetPDF
     if @print_type == "4"
       @notSumFlag = true
     end
-       
+      
     #$quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification| 
     #upd170626
     quotation_detail_large_classifications.order(:line_number).each do |quotation_detail_large_classification|
@@ -91,17 +91,17 @@ class EstimationSheetPDF
       if @flag.nil? 
   
         @flag = "1"
-		   
+   
         if @history == false
           @quotation_headers = QuotationHeader.find(quotation_detail_large_classification.quotation_header_id)
         else
-        #履歴用
+          #履歴用
           @quotation_headers = QuotationHeaderHistory.find(quotation_detail_large_classification.quotation_header_history_id)
         end
-		 
+
         #郵便番号(得意先)
         @report.page.item(:post).value(@quotation_headers.post) 
-		 
+
         #住所(得意先)
         #分割された住所を一つにまとめる。
         all_address = @quotation_headers.address
@@ -128,10 +128,10 @@ class EstimationSheetPDF
           honorific_name = CustomerMaster.honorific[id].find{id} #"御中"
         end
         @report.page.item(:honorific).value(honorific_name) 
-		   
+       
         #担当1
         if @quotation_headers.ConstructionDatum.present? && 
-              !@quotation_headers.ConstructionDatum.personnel.blank?
+          !@quotation_headers.ConstructionDatum.personnel.blank?
           responsible = @quotation_headers.ConstructionDatum.personnel + "  様"
           @report.page.item(:responsible1).value(responsible)
         end
@@ -141,34 +141,34 @@ class EstimationSheetPDF
           @report.page.item(:responsible2).value(responsible)
         end
         ##
-		   
+       
         #件名
         @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
   
         #見積No
         @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
-		 
+ 
         date_per_ten_start = Date.parse("2019/10/01")   #消費税１０％開始日 
          
         if @notSumFlag == false   
           #税込見積合計金額	 
           if @quotation_headers.quote_price.present?
             if @quotation_headers.quotation_date.nil?
-            #日付なしの場合--消費税10%にする
+              #日付なしの場合--消費税10%にする
               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
             elsif @quotation_headers.quotation_date < date_per_ten_start
-            #消費税8%の場合 
+              #消費税8%の場合 
               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include
             else
-            #消費税10%の場合 
+              #消費税10%の場合 
               @quote_price_tax_in = @quotation_headers.quote_price * $consumption_tax_include_per_ten
             end
             @report.page.item(:quote_price_tax_in).value(@quote_price_tax_in) 
           end
-		   
+
           #消費税
           if @quotation_headers.quote_price.present?
-          #if @quotation_headers.quotation_date < date_per_ten_start
+            #if @quotation_headers.quotation_date < date_per_ten_start
             if @quotation_headers.quotation_date.nil?
               @quote_price_tax_only = @quotation_headers.quote_price * $consumption_tax_only_per_ten
             elsif @quotation_headers.quotation_date < date_per_ten_start
@@ -200,7 +200,7 @@ class EstimationSheetPDF
         end
            
         if @quotation_headers.construction_period_date1.present? &&
-            @quotation_headers.construction_period_date2.present?
+          @quotation_headers.construction_period_date2.present?
           construction_period += " 〜 "
         end
            
@@ -243,7 +243,7 @@ class EstimationSheetPDF
           @report.page.item(:construction_place_d2).value(address_2)
         end
         #
-		   
+
         #取引方法
         @report.page.item(:trading_method).value(@quotation_headers.trading_method) 
         #有効期間
@@ -257,21 +257,21 @@ class EstimationSheetPDF
           empty_string =  $gengo_name_2 + "　　" + "年" + "　　" + "月" + "　　" + "日"
           @report.page.item(:quotation_date).value(empty_string) 
         end
-		   
+
         #NET金額
         if @quotation_headers.net_amount.present?
           @net_amount = "(" + @quotation_headers.net_amount.to_s(:delimited, delimiter: ',') + ")" 
           @report.page.item(:message_net).value("NET")
           @report.page.item(:net_amount).value(@net_amount)
         end
-		   
+
         #小計(見積金額) 
         #本来ならフッターに設定するべきだが、いまいちわからないため・・
         if @notSumFlag == false  #
           @report.page.item(:quote_price).value(@quotation_headers.quote_price)
         end
       end  #@flag.nil? 
-		 
+
       
       @report.list(:default).add_row do |row|
         #仕様の場合に数値・単位をnullにする
@@ -357,9 +357,9 @@ class EstimationSheetPDF
         quotation_header_id = quotation_detail_large_classification.quotation_header_history_id
       end 
       quotation_detail_large_classification_id =  quotation_detail_large_classification.id
-	    
+    
       if @history == false
-	      @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
+        @quotation_detail_middle_classifications = QuotationDetailMiddleClassification.where(:quotation_header_id => quotation_header_id).
                                                  where(:quotation_detail_large_classification_id => quotation_detail_large_classification_id).where("id is NOT NULL")
       else
         @quotation_detail_middle_classifications = QuotationDetailsHistory.where(:quotation_header_history_id => quotation_header_id).
@@ -374,17 +374,17 @@ class EstimationSheetPDF
   end
   
   def self.detailed_statement
-  #内訳書PDF発行(A4縦ver)
+    #内訳書PDF発行(A4縦ver)
       
     #@@quote_price = 0
     @quote_price = 0
     
-	  #(＊単独モジュールと違う箇所)
-	  # 1ページ目を開始
+    #(＊単独モジュールと違う箇所)
+    # 1ページ目を開始
     @report.start_new_page layout: "#{Rails.root}/app/pdfs/detailed_statement_pdf.tlf"
-	   
+     
     @flag = nil
-	  
+    
     #ソートしている場合は、並び順を変える
     #if $sort_qm == "asc"
     #if session[:sort_qm]
@@ -393,10 +393,10 @@ class EstimationSheetPDF
     else
       sort_string = "line_number asc"
     end
-	  #
-	  
+    #
+    
     #@quotation_detail_middle_classifications.order(:line_number).each do |quotation_detail_middle_classification| 
-	  @quotation_detail_middle_classifications.order(sort_string).each do |quotation_detail_middle_classification| 
+    @quotation_detail_middle_classifications.order(sort_string).each do |quotation_detail_middle_classification| 
       #---見出し---
       if @flag.nil? 
         @flag = "1"
@@ -411,10 +411,10 @@ class EstimationSheetPDF
   
         #件名
         @report.page.item(:construction_name).value(@quotation_headers.construction_name) 
-		 
+
         #見積No
         @report.page.item(:quotation_code).value(@quotation_headers.quotation_code) 
-		   
+
         #見積日
         if @quotation_headers.quotation_date.present?
           
@@ -433,7 +433,7 @@ class EstimationSheetPDF
           #仕様名
           @report.page.item(:working_large_specification).value(quotation_detail_middle_classification.QuotationDetailLargeClassification.working_large_specification)
         else
-        #履歴の場合
+          #履歴の場合
           #品目名
           @report.page.item(:working_large_item_name).value(quotation_detail_middle_classification.QuotationBreakdownHistory.working_large_item_name)
           #仕様名
@@ -483,7 +483,7 @@ class EstimationSheetPDF
                   
         #if $print_type != "4"   #upd200218
         if @print_type != "4"  
-        #小計、値引きの場合は項目を単価欄に表示させる為の分岐
+          #小計、値引きの場合は項目を単価欄に表示させる為の分岐
           case quotation_detail_middle_classification.construction_type.to_i
           when $INDEX_SUBTOTAL, $INDEX_DISCOUNT
             item_name = ""
@@ -495,7 +495,7 @@ class EstimationSheetPDF
           end
         end
         #
-					  
+
         if quotation_detail_middle_classification.quote_price.present?
           if quotation_detail_middle_classification.construction_type.to_i != $INDEX_SUBTOTAL  #add 170308
             tmp = quotation_detail_middle_classification.quote_price.delete("^0-9").to_i
@@ -525,16 +525,16 @@ class EstimationSheetPDF
                    #quote_price: quotation_detail_middle_classification.quote_price
                    quote_price: quote_price
         
-         		  
+         
       end  #report end do
-		  
+  
       #頁番号
       #(＊単独モジュールと違う箇所)
       page_number = @report.page_count - @estimation_sheet_pages
       
       page_count = "(" +  page_number.to_s + ")"
       @report.page.item(:page_number).value(page_count)
-		  
+  
       #数値→漢字へ変換する場合
       #@kanji = num_to_k(@@page_number)
       #@page_number = "(" + @kanji.to_s + "頁)"
@@ -555,7 +555,7 @@ class EstimationSheetPDF
       
     #小計の前は１行空行を入れる
     #@report.list(:default).add_row working_middle_item_name: ""
-		   
+   
     @report.page.item(:message_sum).value("計")
     #カッコを消す
     @report.page.item(:blackets1).value(" ")

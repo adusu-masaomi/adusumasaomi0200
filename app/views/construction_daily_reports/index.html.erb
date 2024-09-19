@@ -19,7 +19,7 @@
   <%= f.label :staff_id, '社員' %>
   <!--<%= f.select :staff_id_eq, options_from_collection_for_select(Staff.all, "id", "staff_name") , {include_blank: true}, {id: 'staff_id_eq', style: 'width:220px' } %>-->
   
-  <%= f.select :staff_id_eq, Staff.all.map{|st| [st.staff_name, st.id]}, {include_blank: true}, { id: 'staff_id_eq', style: 'width:220px'} %>
+  <%= f.select :staff_id_eq, Staff.where("is_resign is null or is_resign = 0").map{|st| [st.staff_name, st.id]}, {include_blank: true}, { id: 'staff_id_eq', style: 'width:220px'} %>
   
   
   <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearStaff()" %>

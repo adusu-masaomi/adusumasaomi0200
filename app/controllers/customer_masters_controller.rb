@@ -13,17 +13,17 @@ class CustomerMastersController < ApplicationController
    
    
     #@q = CustomerMaster.ransack(params[:q])   
-	#ransack保持用--上記はこれに置き換える
+    #ransack保持用--上記はこれに置き換える
     @q = CustomerMaster.ransack(query)
-	
-	#ransack保持用コード
+  
+    #ransack保持用コード
     search_history = {
-    value: params[:q],
-    expires: 24.hours.from_now
+      value: params[:q],
+      expires: 24.hours.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
-	
+
     @customer_masters  = @q.result(distinct: true)
     @customer_masters  = @customer_masters.page(params[:page])
     
@@ -37,8 +37,8 @@ class CustomerMastersController < ApplicationController
     #end
     
     
-	respond_to do |format|
-	  format.html
+    respond_to do |format|
+      format.html
       
       #format.csv { send_data @customer_masters.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis' }
       
@@ -46,17 +46,17 @@ class CustomerMastersController < ApplicationController
       format.csv { send_data @customer_masters.to_csv.encode("SJIS"), type: 'text/csv; charset=shift_jis', disposition: 'attachment' }
       
       
-	  format.pdf do
+      format.pdf do
         report = CustomerListCardPDF.create @customer_list_card 
         # ブラウザでPDFを表示する
         # disposition: "inline" によりダウンロードではなく表示させている
         send_data(
-          report.generate,
-          filename:  "customer_list_card.pdf",
-          type:        "application/pdf",
-          disposition: "inline")
+        report.generate,
+        filename:  "customer_list_card.pdf",
+        type:        "application/pdf",
+        disposition: "inline")
       end
-	end
+    end
     
   end
 
@@ -84,8 +84,8 @@ class CustomerMastersController < ApplicationController
     @customer_master = CustomerMaster.new(customer_master_params)
 
     ###連絡先マスターへも追加する
-	create_or_update_contact
-	
+    create_or_update_contact
+  
     if @contact_new.present?
       @customer_master.contact_id = @contact_new.id
     end
@@ -108,13 +108,13 @@ class CustomerMastersController < ApplicationController
     
     #住所のパラメータ変換
     params[:customer_master][:address] = params[:addressX]
-	
+  
     respond_to do |format|
       if @customer_master.update(customer_master_params)
-	  
-	    #連絡先マスターも更新する
-		create_or_update_contact
-	  
+    
+        #連絡先マスターも更新する
+        create_or_update_contact
+  
         format.html { redirect_to @customer_master, notice: 'Customer master was successfully updated.' }
         format.json { render :show, status: :ok, location: @customer_master }
       else
@@ -143,29 +143,29 @@ class CustomerMastersController < ApplicationController
                          address: params[:customer_master][:address], tel: params[:customer_master][:tel_main], fax: params[:customer_master][:fax_main],
                          email: params[:customer_master][:email_main], partner_division_id: 1 }
     
-	if contact_id.present?
+    if contact_id.present?
 
       @contact = Contact.find(contact_id)
       
-	  if @contact.present?
-	  #更新
-	    @contact.update(contact_params)
+      if @contact.present?
+        #更新
+        @contact.update(contact_params)
       end
-	else
-	  #登録
-	  @contact_new = Contact.create(contact_params)
-	end
+    else
+      #登録
+      @contact_new = Contact.create(contact_params)
+    end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_customer_master
-      @customer_master = CustomerMaster.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_customer_master
+    @customer_master = CustomerMaster.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def customer_master_params
-      params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :house_number, :address2, :tel_main, :fax_main, :email_main, :closing_date, 
-	                 :closing_date_division, :due_date, :due_date_division, :responsible1, :responsible2, :contact_id, :payment_bank_id, :card_not_flag, :contractor_flag, :public_flag)
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def customer_master_params
+    params.require(:customer_master).permit(:customer_name, :search_character, :post, :address, :house_number, :address2, :tel_main, :fax_main, :email_main, :closing_date, 
+                   :closing_date_division, :due_date, :due_date_division, :responsible1, :responsible2, :contact_id, :payment_bank_id, :card_not_flag, :contractor_flag, :public_flag)
+  end
 end

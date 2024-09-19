@@ -10,12 +10,12 @@ class ConstructionDataController < ApplicationController
     #ransack保持用コード
     query = params[:q]
     query ||= eval(cookies[:recent_search_history].to_s)  	
-	
+
    
     @construction_code_extract = ConstructionDatum.all     #add180830
     #件名の絞り込み addd180830
     if query.present? && query[:customer_id_eq].present?
-       @construction_code_extract = ConstructionDatum.where(customer_id: query[:customer_id_eq]).order("construction_code desc")
+      @construction_code_extract = ConstructionDatum.where(customer_id: query[:customer_id_eq]).order("construction_code desc")
     end
     ##upd end
     
@@ -28,12 +28,12 @@ class ConstructionDataController < ApplicationController
     
     #ransack保持用コード
     search_history = {
-    value: params[:q],
-    expires: 24.hours.from_now
+      value: params[:q],
+      expires: 24.hours.from_now
     }
     cookies[:recent_search_history] = search_history if params[:q].present?
     #
-	
+
     @construction_data  = @q.result(distinct: true)
     
     #kaminari用設定
@@ -62,10 +62,10 @@ class ConstructionDataController < ApplicationController
           # ブラウザでPDFを表示する
           # disposition: "inline" によりダウンロードではなく表示させている
           send_data(
-            report.generate,
-            filename:  "construction_list.pdf",
-            type:        "application/pdf",
-            disposition: "inline")
+          report.generate,
+          filename:  "construction_list.pdf",
+          type:        "application/pdf",
+          disposition: "inline")
         end  #format pdf do
       end    #format do
     end
@@ -99,36 +99,36 @@ class ConstructionDataController < ApplicationController
   
   # GET /construction_data/1/edit2
   def edit2
-     Time.zone = "Tokyo"
-	 @construction_datum.issue_date = Date.today
+    Time.zone = "Tokyo"
+    @construction_datum.issue_date = Date.today
   end
   
   
   #資料添付用
   # GET /construction_data/1/edit3
   def edit3
-     #test
-     #3.times { @construction_datum.construction_attachments.build }
+    #test
+    #3.times { @construction_datum.construction_attachments.build }
     
   end
   def openFileDialog
      
-     if params[:format].present?
-       @construction_datum = ConstructionDatum.find(params[:format])
-     end
+    if params[:format].present?
+      @construction_datum = ConstructionDatum.find(params[:format])
+    end
      
-     if @construction_datum.present?
-       dir_detail_path = @construction_datum.construction_code + "-" + @construction_datum.construction_name + "/"
+    if @construction_datum.present?
+      dir_detail_path = @construction_datum.construction_code + "-" + @construction_datum.construction_name + "/"
      
-       if browser.platform.windows?
-         #windowsの場合
-         system("explorer #{"/Users/%username%/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
-         #system("start /Users/$USER/OneDrive/ADUSU/工事資料/")
-       elsif browser.platform.mac?
-         #macの場合
-         system("open #{"/Users/$USER/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
-       end
-     end
+      if browser.platform.windows?
+        #windowsの場合
+        system("explorer #{"/Users/%username%/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
+        #system("start /Users/$USER/OneDrive/ADUSU/工事資料/")
+      elsif browser.platform.mac?
+        #macの場合
+        system("open #{"/Users/$USER/OneDrive/ADUSU/工事資料/" + dir_detail_path}")
+      end
+    end
   end
   
   def download
@@ -203,7 +203,7 @@ class ConstructionDataController < ApplicationController
                        execution_amount: 0, purchase_order_amount: ""}
         @construction_cost = ConstructionCost.create(construction_cost_params)
         #
-	  
+
         format.html { redirect_to @construction_datum, notice: 'Construction datum was successfully created.' }
         format.json { render :show, status: :created, location: @construction_datum }
       else
@@ -232,14 +232,14 @@ class ConstructionDataController < ApplicationController
     create_or_update_site
     
     if params[:directions].present?
-	  
+
       #手入力用IDの場合は、安全事項マスタへも登録する。
       @matter_name = nil
       if @construction_datum.working_safety_matter_id == 1
          
         #既に登録してないかチェック
-	      new_name =  params[:construction_datum][:working_safety_matter_name]
-	   
+        new_name =  params[:construction_datum][:working_safety_matter_name]
+     
         if new_name != "" then
           @check_matter = WorkingSafetyMatter.find_by(working_safety_matter_name: new_name)
           if @check_matter.nil?
@@ -252,7 +252,7 @@ class ConstructionDataController < ApplicationController
     end
   
     respond_to do |format|
-	
+
       document_flag = false
     
       @update = nil
@@ -285,10 +285,10 @@ class ConstructionDataController < ApplicationController
         #add170330
         construction_cost = ConstructionCost.where(:construction_datum_id => @construction_datum.id).first
         if construction_cost.blank?
-            construction_cost_params = {construction_datum_id: @construction_datum.id, purchase_amount: 0, 
-                       execution_amount: 0, purchase_order_amount: ""}
+          construction_cost_params = {construction_datum_id: @construction_datum.id, purchase_amount: 0, 
+                      execution_amount: 0, purchase_order_amount: ""}
 
-            @construction_cost = ConstructionCost.create(construction_cost_params)
+          @construction_cost = ConstructionCost.create(construction_cost_params)
         end
         #
         if document_flag = false
@@ -308,20 +308,20 @@ class ConstructionDataController < ApplicationController
           #                params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
           working_date = params[:construction_datum]["working_date(1i)"] + "/" + 
                           params[:construction_datum]["working_date(2i)"] + "/" + params[:construction_datum]["working_date(3i)"]
-		      #upd191009
+          #upd191009
           #曜日を追加
           week = %w{日 月 火 水 木 金 土}[Date.parse(working_date).wday]
           #$working_date = working_date + "（" + week + "）"
           working_date = working_date + "（" + week + "）"
                     
-		      #発行日をグローバルへセット
+          #発行日をグローバルへセット
           #$issue_date = params[:construction_datum][:issue_date]
           issue_date = params[:construction_datum][:issue_date]
           
           #復活した場合に残しておく
           #曜日を追加
           #issue_date = params[:construction_datum][:issue_date]
-		      #week = %w{日 月 火 水 木 金 土}[Date.parse(issue_date).wday]
+          #week = %w{日 月 火 水 木 金 土}[Date.parse(issue_date).wday]
           #$issue_date = issue_date + "（" + week + "）"
           #復活~end
           
@@ -341,10 +341,10 @@ class ConstructionDataController < ApplicationController
             # ブラウザでPDFを表示する
             # disposition: "inline" によりダウンロードではなく表示させている
             send_data(
-              report.generate,
-              filename:  "working_directions.pdf",
-              type:        "application/pdf",
-              disposition: "inline")
+            report.generate,
+            filename:  "working_directions.pdf",
+            type:        "application/pdf",
+            disposition: "inline")
           end
         end
 		
@@ -353,11 +353,11 @@ class ConstructionDataController < ApplicationController
         end
         
       else
-      #if update failed
+        #if update failed
         format.html { render :edit }
         format.json { render json: @construction_datum.errors, status: :unprocessable_entity }
       end
-	  
+    
     end  #loop end
     
   end
@@ -464,7 +464,7 @@ class ConstructionDataController < ApplicationController
       numeric = true
       @site = Site.find(params[:construction_datum][:site_id])
     else
-    #名称手入力されている場合は、名称で検索
+      #名称手入力されている場合は、名称で検索
       @site = Site.where(["name = ?", 
              params[:construction_datum][:site_id]]).first
     end
@@ -473,7 +473,7 @@ class ConstructionDataController < ApplicationController
       #if numeric == false && params[:construction_datum][:site_id] != ""
       #upd230711
       if numeric == false && params[:construction_datum][:site_id].present?
-      #文字の場合(コード入力はないものとする)
+        #文字の場合(コード入力はないものとする)
         site_params = {name: params[:construction_datum][:site_id], post: params[:construction_datum][:post], 
                        address: params[:construction_datum][:address], house_number: params[:construction_datum][:house_number],
                        address2: params[:construction_datum][:address2] }
@@ -483,7 +483,7 @@ class ConstructionDataController < ApplicationController
         params[:construction_datum][:site_id] = @site.id
       end
     else
-    #更新
+      #更新
       #（IDor手入力一致→住所のみ更新)
       site_params = {post: params[:construction_datum][:post], 
                      address: params[:construction_datum][:address], house_number: params[:construction_datum][:house_number],
@@ -500,14 +500,14 @@ class ConstructionDataController < ApplicationController
     #  @purchase_unit_prices.update(purchase_unit_prices_params)
     #else
     ##該当なしの場合は新規追加  add180120
-	#   #仕入先用CDをセット
-	#   if params[:purchase_datum][:supplier_material_code].present?
-	#	  supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
-	#   else
-#		  #仕入先品番が未入力の場合は、品番をそのままセットする
-	#	  supplier_masterial_code = params[:purchase_datum][:material_code]
-	#   end
-	
+    #  #仕入先用CDをセット
+    #  if params[:purchase_datum][:supplier_material_code].present?
+    #    supplier_masterial_code = params[:purchase_datum][:supplier_material_code]
+    #  else
+    #    #仕入先品番が未入力の場合は、品番をそのままセットする
+    #    supplier_masterial_code = params[:purchase_datum][:material_code]
+    #  end
+
     #  purchase_unit_prices_params = {material_id:  params[:purchase_datum][:material_id], supplier_id: params[:purchase_datum][:supplier_id], 
     #                    supplier_material_code: supplier_masterial_code, 
     #                    unit_price: params[:purchase_datum][:purchase_unit_price], unit_id: params[:purchase_datum][:unit_id]}
@@ -552,13 +552,13 @@ class ConstructionDataController < ApplicationController
       # ブラウザでPDFを表示する
       # disposition: "inline" によりダウンロードではなく表示させている
       send_data(
-        report.generate,
-        filename:  "working_directions.pdf",
-        type:        "application/pdf",
-        disposition: "inline")
+      report.generate,
+      filename:  "working_directions.pdf",
+      type:        "application/pdf",
+      disposition: "inline")
     end
       
-	  #end
+    #end
   end
   
   #def update_and_pdf
@@ -588,7 +588,7 @@ class ConstructionDataController < ApplicationController
     #header = @construction_new_code[0, 1]  #参考になるコードのため、消さない事
     #newNum = @construction_new_code.to_i + 1
     newNum = construction_new_code.to_i + 1
-	 
+
     #@@construction_new_code = newNum.to_s
     @construction_new_code = newNum.to_s
 
@@ -606,7 +606,7 @@ class ConstructionDataController < ApplicationController
     
   # ajax
   def working_safety_matter_name_select
-     @working_safety_matter_name = WorkingSafetyMatter.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_safety_matter_name).flatten.join(" ")
+    @working_safety_matter_name = WorkingSafetyMatter.where(:id => params[:id]).where("id is NOT NULL").pluck(:working_safety_matter_name).flatten.join(" ")
   end
   
   #add171121
@@ -619,45 +619,45 @@ class ConstructionDataController < ApplicationController
       
       #初期値として、”手入力”も選択できるようにする
       #del210708
-	    #@customer_extract = @construction.where(:id => 1).where("id is NOT NULL").
+      #@customer_extract = @construction.where(:id => 1).where("id is NOT NULL").
       #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
       
       
       #add210708
       #リストに全て載せようとすると処理落ちするので
       #現在日から１年前からの、登録された工事データのみ表示させるようにする。
-	    #
-	    require 'date'
+      #
+      require 'date'
       now_date = Date.today
       past_date = now_date << 12
       #
       
-	  
-	    #カテゴリー別のアイテムをセット
+
+      #カテゴリー別のアイテムをセット
       #upd210707 to_aつけて速くなる
-	    @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).where(:customer_id => params[:customer_id]).
+      @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).where(:customer_id => params[:customer_id]).
       #@customer_extract  = @construction.where(:customer_id => params[:customer_id]).
       #@customer_extract  += @construction.where(:customer_id => params[:customer_id]).
-           where("id is NOT NULL").order("construction_data.construction_code desc").
-           pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
+      where("id is NOT NULL").order("construction_data.construction_code desc").
+      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
       
       #@customer_extract  += @construction.where(:customer_id => params[:customer_id]).where("id is NOT NULL").order("construction_data.construction_code desc").
       #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
     else
       #未選択状態の場合は、全リストを出す
       #カテゴリー別のアイテムをセット
-	  
-	    #upd171205 リストに全て載せようとすると処理落ちするので
-	    #現在日から１年前からの、登録された工事データのみ表示させるようにする。
-	    #
-	    require 'date'
+  
+      #upd171205 リストに全て載せようとすると処理落ちするので
+      #現在日から１年前からの、登録された工事データのみ表示させるようにする。
+      #
+      require 'date'
       now_date = Date.today
       past_date = now_date << 12
       #
-	  
+
       @customer_extract  = ConstructionDatum.where( "created_at >= ?" , past_date).order("construction_data.construction_code desc").
-	      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
-	  
+      pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id").to_a
+  
       #@customer_extract  = ConstructionDatum.all.
       #     pluck("CONCAT(construction_data.construction_code, ':' , construction_data.construction_name), construction_data.id")
   
@@ -671,39 +671,39 @@ class ConstructionDataController < ApplicationController
   def set_billed_flag
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
-        #更新する
-        #construction_data_params = { billed_flag: params[:billed_flag] }
-        #construction_data.update(construction_data_params)
+      #更新する
+      #construction_data_params = { billed_flag: params[:billed_flag] }
+      #construction_data.update(construction_data_params)
         
-        #upd211005 validateしない
-        construction_data.billed_flag = params[:billed_flag]
-        construction_data.save(:validate => false)
+      #upd211005 validateしない
+      construction_data.billed_flag = params[:billed_flag]
+      construction_data.save(:validate => false)
     end
   end
   #受注フラグのON/OFF
   def set_order_flag
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
-        #更新する
-        #construction_data_params = { order_flag: params[:order_flag] }
-        #construction_data.update(construction_data_params)
+      #更新する
+      #construction_data_params = { order_flag: params[:order_flag] }
+      #construction_data.update(construction_data_params)
         
-        #upd211005 validateしない
-        construction_data.order_flag = params[:order_flag]
-        construction_data.save(:validate => false)
+      #upd211005 validateしない
+      construction_data.order_flag = params[:order_flag]
+      construction_data.save(:validate => false)
     end
   end
   #集計フラグのON/OFF(add200130)
   def set_calculated_flag
     construction_data = ConstructionDatum.find(params[:id])
     if construction_data.present?
-        #更新する
-        #construction_data_params = { calculated_flag: params[:calculated_flag] }
-        #construction_data.update(construction_data_params)
+      #更新する
+      #construction_data_params = { calculated_flag: params[:calculated_flag] }
+      #construction_data.update(construction_data_params)
         
-        #upd211005 validateしない
-        construction_data.calculated_flag = params[:calculated_flag]
-        construction_data.save(:validate => false)
+      #upd211005 validateしない
+      construction_data.calculated_flag = params[:calculated_flag]
+      construction_data.save(:validate => false)
     end
   end
   
@@ -721,12 +721,12 @@ class ConstructionDataController < ApplicationController
     if add1.present?
       @address = add1 
     end
-	 
+    
     #番地
     if num.present?
       @house_number = num 
     end
-	 
+  
     if add2.present?
       @address2 = add2 
     end
@@ -764,11 +764,11 @@ class ConstructionDataController < ApplicationController
     
       #締め日算出
       if @customer.closing_date_division == 1
-      #月末の場合
+        #月末の場合
         d = @purchase_date
         @closing_date = Date.new(d.year, d.month, -1)
       else
-      #日付指定の場合
+        #日付指定の場合
         d = @purchase_date
         
         if @customer.closing_date != 0
@@ -779,7 +779,7 @@ class ConstructionDataController < ApplicationController
               @closing_date = Date.new(d.year, d.month, @customer.closing_date)
             end
           else
-          #締め日を過ぎていた場合、月＋１
+            #締め日を過ぎていた場合、月＋１
             addMonth += 1
             
             d = d >> addMonth
@@ -789,7 +789,7 @@ class ConstructionDataController < ApplicationController
             end
           end
         else
-        #日付指定有で指定日未入力なら、月末とみなす
+          #日付指定有で指定日未入力なら、月末とみなす
           d = @purchase_date
           @closing_date = Date.new(d.year, d.month, -1)
         end
@@ -808,10 +808,10 @@ class ConstructionDataController < ApplicationController
           d2 = d2 >> addMonth
           d2 = Date.new(d2.year, d2.month, -1)
             
-            @payment_due_date = d2
+          @payment_due_date = d2
           
         else
-        ##月末の扱いでなければ、そのまま
+          ##月末の扱いでなければ、そのまま
           if Date.valid_date?(d.year, d.month, @customer.due_date)
             d2 = Date.new(d.year, d.month, @customer.due_date)
             
@@ -831,14 +831,14 @@ class ConstructionDataController < ApplicationController
   def construction_and_customer_select
     @construction_name = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_name).flatten.join(" ")
     @customer_id = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
-	 
+
     #郵便番号・住所
     @post = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:post).flatten.join(" ")
     add1 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address).flatten.join(" ")
     #番地  
     num = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:house_number).flatten.join(" ")
     add2 = ConstructionDatum.where(:id => params[:id]).where("id is NOT NULL").pluck(:address2).flatten.join(" ")
-	 
+
     @address = ""
     if add1.present?
       @address = add1 
@@ -864,7 +864,7 @@ class ConstructionDataController < ApplicationController
 
     customer = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:customer_id).flatten.join(" ")
     @customer_id = CustomerMaster.where(:id => customer).where("id is NOT NULL").pluck(:customer_name, :id)
-	 
+
     #郵便番号（*工事場所）
     @post = QuotationHeader.where(:id => params[:id]).where("id is NOT NULL").pluck(:construction_post).flatten.join(" ")
 
@@ -916,15 +916,15 @@ class ConstructionDataController < ApplicationController
         c_code = "0003"
         c_name = "工具類"
       end
-  
+
       construction_code = year_code + c_code
-  
+
       construction_data_params = {construction_code: construction_code, 
                               construction_name: c_name, alias_name: c_name,
                               reception_date: Date.current, 
                               customer_id: customer_own, post: "", address: "", house_number: "", 
                               address2: "", order_flag: 1}
-                              
+
       @construction = ConstructionDatum.new(construction_data_params)
       @construction.save!(:validate => false)
       
@@ -967,13 +967,13 @@ class ConstructionDataController < ApplicationController
         when 1
           supplier_master_id = $SUPPLIER_MASER_ID_OST
         end
-        
+      
         #
         purchase_order_data_params = {purchase_order_code: purchase_order_code, 
                               construction_datum_id: construction_datum_id, 
                               supplier_master_id: supplier_master_id, alias_name: alias_name
                               }
-                              
+
         @purchase_order_data = PurchaseOrderDatum.create(purchase_order_data_params)
       end
       
@@ -983,20 +983,20 @@ class ConstructionDataController < ApplicationController
   
   
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_construction_datum
-	  #binding.pry
-	  
-      @construction_datum = ConstructionDatum.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_construction_datum
+    #binding.pry
+  
+    @construction_datum = ConstructionDatum.find(params[:id])
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def construction_datum_params
-      params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :personnel, :site_id, :construction_start_date, 
-      :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
-      :working_safety_matter_id, :working_safety_matter_name, :estimated_amount, :final_amount, :billing_due_date, :deposit_due_date, :deposit_date, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
-    end
-    def construction_datum_attachments_params
-      params.require(:construction_datum).permit(construction_attachments_attributes: [:id, :attachment, :title, :_destroy])
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def construction_datum_params
+    params.require(:construction_datum).permit(:construction_code, :construction_name, :alias_name, :reception_date, :customer_id, :personnel, :site_id, :construction_start_date, 
+    :construction_end_date, :construction_period_start, :construction_period_end, :post, :address, :house_number, :address2, :latitude, :longitude, :construction_detail, :attention_matter, 
+    :working_safety_matter_id, :working_safety_matter_name, :estimated_amount, :final_amount, :billing_due_date, :deposit_due_date, :deposit_date, :quotation_header_id, :delivery_slip_header_id, :billed_flag, :calculated_flag, :order_flag)
+  end
+  def construction_datum_attachments_params
+    params.require(:construction_datum).permit(construction_attachments_attributes: [:id, :attachment, :title, :_destroy])
+  end
 end

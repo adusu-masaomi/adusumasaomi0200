@@ -9,55 +9,55 @@
   <!-- 追加箇所開始 -->
   <%= page_entries_info @purchase_order_data %>
   <!-- 追加箇所終了 -->
-    <%= search_form_for @q do |f| %>
-      <%= f.label :purchase_order_code, '注文No：' %>
-	    <%= f.select :id_eq, PurchaseOrderDatum.order('purchase_order_code').all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
-	     { style: 'width:220px' , class: "searchablePurchaseOrderCode"}  %>
-      <!--モバイル用対応  add180830-->
-      <% if browser.platform.ios? || browser.platform.android? %>
-        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCode()" %>
-      <% end %>
+  <%= search_form_for @q do |f| %>
+    <%= f.label :purchase_order_code, '注文No：' %>
+    <%= f.select :id_eq, PurchaseOrderDatum.order('purchase_order_code').all.map{|st| [st.purchase_order_code, st.id]}, {include_blank: true}, 
+      { style: 'width:220px' , class: "searchablePurchaseOrderCode"}  %>
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCode()" %>
+    <% end %>
       
-	  <%= f.label :purchase_order_code_header, '注文No頭文字::' %>
-	  <%= f.select :purchase_order_code_cont, PurchaseOrderDatum.header_numbers.map{|st| [st,st]}, {include_blank: true}, { style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader"}  %>
-	  <!--モバイル用対応  add180830-->
-      <% if browser.platform.ios? || browser.platform.android? %>
-        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCodeHeader()" %>
-      <% end %>
+    <%= f.label :purchase_order_code_header, '注文No頭文字::' %>
+    <%= f.select :purchase_order_code_cont, PurchaseOrderDatum.header_numbers.map{|st| [st,st]}, {include_blank: true}, { style: 'width:100px' , class: "searchablePurchaseOrderCodeHeader"}  %>
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearPurchaseOrderCodeHeader()" %>
+    <% end %>
       
-	  </br>
-	  <%= f.label :construction_datum_id, '工事名：：' %>
-	  <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, { style: 'width:440px' , class: "searchableConstructionCode"}  %>
-	  <!--モバイル用対応  add180830-->
-      <% if browser.platform.ios? || browser.platform.android? %>
-        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
-      <% end %>
+    </br>
+    <%= f.label :construction_datum_id, '工事名：：' %>
+    <%= f.select :construction_datum_id_eq, ConstructionDatum.all.map{|st| [st.p_cd_name, st.id]}, {include_blank: true}, { style: 'width:440px' , class: "searchableConstructionCode"}  %>
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearConstruction()" %>
+    <% end %>
       
-      <%= f.label :supplier_master_id, '仕入先：：' %>
-      <%= f.select :supplier_master_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
-      <!--モバイル用対応  add180830-->
-      <% if browser.platform.ios? || browser.platform.android? %>
-        <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSupplier()" %>
-      <% end %>
-      </br>
+    <%= f.label :supplier_master_id, '仕入先：：' %>
+    <%= f.select :supplier_master_id_eq, SupplierMaster.all.map{|st| [st.supplier_name, st.id]}, {include_blank: true}, {style: 'width:220px' , class: "searchableSupplierName" } %>
+    <!--モバイル用対応  add180830-->
+    <% if browser.platform.ios? || browser.platform.android? %>
+      <%= button_tag "×", type: 'button', :class => 'btn btn-grey400_rsd btn-xs', onclick: "clearSupplier()" %>
+    <% end %>
+    </br>
   
-      <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
-	  <div>
-    	  <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
-		  <%= link_to t('.new', :default => t("helpers.links.new")),
+    <!--<%= f.select :construction_datum_id_eq, options_from_collection_for_select(ConstructionDatum.all, "id", "p_cd_name") ,{ include_blank: true }, {style: 'width:440px' , class: "searchableConstructionCode" } %></br>-->
+    <div>
+      <%= f.submit '検索する', :class => 'btn btn-white_rsd' %>
+      <%= link_to t('.new', :default => t("helpers.links.new")),
             new_purchase_order_datum_path(construction_id: params[:construction_id], move_flag: params[:move_flag]),
             :class => 'btn btn-primary keep-disp' %>
-          <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
-          <!--<%= link_to t('.back', :default => t("注文明細へ")), construction_data_path, :class => 'btn btn-info'  %>-->
+      <%= link_to t('.back', :default => t("工事一覧へ")), construction_data_path, :class => 'btn btn-warning'  %>
+      <!--<%= link_to t('.back', :default => t("注文明細へ")), construction_data_path, :class => 'btn btn-info'  %>-->
           
-          <%= link_to t('.back', :default => t("注文明細へ")),
+      <%= link_to t('.back', :default => t("注文明細へ")),
             purchase_order_histories_detail_path(construction_id: params[:construction_id], 
                                                  purchase_order_datum_id: params[:purchase_order_datum_id], 
                                                  supplier_master_id: params[:supplier_master_id],
                                                  move_flag: params[:move_flag] || "1"), :class => 'btn btn-info' %>
           
-  	  </div>
-   <% end %>
+    </div>
+  <% end %>
    
    
 </div>
@@ -67,180 +67,180 @@
 <!--見出し固定用設定追加-->
 <div style="margin-top : -20px;", class="span11 table-scrollable">
  
- <style>
-   table { }
-   table th, table td { white-space:nowrap; overflow:hidden; }
+  <style>
+    table { }
+    table th, table td { white-space:nowrap; overflow:hidden; }
   </style>
 
-<!--<table class="table table-striped">-->
-<!--見出し固定用設定追加-->
-<table id="tablefix", class="table  table-striped", style="width:1920px">
+  <!--<table class="table table-striped">-->
+  <!--見出し固定用設定追加-->
+  <table id="tablefix", class="table  table-striped", style="width:1920px">
 
-  <thead>
-    <tr>
-      <th><%= model_class.human_attribute_name(:id) %></th>
-      <!--<th><%= model_class.human_attribute_name(:purchase_order_code) %></th>-->
-	  <th><%= sort_link(@q, :purchase_order_code, model_class.human_attribute_name(:purchase_order_code), default_order: :desc ) %></th>
-      <th><%= model_class.human_attribute_name(:construction_name) %></th>
-	  <!--<th><%= model_class.human_attribute_name(:alias_name) %></th>-->
-	  <th>通称／備考</th>
-	  <th><%= model_class.human_attribute_name(:supplier_name) %></th>
-	  <th>担当者名</th>
-	  <th>Email</th>
-      <th><%= model_class.human_attribute_name(:created_at) %></th>
-      <th><%=t '.actions', :default => t("helpers.actions") %></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @purchase_order_data.order("id desc").each do |purchase_order_datum| %>
+    <thead>
       <tr>
-        <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]) %></td>
-        <% @purchase_order_code = purchase_order_datum.purchase_order_code %>
-        <!--<td><%= purchase_order_datum.purchase_order_code %></td>-->
-        <!--仕入画面へ遷移-->
+        <th><%= model_class.human_attribute_name(:id) %></th>
+        <!--<th><%= model_class.human_attribute_name(:purchase_order_code) %></th>-->
+        <th><%= sort_link(@q, :purchase_order_code, model_class.human_attribute_name(:purchase_order_code), default_order: :desc ) %></th>
+        <th><%= model_class.human_attribute_name(:construction_name) %></th>
+        <!--<th><%= model_class.human_attribute_name(:alias_name) %></th>-->
+        <th>通称／備考</th>
+        <th><%= model_class.human_attribute_name(:supplier_name) %></th>
+        <th>担当者名</th>
+      <th>Email</th>
+          <th><%= model_class.human_attribute_name(:created_at) %></th>
+        <th><%=t '.actions', :default => t("helpers.actions") %></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @purchase_order_data.order("id desc").each do |purchase_order_datum| %>
+        <tr>
+          <td><%= link_to purchase_order_datum.id, purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]) %></td>
+          <% @purchase_order_code = purchase_order_datum.purchase_order_code %>
+          <!--<td><%= purchase_order_datum.purchase_order_code %></td>-->
+          <!--仕入画面へ遷移-->
         
-        <% if purchase_order_datum.supplier_master_id != 31 && purchase_order_datum.supplier_master_id != 37 && purchase_order_datum.supplier_master_id != 39 %>
-        <!--通常の仕入先(村山・須戸・小柳電気以外)-->
+          <% if purchase_order_datum.supplier_master_id != 31 && purchase_order_datum.supplier_master_id != 37 && purchase_order_datum.supplier_master_id != 39 %>
+            <!--通常の仕入先(村山・須戸・小柳電気以外)-->
             <td><%= link_to purchase_order_datum.purchase_order_code, purchase_data_path(purchase_order_id: purchase_order_datum.id, 
-                supplier_master_id: purchase_order_datum.supplier_master_id,
-                construction_id: params[:construction_id] || purchase_order_datum.construction_datum_id, move_flag: "2"), 
-                :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
-        <% else %>
-        <!--add190129 外注の場合はリンク変更-->
+              supplier_master_id: purchase_order_datum.supplier_master_id,
+              construction_id: params[:construction_id] || purchase_order_datum.construction_datum_id, move_flag: "2"), 
+              :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
+          <% else %>
+            <!--add190129 外注の場合はリンク変更-->
             <td><%= link_to purchase_order_datum.purchase_order_code, outsourcing_data_path(purchase_order_id: purchase_order_datum.id, 
-                supplier_master_id: purchase_order_datum.supplier_master_id,
-                construction_id: params[:construction_id] || purchase_order_datum.construction_datum_id, move_flag: "2"), 
-                :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
-        <% end %>
+              supplier_master_id: purchase_order_datum.supplier_master_id,
+              construction_id: params[:construction_id] || purchase_order_datum.construction_datum_id, move_flag: "2"), 
+              :class => 'keep-disp' , :style => "color: blue;text-decoration: underline" %></td>
+          <% end %>
         
-        <% if purchase_order_datum.construction_datum.nil? %>
-           <td>-</td>
-		   <% @construction_name = "-" %>
-        <% else %>
-		  <td><%= purchase_order_datum.construction_datum.construction_name %></td>
-		  <% @construction_name = purchase_order_datum.construction_datum.construction_name %>
-        <% end %>
-		<td><%= purchase_order_datum.alias_name %></td>
-		<% if purchase_order_datum.supplier_master.nil? %>
-           <td>-</td>
-		   <td>-</td>
-		   <td>-</td>
-		   <% @supplier_name = "-" %>
-        <% else %>
-		  <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
-		  
-          <!--<td><%= purchase_order_datum.supplier_master.responsible1 %></td>-->
-          <% if purchase_order_datum.supplier_responsible.present? %>
-            <td><%= purchase_order_datum.supplier_responsible.responsible_name %></td>
+          <% if purchase_order_datum.construction_datum.nil? %>
+            <td>-</td>
+            <% @construction_name = "-" %>
           <% else %>
-            <td></td>
+            <td><%= purchase_order_datum.construction_datum.construction_name %></td>
+            <% @construction_name = purchase_order_datum.construction_datum.construction_name %>
           <% end %>
+          <td><%= purchase_order_datum.alias_name %></td>
+          <% if purchase_order_datum.supplier_master.nil? %>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+            <% @supplier_name = "-" %>
+          <% else %>
+            <td><%= purchase_order_datum.supplier_master.supplier_name %></td>
+  
+            <!--<td><%= purchase_order_datum.supplier_master.responsible1 %></td>-->
+            <% if purchase_order_datum.supplier_responsible.present? %>
+              <td><%= purchase_order_datum.supplier_responsible.responsible_name %></td>
+            <% else %>
+              <td></td>
+            <% end %>
           
-		  <!--<td><%= purchase_order_datum.supplier_master.email1 %></td>-->
-          <% if purchase_order_datum.supplier_responsible.present? %>
-            <td><%= purchase_order_datum.supplier_responsible.responsible_email %></td>
-          <% else %>
-            <td></td>
+            <!--<td><%= purchase_order_datum.supplier_master.email1 %></td>-->
+            <% if purchase_order_datum.supplier_responsible.present? %>
+              <td><%= purchase_order_datum.supplier_responsible.responsible_email %></td>
+            <% else %>
+              <td></td>
+            <% end %>
+        
+            <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
           <% end %>
-		  
-          <% @supplier_name = purchase_order_datum.supplier_master.supplier_name %>
-        <% end %>
-		
-	    <td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
 
-        <td>
-          <!--upd220108-->
-		  <%= link_to t('.edit', :default => t("作成")),
-                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_histories, :id => purchase_order_datum.id, 
-                      construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"), :class => 'btn btn-info btn-xs keep-disp' %>
+          <td><%=l purchase_order_datum.created_at.in_time_zone('Tokyo') %></td>
+
+          <td>
+            <!--upd220108-->
+            <%= link_to t('.edit', :default => t("作成")),
+            edit_purchase_order_history_path(purchase_order_datum.purchase_order_histories, :id => purchase_order_datum.id, 
+            construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"), :class => 'btn btn-info btn-xs keep-disp' %>
                       
-                      <!--
-                      edit_purchase_order_history_path(purchase_order_datum.purchase_order_history, :id => purchase_order_datum.id, 
-                      construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"), :class => 'btn btn-info btn-xs keep-disp' %>
-                      -->
-		  <%= link_to "一覧",
+            <!--
+            edit_purchase_order_history_path(purchase_order_datum.purchase_order_history, :id => purchase_order_datum.id, 
+            construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"), :class => 'btn btn-info btn-xs keep-disp' %>
+            -->
+            <%= link_to "一覧",
             purchase_order_histories_list_path(purchase_order_datum_id: purchase_order_datum.id, purchase_order_code: @purchase_order_code, 
             construction_name: @construction_name, supplier_name: @supplier_name , construction_id: params[:construction_id], move_flag: params[:move_flag] || "1"),
             :class => 'btn btn-xs btn-warning keep-disp' %>
 
-          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+            <%= link_to t('.edit', :default => t("helpers.links.edit")),
                       edit_purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]), 
-                       :class => 'btn btn-white_rsd btn-xs keep-disp' %>
-          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      :class => 'btn btn-white_rsd btn-xs keep-disp' %>
+            <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
                       purchase_order_datum_path(purchase_order_datum, construction_id: params[:construction_id], move_flag: params[:move_flag]),
                       :method => :delete,
                       :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
                       :class => 'btn btn-xs btn-danger keep-disp' %>
-        </td>
-      </tr>
-    <% end %>
-    <!-- 追加箇所開始 -->
-    <%= paginate @purchase_order_data %>
-    <!-- 追加箇所終了 -->
-  </tbody>
-</table>
+          </td>
+        </tr>
+      <% end %>
+      <!-- 追加箇所開始 -->
+      <%= paginate @purchase_order_data %>
+      <!-- 追加箇所終了 -->
+    </tbody>
+  </table>
 </div>
 
 <script type="text/javascript">
-  
-  //検索可能なリストボックス
-  $(document).ready(function(){
 
-        $(".searchablePurchaseOrderCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
-		$(".searchablePurchaseOrderCodeHeader").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
-		$(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
-        $(".searchableSupplierName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
-        
-		
-		//見出し固定用設定追加
-		var sz = window.parent.screen.width;
-		var fc = 1;    //デフォルトの固定列数(社長PC基準)
-		var ht = 618;  //デフォルトの高さ(社長PC基準)
-		
-		if (sz != 1920) {
-		//画面サイズ1920px(社長PC基準)以外は、列固定させる。
-          fc = 2;  //固定列数
-		  ht -= 80;
-          
-          sz = 1920; //for ipad pro (add180829)
-        }
-		$('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
-		
-	    //実行
-        $('form').keepPosition();
+  //検索可能なリストボックス
+  $(document).ready(function() {
+
+    $(".searchablePurchaseOrderCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchablePurchaseOrderCodeHeader").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableConstructionCode").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+    $(".searchableSupplierName").select2({ theme: "classic", allowClear: true , placeholder: MESSAGE_LIST });
+
+
+    //見出し固定用設定追加
+    var sz = window.parent.screen.width;
+    var fc = 1;    //デフォルトの固定列数(社長PC基準)
+    var ht = 618;  //デフォルトの高さ(社長PC基準)
+
+    if (sz != 1920) {
+      //画面サイズ1920px(社長PC基準)以外は、列固定させる。
+      fc = 2;  //固定列数
+      ht -= 80;
+
+      sz = 1920; //for ipad pro (add180829)
+    }
+    $('#tablefix').tablefix({width: sz, height: ht, fixRows: 1, fixCols: fc});
+
+    //実行
+    $('form').keepPosition();
   });
   
-//180914共通化
-//  //画面カーソル保持用
-//  $.fn.keepPosition = function(){
-//    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
-//    var key = 'keep-position-'+location.pathname;
-//    var win = $(window);
-//    this.each(function(){
-//        //$(this).on('submit',function(){
-//        $(".keep-disp").click(function(){
-//			div_top = bodyDiv.scrollTop();
-//			$.cookie(key, div_top);
-//	    });
-//    });
-//    setTimeout(function(){
-//		bodyDiv.scrollTop($.cookie(key));
-//    },0);
-//  }
+  //180914共通化
+  //  //画面カーソル保持用
+  //  $.fn.keepPosition = function() {
+  //    //cookieに保存する名前（他のページと競合しないようURLを含めるようにする）
+  //    var key = 'keep-position-'+location.pathname;
+  //    var win = $(window);
+  //    this.each(function() {
+  //      //$(this).on('submit',function() {
+  //      $(".keep-disp").click(function() {
+  //      div_top = bodyDiv.scrollTop();
+  //      $.cookie(key, div_top);
+  //      });
+  //    });
+  //    setTimeout(function() {
+  //      bodyDiv.scrollTop($.cookie(key));
+  //    },0);
+  //  }
   
   
   //モバイル用対応 add180830
   //select2をクリアする
-  function clearPurchaseOrderCode(){
+  function clearPurchaseOrderCode() {
     $(".searchablePurchaseOrderCode").val(null).trigger("change"); 
   }
-  function clearPurchaseOrderCodeHeader(){
+  function clearPurchaseOrderCodeHeader() {
     $(".searchablePurchaseOrderCodeHeader").val(null).trigger("change"); 
   }
-  function clearConstruction(){
+  function clearConstruction() {
     $(".searchableConstructionCode").val(null).trigger("change"); 
   }
-  function clearSupplier(){
+  function clearSupplier() {
     $(".searchableSupplierName").val(null).trigger("change"); 
   }
   

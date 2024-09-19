@@ -6,7 +6,12 @@
   <%= f.input :hourly_wage %>
   <%= f.input :daily_pay, hint: "*通常はこちらに登録して下さい。" %>
   
+  <%= f.check_box :is_resign %>
+  <%= f.label :is_resign, "退職", {style: 'color: purple'}  %>
+  </br></br>
+  
   <%= f.button :submit, :class => 'btn-primary' %>
+  
   <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 staffs_path, :class => 'btn btn-default' %>
 <% end %>

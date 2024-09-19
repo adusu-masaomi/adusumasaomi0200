@@ -416,6 +416,14 @@ class ApplicationController < ActionController::Base
   $SUPPLIER_MASER_ID_SUDO_DENKI = 31
   $SUPPLIER_MASER_ID_OYANAGI_DENKI = 39
   
+  #add 240415
+  #取引先(django用)
+  $PARTNER_ID_MURAYAMA = 73
+  $PARTNER_ID_SUDO = 50
+  #勘定科目ID(django用)
+  $ACCOUNT_TITLE_ID_OUTSOURCING = 27
+  #add end
+  
   #社員ID
   $STAFF_ID_MURAYAMA = 3   #add200201
   $STAFF_ID_SUDO = 6       #add200201

@@ -31,7 +31,7 @@
   <% end %>
   </br>
   <%= f.label :社員, {:class => "my-custom-class-l"}  %></br>
-  <%= f.collection_select :staff_id, Staff.all, :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
+  <%= f.collection_select :staff_id, Staff.where("is_resign is null or is_resign = 0"), :id, :staff_name, {:prompt => "どれか一つを選択して下さい" } , {id:"staff_id", class: "my-custom-class" , 
       :tabindex=>"2", :onchange=> "getDailyPay(this.form)" }  %>
   <%= f.collection_select :daily_pay, Staff.all, :id, :daily_pay, {:selected => @construction_daily_report.staff_id} , { id:"daily_pay" , :readonly => true } %>
   
@@ -652,9 +652,13 @@
          //tmp_kinmu_time = tmp_kinmu_time + 86400 - end_time + start_time;
          //upd 170303
          tmp_kinmu_time = tmp_kinmu_time + 86400 - start_time + end_time ;  
-      } else if (start_time >= 34200 & start_time <= 37800 & end_time >= 55800 & end_time <= 86400){
-	  //add170328  9:30~10:30 ~ の勤務は、昼と、１５時休憩をマイナスする。
-	     tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 5400; 
+      //} else if (start_time >= 34200 & start_time <= 37800 & end_time >= 55800 & end_time <= 86400){
+      //} else if (start_time > 32400 & start_time <= 37800 & end_time >= 55800 & end_time <= 86400){
+      //upd240705
+      } else if (start_time > 32400 & start_time < 39600 & end_time >= 55800 & end_time <= 86400){
+	     //(旧)add170328  9:30~10:30 ~ の勤務は、昼と、１５時休憩をマイナスする。
+	     //upd240202 9時過ぎ〜10:30の勤務は、昼と、１５時休憩をマイナスする。
+       tmp_kinmu_time = tmp_kinmu_time + end_time - start_time - 5400; 
 	  } else if (start_time >= 39600 & start_time <= 43200 & end_time >= 55800 & end_time <= 86400){
 	  //add170328  11:00 ~ の勤務は、昼休憩のみをマイナスする。→しない！！
       //200608 restore 11:00~18:00のような勤務が１日扱いになるので

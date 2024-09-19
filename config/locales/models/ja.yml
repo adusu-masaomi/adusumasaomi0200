@@ -202,6 +202,7 @@ ja:
        stocktake: 棚卸データ
        contact: 連絡先マスター
        site: 現場マスター
+       storage_inventory: 支給品在庫マスター
        working_category: カテゴリーマスター
        working_subcategory: カテゴリーサブマスター
        task: 工程表データ

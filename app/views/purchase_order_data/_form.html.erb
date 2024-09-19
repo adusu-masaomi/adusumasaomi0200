@@ -1,14 +1,14 @@
 <%= simple_form_for @purchase_order_datum, :html => { :id => 'form_id', :class => 'well form-horizontal', :style=> 'width:1280px' } do |f| %>
   <% if @purchase_order_datum.errors.any? %>
-   <div id="error_explanation">
-    <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
+    <div id="error_explanation">
+      <h2><%= @purchase_order_datum.errors.count %>件のエラーがあります。</h2>
  
-    <ul>
-    <% @purchase_order_datum.errors.full_messages.each do |msg| %>
-      <li><%= msg %></li>
-    <% end %>
-    </ul>
-   </div>
+      <ul>
+      <% @purchase_order_datum.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
   <% end %>
   
   <!--upd201229 hiddenにした-->
@@ -18,13 +18,13 @@
   <% if @construction_data.present? %>
     <%= f.collection_select :construction_datum_id, @construction_data ,:id, :p_cd_name, {}, 
     {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" ,
-     class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()", 
-     :tabindex=>"1"} %></p></p>
+    class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()", 
+    :tabindex=>"1"} %></p></p>
   <% else %>
     <%= f.collection_select :construction_datum_id, ConstructionDatum.all ,:id, :p_cd_name, {}, 
     {id:"construction_datum_id",  name: "purchase_order_datum[construction_datum_id]" ,
-      class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()",
-      :tabindex=>"1"} %></p></p>
+    class: "searchableConstructionName" , style: 'width:430px', :onchange => "getAddress()",
+    :tabindex=>"1"} %></p></p>
   <% end %>
   
   <!-- 現場住所追加 -->
@@ -34,14 +34,14 @@
                  :tabindex=>"2", style: 'width:130px' } %>
   </div>
   <div class="col-xs-8", style="margin-left : -170px">
-      <%= f.input :address, input_html:{id:"address", name:"addressX", :tabindex=>"3" , style: 'width:320px',
+    <%= f.input :address, input_html:{id:"address", name:"addressX", :tabindex=>"3" , style: 'width:320px',
                                         :onkeydown => "setPostAuto($(this).val(), 'post', event)" } %>
   </div>
   <div class="col-lg-3", style="margin-left : -495px">
-      <%= f.input :house_number, input_html:{id:"house_number", :tabindex=>"4" , style: 'width:320px' } %>
+    <%= f.input :house_number, input_html:{id:"house_number", :tabindex=>"4" , style: 'width:320px' } %>
   </div>
   <div class="col-lg-3", style="margin-left : -165px">
-      <%= f.input :address2, input_html:{id:"address2", :tabindex=>"5" , style: 'width:350px' } %>
+    <%= f.input :address2, input_html:{id:"address2", :tabindex=>"5" , style: 'width:350px' } %>
   </div>
   </br></br></br></br>
   <!-- -->
@@ -52,7 +52,7 @@
   <%= f.collection_select :supplier_master_id, SupplierMaster.all, :id, :supplier_name, {}, {id:"supplier_master_id", class: "searchableSupplier" , style: 'width:430px', :tabindex=>"7"} %></br></br>
   
   <% if @supplier_responsibles.blank? %>
-     <% @supplier_responsibles = SupplierResponsible.all %>
+    <% @supplier_responsibles = SupplierResponsible.all %>
   <% end %>
   
   <div class="col-lg-3", style="margin-left : -15px">
@@ -64,17 +64,17 @@
   </div>
   
   <div class="col-lg-3", style="margin-left : -60px">
-  <%= f.simple_fields_for :supplier_responsible, :remote => true do |k| %>
-    <%= k.label :担当Email , {:class => "my-custom-class-l"} %></br>
+    <%= f.simple_fields_for :supplier_responsible, :remote => true do |k| %>
+      <%= k.label :担当Email , {:class => "my-custom-class-l"} %></br>
     
-    <% if @supplier_responsible_emails.blank? %>
-      <% @supplier_responsible_emails = SupplierResponsible.all %>
-    <% end %>
+      <% if @supplier_responsible_emails.blank? %>
+        <% @supplier_responsible_emails = SupplierResponsible.all %>
+      <% end %>
     
     
-    <%= k.collection_select :responsible_email, @supplier_responsible_emails, :id, :responsible_email, {:include_blank => true}, 
+      <%= k.collection_select :responsible_email, @supplier_responsible_emails, :id, :responsible_email, {:include_blank => true}, 
                  {id:"supplier_responsible_email", class: "searchableEmail" , style: 'width:420px', :tabindex=>"9"} %>
-  <% end %>
+    <% end %>
   </div>
   </br>
   </br>
@@ -82,7 +82,7 @@
   
   <!--
   <%= f.simple_fields_for :supplier_master, :remote => true do |k| %>
-     <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"10"}  %>
+    <%= k.input :email1, label:"Email" , input_html:{ id:"email1",  style: 'width:430px', :tabindex=>"10"}  %>
   <% end %>
   -->
   
@@ -104,98 +104,98 @@
   <%= hidden_field_tag(:move_flag, params[:move_flag]) %>
   
   <div>
-  <!--これを使いたいがsubmitでは現状sweetalertが使えないので、保留中・・・-->
-  <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？"} %>-->
-  <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", 
+    <!--これを使いたいがsubmitでは現状sweetalertが使えないので、保留中・・・-->
+    <!--<%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", data: {confirm: "メール送信&更新します。よろしいですか？"} %>-->
+    <%= f.submit "メール送信＆登録",name: "send", class: "btn btn-info", id: "mail_sent_button", 
     :onclick => "return confirm('メール送信&更新します。よろしいですか？ ')",  :tabindex => "11"  %>
   
-  <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
+    <%= f.submit '登録のみ', name: "upd", class: "btn btn-success" %>
   
-  <%= button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
+    <%= button_tag( 'ＦＡＸ', :value => 'pdf', :name => 'format', :class => "btn btn-lime500_ftg" , 
              formtarget: "_blank" ) %>
              
-  <!--<%= button_tag( 'ＦＡＸ', format: "pdf",  :value => 'pdf', :name => 'order_number_fax', :class => "btn btn-lime500_ftg" , 
+    <!--<%= button_tag( 'ＦＡＸ', format: "pdf",  :value => 'pdf', :name => 'order_number_fax', :class => "btn btn-lime500_ftg" , 
              formtarget: "_blank" ) %>-->
              
-  <!--<%= f.submit "ＦＡＸ", format: "pdf", name: "order_number_fax", class: "btn btn-pink300_ftg",  :tabindex => "6"  %>-->
+    <!--<%= f.submit "ＦＡＸ", format: "pdf", name: "order_number_fax", class: "btn btn-pink300_ftg",  :tabindex => "6"  %>-->
   
-  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+    <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
                 purchase_order_data_path(construction_id: params[:construction_id], move_flag: params[:move_flag]), 
                 :class => 'btn btn-white_rsd' %>
-   </div>
+  </div>
 <% end %>
 
 <script src="https://ajaxzip3.github.io/ajaxzip3.js" charset="UTF-8"></script>
 <script type="text/javascript">
     
-    $(document).ready(function(){
-	   //検索可能なリストボックス(注文Noの場合)
-       $(".searchableConstructionName").select2({ theme: "bootstrap" });
-	   
-	   $(".searchableConstructionName").change(function(e) {
-         setAliasName();
-       });  
-	   //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
-	   $( ".searchableConstructionName" ).on("select2:close", function (e) {
-	     $('[tabindex=2]').focus(); 
-	   });
-	   
-	   $(".searchableSupplier").select2({ theme: "bootstrap" }); 
-       $(".searchableSupplier").change(function(e) {
-         setEmail();
-       });  
-	   $( ".searchableSupplier" ).on("select2:close", function (e) {
-	     $('[tabindex=8]').focus(); 
-	   });
-	   
-       $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
-       $( ".searchableResponsible" ).change(function(e) {
-           obj = $(this);
-		   //分類からアイテム抽出する
-		   //setMaterialExtractByCategory(obj);
+  $(document).ready(function() {
+    //検索可能なリストボックス(注文Noの場合)
+    $(".searchableConstructionName").select2({ theme: "bootstrap" });
+     
+    $(".searchableConstructionName").change(function(e) {
+      setAliasName();
+    });  
+    //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。イマイチだが・・
+    $( ".searchableConstructionName" ).on("select2:close", function (e) {
+      $('[tabindex=2]').focus(); 
+    });
+   
+    $(".searchableSupplier").select2({ theme: "bootstrap" }); 
+    $(".searchableSupplier").change(function(e) {
+      setEmail();
+    });  
+    $( ".searchableSupplier" ).on("select2:close", function (e) {
+      $('[tabindex=8]').focus(); 
+    });
+     
+    $(".searchableResponsible").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+    $( ".searchableResponsible" ).change(function(e) {
+      obj = $(this);
+      //分類からアイテム抽出する
+      //setMaterialExtractByCategory(obj);
            
-           //ここにajax
-           //担当Emailを取得
-           getEmail()
-       });
-       $( ".searchableResponsible" ).on("select2:close", function (e) {
-	     $('[tabindex=9]').focus(); 
-	   });
-       //Email
-       $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
-       $( ".searchableEmail" ).change(function(e) {
-           obj = $(this);
-		   //分類からアイテム抽出する
-		   //setMaterialExtractByCategory(obj);
-       });
-       $( ".searchableEmail" ).on("select2:close", function (e) {
-	     $('[tabindex=10]').focus(); 
-	   });
+      //ここにajax
+      //担当Emailを取得
+      getEmail()
+    });
+    $( ".searchableResponsible" ).on("select2:close", function (e) {
+      $('[tabindex=9]').focus(); 
+    });
+    //Email
+    $(".searchableEmail").select2({ theme: "classic", allowClear: true , placeholder: "-", tags: true});
+    $( ".searchableEmail" ).change(function(e) {
+      obj = $(this);
+      //分類からアイテム抽出する
+      //setMaterialExtractByCategory(obj);
+    });
+    $( ".searchableEmail" ).on("select2:close", function (e) {
+      $('[tabindex=10]').focus(); 
+    });
+     
+    //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
+    //var flag = document.getElementById("mail_sent_flag").value;
+    //if (flag == 1) {
        
-       //メール送信ボタンをデフォルトで使用不可にさせるか否かの判定
-       //var flag = document.getElementById("mail_sent_flag").value;
-	   //if (flag == 1) {
-       
-       if (document.getElementById("mail_sent_flag").checked) {
-	     document.getElementById("mail_sent_button").disabled = true;
-	   } 
-	   
-	   //メール送信のチェックを解除した場合に、送信ボタンを復活させる。
-	   $('.mail_sent_flag').on('change', function(){
-         if ($(this).is(':checked')) {
-		 //チェックされた場合
-		   document.getElementById("mail_sent_button").disabled = true;
-		 }else{
-		 //チェック外した場合
-		   document.getElementById("mail_sent_button").disabled = false;
-		 }
-       });
-   });
+    if (document.getElementById("mail_sent_flag").checked) {
+      document.getElementById("mail_sent_button").disabled = true;
+    } 
+     
+    //メール送信のチェックを解除した場合に、送信ボタンを復活させる。
+    $('.mail_sent_flag').on('change', function() {
+      if ($(this).is(':checked')) {
+        //チェックされた場合
+        document.getElementById("mail_sent_button").disabled = true;
+      } else {
+        //チェック外した場合
+        document.getElementById("mail_sent_button").disabled = false;
+      }
+    });
+  });
   
-  window.onload = function(){
+  window.onload = function() {
     //通称名をデフォルトで表示させる(未登録の場合)
    	obj = document.getElementById("alias_name");
-    if (obj.value == ""){
+    if (obj.value == "") {
       setAliasName();
     }
     //最終番号表示する
@@ -210,102 +210,94 @@
 
   function checkAutoOutSourcing() {
     obj = document.getElementById("purchase_order_code").value;
-	if (obj != ""){
-	  purchase_order_code_header = obj.substr(0, 1) ;
-	  if (purchase_order_code_header == "M" || purchase_order_code_header == "N"){
-	  //仕入先を村山電気にする
-         index = 37;
-         $(".searchableSupplier").val(index).trigger("change"); 
-	  }
-	
-	}
+    if (obj != "") {
+      purchase_order_code_header = obj.substr(0, 1) ;
+      if (purchase_order_code_header == "M" || purchase_order_code_header == "N") {
+        //仕入先を村山電気にする
+        index = 37;
+        $(".searchableSupplier").val(index).trigger("change"); 
+      }
+
+    }
   }
 
   //ajax
-  function setAliasName()
-  {
+  function setAliasName() {
   
-       obj = document.getElementById("construction_datum_id");
-       construction_id = parseInt(obj.value);
-       $.get("<%= purchase_order_datum_get_alias_name_path %>",
-         {id: construction_id },
-          function(data){
-               obj = document.getElementById("alias_name").textContent;
-			   // ハイフンの場合は空白としてセット(バリデーションのため)
-			   if (obj == "-") {
-			     obj = "";
-			   }
-               document.getElementById("alias_name").value = obj;
-          }
-        );
+    obj = document.getElementById("construction_datum_id");
+    construction_id = parseInt(obj.value);
+    $.get("<%= purchase_order_datum_get_alias_name_path %>",
+      {id: construction_id },
+      function(data) {
+        obj = document.getElementById("alias_name").textContent;
+        // ハイフンの場合は空白としてセット(バリデーションのため)
+        if (obj == "-") {
+          obj = "";
+        }
+        document.getElementById("alias_name").value = obj;
+      }
+    );
   };
   //ajax
-  function setEmail()
-  {
+  function setEmail() {
     obj = document.getElementById("supplier_master_id")
     supplier_master_id = parseInt(obj.value)
     $.get("<%= purchase_order_datum_get_email1_path %>",
       {id: supplier_master_id },
-      function(data){
+      function(data) {
         //obj = document.getElementById("email1").textContent
         //document.getElementById("email1").value = obj
                
         //メーカー名もセット
-   	    obj = document.getElementById("supplier_responsible_id")
-   	    index = obj.selectedIndex
+        obj = document.getElementById("supplier_responsible_id")
+         index = obj.selectedIndex
         //上記でピンポイントしているので0とする
         //index = 0;
-  	    //f.maker_name.value = obj.options[index].innerText;
+        //f.maker_name.value = obj.options[index].innerText;
       }
     )
   }
 
   //ajax
-  function getSupplier()
-  {
-     obj = document.getElementById("search_character");
-     search_character = obj.value;
-     $.get("<%= purchase_order_datum_get_supplier_by_character_path %>",
-       {header_code: search_character },
-        function(data){
+  function getSupplier() {
+    obj = document.getElementById("search_character");
+    search_character = obj.value;
+    $.get("<%= purchase_order_datum_get_supplier_by_character_path %>",
+      {header_code: search_character },
+      function(data) {
           
-           //obj = document.getElementById("email1").textContent;
-	       //document.getElementById("email1").value = obj;
-        }
-     );
+        //obj = document.getElementById("email1").textContent;
+        //document.getElementById("email1").value = obj;
+      }
+    );
   };
   
-  function getEmail()
-  {
-     obj = document.getElementById("supplier_master_id")
-     supplier_master_id = obj.value
+  function getEmail() {
+    obj = document.getElementById("supplier_master_id")
+    supplier_master_id = obj.value
   
-     obj = document.getElementById("supplier_responsible_id")
-     supplier_responsible_id = obj.value
+    obj = document.getElementById("supplier_responsible_id")
+    supplier_responsible_id = obj.value
      
-     //if (supplier_responsible_id != "")
-     if (parseInt(supplier_responsible_id) > 0)
-     {
-       $.get("<%= purchase_order_datum_get_responsible_email_path %>",
-         {supplier_master_id: supplier_master_id, 
-          supplier_responsible_id: supplier_responsible_id},
-           function(data){
-           })
-     }else{
-       //メールはクリアする(新規入力の場合)
-       $(".searchableEmail").val(0).trigger("change");
-     }
+    //if (supplier_responsible_id != "")
+    if (parseInt(supplier_responsible_id) > 0) {
+      $.get("<%= purchase_order_datum_get_responsible_email_path %>",
+      {supplier_master_id: supplier_master_id, 
+      supplier_responsible_id: supplier_responsible_id},
+      function(data) {
+      })
+    } else {
+      //メールはクリアする(新規入力の場合)
+      $(".searchableEmail").val(0).trigger("change");
+    }
   }
   
   //住所取得
-  function getAddress()
-  {
-    if ( document.getElementById("construction_datum_id").value != "")
-    {
+  function getAddress() {
+    if ( document.getElementById("construction_datum_id").value != "") {
       construction_datum_id = document.getElementById("construction_datum_id").value;
       $.get("<%= purchase_order_datum_get_address_path %>",
-      {construction_datum_id: construction_datum_id }, function(data)
-      {
+      {construction_datum_id: construction_datum_id }, function(data) {
         obj = document.getElementById("post").textContent;
         document.getElementById("post").value = obj;
         //
@@ -323,27 +315,25 @@
   }
   
   //最終番号のセット
-  function getLastCode()
-  { 
+  function getLastCode() { 
   
-    if ( document.getElementById("purchase_order_code").value == "")
-    {
+    if ( document.getElementById("purchase_order_code").value == "") {
       obj = document.getElementById("last_header_number");
       //quotation_unit_id = parseInt(obj.value);
-	  header = obj.value;
+      header = obj.value;
       $.get("<%= purchase_order_datum_get_last_number_select_path %>",
-         {header: header },
-         function(data){
-		  obj = document.getElementById("purchase_order_code").textContent;
-		  document.getElementById("purchase_order_code").value = obj;
-		  
+        {header: header },
+        function(data) {
+          obj = document.getElementById("purchase_order_code").textContent;
+          document.getElementById("purchase_order_code").value = obj;
+  
           //Mなら自動で村山にする処理 -201229抹消
-		  //村山電気対応 
-		  //checkAutoOutSourcing();
-		 }
-       );
-     }
-   };  
+          //村山電気対応 
+          //checkAutoOutSourcing();
+        }
+      );
+    }
+  };
 
 
   $('a[data-sweet-confirm]').on('click', function(e) {

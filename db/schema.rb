@@ -11,7 +11,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20230518004527) do
+ActiveRecord::Schema.define(version: 20240514095636) do
+
+  create_table "account_account", force: :cascade do |t|
+    t.integer  "order",      limit: 4,                 null: false
+    t.string   "name",       limit: 255,               null: false
+    t.datetime "created_at",             precision: 6
+    t.datetime "update_at",              precision: 6
+  end
+
+  create_table "account_account_sub", force: :cascade do |t|
+    t.integer  "order",      limit: 4,                 null: false
+    t.string   "name",       limit: 255,               null: false
+    t.datetime "created_at",             precision: 6
+    t.datetime "update_at",              precision: 6
+    t.integer  "account_id", limit: 4
+  end
+
+  add_index "account_account_sub", ["account_id"], name: "account_account_sub_account_id_9a80f152_fk_account_account_id", using: :btree
 
   create_table "account_account_title", force: :cascade do |t|
     t.integer  "order",             limit: 4,                 null: false
@@ -99,6 +116,7 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer  "expences",               limit: 4
     t.integer  "balance",                limit: 4
     t.integer  "reduced_tax_flag",       limit: 4
+    t.boolean  "is_representative"
     t.datetime "created_at",                         precision: 6
     t.datetime "update_at",                          precision: 6
     t.integer  "account_title_id",       limit: 4
@@ -184,13 +202,23 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer  "table_type_id",  limit: 4
     t.integer  "table_id",       limit: 4
     t.date     "occurred_on",                              null: false
-    t.integer  "account_id",     limit: 4
-    t.integer  "sub_account_id", limit: 4
     t.string   "description",    limit: 255,               null: false
     t.integer  "debit",          limit: 4
     t.integer  "credit",         limit: 4
     t.datetime "created_at",                 precision: 6
     t.datetime "updated_at",                 precision: 6
+    t.integer  "account_id",     limit: 4
+    t.integer  "account_sub_id", limit: 4
+  end
+
+  add_index "account_daily_representative_loan", ["account_id"], name: "account_daily_representative_loan_8a089c2a", using: :btree
+  add_index "account_daily_representative_loan", ["account_sub_id"], name: "account_daily_representative_loan_820f93b9", using: :btree
+
+  create_table "account_monthly_representative_loan", force: :cascade do |t|
+    t.date     "occurred_year_month",                         null: false
+    t.integer  "last_month_balance",  limit: 4
+    t.datetime "created_at",                    precision: 6
+    t.datetime "updated_at",                    precision: 6
   end
 
   create_table "account_partner", force: :cascade do |t|
@@ -1439,9 +1467,25 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.integer  "location_id",        limit: 4
     t.integer  "material_master_id", limit: 4
     t.integer  "quantity",           limit: 4
+    t.integer  "unit_master_id",     limit: 4
     t.float    "unit_price",         limit: 24
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
+  end
+
+  create_table "storage_inventory_histories", force: :cascade do |t|
+    t.date     "occurred_date"
+    t.string   "slip_code",               limit: 255
+    t.integer  "purchase_order_datum_id", limit: 4
+    t.integer  "construction_datum_id",   limit: 4
+    t.integer  "material_master_id",      limit: 4
+    t.float    "quantity",                limit: 24
+    t.float    "unit_price",              limit: 24
+    t.integer  "amount",                  limit: 4
+    t.integer  "supplier_master_id",      limit: 4
+    t.integer  "invenrtory_division_id",  limit: 4
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
   end
 
   create_table "supplier_masters", force: :cascade do |t|
@@ -1568,13 +1612,21 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.float    "labor_productivity_unit",         limit: 24
     t.float    "labor_productivity_unit_total",   limit: 24
     t.integer  "material_quantity",               limit: 4
-    t.integer  "accessory_cost",                  limit: 4
-    t.integer  "material_cost_total",             limit: 4
+    t.float    "accessory_cost",                  limit: 24
+    t.float    "material_cost_total",             limit: 24
     t.integer  "labor_cost_total",                limit: 4
-    t.integer  "other_cost",                      limit: 4
+    t.float    "other_cost",                      limit: 24
     t.integer  "seq",                             limit: 4
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
+    t.integer  "accessory_base_cost",             limit: 4
+    t.float    "accessory_rate",                  limit: 24
+    t.float    "miscellaneous_base_cost",         limit: 24
+    t.float    "miscellaneous_rate",              limit: 24
+    t.float    "miscellaneous_cost",              limit: 24
+    t.float    "other_base_cost",                 limit: 24
+    t.float    "other_rate",                      limit: 24
+    t.float    "benefit_rate",                    limit: 24
   end
 
   create_table "working_safety_matters", force: :cascade do |t|
@@ -1709,6 +1761,7 @@ ActiveRecord::Schema.define(version: 20230518004527) do
     t.datetime "updated_at",                    null: false
   end
 
+  add_foreign_key "account_account_sub", "account_account", column: "account_id", name: "account_account_sub_account_id_9a80f152_fk_account_account_id"
   add_foreign_key "account_authuser_groups", "account_authuser", column: "authuser_id", name: "account_authuser_gro_authuser_id_e424ce42_fk_account_authuser_id"
   add_foreign_key "account_authuser_groups", "auth_group", column: "group_id", name: "account_authuser_groups_group_id_b724de06_fk_auth_group_id"
   add_foreign_key "account_authuser_user_permissions", "account_authuser", column: "authuser_id", name: "account_authuser_use_authuser_id_6e7eeb5d_fk_account_authuser_id"
@@ -1722,6 +1775,8 @@ ActiveRecord::Schema.define(version: 20230518004527) do
   add_foreign_key "account_cash_flow_detail_actual", "account_partner", column: "partner_id", name: "account_cash_flow_deta_partner_id_5e07ac37_fk_account_partner_id"
   add_foreign_key "account_cash_flow_detail_expected", "account_account_title", column: "account_title_id", name: "account_ca_account_title_id_d5088a44_fk_account_account_title_id"
   add_foreign_key "account_cash_flow_detail_expected", "account_partner", column: "partner_id", name: "account_cash_flow_deta_partner_id_1e66dd5c_fk_account_partner_id"
+  add_foreign_key "account_daily_representative_loan", "account_account", column: "account_id", name: "account_daily_represen_account_id_ebe5bb50_fk_account_account_id"
+  add_foreign_key "account_daily_representative_loan", "account_account_sub", column: "account_sub_id", name: "account_daily__account_sub_id_33b9d81f_fk_account_account_sub_id"
   add_foreign_key "account_partner", "account_account_title", column: "account_title_id", name: "account_partner_account_title_id_83c0e560_fk_account_a"
   add_foreign_key "account_partner", "account_bank", column: "bank_id", name: "account_partner_bank_id_4b4698ec_fk_account_bank_id"
   add_foreign_key "account_partner", "account_bank", column: "source_bank_id", name: "account_partner_source_bank_id_d58cbbcf_fk_account_bank_id"

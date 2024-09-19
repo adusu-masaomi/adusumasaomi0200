@@ -155,9 +155,13 @@
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
        
-       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+       &nbsp;&nbsp;&nbsp;&nbsp;
+       
+       <%= f.button_tag "支払データ反映", :type => 'link', name: "setPayment", :value => 'true', 
+               :onclick => "return submitAfterValidationPayment()" , :class => 'btn btn-blue100_rsd keep-disp' %>
+               
+       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
        
        <!--<%= link_to "チェック反映",
@@ -467,9 +471,22 @@
   
   //一括チェックによる更新
   function bulkCheck(){
+     //debugger;
      //画面再描画のためリロードする(のみ・・)
      window.location.reload();
   }
+  
+  //支払データへの反映処理
+  function submitAfterValidationPayment(){
+    if (window.confirm('支払データを更新しますか？')) {
+      //document.forms[0].submit();
+      return true;
+    }else{
+      return false;
+    };
+    
+  }
+  
   //請求済を空にする
   function cleaInvoiceFlag(){
     document.getElementById("outsourcing_invoice_flag").selectedIndex = 0;
@@ -587,9 +604,10 @@
  function clearPurchaseDivision(){
    document.getElementById("division_id").selectedIndex = 0;
  }
- //入出庫区分を空にする
- function clearInventoryDivision(){
-   document.getElementById("inventory_division_id").selectedIndex = 0;
- }
+  //入出庫区分を空にする
+  function clearInventoryDivision(){
+    document.getElementById("inventory_division_id").selectedIndex = 0;
+  }
+    
   
 </script>

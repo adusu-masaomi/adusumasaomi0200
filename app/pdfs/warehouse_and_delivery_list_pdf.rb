@@ -5,7 +5,9 @@ class WarehouseAndDeliveryListPDF
 	#入出庫表PDF発行
  
        # tlfファイルを読み込む
-       report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/warehouse_and_delivery_list_pdf.tlf")
+       #report = ThinReports::Report.new(layout: "#{Rails.root}/app/pdfs/warehouse_and_delivery_list_pdf.tlf")
+       #upd240127
+       report = Thinreports::Report.new(layout: "#{Rails.root}/app/pdfs/warehouse_and_delivery_list_pdf.tlf")
        
         # 1ページ目を開始
         report.start_new_page
@@ -129,13 +131,32 @@ class WarehouseAndDeliveryListPDF
                quantity = sprintf("%.0f", inventory_history.quantity)
              end
              #
-					   
+			
+       #add240127
+       construction_code = nil
+       if inventory_history.construction_datum.present? && inventory_history.construction_datum.construction_code.present?
+         construction_code = inventory_history.construction_datum.construction_code
+       end
+       construction_name = nil
+       if inventory_history.construction_datum.present? && inventory_history.construction_datum.construction_name.present?
+         construction_name = inventory_history.construction_datum.construction_name
+       end
+       customer_name = nil
+       if inventory_history.construction_datum.present? && inventory_history.construction_datum.CustomerMaster.present? &&
+          inventory_history.construction_datum.CustomerMaster.customer_name.present?
+         customer_name = inventory_history.construction_datum.CustomerMaster.customer_name
+       end
+       #
+      
 			 row.values inventory_date: inventory_history.inventory_date,
 			            inventory_division_name: InventoryHistory.inventory_division[inventory_history.inventory_division_id][0],
-                        construction_code: inventory_history.construction_datum.construction_code,
-					    construction_name: inventory_history.construction_datum.construction_name,
-					    customer_name: inventory_history.construction_datum.CustomerMaster.customer_name,
-					    #purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
+                  #construction_code: inventory_history.construction_datum.construction_code,
+                  construction_code: construction_code,
+                  #construction_name: inventory_history.construction_datum.construction_name,
+                  construction_name: construction_name,
+                  #customer_name: inventory_history.construction_datum.CustomerMaster.customer_name,
+                  customer_name: customer_name, 
+                  #purchase_order_code: purchase_datum.purchase_order_datum.purchase_order_code,
 					    material_code: material_code,
                         material_name: material_name,
 					    maker_name: inventory_history.material_master.MakerMaster.maker_name,

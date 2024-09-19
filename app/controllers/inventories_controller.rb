@@ -1277,33 +1277,44 @@ class InventoriesController < ApplicationController
   #最終単価＆仕入業者を返す(アイテム選択時)
   def get_unit_price
     record = Inventory.where(material_master_id: params[:material_id]).first
-  	
-      
-  if record.present?
-    #@current_unit_price = record.current_unit_price
-    #@inventory_id = record.id   #idをセット add171128
+  
+    if record.present?
+      #@current_unit_price = record.current_unit_price
+      #@inventory_id = record.id   #idをセット add171128
     
-    #@current_unit_price = record.last_unit_price
-    #upd200701
-    if record.inventory_quantity.present? && record.inventory_quantity > 0
-      @current_unit_price = record.current_unit_price
+      #@current_unit_price = record.last_unit_price
+      #upd200701
+      if record.inventory_quantity.present? && record.inventory_quantity > 0
+        @current_unit_price = record.current_unit_price
+      else
+        #数量がなければ、単価は入れないでおく(警告メッセージを出すため)
+        @current_unit_price = nil
+      end
+      #@supplier  = SupplierMaster.where(:id => record.supplier_master_id).where("id is NOT NULL").pluck("supplier_name, id")
+      #200627
+      #ここで仕入先を自社にする。
+      @supplier  = SupplierMaster.where(:id => $SUPPLIER_MASER_ID_OWN_COMPANY).where("id is NOT NULL").pluck("supplier_name, id")
+      @supplier += SupplierMaster.all.pluck("supplier_name, id")
     else
-      #数量がなければ、単価は入れないでおく(警告メッセージを出すため)
-      @current_unit_price = nil
-    end
-    #@supplier  = SupplierMaster.where(:id => record.supplier_master_id).where("id is NOT NULL").pluck("supplier_name, id")
-    #200627
-    #ここで仕入先を自社にする。
-    @supplier  = SupplierMaster.where(:id => $SUPPLIER_MASER_ID_OWN_COMPANY).where("id is NOT NULL").pluck("supplier_name, id")
-    @supplier += SupplierMaster.all.pluck("supplier_name, id")
-  else
       #自社にする
       @supplier  = SupplierMaster.where(:id => $SUPPLIER_MASER_ID_OWN_COMPANY).where("id is NOT NULL").pluck("supplier_name, id")
     
       @supplier += SupplierMaster.all.pluck("supplier_name, id")
       #@supplier = SupplierMaster.all.pluck("supplier_name, id")
-	end
-	  
+    end
+    
+    #add240517
+    #単位を資材マスターから取得
+    material_master = MaterialMaster.where(id: params[:material_id]).first
+    
+    if material_master.present? && material_master.unit_id.present?
+      @unit_master = UnitMaster.where(:id => material_master.unit_id).pluck("unit_name, id")
+      @unit_master += UnitMaster.all.where.not(id: material_master.unit_id).pluck("unit_name, id")
+    else
+      @unit_master = UnitMaster.all.pluck("unit_name, id")
+    end
+    #add end
+    
   end
   
   ###

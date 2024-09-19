@@ -141,7 +141,7 @@ class OutsourcingDataController < ApplicationController
       #通常の検索の場合
       @q = PurchaseDatum.ransack(query)
     end
-        
+    
     #@q = PurchaseDatum.ransack(params[:q]) 
     #ransack保持用--上記はこれに置き換える
     #@q = PurchaseDatum.ransack(query)
@@ -293,7 +293,16 @@ class OutsourcingDataController < ApplicationController
           disposition: "inline")
       end
     end  #format do
-
+    
+    #add240415
+    #外注の支払予定を支払データへ書き込む
+    if params[:setPayment] == "true"
+      require './app/controllers/outsourcing_to_payment'
+      osp = OutsourcingToPayment.new
+      #test = osp.set_oursourcing_to_payment(@purchase_data)
+      osp.set_oursourcing_to_payment(@purchase_data)
+      
+    end
     
     
     #仕入表PDF発行

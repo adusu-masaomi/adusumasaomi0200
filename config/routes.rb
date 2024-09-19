@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :storage_inventory_histories
+  resources :storage_inventory_histories
   resources :storage_inventories
   resources :daily_representative_loans
   resources :daily_loan_headers
@@ -636,6 +638,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :storage_inventory_histories
+  resources :storage_inventory_histories
   resources :storage_inventories
   resources :daily_loan_headers
   resources :daily_loan_details
