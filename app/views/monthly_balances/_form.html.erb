@@ -1,0 +1,11 @@
+<%= simple_form_for @monthly_balance, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :occur_year_month %>
+  <%= f.input :balance_daishi_hokuetsu %>
+  <%= f.input :balance_sanshin %>
+  <%= f.input :balance_cash %>
+  <%= f.input :is_actual %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                monthly_balances_path, :class => 'btn btn-default' %>
+<% end %>

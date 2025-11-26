@@ -1,0 +1,18 @@
+<%= simple_form_for @expence, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :table_type_id %>
+  <%= f.input :table_id %>
+  <%= f.input :payment_method_id %>
+  <%= f.input :payment_on %>
+  <%= f.input :unpaid_on, :include_blank => true %>
+  <!--特例を除いてコメントアウトしておく-->
+  <%= f.input :name %>
+  <%= f.input :payment_amount %>
+  <%= f.input :billing_year_month %>
+  <%= f.input :payment_source_id %>
+  <%= f.input :is_estimate %>
+  <%= f.input :is_completed %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                expences_path, :class => 'btn btn-default' %>
+<% end %>

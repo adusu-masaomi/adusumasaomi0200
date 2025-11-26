@@ -1,0 +1,68 @@
+<%- model_class = ProfitDetail -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @profit_details %>
+  <!-- kaminari用追加箇所終了 -->
+  <%= search_form_for @q, url: profit_details_path , :html => {:style=> 'width:1920px' } do |f| %>
+    <%= f.text_field :occurred_on_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'occurred_on_from' , style: 'width:100px'  %>
+    <%= f.text_field :occurred_on_lteq, class:"input-append date datepicker", include_blank: true ,  id: 'occurred_on_to' , style: 'width:100px'  %>
+    <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+    <%= link_to "明細(荒利)PDF",
+            profit_details_path(print_type: "1", format: "pdf"),
+            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] %>
+    <%= link_to "明細(経費)PDF",
+            profit_details_path(print_type: "2", format: "pdf"),
+            :class => 'btn btn-cyan300_ftg keep-disp' , :target=>["_blank"] %>
+    <%= link_to "明細(返済)PDF",
+            profit_details_path(print_type: "3", format: "pdf"),
+            :class => 'btn btn-glay200_ftg keep-disp' , :target=>["_blank"] %>
+            
+  <% end %>
+  
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:occurred_on) %></th>
+      <th><%= model_class.human_attribute_name(:cost_id) %></th>
+      <th><%= model_class.human_attribute_name(:table_type_id) %></th>
+      <th><%= model_class.human_attribute_name(:table_id) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @profit_details.order("id desc").each do |profit_detail| %>
+      <tr>
+        <td><%= link_to profit_detail.id, profit_detail_path(profit_detail) %></td>
+        <td><%= profit_detail.occurred_on %></td>
+        <td><%= profit_detail.cost_id %></td>
+        <td><%= profit_detail.table_type_id %></td>
+        <td><%= profit_detail.table_id %></td>
+        <td><%=l profit_detail.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_profit_detail_path(profit_detail), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      profit_detail_path(profit_detail),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  <!-- kaminari追加箇所開始 -->
+  <%= paginate @profit_details %>
+  <!-- kaminari追加箇所終了 -->
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @profit_details %>
+<!-- kaminari追加箇所終了 -->
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_profit_detail_path,
+            :class => 'btn btn-primary' %>

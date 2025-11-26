@@ -1,0 +1,75 @@
+<%= simple_form_for @storage_inventory, :html => { :class => 'well form-horizontal' } do |f| %>
+  
+  <% if @storage_inventory.errors.any? %>
+  <div id="error_explanation">
+    <h2><%= @storage_inventory.errors.count %>件のエラーがあります。</h2>
+ 
+    <ul>
+    <% @storage_inventory.errors.full_messages.each do |msg| %>
+      <li><%= msg %></li>
+    <% end %>
+    </ul>
+  </div>
+ <% end %>
+  
+  <!--
+  <%= f.label :保管場所　, {:class => "my-custom-class-l"} %></br>
+  <%= f.select :warehouse_id, StorageInventory.warehouse, {:include_blank => true}, 
+       {id:'warehouse_id',  :tabindex=>"0", style: 'width:90px;height:30px;font-size:16px;margin-left:-15px;' } %>
+  </br></br>
+  -->
+  
+  <!--<%= f.input :material_master_id %>-->
+  <%= f.label :品名, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :material_master_id, MaterialMaster.all,  :id, :p_material_code_name,  
+      {:prompt => "どれか一つを選択して下さい",:selected => @storage_inventory.material_master_id} , 
+      {id:'material_master_id', :class => "searchableSelect3_1" }  %>
+      
+  <%= f.input :quantity , input_html: { id:'quantity', :tabindex=>"2" } %>
+  
+  <!--
+  <%= f.label :単位, {:class => "my-custom-class-l"}  %></br>
+  <%= f.collection_select :unit_master_id, UnitMaster.all,:id, :unit_name, {:selected => @storage_inventory.unit_master_id || 1} ,
+     {id:"unit_master_id", style: 'width:110px;' , :class => "searchableSelect3_2"} %>
+  --> 
+  
+  <%= f.input :unit_price , input_html: { id:'unit_price', :tabindex=>"4" } %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                storage_inventories_path, :class => 'btn btn-default' %>
+<% end %>
+
+<script type="text/javascript">
+  $(".searchableSelect3_1").select2({ theme: "classic", allowClear: true , placeholder: "どれか一つを選択して下さい。"})
+  $( ".searchableSelect3_1" ).change(function(e) {
+    //直近単価を取得する
+    material_master_id = parseInt(document.getElementById("material_master_id").value);
+    if (material_master_id > 0) {
+      $.get("<%= storage_inventoriez_get_material_unit_price_path %>",
+       {material_master_id: material_master_id },
+        function(data){
+          obj = document.getElementById("unit_price").textContent;
+          document.getElementById("unit_price").value = obj;
+        }
+      );
+    }
+  });
+  
+  //select2のタブインデックスはここで指定する
+  $(".searchableSelect3_1").select2({ theme: "bootstrap"}).on("load", function(e) { 
+    $(this).prop('tabindex',1)}).trigger('load');
+  //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+  $( ".searchableSelect3_1" ).on("select2:close", function (e) {
+    $('[tabindex=2]').focus(); 
+  });
+  
+  //select2のタブインデックスはここで指定する
+  $(".searchableSelect3_2").select2({ theme: "bootstrap"}).on("load", function(e) { 
+    $(this).prop('tabindex',3)}).trigger('load');
+  //select2をenterキー押下した場合(リストが閉じられた時)のタブ移動。
+  $( ".searchableSelect3_2" ).on("select2:close", function (e) {
+    $('[tabindex=4]').focus(); 
+  });
+  
+</script>

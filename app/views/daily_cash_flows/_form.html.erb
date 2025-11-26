@@ -1,0 +1,15 @@
+<%= simple_form_for @daily_cash_flow, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :cash_flow_date %>
+  <%= f.input :income %>
+  <%= f.input :expence %>
+  <%= f.input :previous_balance %>
+  <%= f.input :balance %>
+  <%= f.input :plan_actual_flag %>
+  <%= f.input :completed_flag %>
+  <%= f.input :income_completed_flag %>
+  <%= f.input :expence_completed_flag %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                daily_cash_flows_path, :class => 'btn btn-default' %>
+<% end %>

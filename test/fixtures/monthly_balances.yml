@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  year_month: MyString
+  balance_daishi_hokuetsu: 1
+  balance_sanshin: 1
+  balance_cash: 1
+
+two:
+  year_month: MyString
+  balance_daishi_hokuetsu: 1
+  balance_sanshin: 1
+  balance_cash: 1

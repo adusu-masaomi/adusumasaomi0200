@@ -1,0 +1,75 @@
+<%- model_class = DailyCashFlow -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @daily_cash_flows %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+    <%= f.label :cash_flow_date, '発生日' %>
+    <%= f.text_field :cash_flow_date_eq, :value=> (f.object.cash_flow_date.strftime("%Y/%m/%d") if f.object.cash_flow_date), 
+      class:"input-append date datepicker", include_blank: true , size: "12", id: 'cash_flow_date'   %>
+  
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_daily_cash_flow_path,
+            :class => 'btn btn-primary' %>
+    </div>
+  <% end %>
+    
+</div>
+
+  
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= sort_link(@q, :cash_flow_date, model_class.human_attribute_name(:cash_flow_date) ) %></th> 
+      <!--<th><%= model_class.human_attribute_name(:cash_flow_date) %></th>-->
+      <th><%= model_class.human_attribute_name(:income) %></th>
+      <th><%= model_class.human_attribute_name(:expence) %></th>
+      <th><%= model_class.human_attribute_name(:previous_balance) %></th>
+      <th><%= model_class.human_attribute_name(:balance) %></th>
+      <th><%= model_class.human_attribute_name(:plan_actual_flag) %></th>
+      <th><%= model_class.human_attribute_name(:completed_flag) %></th>
+      <th><%= model_class.human_attribute_name(:income_completed_flag) %></th>
+      <th><%= model_class.human_attribute_name(:expence_completed_flag) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @daily_cash_flows.each do |daily_cash_flow| %>
+      <tr>
+        <td><%= link_to daily_cash_flow.id, daily_cash_flow_path(daily_cash_flow) %></td>
+        <td><%= daily_cash_flow.cash_flow_date %></td>
+        <td><%= daily_cash_flow.income %></td>
+        <td><%= daily_cash_flow.expence %></td>
+        <td><%= daily_cash_flow.previous_balance %></td>
+        <td><%= daily_cash_flow.balance %></td>
+        <td><%= daily_cash_flow.plan_actual_flag %></td>
+        <td><%= daily_cash_flow.completed_flag %></td>
+        <td><%= daily_cash_flow.income_completed_flag %></td>
+        <td><%= daily_cash_flow.expence_completed_flag %></td>
+        <td><%=l daily_cash_flow.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_daily_cash_flow_path(daily_cash_flow), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      daily_cash_flow_path(daily_cash_flow),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  <!-- kaminari追加箇所開始 -->
+  <%= paginate @daily_cash_flows %>
+  <!-- kaminari追加箇所終了 -->
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @daily_cash_flows %>
+<!-- kaminari追加箇所終了 -->

@@ -1,0 +1,2535 @@
+{
+  "version": "0.9.1",
+  "items": [
+    {
+      "id": "default",
+      "type": "list",
+      "display": true,
+      "description": "",
+      "x": 50,
+      "y": 386,
+      "width": 533.2,
+      "height": 412.8,
+      "header": {
+        "enabled": true,
+        "height": 12.6,
+        "translate": {
+          "x": 1.2,
+          "y": 32.4
+        },
+        "items": []
+      },
+      "detail": {
+        "height": 20.5,
+        "translate": {
+          "x": 1.2,
+          "y": 2.5
+        },
+        "items": [
+          {
+            "id": "working_large_item_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 63.5,
+            "y": 396.6,
+            "width": 270,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "quantity",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 348.8,
+            "y": 401.5,
+            "width": 26.4,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "quote_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 512.8,
+            "y": 401.5,
+            "width": 67.5,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          },
+          {
+            "id": "working_unit_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 387.8,
+            "y": 401.5,
+            "width": 23.5,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "working_large_specification",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 63.5,
+            "y": 405.4,
+            "width": 270,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "working_unit_price",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 428.1,
+            "y": 401.5,
+            "width": 55.8,
+            "height": 10,
+            "style": {
+              "font-family": [
+                "IPAMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "right",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": "number",
+              "number": {
+                "delimiter": ",",
+                "precision": 0
+              }
+            }
+          }
+        ]
+      },
+      "page-footer": {
+        "enabled": true,
+        "height": 4.8,
+        "translate": {
+          "x": 1.2,
+          "y": -19.5
+        },
+        "items": []
+      },
+      "footer": {
+        "enabled": true,
+        "height": 5,
+        "translate": {
+          "x": 1.2,
+          "y": -46.6
+        },
+        "items": []
+      },
+      "content-height": 400.2,
+      "auto-page-break": true
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.2,
+      "y": 387,
+      "width": 531,
+      "height": 12.1,
+      "style": {
+        "border-color": "none",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#9bbb59"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 786.9,
+      "width": 531,
+      "height": 20.6,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "quote_price_tax_only",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 243,
+      "y": 351,
+      "width": 58,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "¥{value}",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 332,
+      "y": 322.9,
+      "width": 72.4,
+      "height": 55,
+      "style": {
+        "border-color": "none",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#9bbb59"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 71,
+      "y": 215,
+      "width": 240,
+      "height": 11.9,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "平素は格別のご高配を賜り、厚く御礼申し上げます。"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 71,
+      "y": 201,
+      "width": 260,
+      "height": 14,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "拝啓　時下ますますご清栄のこととお慶び申し上げます。"
+      ]
+    },
+    {
+      "id": "construction_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 98,
+      "y": 302,
+      "width": 221.1,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "quote_price_tax_in",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 84,
+      "y": 350,
+      "width": 123.2,
+      "height": 14.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "¥{value}",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "customer_name",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 73,
+      "y": 76,
+      "width": 202.5,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 12,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "quotation_code",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 512.7,
+      "y": 52,
+      "width": 66.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "No.{value}",
+        "type": ""
+      }
+    },
+    {
+      "id": "post",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 63,
+      "y": 34,
+      "width": 65.7,
+      "height": 8.6,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "address",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 63,
+      "y": 51.2,
+      "width": 220,
+      "height": 8.6,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_period",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 325,
+      "width": 165,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 337,
+      "width": 171.2,
+      "height": 12.1,
+      "style": {
+        "font-family": [
+          "Helvetica"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "middle",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": true,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "trading_method",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 351.5,
+      "width": 165,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "effective_period",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 365.5,
+      "width": 165,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "quotation_date",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 345,
+      "y": 52,
+      "width": 98.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 462,
+      "y": 814.8,
+      "width": 25.7,
+      "height": 13.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "小計"
+      ]
+    },
+    {
+      "id": "quote_price",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 514,
+      "y": 815.3,
+      "width": 67.5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 483,
+      "y": 52,
+      "width": 24.6,
+      "height": 15.7,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "見積"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 71,
+      "y": 243,
+      "width": 195,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "下記明細の通り御見積申し上げます。"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 507,
+      "y": 184,
+      "width": 32.5,
+      "height": 11.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "検　印"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 546,
+      "y": 184,
+      "width": 40,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 8,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "担当社印"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 399,
+      "y": 102,
+      "width": 59.3,
+      "height": 13.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "代表取締役"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 470,
+      "y": 102,
+      "width": 97.6,
+      "height": 16.4,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "薄　田　　圭　介"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 395,
+      "y": 118,
+      "width": 50,
+      "height": 12.4,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "〒955-0013"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 448,
+      "y": 118,
+      "width": 119.9,
+      "height": 14.8,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "新潟県三条市井栗1丁目42-23"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 396,
+      "y": 131,
+      "width": 175,
+      "height": 14.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "TEL 0256-47-0200   FAX 0256-47-0211"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 395,
+      "y": 144,
+      "width": 112.9,
+      "height": 13.5,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "携帯  090-2216-6304"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 396,
+      "y": 158,
+      "width": 140,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "E-Mail  adusu@coda.ocn.ne.jp"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 395,
+      "y": 171.5,
+      "width": 30,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "担当："
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 62,
+      "y": 303.5,
+      "width": 36.3,
+      "height": 14.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "件名 ："
+      ]
+    },
+    {
+      "id": "message_net",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 462,
+      "y": 792,
+      "width": 25.7,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "net_amount",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 514,
+      "y": 792,
+      "width": 67.5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": "number",
+        "number": {
+          "delimiter": ",",
+          "precision": 0
+        }
+      }
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 161,
+      "y": 388,
+      "width": 83.3,
+      "height": 13.3,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "項目／備考等"
+      ]
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 327.9,
+      "y": 26,
+      "width": 252,
+      "height": 20,
+      "style": {
+        "border-color": "none",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#9bbb59"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 344,
+      "y": 29,
+      "width": 118.9,
+      "height": 17.7,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 14,
+        "color": "#ffffff",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "御　見　積　書"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 61.8,
+      "y1": 90.5,
+      "x2": 313.8,
+      "y2": 90.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 61.8,
+      "y1": 105.8,
+      "x2": 281.8,
+      "y2": 105.8
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 327.9,
+      "y1": 64.8,
+      "x2": 579.9,
+      "y2": 64.8
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.8,
+      "y": 185,
+      "width": 274.7,
+      "height": 112.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 61.8,
+      "y1": 122,
+      "x2": 281.8,
+      "y2": 122
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 423,
+      "y": 171.5,
+      "width": 35.7,
+      "height": 12.4,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "薄田"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 199,
+      "x2": 307,
+      "y2": 199
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66.5,
+      "y1": 213,
+      "x2": 307.5,
+      "y2": 213
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 227,
+      "x2": 307,
+      "y2": 227
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 241,
+      "x2": 307,
+      "y2": 241
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 332.1,
+      "y": 322.8,
+      "width": 253.1,
+      "height": 55,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 497.3,
+      "y": 181.1,
+      "width": 87.3,
+      "height": 57.2,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 54.1,
+      "y1": 315.4,
+      "x2": 323.2,
+      "y2": 314.9
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 540,
+      "y1": 181,
+      "x2": 540,
+      "y2": 238.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 497,
+      "y1": 196,
+      "x2": 584,
+      "y2": 196
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.1,
+      "y": 323.1,
+      "width": 269.1,
+      "height": 55.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 237,
+      "y1": 323.1,
+      "x2": 237,
+      "y2": 378.5
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 53.7,
+      "y": 322.6,
+      "width": 183.4,
+      "height": 12.1,
+      "style": {
+        "border-color": "none",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#9bbb59"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.2,
+      "y": 387.1,
+      "width": 531,
+      "height": 444.7,
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "none"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 236.8,
+      "y": 323.2,
+      "width": 86.4,
+      "height": 11.5,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 221,
+      "y1": 357.4,
+      "x2": 232,
+      "y2": 357.4
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 106.3,
+      "y": 324.2,
+      "width": 57.9,
+      "height": 14.9,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "合 計 金 額"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#000000",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 311,
+      "y1": 357.4,
+      "x2": 319,
+      "y2": 357.4
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 253,
+      "y": 324,
+      "width": 44.2,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#71a420",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "消費税等"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 269,
+      "x2": 307,
+      "y2": 269
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 255,
+      "x2": 307,
+      "y2": 255
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "dashed"
+      },
+      "x1": 66,
+      "y1": 283,
+      "x2": 307,
+      "y2": 283
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 403.7,
+      "y1": 336.5,
+      "x2": 585.2,
+      "y2": 336.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 403.7,
+      "y1": 350,
+      "x2": 585.2,
+      "y2": 350.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 403.7,
+      "y1": 363.5,
+      "x2": 585.2,
+      "y2": 363.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 331.6,
+      "y1": 336.5,
+      "x2": 405.3,
+      "y2": 336.5
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 331.6,
+      "y1": 350,
+      "x2": 404.7,
+      "y2": 350
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 331.6,
+      "y1": 363.5,
+      "x2": 403.7,
+      "y2": 363.5
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 345,
+      "y": 324.5,
+      "width": 40.5,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "工事期間"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 345,
+      "y": 338,
+      "width": 40.5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "工事場所"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 345,
+      "y": 351,
+      "width": 40.5,
+      "height": 12.6,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "取引方法"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 345,
+      "y": 366.3,
+      "width": 40.5,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": []
+      },
+      "texts": [
+        "有効期間"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#99c257",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 53.5,
+      "y1": 424.7,
+      "x2": 572.1,
+      "y2": 424.7
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.2,
+      "y": 419.7,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 460.5,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 354,
+      "y": 388,
+      "width": 21.7,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "数量"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 392,
+      "y": 388,
+      "width": 20.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "単位"
+      ]
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 518,
+      "y": 388,
+      "width": 27.6,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "金額"
+      ]
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54.2,
+      "y": 501.3,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 542.1,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 582.9,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 623.7,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 664.5,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 705.3,
+      "width": 531,
+      "height": 23.5,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 54,
+      "y": 746.1,
+      "width": 531,
+      "height": 20.4,
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#ebf1de"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 382,
+      "y1": 396.8,
+      "x2": 382,
+      "y2": 831.8
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 418,
+      "y1": 396.8,
+      "x2": 418,
+      "y2": 831.8
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 489,
+      "y1": 396.8,
+      "x2": 489,
+      "y2": 831.8
+    },
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 442,
+      "y": 388,
+      "width": 20.5,
+      "height": 11.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 9,
+        "color": "#ffffff",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "単価"
+      ]
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#9bbb59",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 344.7,
+      "y1": 396.8,
+      "x2": 344.7,
+      "y2": 831.8
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 344.7,
+      "y1": 385.6,
+      "x2": 344.7,
+      "y2": 398.9
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 382,
+      "y1": 385.6,
+      "x2": 382,
+      "y2": 398.9
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 418,
+      "y1": 385.6,
+      "x2": 418,
+      "y2": 398.9
+    },
+    {
+      "id": "",
+      "type": "line",
+      "display": true,
+      "description": "",
+      "style": {
+        "border-color": "#ffffff",
+        "border-width": 1,
+        "border-style": "solid"
+      },
+      "x1": 489,
+      "y1": 387.2,
+      "x2": 489,
+      "y2": 400.5
+    },
+    {
+      "id": "honorific",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 285,
+      "y": 77,
+      "width": 24,
+      "height": 12.3,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 11,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "responsible1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 73,
+      "y": 93.5,
+      "width": 80,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "responsible2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 73,
+      "y": 109.5,
+      "width": 80,
+      "height": 11.1,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place_d1",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 337,
+      "width": 171.2,
+      "height": 7.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 7,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "construction_place_d2",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 414,
+      "y": 343,
+      "width": 171.2,
+      "height": 7.2,
+      "style": {
+        "font-family": [
+          "IPAMincho"
+        ],
+        "font-size": 7,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "fit",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    },
+    {
+      "id": "",
+      "type": "image",
+      "display": true,
+      "description": "",
+      "x": 395,
+      "y": 70,
+      "width": 171.3,
+      "height": 36,
+      "data": {
+        "mime-type": "image/png",
+        "base64": "iVBORw0KGgoAAAANSUhEUgAAAmcAAACDCAYAAADI+LysAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAhGVYSWZNTQAqAAAACAAFARIAAwAAAAEAAQAAARoABQAAAAEAAABKARsABQAAAAEAAABSASgAAwAAAAEAAgAAh2kABAAAAAEAAABaAAAAAAAAAHgAAAABAAAAeAAAAAEAA6ABAAMAAAABAAEAAKACAAQAAAABAAACZ6ADAAQAAAABAAAAgwAAAAClrS/wAAAACXBIWXMAABJ0AAASdAHeZh94AAABWWlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iWE1QIENvcmUgNi4wLjAiPgogICA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPgogICAgICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIgogICAgICAgICAgICB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+CiAgICAgICAgIDx0aWZmOk9yaWVudGF0aW9uPjE8L3RpZmY6T3JpZW50YXRpb24+CiAgICAgIDwvcmRmOkRlc2NyaXB0aW9uPgogICA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgoZXuEHAAAosklEQVR4Ae2dCcxdVbXH268Dg0wyqKilBdT3wKA8UBwCz4kXaZkNBaISNU+hoAZQUmxlJhihFk21UivQgIWYEiiDbRgafKlQSV+D0Ajvo0wNitj3BfqCTSkFvO+/Lvvc7HvuWueeebj3v5N9z7n77L32Wr99hn32dMaNoyMBEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEiABEhh4Aq1WazyMnD7whtJAEiABEiABEiiJwH7I58/wbzkv+xIWx+2NSBvgJe0o/DR4ze2PwPXw252X/WnwTXQtKK35HltQaRnpCRzAgIsvvvhwmPXWr371q50bbF6W6yDKbO1ckTA6EiABEiABEjAJLMOR8ANEwuK4KxDJT3u7kWhlKJ6kWWHErXuwb6+/36P3cccddwoCt8E/Bn8r/Bz4f4ffEX4gnGs1ewbGCIv5DTYqy3UQZbZ/jvj7UWl4jARIgARIYMgJvAj7/YeG7L8Qk8mDobQiS3NjCAznsUmL2ICwsB3B/x7VXcvZRhwI4vjb43sSNDDgnHPO+bRv32WXXfauBpohKme5DqJM9svc349Kw2PDRWABzJWehz19s2fOnDkB/+Ve/Aj8FP8Y90mABAafgLTs+A8N2ZewOO45RPLTWumk29OPJ/vSxdlEF7Yj+K/agi6/Q3AgiNO1Pf744z+uJmpIICpi0m0rDw/fLmklbaLLch1E2euz8fej0vDYcBG4EObKufEq/C4h00fdMTk+NXSMf0mABAaYgP/A8PfjmLwZkfw0sq+5cJzgvxa37mGB7uFtlN5at66kf/X3v//9xKiEdT52wgknfA76hTm05syZc3Cd9TZ067HD2WZEjx1clNzYCjBivQksWLBgN2gYnCePupeettJ4gTvSO/byunXrJtXbGmpHAiSQF4HgpuBvpaUrjtNaG7R0vmx/X4tb9zBff3/f1PvWW2+ViRN+XH9/hpmwxgdcl610Tfu2BPuj/gOmxmb4qgW6+9u414EvJ7zvy/P3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ByQt/G6QIxVtsxyQl9bVbeWRS7izxdIpysY4+Vty46TNO47Ycim8ptPcvDOruzxUVo8xWHTxcV8KqLs5WfXrsjkOl5zjZNWf6eMROD1uueGZaTa6xMvKjCUv4XHPt/WmlCE4oEHKzWx5OFsF4Y7lllcMQRdZuqQIvz1GfrGirFixQiYbaOWghcWSmSQSKlvynUwtryrCSq8k9KmcaSiltXMZ/IvwRQyeFpkiW/KQvPJ2B0LgQviX4EfhZTxK1kooRDTSHQStF8E/Ay9dKNK9J2/rgb8K+8PgqrjW/TyHgXFdbJwCReQ+uxpe7gHSQ7XFbTdj+zLGqBV2H5YXdeQR1Y1e9P0P2TfD+RdIsJ+b5lEPPncst7z6CUKXmr/qvpwcL8PLTXkdvAw8lArXEnjpqpUB1NK1+h34b8CfBn8C/H/AH5V3Cw8uBsk34B+1RbTcXRFdvlE2RB7Lm21MWpZOWvIyB09LXnQkQAIkQAJDRkB7KOWGoE6VMzFK9Cm7UhgHJiqOe4p6MXwccbHj1KzVLLBfKsVluyDv8FbTI+qtL5w+63/Ji44ESIAESGDICGgPj7wRaHlIGJ1HAK1n1vcsfX5eilx250GKL78W+6g0lj1r0LJbg2zFLSpc04FhJEACJEACA0xAe6Dkba70Y4fzkTA6j8BDDz0ki/KGOYX/eymy7WLVZhnwGZZfl//SlVyms+zWdLDiFhWu6cAwEiABEiCBCgiUNUBXHihhl3fezyGD/UOZPI//B4TChv4vZpB9H5/WORcgJsFPdD7Yl22eM1znQ9734PN0/3TCpDvuTedf97Yy2FMGXgf+H9iXAamyfQVeKu3yRQgZC7gWviynXQeSt3YtWHGL0lXToai8KJcESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESIAESGAYCPw/CtKt1a62IkcAAAAASUVORK5CYII="
+      }
+    }
+  ],
+  "state": {
+    "layout-guides": []
+  },
+  "title": "quotation_pdf",
+  "report": {
+    "paper-type": "A4",
+    "orientation": "portrait",
+    "margin": [
+      20,
+      10,
+      10,
+      20
+    ]
+  }
+}

@@ -1,0 +1,70 @@
+<%- model_class = MonthlyLoan -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @monthly_loans %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+    <%= f.label :year_month, '発生日' %>
+    <%= f.text_field :occur_year_month_eq, :value=> (f.object.occur_year_month.strftime("%Y/%m") if f.object.occur_year_month), 
+      data: { date_format: 'YYYY/MM'}, class:"input-append date datepicker", include_blank: true , size: "12", id: 'occur_year_month'   %>
+     
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_monthly_loan_path,
+            :class => 'btn btn-primary' %>  </div>
+  <% end %>
+  
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:occur_year_month) %></th>
+      <th><%= model_class.human_attribute_name(:lend) %></th>
+      <th><%= model_class.human_attribute_name(:borrow) %></th>
+      <th><%= model_class.human_attribute_name(:lend_total) %></th>
+      <th><%= model_class.human_attribute_name(:borrow_total) %></th>
+      <th><%= model_class.human_attribute_name(:is_actual) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @monthly_loans.each do |monthly_loan| %>
+      <tr>
+        <td><%= link_to monthly_loan.id, monthly_loan_path(monthly_loan) %></td>
+        <td><%= monthly_loan.occur_year_month %></td>
+        <td><%= monthly_loan.lend %></td>
+        <td><%= monthly_loan.borrow %></td>
+        <td><%= monthly_loan.lend_total %></td>
+        <td><%= monthly_loan.borrow_total %></td>
+        <td><%= monthly_loan.is_actual %></td>
+        <td><%=l monthly_loan.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_monthly_loan_path(monthly_loan), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      monthly_loan_path(monthly_loan),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- kaminari追加箇所開始 -->
+    <%= paginate @monthly_loans %>
+    <!-- kaminari追加箇所終了 -->
+  </tbody>
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @monthly_loans %>
+<!-- kaminari追加箇所終了 -->
+    
+<!--<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_monthly_loan_path,
+            :class => 'btn btn-primary' %>-->

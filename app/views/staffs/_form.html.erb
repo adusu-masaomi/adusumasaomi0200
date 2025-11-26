@@ -8,7 +8,11 @@
   
   <%= f.check_box :is_resign %>
   <%= f.label :is_resign, "退職", {style: 'color: purple'}  %>
-  </br></br>
+  </br>
+  <%= f.check_box :is_invisible %>
+  <%= f.label :is_resign, "非表示", {style: 'color: green'}  %>
+  </br>
+  </br>
   
   <%= f.button :submit, :class => 'btn-primary' %>
   

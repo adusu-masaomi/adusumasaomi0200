@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20240514095636) do
+ActiveRecord::Schema.define(version: 20251024052642) do
 
   create_table "account_account", force: :cascade do |t|
     t.integer  "order",      limit: 4,                 null: false
@@ -36,6 +36,13 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.integer  "trade_division_id", limit: 4,                 null: false
     t.datetime "created_at",                    precision: 6
     t.datetime "update_at",                     precision: 6
+  end
+
+  create_table "account_accrued_expence", force: :cascade do |t|
+    t.date     "occurred_on"
+    t.integer  "saraly",      limit: 4
+    t.datetime "created_at",            precision: 6
+    t.datetime "updated_at",            precision: 6
   end
 
   create_table "account_authuser", force: :cascade do |t|
@@ -117,6 +124,8 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.integer  "balance",                limit: 4
     t.integer  "reduced_tax_flag",       limit: 4
     t.boolean  "is_representative"
+    t.boolean  "is_no_invoice"
+    t.boolean  "is_cost"
     t.datetime "created_at",                         precision: 6
     t.datetime "update_at",                          precision: 6
     t.integer  "account_title_id",       limit: 4
@@ -198,6 +207,35 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.integer "actual_cash_company",        limit: 4, null: false
   end
 
+  create_table "account_compensation", force: :cascade do |t|
+    t.date     "payment_year_month",                         null: false
+    t.integer  "amount",             limit: 4
+    t.integer  "is_completed",       limit: 4,               null: false
+    t.integer  "paid_amount",        limit: 4
+    t.integer  "unpaid_amount",      limit: 4
+    t.integer  "carryover_amount",   limit: 4
+    t.datetime "created_at",                   precision: 6
+    t.datetime "updated_at",                   precision: 6
+  end
+
+  add_index "account_compensation", ["payment_year_month"], name: "payment_year_month", unique: true, using: :btree
+
+  create_table "account_daily_compensation", force: :cascade do |t|
+    t.date     "paid_on",                                     null: false
+    t.integer  "amount",              limit: 4
+    t.date     "target_year_month_1"
+    t.date     "target_year_month_2"
+    t.date     "target_year_month_3"
+    t.integer  "deduction_amount_1",  limit: 4
+    t.integer  "deduction_amount_2",  limit: 4
+    t.integer  "deduction_amount_3",  limit: 4
+    t.integer  "carryover_amount_1",  limit: 4
+    t.integer  "carryover_amount_2",  limit: 4
+    t.integer  "carryover_amount_3",  limit: 4
+    t.datetime "created_at",                    precision: 6
+    t.datetime "updated_at",                    precision: 6
+  end
+
   create_table "account_daily_representative_loan", force: :cascade do |t|
     t.integer  "table_type_id",  limit: 4
     t.integer  "table_id",       limit: 4
@@ -215,10 +253,11 @@ ActiveRecord::Schema.define(version: 20240514095636) do
   add_index "account_daily_representative_loan", ["account_sub_id"], name: "account_daily_representative_loan_820f93b9", using: :btree
 
   create_table "account_monthly_representative_loan", force: :cascade do |t|
-    t.date     "occurred_year_month",                         null: false
-    t.integer  "last_month_balance",  limit: 4
-    t.datetime "created_at",                    precision: 6
-    t.datetime "updated_at",                    precision: 6
+    t.date     "occurred_year_month",                              null: false
+    t.integer  "last_month_balance",       limit: 4
+    t.integer  "last_month_balance_total", limit: 4
+    t.datetime "created_at",                         precision: 6
+    t.datetime "updated_at",                         precision: 6
   end
 
   create_table "account_partner", force: :cascade do |t|
@@ -248,6 +287,7 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.integer  "fixed_content_id",      limit: 4
     t.integer  "rough_estimate",        limit: 4
     t.integer  "fixed_cost",            limit: 4
+    t.integer  "cost_flag",             limit: 4
     t.datetime "created_at",                        precision: 6
     t.datetime "update_at",                         precision: 6
     t.integer  "account_title_id",      limit: 4
@@ -317,6 +357,13 @@ ActiveRecord::Schema.define(version: 20240514095636) do
   add_index "account_payment_reserve", ["partner_id"], name: "account_payment_reserv_partner_id_45736520_fk_account_partner_id", using: :btree
   add_index "account_payment_reserve", ["source_bank_branch_id"], name: "account_payment_reserve_129e5ec4", using: :btree
   add_index "account_payment_reserve", ["source_bank_id"], name: "account_payment_reser_source_bank_id_999bb827_fk_account_bank_id", using: :btree
+
+  create_table "account_yearly_representative_loan", force: :cascade do |t|
+    t.date     "occurred_year",                             null: false
+    t.integer  "beginning_balance", limit: 4
+    t.datetime "created_at",                  precision: 6
+    t.datetime "updated_at",                  precision: 6
+  end
 
   create_table "affiliations", force: :cascade do |t|
     t.string   "affiliation_name", limit: 255
@@ -405,17 +452,19 @@ ActiveRecord::Schema.define(version: 20240514095636) do
   end
 
   create_table "construction_costs", force: :cascade do |t|
-    t.integer  "construction_datum_id", limit: 4
-    t.integer  "purchase_amount",       limit: 4
-    t.integer  "supplies_expense",      limit: 4
-    t.integer  "labor_cost",            limit: 4
-    t.integer  "misellaneous_expense",  limit: 4
-    t.integer  "execution_amount",      limit: 4
-    t.integer  "constructing_amount",   limit: 4
-    t.string   "purchase_order_amount", limit: 500
-    t.integer  "final_return_division", limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "update_at",                         null: false
+    t.integer  "construction_datum_id",    limit: 4
+    t.integer  "purchase_amount",          limit: 4
+    t.integer  "supplies_expense",         limit: 4
+    t.integer  "labor_cost",               limit: 4
+    t.integer  "misellaneous_expense",     limit: 4
+    t.integer  "execution_amount",         limit: 4
+    t.integer  "constructing_amount",      limit: 4
+    t.string   "purchase_order_amount",    limit: 500
+    t.integer  "final_return_division",    limit: 4
+    t.date     "invoice_date"
+    t.integer  "is_purchase_amount_fixed", limit: 4
+    t.datetime "created_at",                           null: false
+    t.datetime "update_at",                            null: false
   end
 
   create_table "construction_daily_reports", force: :cascade do |t|
@@ -967,6 +1016,15 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.datetime "updated_at",                   null: false
   end
 
+  create_table "monthly_profits", force: :cascade do |t|
+    t.date     "occurred_on"
+    t.integer  "gross_profit", limit: 4
+    t.integer  "expense",      limit: 4
+    t.integer  "repayment",    limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "orders", force: :cascade do |t|
     t.integer  "purchase_order_history_id", limit: 4
     t.integer  "material_id",               limit: 4
@@ -1012,6 +1070,15 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.date     "unpaid_payment_date"
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+  end
+
+  create_table "profit_details", force: :cascade do |t|
+    t.date     "occurred_on"
+    t.integer  "cost_id",       limit: 4
+    t.integer  "table_type_id", limit: 4
+    t.integer  "table_id",      limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
   end
 
   create_table "purchase_data", force: :cascade do |t|
@@ -1072,6 +1139,7 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.string   "alias_name",              limit: 255
     t.date     "purchase_order_date"
     t.integer  "mail_sent_flag",          limit: 4
+    t.string   "notes",                   limit: 255
     t.datetime "created_at",                          null: false
     t.datetime "update_at",                           null: false
   end
@@ -1444,6 +1512,8 @@ ActiveRecord::Schema.define(version: 20240514095636) do
     t.integer  "affiliation_id", limit: 4
     t.integer  "hourly_wage",    limit: 4
     t.integer  "daily_pay",      limit: 4
+    t.integer  "is_resign",      limit: 4
+    t.integer  "is_invisible",   limit: 4
     t.datetime "created_at",                 null: false
     t.datetime "update_at",                  null: false
   end

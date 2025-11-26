@@ -30,6 +30,11 @@ class PostMailer < ApplicationMailer
      #@responsible_name = $responsible_name + "様"
      @responsible_name = responsible_name + "様"
     
+     #add250513
+     #備考追加
+     @notes = user.notes
+     #add end
+    
      #件名に日時を入れる（メール重なるのを防ぐため）
      require 'date'
      subject_time = "<" + Time.now.to_s + ">"

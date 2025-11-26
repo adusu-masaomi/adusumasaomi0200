@@ -1,0 +1,13 @@
+<%= simple_form_for @deposit, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :table_type_id %>
+  <%= f.input :table_id %>
+  <%= f.input :deposit_due_date %>
+  <%= f.input :name %>
+  <%= f.input :deposit_amount %>
+  <%= f.input :deposit_source_id %>
+  <%= f.input :completed_flag %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                deposits_path, :class => 'btn btn-default' %>
+<% end %>

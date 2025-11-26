@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  cash_flow_date: 2023-01-20
+  income: 1
+  expence: 1
+  balance: 1
+  plan_actual_flag: 1
+  completed_flag: 1
+
+two:
+  cash_flow_date: 2023-01-20
+  income: 1
+  expence: 1
+  balance: 1
+  plan_actual_flag: 1
+  completed_flag: 1

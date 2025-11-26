@@ -1,0 +1,736 @@
+{
+  "version": "0.9.1",
+  "items": [
+    {
+      "id": "",
+      "type": "text",
+      "display": true,
+      "description": "",
+      "x": 20,
+      "y": 26,
+      "width": 84,
+      "height": 15.7,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 14,
+        "color": "#000000",
+        "text-align": "left",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [
+          "bold"
+        ]
+      },
+      "texts": [
+        "得意先一覧表"
+      ]
+    },
+    {
+      "id": "",
+      "type": "rect",
+      "display": true,
+      "description": "",
+      "x": 20,
+      "y": 53.8,
+      "width": 782.5,
+      "height": 16.2,
+      "style": {
+        "border-color": "#f79646",
+        "border-width": 1,
+        "border-style": "solid",
+        "fill-color": "#f79646"
+      },
+      "border-radius": 0
+    },
+    {
+      "id": "default",
+      "type": "list",
+      "display": true,
+      "description": "",
+      "x": 0.7,
+      "y": 54,
+      "width": 801.8,
+      "height": 540,
+      "header": {
+        "enabled": true,
+        "height": 15.3,
+        "translate": {
+          "x": -19.3,
+          "y": 0
+        },
+        "items": [
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 61.3,
+            "y": 56.7,
+            "width": 54.4,
+            "height": 11.2,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "得意先名"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 262.3,
+            "y": 56.7,
+            "width": 40.3,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "郵便番号"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 323.3,
+            "y": 56.7,
+            "width": 37.7,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "住所１"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 607.3,
+            "y": 56.7,
+            "width": 51.7,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "電話番号"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 509.9,
+            "y": 56.7,
+            "width": 41.6,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "住所２"
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 677.1,
+            "y": 57.2,
+            "width": 37.2,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "FAX",
+              ""
+            ]
+          },
+          {
+            "id": "",
+            "type": "text",
+            "display": true,
+            "description": "",
+            "x": 749.3,
+            "y": 57.2,
+            "width": 31.7,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#ffffff",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [
+                "bold"
+              ]
+            },
+            "texts": [
+              "担当者",
+              ""
+            ]
+          }
+        ]
+      },
+      "detail": {
+        "height": 16.4,
+        "translate": {
+          "x": -19.3,
+          "y": -88.9
+        },
+        "items": [
+          {
+            "id": "frame",
+            "type": "rect",
+            "display": true,
+            "description": "",
+            "x": 39.3,
+            "y": 158.2,
+            "width": 782.5,
+            "height": 16.4,
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid",
+              "fill-color": "none"
+            },
+            "border-radius": 0
+          },
+          {
+            "id": "customer_name",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 60.3,
+            "y": 162.4,
+            "width": 193.2,
+            "height": 10.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "post",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 261.3,
+            "y": 162.4,
+            "width": 52,
+            "height": 10.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "address",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 322.3,
+            "y": 161.9,
+            "width": 178.1,
+            "height": 10.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "responsible",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 748.3,
+            "y": 162.4,
+            "width": 65.9,
+            "height": 10.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "line_2",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 257.3,
+            "y1": 158.2,
+            "x2": 257.3,
+            "y2": 174.6
+          },
+          {
+            "id": "line_3",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 317.3,
+            "y1": 158.2,
+            "x2": 317.3,
+            "y2": 174.6
+          },
+          {
+            "id": "line_4",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 505.3,
+            "y1": 158.2,
+            "x2": 505.3,
+            "y2": 174.6
+          },
+          {
+            "id": "line_1",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 56.3,
+            "y1": 158.2,
+            "x2": 56.3,
+            "y2": 174.6
+          },
+          {
+            "id": "ID",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 42.3,
+            "y": 162.4,
+            "width": 10.9,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "center",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "house_number",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 509.3,
+            "y": 161.9,
+            "width": 90.5,
+            "height": 11.1,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 10,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 603.3,
+            "y1": 158.2,
+            "x2": 603.3,
+            "y2": 174.6
+          },
+          {
+            "id": "tel",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 606.8,
+            "y": 162.9,
+            "width": 63.5,
+            "height": 9.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 673.3,
+            "y1": 158.2,
+            "x2": 673.3,
+            "y2": 174.6
+          },
+          {
+            "id": "fax",
+            "type": "text-block",
+            "display": true,
+            "description": "",
+            "x": 676.3,
+            "y": 162.9,
+            "width": 63.5,
+            "height": 9.6,
+            "style": {
+              "font-family": [
+                "IPAPMincho"
+              ],
+              "font-size": 9,
+              "color": "#000000",
+              "text-align": "left",
+              "vertical-align": "top",
+              "line-height": "",
+              "line-height-ratio": "",
+              "letter-spacing": "",
+              "font-style": [],
+              "overflow": "fit",
+              "word-wrap": "none"
+            },
+            "reference-id": "",
+            "value": "",
+            "multiple-line": false,
+            "format": {
+              "base": "",
+              "type": ""
+            }
+          },
+          {
+            "id": "",
+            "type": "line",
+            "display": true,
+            "description": "",
+            "style": {
+              "border-color": "#f79646",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 744.1,
+            "y1": 158.2,
+            "x2": 744.1,
+            "y2": 174.6
+          },
+          {
+            "id": "line_through",
+            "type": "line",
+            "display": false,
+            "description": "",
+            "style": {
+              "border-color": "#000000",
+              "border-width": 1,
+              "border-style": "solid"
+            },
+            "x1": 39.3,
+            "y1": 167.9,
+            "x2": 821.3,
+            "y2": 167.9
+          }
+        ]
+      },
+      "page-footer": {
+        "enabled": true,
+        "height": 22.1,
+        "translate": {
+          "x": -19.3,
+          "y": -176.7
+        },
+        "items": []
+      },
+      "footer": {
+        "enabled": true,
+        "height": 16,
+        "translate": {
+          "x": -19.3,
+          "y": -232.8
+        },
+        "items": []
+      },
+      "content-height": 524.7,
+      "auto-page-break": true
+    },
+    {
+      "id": "page_no",
+      "type": "text-block",
+      "display": true,
+      "description": "",
+      "x": 770,
+      "y": 26,
+      "width": 26.5,
+      "height": 10.6,
+      "style": {
+        "font-family": [
+          "IPAPMincho"
+        ],
+        "font-size": 10,
+        "color": "#000000",
+        "text-align": "right",
+        "vertical-align": "top",
+        "line-height": "",
+        "line-height-ratio": "",
+        "letter-spacing": "",
+        "font-style": [],
+        "overflow": "truncate",
+        "word-wrap": "none"
+      },
+      "reference-id": "",
+      "value": "",
+      "multiple-line": false,
+      "format": {
+        "base": "",
+        "type": ""
+      }
+    }
+  ],
+  "state": {
+    "layout-guides": []
+  },
+  "title": "",
+  "report": {
+    "paper-type": "A4",
+    "orientation": "landscape",
+    "margin": [
+      20,
+      20,
+      0,
+      20
+    ]
+  }
+}

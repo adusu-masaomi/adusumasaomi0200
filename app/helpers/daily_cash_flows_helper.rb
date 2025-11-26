@@ -1,0 +1,2 @@
+module DailyCashFlowsHelper
+end

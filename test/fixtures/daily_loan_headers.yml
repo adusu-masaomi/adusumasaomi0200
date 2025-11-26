@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  occurred_on: 2023-05-17
+  lend: 1
+  borrow: 1
+
+two:
+  occurred_on: 2023-05-17
+  lend: 1
+  borrow: 1

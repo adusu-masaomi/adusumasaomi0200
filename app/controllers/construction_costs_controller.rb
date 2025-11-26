@@ -411,6 +411,6 @@ class ConstructionCostsController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def construction_cost_params
       params.require(:construction_cost).permit(:construction_datum_id, :supplies_expense, :labor_cost, :misellaneous_expense, :constructing_amount, :purchase_order_amount, 
-                                                :purchase_amount, :execution_amount, :final_return_division)
+                                                :purchase_amount, :execution_amount, :final_return_division, :invoice_date, :is_purchase_amount_fixed)
     end
 end

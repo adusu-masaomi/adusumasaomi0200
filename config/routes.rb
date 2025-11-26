@@ -1,4 +1,6 @@
 Rails.application.routes.draw do
+  resources :profit_details
+  resources :monthly_profits
   resources :storage_inventory_histories
   resources :storage_inventory_histories
   resources :storage_inventories
@@ -638,6 +640,8 @@ Rails.application.routes.draw do
   
   # 保留
   # ExcelReport::Application.routes.draw do
+  resources :profit_details
+  resources :monthly_profits
   resources :storage_inventory_histories
   resources :storage_inventory_histories
   resources :storage_inventories

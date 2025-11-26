@@ -1,0 +1,34 @@
+<%- model_class = DailyCashFlow -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:cash_flow_date) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.cash_flow_date %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:income) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.income %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:expence) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.expence %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:balance) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.balance %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:plan_actual_flag) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.plan_actual_flag %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:completed_flag) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.completed_flag %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:income_completed_flag) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.income_completed_flag %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:expence_completed_flag) %>:</strong></dt>
+  <dd><%= @daily_cash_flow.expence_completed_flag %></dd>
+  
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              daily_cash_flows_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_daily_cash_flow_path(@daily_cash_flow), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              daily_cash_flow_path(@daily_cash_flow),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

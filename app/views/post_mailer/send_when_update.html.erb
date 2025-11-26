@@ -7,6 +7,9 @@
   <p><%= @user %></p>
   <p><%= @construction %></p>
   <p><%= @construction_place %></p>
+  <% if @notes.present? %>
+    <p><%= "※" + @notes %></p>
+  <% end %>
   <p></p>
   ※このメールアドレスは配信専用です。このメッセージに返信しないようお願いいたします。
 </p>

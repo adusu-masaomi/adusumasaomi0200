@@ -653,7 +653,7 @@ class PurchaseOrderDataController < ApplicationController
     # Never trust parameters from the scary internet, only allow the white list through.
     def purchase_order_datum_params
       params.require(:purchase_order_datum).permit(:purchase_order_code, :construction_datum_id, :supplier_master_id,
-                     :supplier_responsible_id, :alias_name, :mail_sent_flag, 
+                     :supplier_responsible_id, :alias_name, :mail_sent_flag, :notes, 
                      :orders_attributes => [:purchase_order_datum_id, :material_id, :material_code, :material_name, :quantity])
     end
 end

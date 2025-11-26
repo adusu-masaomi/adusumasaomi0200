@@ -17,14 +17,27 @@
   <%= f.input :construction_datum_id , input_html:{id:"construction_datum_id" }, as: :hidden  %>
   
   <%= f.label :工事コード, {:class => "my-custom-class-l"}  %></br>
+  <div class="col-xs-8" , style="margin-left : -15px">
   <%= f.collection_select :construction_datum_id, ConstructionDatum.order('construction_code DESC').all, :id, :p_cd_name, {:prompt => "どれか一つを選択して下さい",:selected => @construction_cost.construction_datum_id} , {id:"construction_datum_id", class: "searchableConstructionCode" , :tabindex=>"0", style: 'width:440px'} %>
+  </div>
+  <div class="col-xs-3" , style="margin-left : 10px; margin-top :-25px;">
+  <%= f.input :invoice_date , as: :string, input_html:{id: "invoice_date" , class: "datepicker", style: 'width:120px' , :tabindex=>"0" }  %>
+  </div>
+  </br></br></br>
   <%= f.fields_for :construction_datum, :remote => true do |p| %>
   	<%= p.input :construction_name , input_html:{id:"construction_name", :disabled => true} %>
   <% end %>
   <div class="col-xs-3" , style="margin-left : -15px">
-    <%= f.input :purchase_amount , input_html:{id:"purchase_amount",  :readonly => true , style: 'width:130px'} %>
+    <!-- ":readonly => true"を除外 251015 -->
+    <%= f.input :purchase_amount , input_html:{id:"purchase_amount", style: 'width:130px', :tabindex=>"0"} %>
   </div>
   <%= f.input :labor_cost_origin, :label => "労務費(日報)", input_html:{id:"labor_cost_origin", style: 'width:130px', :disabled => true } %>
+  
+  <div class="col-xs-6" , style="margin-left :-20px; margin-top :-30px;">
+  <%= f.check_box :is_purchase_amount_fixed,  {id:'is_purchase_amount_fixed'} %> 
+  
+  <%= f.label :order_flag, "仕入確定済", {style: 'color: purple'} %>
+  </div>
   
   <div class="col-xs-3" , style="margin-left : -15px">
     <%= f.input :supplies_expense , input_html:{id:"supplies_expense", :tabindex=>"1", style: 'width:130px', :onfocusout => "calcExecutionAmount()"  } %>
@@ -154,9 +167,15 @@
 	            obj = document.getElementById("purchase_order_amount").textContent;
 				document.getElementById("purchase_order_amount").value = obj;
 	    	    
-				//仕入合計取得
-		        setPurchaseAmount();
-		  
+          //仕入合計取得
+          //debugger;
+          if (document.getElementById("is_purchase_amount_fixed").checked == false){
+             setPurchaseAmount();
+          }else{
+             //仕入金額確定済(手入力)の場合、直接実行金額を計算する
+             calcExecutionAmount();
+          }
+  
 			    //差額を求める
 			    setDifferense();
 			 

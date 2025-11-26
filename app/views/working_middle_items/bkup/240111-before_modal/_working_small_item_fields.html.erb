@@ -1,0 +1,223 @@
+<fieldset>
+
+  </br>
+
+  <!--モーダル用のアクション判定フラグをセット -->
+  <!--  <% if @working_middle_item.working_small_items.present? %>
+	   <% @action_flag = "edit" %>
+	<% else %>
+	   <% @action_flag = "new" %>
+	<% end %> -->
+  <!-- -->
+
+
+  <%= f.label :working_small_item_code, "品番:" %>
+  
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  
+  <!--品番-->
+  <!--<%= f.collection_select :working_small_item_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.working_small_item_id || 1, } , 
+    {class: "searchableMaterial" , id: "working_small_item_id" << f.options[:child_index].to_s ,  style: 'width:690px' } %>-->
+  <%= f.collection_select :working_small_item_id, MaterialMaster.all, :id, :p_material_code_name, {:selected => f.object.working_small_item_id || 1, } , 
+    {class: "searchableMaterial" , id: "working_small_item_id" << f.options[:child_index].to_s ,  style: 'width:350px' } %>
+  
+  <!--メーカー追加-->
+  <%= f.label :maker_master_id, "メーカー:　" %>
+  <%= f.collection_select :maker_master_id, MakerMaster.all, :id, :maker_name, {:selected => f.object.maker_master_id || 1} , 
+      {class: "searchableMaker" , id: "maker_master_id" , style: 'width:180px;'} %>
+  
+  </br>
+  <%= f.label :working_small_item_code, "品番手入力:　"%>
+  <!--tabindexの右端の数は、トータルのタブ数。-->
+  <!--<%= f.text_field :working_small_item_code , :style => 'width:100px;ime-mode:inactive', :tabindex=> (16 + (f.options[:child_index] *7)).to_s , :onkeyup => "focusNextModal(this, event, 'modal_working_small_item_code', 'modal_working_small_item_name')",  
+     :id => "modal_working_small_item_code" << f.options[:child_index].to_s , :onchange =>  "searchItemCode(this)" %>-->
+  
+  <!--upd 180213-->
+  <%= f.collection_select :working_small_item_code, MaterialMaster.all, :material_code, :material_code, {:include_blank => true , :selected => f.object.working_small_item_code || nil} , 
+    {class: "searchInsertMaterial" , id: "modal_working_small_item_code" << f.options[:child_index].to_s ,  style: 'width:150px;ime-mode:inactive' } %>
+  
+  <%= f.label :working_small_item_name, "品名手入力:"%>
+  <%= f.text_field :working_small_item_name , :style => 'width:350px;font-size:12px;ime-mode:active', :tabindex=> (17 + (f.options[:child_index] * 7)).to_s , :onkeyup => "focusNextModal(this, event, 'modal_working_small_item_name', 'modal_quantity')",
+     :id => "modal_working_small_item_name" << f.options[:child_index].to_s %>
+  
+  <%= f.hidden_field :_destroy %>
+  <%= link_to "削除", '#', class: "remove_fields btn btn-pink500_rsd", id: f.options[:child_index]%>
+  
+  </br>
+  
+  <%= f.label :quantity, "数量:"%>
+  <!--[type: 'number']を入れてもOKだが全角入力もあるので保留-->
+  <%= f.text_field :quantity , :style => 'width:45px;font-size:12px; text-align:right;ime-mode:disabled;', :tabindex=> (18 + (f.options[:child_index] * 7)).to_s , 
+      :onkeyup => "focusNextModal(this, event, 'modal_quantity', 'modal_unit_price')", id: 'modal_quantity' << f.options[:child_index].to_s  %>
+  
+  <!--単位追加-->
+  <%= f.label :unit_master_id, "単位:　"%>
+  <%= f.collection_select :unit_master_id, UnitMaster.all, :id, :unit_name, {:selected => f.object.unit_master_id || 1} , 
+      {class: "searchableUnit" , id: "unit_master_id" , style: 'width:60px;'} %>
+  
+  <!--<%= f.label :unit_price, "単価:" %>-->
+  <!--upd180131-->
+  <%= f.label :unit_price, "定価:" %>
+  
+  <!--add180331 パナソニックの値上がり分は色をセット(201710分)-->
+  <!--変更時はコントローラ側も要変更-->
+  <% if f.object.maker_master_id.present? %>
+    <% @material_master = MaterialMaster.find(f.object.working_small_item_id) %>
+  <% else %>
+    <% @material_master = nil %>
+  <% end %>
+  <% @color = "black" %>
+  <% if @material_master.present? %>
+    <%require "date"%>
+    <% if @material_master.list_price_update_at == Date.new(2017,10,01) %>
+      <% @color = "blue" %>
+    <% end %>
+  <% end %>
+  <!--add end-->
+  <font color = <%= @color %>  >
+  <%= f.text_field :unit_price , :style => 'width:60px; text-align:right;ime-mode:disabled;font-size:12px;' , :tabindex => (20 + (f.options[:child_index] * 7)).to_s , 
+       :onkeyup => "focusNextModal(this, event, 'modal_unit_price', 'modal_rate')", id:'modal_unit_price' << f.options[:child_index].to_s  %>
+  </font>
+  <!---->
+  
+  <%= f.label :rate, "掛率:" %>
+  <!--<%= f.text_field :rate , :style => 'width:60px; text-align:right;ime-mode:disabled;' , :tabindex => (21 + (f.options[:child_index] * 7)).to_s , 
+      :onkeydown => "focusNextModal(this, event, 'modal_rate', 'modal_material_price')", id:'modal_rate' << f.options[:child_index].to_s  %>-->
+  <!--upd180308-->
+  <%= f.text_field :rate , :style => 'width:60px; text-align:right;ime-mode:disabled;' , :tabindex => (21 + (f.options[:child_index] * 7)).to_s , 
+      :onkeyup => "focusNextModal(this, event, 'modal_rate', 'modal_material_price')", id:'modal_rate' << f.options[:child_index].to_s  %>
+  
+  <%= f.label :material_price, "資材費:" %>
+  <!--upd180315 onkeyupに変更-->
+  <%= f.text_field :material_price , :style => 'width:70px; text-align:right;ime-mode:disabled;' , :tabindex => (22 + (f.options[:child_index] * 7)).to_s, 
+       :onkeyup => "focusNextModal(this, event, 'modal_material_price', 'modal_labor_productivity_unit')", 
+        id:'modal_material_price' << f.options[:child_index].to_s , name: "material_price[]" %>
+  
+  <%= f.label :labor_productivity_unit, "歩掛:" %>
+  <!--<%= f.text_field :labor_productivity_unit , :style => 'width:50px; text-align:right;ime-mode:disabled;' , :tabindex => (23 + (f.options[:child_index] * 7)).to_s, 
+     :onkeydown => "focusNextModal(this, event, 'modal_labor_productivity_unit', 'modal_labor_productivity_unit_total')", 
+         id:'modal_labor_productivity_unit' << f.options[:child_index].to_s  %>-->
+  <%= f.text_field :labor_productivity_unit , :style => 'width:50px; text-align:right;ime-mode:disabled;' , :tabindex => (23 + (f.options[:child_index] * 7)).to_s, 
+     :onkeyup => "focusNextModal(this, event, 'modal_labor_productivity_unit', 'modal_labor_productivity_unit_total')", 
+         id:'modal_labor_productivity_unit' << f.options[:child_index].to_s  %>
+         
+  <!--スペース-->
+  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+  <!--upd171209-->
+  <!--&nbsp;&nbsp;-->
+  
+  <%= f.label :labor_productivity_unit_total, "歩掛計:" %>
+  <%= f.text_field :labor_productivity_unit_total , :style => 'width:60px; text-align:right;ime-mode:disabled;' , :tabindex => (24 + (f.options[:child_index] * 6)).to_s, 
+       :value => ( (f.object.quantity || 0) * (f.object.labor_productivity_unit || 0)) , 
+       id:'modal_labor_productivity_unit_total' << f.options[:child_index].to_s, name: "labor_productivity_unit_total[]" %>
+  
+  <!--<%= f.options[:child_index] %>-->
+  <!--<%= f.text_field :working_small_item_code %>-->
+  <!--<%= f.label :working_small_item_name, "品名" %>-->
+  <!--<%= f.text_field :working_small_item_name %><br />-->
+  
+  <!--</br>-->
+  
+  <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+  <!--upd171209-->
+  <!--&nbsp;&nbsp;-->
+  <!--<%= link_to "削除", '#', class: "remove_fields btn btn-pink500_rsd", id: f.options[:child_index]%>-->
+ 
+</fieldset>
+
+<script type="text/javascript">
+
+  //モーダルの場合は、このコードがないとselect2が正常動作しない。
+  //$.fn.modal.Constructor.prototype.enforceFocus = function() {};
+
+  //$(document).on('ready page:load', function(){
+  $(document).ready(function(){
+    
+    $(".searchableMaterial").select2({ theme: "classic" });
+    //$(".searchableMaker").select2({ theme: "classic" });
+    //upd180412
+      $(".searchableMaker").select2({ theme: "classic", tags: true });
+    
+    //$(".searchableUnit").select2({ theme: "classic" });
+	$(".searchableUnit").select2({ theme: "classic"}).on("load", function(e) { 
+        $(this).prop('tabindex',19)}).trigger('load');
+    
+    
+	$( ".searchableMaterial" ).change(function(e) {
+	    material_id = $(this)[0].value;
+		
+		var child_index = $(this)[0].id;
+        child_index = child_index.replace( /working_small_item_id/g , "" ) ;
+		   
+		if (material_id != undefined){
+		  material_id =  parseInt(material_id);
+			 
+		  //ajax
+		  $.get("<%= working_small_itemz_material_standard_select_path %>",
+             { material_id: material_id },
+			   function(data){ 
+                 //各種アイテム情報のセット
+			     setMaterialDetail(child_index);
+			 }
+           );
+		}
+	});
+	
+    
+    //add 180213
+    $(".searchInsertMaterial").select2({ theme: "classic", tags: true });
+    
+    //add 180213
+    $(".searchInsertMaterial").change(function(e) {
+       searchItemCode(this);
+    });
+       
+    $( ".searchInsertMaterial" ).on("select2:close", function (e) {
+	  //次のコントロールへフォーカスを移す処理
+      
+      //name属性に埋め込まれているIDを抜き出す
+	  var controlName = $(this)[0].name;
+	  var child_index = 0;
+	  child_index = controlName.slice(52);
+      child_index = child_index.slice(0,-26);
+         
+      var nm = "working_middle_item[working_small_items_attributes][" + child_index + "][working_small_item_name]"
+      if (nm != undefined){
+		   if (document.getElementsByName(nm)[0] != undefined){
+             document.getElementsByName(nm)[0].focus();
+		}
+	  }
+         
+      e.keyCode = 0;  //キーコードをリセットする（しないと次のコントロールまで進んでしまう）
+    });
+    
+	
+
+  });
+  
+  
+  //ENTER→TABキーに変換する処理。
+   $('[tabindex]').keydown(function (e) {
+      
+	//すでに登録済みのものは、このファンクションに遷移してくる。
+	  var this_id =  this.id.slice(0, -1) ;
+	  var next_id = "";
+	  
+	  //if (this_id == 'quantity'){
+	  if (this_id == 'modal_quantity'){
+	    next_id = "modal_unit_price";
+	  }
+	  if (this_id == 'modal_unit_price'){
+	    next_id = "material_price";
+	  }
+	  
+	  
+	  //親フォーム側のイベントに飛ぶ。
+	  focusNext(this, event, this_id, next_id);
+    });
+  
+  
+  
+  
+  
+</script>

@@ -1,0 +1,2 @@
+module MonthlyProfitsHelper
+end

@@ -1,0 +1,9 @@
+<%= simple_form_for @daily_loan_header, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :occurred_on %>
+  <%= f.input :lend %>
+  <%= f.input :borrow %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                daily_loan_headers_path, :class => 'btn btn-default' %>
+<% end %>

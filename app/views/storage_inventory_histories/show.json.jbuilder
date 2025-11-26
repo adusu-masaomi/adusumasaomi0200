@@ -1,0 +1,1 @@
+json.partial! "storage_inventory_histories/storage_inventory_history", storage_inventory_history: @storage_inventory_history

@@ -1,0 +1,92 @@
+<%- model_class = MonthlyProfit -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @monthly_profits %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q, url: monthly_profits_path , :html => {:style=> 'width:1920px' } do |f| %>
+    <%= f.text_field :occurred_on_gteq, class:"input-append date datepicker", include_blank: true ,  id: 'occurred_on_from' , style: 'width:100px'  %>
+    <%= f.text_field :occurred_on_lteq, class:"input-append date datepicker", include_blank: true ,  id: 'occurred_on_to' , style: 'width:100px'  %>
+    <!--
+    <%= f.button_tag "印刷する", :type => 'link', name: "setPrint", :value => 'true', 
+               :onclick => "return submitAfterValidation()" , :class => 'btn btn-green100_rsd keep-disp' %>-->
+    <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+    <%= link_to "荒利集計PDF",
+            monthly_profits_path(print_type: "1", format: "pdf"),
+            :class => 'btn btn-green500_ftg keep-disp' , :target=>["_blank"] %>
+            
+    <%= f.text_field :occurred_on, class:"input-append date datepicker", include_blank: true ,  id: 'occurred_on_input' , style: 'width:100px'  %>
+    <%= f.button_tag "データ作成", :type => 'link', name: "setCalculate", :value => 'true', 
+               :onclick => "return submitAfterValidation()" , :class => 'btn btn-blue100_rsd keep-disp' %>
+  <% end %>
+  
+  
+</div>
+
+  
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:occurred_on) %></th>
+      <th><%= model_class.human_attribute_name(:sales) %></th>
+      <th><%= model_class.human_attribute_name(:variable_cost) %></th>
+      <th><%= model_class.human_attribute_name(:gross_profit) %></th>
+      <th><%= model_class.human_attribute_name(:expense) %></th>
+      <th><%= model_class.human_attribute_name(:repayment) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @monthly_profits.order("id desc").each do |monthly_profit| %>
+      <tr>
+        <td><%= link_to monthly_profit.id, monthly_profit_path(monthly_profit) %></td>
+        <td><%= monthly_profit.occurred_on %></td>
+        <td><%= monthly_profit.sales %></td>
+        <td><%= monthly_profit.variable_cost %></td>
+        <td><%= monthly_profit.gross_profit %></td>
+        <td><%= monthly_profit.expense %></td>
+        <td><%= monthly_profit.repayment %></td>
+        <td><%=l monthly_profit.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_monthly_profit_path(monthly_profit), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      monthly_profit_path(monthly_profit),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+  <!-- kaminari追加箇所開始 -->
+  <%= paginate @monthly_profits %>
+  <!-- kaminari追加箇所終了 -->
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @monthly_profits %>
+<!-- kaminari追加箇所終了 -->
+
+<%= link_to t('.new', :default => t("helpers.links.new")),
+            new_monthly_profit_path,
+            :class => 'btn btn-primary' %>
+            
+<script type="text/javascript">
+  
+  //集計処理
+  function submitAfterValidation(){
+    if (window.confirm('集計処理を行いますか？(データが一旦消去されます)')) {
+      //document.forms[0].submit();
+      return true;
+    }else{
+      return false;
+    };
+    
+  }
+  
+</script>

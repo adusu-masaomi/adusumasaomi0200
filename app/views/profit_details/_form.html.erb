@@ -1,0 +1,10 @@
+<%= simple_form_for @profit_detail, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :occurred_on %>
+  <%= f.input :cost_id %>
+  <%= f.input :table_type_id %>
+  <%= f.input :table_id %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                profit_details_path, :class => 'btn btn-default' %>
+<% end %>

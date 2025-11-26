@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  occur_year_month: MyString
+  lend: 1
+  borrow: 1
+  is_actual: 1
+
+two:
+  occur_year_month: MyString
+  lend: 1
+  borrow: 1
+  is_actual: 1

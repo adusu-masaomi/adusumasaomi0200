@@ -1,0 +1,71 @@
+<%- model_class = Deposit -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @deposits %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+    <%= f.label :deposit_due_date, '入金予定日' %>
+    <%= f.text_field :deposit_due_date_eq, :value=> (f.object.deposit_due_date.strftime("%Y/%m/%d") if f.object.deposit_due_date), 
+      class:"input-append date datepicker", include_blank: true , size: "12", id: 'deposit_due_date'   %>
+  
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_deposit_path,
+            :class => 'btn btn-primary' %>
+    </div>
+  <% end %>
+  
+</div>
+
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:table_type_id) %></th>
+      <th><%= model_class.human_attribute_name(:table_id) %></th>
+      <th><%= model_class.human_attribute_name(:deposit_due_date) %></th>
+      <th><%= model_class.human_attribute_name(:name) %></th>
+      <th><%= model_class.human_attribute_name(:deposit_amount) %></th>
+      <th><%= model_class.human_attribute_name(:deposit_source_id) %></th>
+      <th><%= model_class.human_attribute_name(:completed_flag) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @deposits.each do |deposit| %>
+      <tr>
+        <td><%= link_to deposit.id, deposit_path(deposit) %></td>
+        <td><%= deposit.table_type_id %></td>
+        <td><%= deposit.table_id %></td>
+        <td><%= deposit.deposit_due_date %></td>
+        <td><%= deposit.name %></td>
+        <td><%= deposit.deposit_amount %></td>
+        <td><%= deposit.deposit_source_id %></td>
+        <td><%= deposit.completed_flag %></td>
+        <td><%=l deposit.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_deposit_path(deposit), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      deposit_path(deposit),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  <!-- kaminari追加箇所開始 -->
+  <%= paginate @deposits %>
+  <!-- kaminari追加箇所終了 -->
+  </tbody>
+</table>
+
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @deposits %>
+<!-- kaminari追加箇所終了 -->

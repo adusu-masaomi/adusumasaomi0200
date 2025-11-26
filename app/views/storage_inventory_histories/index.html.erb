@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Listing Storage Inventory Histories</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Occurred date</th>
+      <th>Slip code</th>
+      <th>Purchase order datum</th>
+      <th>Construction datum</th>
+      <th>Material master</th>
+      <th>Quantity</th>
+      <th>Unit price</th>
+      <th>Amount</th>
+      <th>Supplier master</th>
+      <th>Invenrtory division</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @storage_inventory_histories.each do |storage_inventory_history| %>
+      <tr>
+        <td><%= storage_inventory_history.occurred_date %></td>
+        <td><%= storage_inventory_history.slip_code %></td>
+        <td><%= storage_inventory_history.purchase_order_datum_id %></td>
+        <td><%= storage_inventory_history.construction_datum_id %></td>
+        <td><%= storage_inventory_history.material_master_id %></td>
+        <td><%= storage_inventory_history.quantity %></td>
+        <td><%= storage_inventory_history.unit_price %></td>
+        <td><%= storage_inventory_history.amount %></td>
+        <td><%= storage_inventory_history.supplier_master_id %></td>
+        <td><%= storage_inventory_history.invenrtory_division_id %></td>
+        <td><%= link_to 'Show', storage_inventory_history %></td>
+        <td><%= link_to 'Edit', edit_storage_inventory_history_path(storage_inventory_history) %></td>
+        <td><%= link_to 'Destroy', storage_inventory_history, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Storage inventory history', new_storage_inventory_history_path %>

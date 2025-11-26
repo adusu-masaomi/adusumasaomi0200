@@ -1,0 +1,17 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  table_id: 1
+  payment_id: 1
+  payment_method_id: 1
+  payment_on: 2023-02-15
+  payment_amount: 1
+  is_completed: 1
+
+two:
+  table_id: 1
+  payment_id: 1
+  payment_method_id: 1
+  payment_on: 2023-02-15
+  payment_amount: 1
+  is_completed: 1

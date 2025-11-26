@@ -1,0 +1,12 @@
+<%= simple_form_for @monthly_profit, :html => { :class => 'well form-horizontal' } do |f| %>
+  <%= f.input :occurred_on %>
+  <%= f.input :sales %>
+  <%= f.input :variable_cost %>
+  <%= f.input :gross_profit %>
+  <%= f.input :expense %>
+  <%= f.input :repayment %>
+  
+  <%= f.button :submit, :class => 'btn-primary' %>
+  <%= link_to t('.cancel', :default => t("helpers.links.cancel")),
+                monthly_profits_path, :class => 'btn btn-default' %>
+<% end %>

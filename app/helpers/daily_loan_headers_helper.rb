@@ -1,0 +1,2 @@
+module DailyLoanHeadersHelper
+end

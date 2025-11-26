@@ -1,0 +1,25 @@
+<%- model_class = MonthlyProfit -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.titleize %></h1>
+</div>
+
+<dl class="dl-horizontal">
+  <dt><strong><%= model_class.human_attribute_name(:occurred_on) %>:</strong></dt>
+  <dd><%= @monthly_profit.occurred_on %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:gross_profit) %>:</strong></dt>
+  <dd><%= @monthly_profit.gross_profit %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:expense) %>:</strong></dt>
+  <dd><%= @monthly_profit.expense %></dd>
+  <dt><strong><%= model_class.human_attribute_name(:repayment) %>:</strong></dt>
+  <dd><%= @monthly_profit.repayment %></dd>
+</dl>
+
+<%= link_to t('.back', :default => t("helpers.links.back")),
+              monthly_profits_path, :class => 'btn btn-default'  %>
+<%= link_to t('.edit', :default => t("helpers.links.edit")),
+              edit_monthly_profit_path(@monthly_profit), :class => 'btn btn-default' %>
+<%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+              monthly_profit_path(@monthly_profit),
+              :method => 'delete',
+              :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+              :class => 'btn btn-danger' %>

@@ -1,0 +1,20 @@
+<%= simple_form_for(@storage_inventory_history) do |f| %>
+  <%= f.error_notification %>
+
+  <div class="form-inputs">
+    <%= f.input :occurred_date %>
+    <%= f.input :slip_code %>
+    <%= f.input :purchase_order_datum_id %>
+    <%= f.input :construction_datum_id %>
+    <%= f.input :material_master_id %>
+    <%= f.input :quantity %>
+    <%= f.input :unit_price %>
+    <%= f.input :amount %>
+    <%= f.input :supplier_master_id %>
+    <%= f.input :invenrtory_division_id %>
+  </div>
+
+  <div class="form-actions">
+    <%= f.button :submit %>
+  </div>
+<% end %>

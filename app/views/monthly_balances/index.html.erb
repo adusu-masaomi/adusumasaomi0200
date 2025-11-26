@@ -1,0 +1,75 @@
+<%- model_class = MonthlyBalance -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @monthly_balances %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+    <%= f.label :year_month, '発生日' %>
+    <%= f.text_field :occur_year_month_eq, :value=> (f.object.occur_year_month.strftime("%Y/%m") if f.object.occur_year_month), 
+      data: { date_format: 'YYYY/MM'}, class:"input-append date datepicker", include_blank: true , size: "12", id: 'occur_year_month'   %>
+     
+  
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_monthly_balance_path,
+            :class => 'btn btn-primary' %>  </div>
+  <% end %>
+  
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:occur_year_month) %></th>
+      <th><%= model_class.human_attribute_name(:balance_daishi_hokuetsu) %></th>
+      <th><%= model_class.human_attribute_name(:balance_sanshin) %></th>
+      <th><%= model_class.human_attribute_name(:balance_cash) %></th>
+      <th><%= model_class.human_attribute_name(:is_actual) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @monthly_balances.each do |monthly_balance| %>
+      <tr>
+        <td><%= link_to monthly_balance.id, monthly_balance_path(monthly_balance) %></td>
+        <td><%= monthly_balance.occur_year_month %></td>
+        <td><%= monthly_balance.balance_daishi_hokuetsu %></td>
+        <td><%= monthly_balance.balance_sanshin %></td>
+        <td><%= monthly_balance.balance_cash %></td>
+        <td><%= monthly_balance.is_actual %></td>
+        <td><%=l monthly_balance.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_monthly_balance_path(monthly_balance), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      monthly_balance_path(monthly_balance),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+    <!-- kaminari追加箇所開始 -->
+    <%= paginate @monthly_balances %>
+    <!-- kaminari追加箇所終了 -->
+  </tbody>
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @monthly_balances %>
+<!-- kaminari追加箇所終了 -->
+    
+<script type="text/javascript">
+            
+//$("#year_month").datepicker( {
+//    format: "mm-yyyy",
+//    startView: "months", 
+//    minViewMode: "months"
+//});
+
+</script>

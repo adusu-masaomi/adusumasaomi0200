@@ -1,0 +1,77 @@
+<%- model_class = Expence -%>
+<div class="page-header">
+  <h1><%=t '.title', :default => model_class.model_name.human.pluralize.titleize %></h1>
+  
+  <!-- kaminari用追加箇所開始 -->
+  <%= page_entries_info @expences %>
+  <!-- kaminari用追加箇所終了 -->
+  
+  <%= search_form_for @q do |f| %>
+    <%= f.label :payment_on, '出金予定日' %>
+    <%= f.text_field :payment_on_eq, :value=> (f.object.payment_on.strftime("%Y/%m/%d") if f.object.payment_on), 
+      class:"input-append date datepicker", include_blank: true , size: "12", id: 'payment_on'   %>
+  
+    <div>
+        <%= f.submit '検索(集計)', :class => 'btn btn-teal50_rsd' %>
+        <%= link_to t('.new', :default => t("helpers.links.new")),
+            new_expence_path,
+            :class => 'btn btn-primary' %>  </div>
+  <% end %>
+  
+</div>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th><%= model_class.human_attribute_name(:id) %></th>
+      <th><%= model_class.human_attribute_name(:table_type_id) %></th>
+      <th><%= model_class.human_attribute_name(:table_id) %></th>
+      <th><%= model_class.human_attribute_name(:payment_method_id) %></th>
+      <th><%= model_class.human_attribute_name(:payment_on) %></th>
+      <th><%= model_class.human_attribute_name(:unpaid_on) %></th>
+      <!--<th><%= model_class.human_attribute_name(:name) %></th>-->
+      <th><%= model_class.human_attribute_name(:payment_amount) %></th>
+      <th><%= model_class.human_attribute_name(:billing_year_month) %></th>
+      <th><%= model_class.human_attribute_name(:payment_source_id) %></th>
+      <th><%= model_class.human_attribute_name(:is_estimate) %></th>
+      <th><%= model_class.human_attribute_name(:is_completed) %></th>
+      <th><%= model_class.human_attribute_name(:created_at) %></th>
+      <th><%=t '.actions', :default => t("helpers.actions") %></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @expences.each do |expence| %>
+      <tr>
+        <td><%= link_to expence.id, expence_path(expence) %></td>
+        <td><%= expence.table_type_id %></td>
+        <td><%= expence.table_id %></td>
+        <td><%= expence.payment_method_id %></td>
+        <td><%= expence.payment_on %></td>
+        <td><%= expence.unpaid_on %></td>
+        <!--<td><%= expence.name %></td>-->
+        <td><%= expence.payment_amount %></td>
+        <td><%= expence.billing_year_month %></td>
+        <td><%= expence.payment_source_id %></td>
+        <td><%= expence.is_estimate %></td>
+        <td><%= expence.is_completed %></td>
+        <td><%=l expence.created_at %></td>
+        <td>
+          <%= link_to t('.edit', :default => t("helpers.links.edit")),
+                      edit_expence_path(expence), :class => 'btn btn-default btn-xs' %>
+          <%= link_to t('.destroy', :default => t("helpers.links.destroy")),
+                      expence_path(expence),
+                      :method => :delete,
+                      :data => { :confirm => t('.confirm', :default => t("helpers.links.confirm", :default => 'Are you sure?')) },
+                      :class => 'btn btn-xs btn-danger' %>
+        </td>
+      </tr>
+    <% end %>
+  <!-- kaminari追加箇所開始 -->
+  <%= paginate @expences %>
+  <!-- kaminari追加箇所終了 -->
+  </tbody>
+</table>
+
+<!-- kaminari追加箇所開始 -->
+<%= paginate @expences %>
+<!-- kaminari追加箇所終了 -->
+

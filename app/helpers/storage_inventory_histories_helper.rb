@@ -1,0 +1,2 @@
+module StorageInventoryHistoriesHelper
+end
